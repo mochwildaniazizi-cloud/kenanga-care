@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import styles from "./Sidebar.module.css";
 
 // Simulating Lucide Icons for now using simple SVGs to avoid dependency issues early on
@@ -172,6 +172,7 @@ const MonitorIcon = () => (
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [shortcutLabel, setShortcutLabel] = useState("K ⌘");
@@ -450,8 +451,8 @@ export default function Sidebar() {
               <button 
                 className={styles.modal_btn_confirm}
                 onClick={() => {
-                  // Perform logout logic here
                   setIsLogoutModalOpen(false);
+                  router.push("/login");
                 }}
               >
                 Keluar

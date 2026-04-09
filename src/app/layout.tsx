@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
 };
 
+import MainLayout from "@/components/MainLayout";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,10 +29,9 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <Sidebar />
-        <main style={{ flex: 1, overflowY: "auto", position: "relative" }}>
+        <MainLayout>
           {children}
-        </main>
+        </MainLayout>
       </body>
     </html>
   );
