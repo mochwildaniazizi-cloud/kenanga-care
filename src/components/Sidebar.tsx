@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import styles from "./Sidebar.module.css";
+import { useCurrentUser } from "@/lib/userStore";
 
 // Simulating Lucide Icons for now using simple SVGs to avoid dependency issues early on
 // We will replace these with real Lucide icons if requested later.
@@ -187,6 +188,8 @@ export default function Sidebar() {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [activeAccount, setActiveAccount] = useState<'ibu' | 'anak'>('ibu');
 
+  const { user, switchUser } = useCurrentUser();
+
   // Close flyout when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -263,8 +266,8 @@ export default function Sidebar() {
           </li>
           <li>
             <Link 
-              href="/ibu/kehamilan" 
-              className={`${styles.nav_link} ${pathname.startsWith('/ibu/kehamilan') ? styles.nav_link_active : ''}`}
+              href="/ibu/kesehatan-ibu" 
+              className={`${styles.nav_link} ${pathname.startsWith('/ibu/kesehatan-ibu') ? styles.nav_link_active : ''}`}
               data-tooltip="Kesehatan Ibu"
             >
               <WomanIcon /> <span className={styles.link_text}>Kesehatan Ibu</span>
@@ -300,11 +303,11 @@ export default function Sidebar() {
           >
             <div className={styles.profile_avatar_group}>
               <div className={styles.profile_avatar}>
-                <img src="https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=150&h=150&fit=crop" alt="Foto Profil" className={styles.avatar_img} />
+                <img src={user.role === 'kader' ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop" : "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=150&h=150&fit=crop"} alt="Foto Profil" className={styles.avatar_img} />
               </div>
               <div className={styles.profile_info}>
-                <span className={styles.profile_name}>Ibu Kenanga</span>
-                <span className={styles.profile_role}>3271234567890001</span>
+                <span className={styles.profile_name}>{user.nama}</span>
+                <span className={styles.profile_role}>{user.nik}</span>
               </div>
             </div>
             {!isCollapsed && (
@@ -321,11 +324,11 @@ export default function Sidebar() {
               <div className={styles.account_item_active}>
                 <div className={styles.profile_avatar_group}>
                   <div className={styles.profile_avatar_small}>
-                    <img src="https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=150&h=150&fit=crop" alt="Foto Profil" />
+                    <img src={user.role === 'kader' ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop" : "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=150&h=150&fit=crop"} alt="Foto Profil" />
                   </div>
                   <div className={styles.profile_info}>
-                    <span className={styles.profile_name_small}>Ibu Kenanga</span>
-                    <span className={styles.profile_role_small}>Ibu Utama</span>
+                    <span className={styles.profile_name_small}>{user.nama}</span>
+                    <span className={styles.profile_role_small}>{user.role === 'kader' ? 'Kader Posyandu' : 'Ibu Balita'}</span>
                   </div>
                 </div>
                 <div className={styles.check_icon_box}>
@@ -371,6 +374,33 @@ export default function Sidebar() {
                 <Link href="/help" className={styles.flyout_row_item} onClick={() => setIsProfileOpen(false)}>
                   <HelpIcon /> <span>Pusat Bantuan / FAQ</span>
                 </Link>
+                
+                {/* User Switcher for Demo */}
+                <div style={{ padding: '10px 14px', marginTop: '4px' }}>
+                  <p style={{ fontSize: '11px', fontWeight: '800', color: '#ea2986', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                    Ganti Peran (Demo Mode)
+                  </p>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => switchUser(0)}
+                      style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '700', border: '1px solid #e2e8f0', background: user.nama === 'Siti Nurhaliza' ? '#ea2986' : 'white', color: user.nama === 'Siti Nurhaliza' ? 'white' : '#64748b', cursor: 'pointer' }}
+                    >
+                      Bunda Siti
+                    </button>
+                    <button 
+                      onClick={() => switchUser(1)}
+                      style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '700', border: '1px solid #e2e8f0', background: user.nama === 'Dewi Lestari' ? '#ea2986' : 'white', color: user.nama === 'Dewi Lestari' ? 'white' : '#64748b', cursor: 'pointer' }}
+                    >
+                      Bunda Dewi
+                    </button>
+                    <button 
+                      onClick={() => switchUser(2)}
+                      style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: '700', border: '1px solid #e2e8f0', background: user.nama === 'Fitri Handayani' ? '#ea2986' : 'white', color: user.nama === 'Fitri Handayani' ? 'white' : '#64748b', cursor: 'pointer' }}
+                    >
+                      Kader Fitri
+                    </button>
+                  </div>
+                </div>
                 <div className={styles.lang_section_wrapper}>
                   <div 
                     className={styles.flyout_row_item} 

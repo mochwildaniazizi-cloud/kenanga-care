@@ -23,6 +23,7 @@ export interface UserPersona {
   isPregnant: boolean;
   hpht?: string;
   hpl?: string;
+  ttdDiminum?: number;
   catatanMedis?: string;
   children?: ChildData[];
   wilayahTugas?: string;
@@ -78,6 +79,7 @@ export const dummyUsers: UserPersona[] = [
     isPregnant: true,
     hpht: "2025-07-10",
     hpl: "2026-04-17",
+    ttdDiminum: 55,
     catatanMedis: "Anemia Ringan (Hb terakhir 9.8 g/dL). Perlu pantauan minum TTD 90 tablet.",
     children: [
       {

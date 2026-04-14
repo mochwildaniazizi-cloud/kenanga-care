@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import styles from "./Auth.module.css";
 
 import { dummyUsers, UserPersona } from "@/lib/dummyData";
+import { setActiveUserIndex } from "@/lib/userStore";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,10 +49,21 @@ export default function LoginPage() {
     setTimeout(() => {
       setIsLoading(false);
       if (enteredPin === verifiedUser?.pin) {
+        // Find the index of the verified user to persist the session
+        const userIndex = dummyUsers.findIndex(u => u.nik === verifiedUser.nik);
+        if (userIndex !== -1) {
+          setActiveUserIndex(userIndex);
+        }
+
         // Successful login - Show transition loader
         setIsRedirecting(true);
         setTimeout(() => {
-          router.push("/ibu"); 
+          // Redirect based on role
+          if (verifiedUser.role === 'kader') {
+            router.push("/ibu"); // Or a specific kader dashboard if it exists
+          } else {
+            router.push("/ibu"); 
+          }
         }, 1500);
       } else {
         setError("PIN yang Anda masukkan salah. Silakan coba lagi.");
