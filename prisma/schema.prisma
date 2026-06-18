@@ -1,0 +1,116 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Mother {
+  mother_id            String                 @id @default(uuid())
+  national_id          String                 @unique
+  mother_name          String
+  birth_date           DateTime?
+  age                  Int?
+  husband_name         String?
+  phone_number         String?
+  blood_type           String?
+  estimated_due_date   DateTime?
+  risk_status          String?
+  number_of_children   Int?                   @default(0)
+  ui_status            String?
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  children             Child[]
+  maternal_records     MaternalHealthRecord[]
+
+  @@map("mothers")
+}
+
+model Child {
+  child_id       String             @id @default(uuid())
+  mother_id      String
+  national_id    String?            @unique
+  child_name     String
+  birth_order    Int?
+  birth_date     DateTime?
+  gender         String             @db.VarChar(1)
+  birth_weight   Decimal?           @db.Decimal(5, 2)
+  birth_length   Decimal?           @db.Decimal(5, 2)
+  current_weight Decimal?           @db.Decimal(5, 2)
+  current_height Decimal?           @db.Decimal(5, 2)
+  created_at     DateTime           @default(now())
+  updated_at     DateTime           @updatedAt
+  mother         Mother             @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
+  measurements   ChildMeasurement[]
+
+  @@map("children")
+}
+
+model Schedule {
+  schedule_id      String                 @id @default(uuid())
+  schedule_date    DateTime
+  start_time       String?
+  end_time         String?
+  service_focus    String?
+  status           String                 @default("Active")
+  created_at       DateTime               @default(now())
+  measurements     ChildMeasurement[]
+  maternal_records MaternalHealthRecord[]
+  logs             ScheduleLog[]
+
+  @@map("schedules")
+}
+
+model ScheduleLog {
+  log_id           String   @id @default(uuid())
+  schedule_id      String
+  change_timestamp DateTime @default(now())
+  changed_by       String
+  change_details   String   @db.Text
+  schedule         Schedule @relation(fields: [schedule_id], references: [schedule_id], onDelete: Cascade)
+
+  @@map("schedule_logs")
+}
+
+model ChildMeasurement {
+  measurement_id        String    @id @default(uuid())
+  child_id              String
+  schedule_id           String?
+  visit_date            DateTime
+  weight                Decimal?  @db.Decimal(5, 2)
+  height                Decimal?  @db.Decimal(5, 2)
+  measurement_method    String?
+  head_circumference    Decimal?  @db.Decimal(4, 2)
+  vitamin_a_capsule     String?
+  deworming_pill        Boolean   @default(false)
+  immunizations         String?
+  supplementary_feeding Boolean   @default(false)
+  cadre_notes           String?   @db.Text
+  is_synced             Boolean   @default(false)
+  created_at            DateTime  @default(now())
+  child                 Child     @relation(fields: [child_id], references: [child_id], onDelete: Cascade)
+  schedule              Schedule? @relation(fields: [schedule_id], references: [schedule_id], onDelete: SetNull)
+
+  @@map("child_measurements")
+}
+
+model MaternalHealthRecord {
+  record_id          String    @id @default(uuid())
+  mother_id          String
+  schedule_id        String?
+  visit_date         DateTime
+  weight             Decimal?  @db.Decimal(5, 2)
+  blood_pressure     String?
+  muac               Decimal?  @db.Decimal(4, 2)
+  fundal_height      Decimal?  @db.Decimal(4, 2)
+  fetal_heart_rate   Int?
+  iron_pills_given   Int?      @default(0)
+  cadre_notes        String?   @db.Text
+  is_synced          Boolean   @default(false)
+  created_at         DateTime  @default(now())
+  mother             Mother    @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
+  schedule           Schedule? @relation(fields: [schedule_id], references: [schedule_id], onDelete: SetNull)
+
+  @@map("maternal_health_records")
+}
