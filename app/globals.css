@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 1. Brand */
+  --brand-primary: #EA2986;
+  --brand-soft: #FCE8F0;
+
+  /* 2. Base */
+  --base-text-primary: #1E1E1E;
+  --base-text-secondary: #6B7280;
+  --base-border: #BBBBBB;
+  --base-bg: #F8F6F7;
+  --base-white: #FFFFFF;
+
+  /* Custom component backing colors */
+  --card-bg: #FFFFFF;
+  --surface-bg: #F8F6F7;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* 1. Brand */
+  --brand-primary: #F472B6;
+  --brand-soft: #301925;
+
+  /* 2. Base */
+  --base-text-primary: #F3F4F6;
+  --base-text-secondary: #9CA3AF;
+  --base-border: #374151;
+  --base-bg: #090B10;
+  --base-white: #15171E;
+
+  /* Custom component backing colors */
+  --card-bg: #15171E;
+  --surface-bg: #090B10;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* 1. Brand */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-soft: var(--brand-soft);
+
+  /* 2. Base */
+  --color-base-text-primary: var(--base-text-primary);
+  --color-base-text-secondary: var(--base-text-secondary);
+  --color-base-border: var(--base-border);
+  --color-base-bg: var(--base-bg);
+  --color-base-white: var(--base-white);
+
+  /* Custom components mapping */
+  --color-card: var(--card-bg);
+  --color-surface: var(--surface-bg);
+
+  /* 3. Status */
+  --color-status-red-solid: #D92D20;
+  --color-status-orange-solid: #E87034;
+  --color-status-yellow-solid: #EBC115;
+  --color-status-green-solid: #1E9D5D;
+  --color-status-green-light: #E6F8ED;
+  --color-status-blue-solid: #4A85F6;
+  --color-status-blue-light: #ECF2FE;
+  --color-status-cerulean-solid: #026AA2;
+  --color-status-cerulean-light: #E0F2FE;
+  --color-status-purple-solid: #7A5AF8;
+  --color-status-pink-dark: #C60C66;
+
+  /* 4. Gender */
+  --color-gender-male-solid: #4A85F6;
+  --color-gender-male-bg: #ECF2FE;
+  --color-gender-female-solid: #E62E7B;
+  --color-gender-female-bg: #FCE8F0;
+
+  /* Radius */
+  --radius-bento-sm: 1rem;
+  --radius-bento-md: 1.5rem;
+  --radius-bento-lg: 2rem;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-base-bg);
+    color: var(--color-base-text-primary);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

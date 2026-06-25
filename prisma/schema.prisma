@@ -3,7 +3,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 model Mother {
@@ -28,21 +29,25 @@ model Mother {
 }
 
 model Child {
-  child_id       String             @id @default(uuid())
-  mother_id      String
-  national_id    String?            @unique
-  child_name     String
-  birth_order    Int?
-  birth_date     DateTime?
-  gender         String             @db.VarChar(1)
-  birth_weight   Decimal?           @db.Decimal(5, 2)
-  birth_length   Decimal?           @db.Decimal(5, 2)
-  current_weight Decimal?           @db.Decimal(5, 2)
-  current_height Decimal?           @db.Decimal(5, 2)
-  created_at     DateTime           @default(now())
-  updated_at     DateTime           @updatedAt
-  mother         Mother             @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
-  measurements   ChildMeasurement[]
+  child_id                 String             @id @default(uuid())
+  mother_id                String
+  national_id              String?            @unique
+  child_name               String
+  birth_order              Int?
+  birth_place              String?
+  birth_date               DateTime?
+  gender                   String             @db.VarChar(1)
+  birth_weight             Decimal?           @db.Decimal(5, 2)
+  birth_length             Decimal?           @db.Decimal(5, 2)
+  current_weight           Decimal?           @db.Decimal(5, 2)
+  current_height           Decimal?           @db.Decimal(5, 2)
+  blood_type               String?
+  special_conditions       String?            @default("[]")
+  special_conditions_notes String?
+  created_at               DateTime           @default(now())
+  updated_at               DateTime           @updatedAt
+  mother                   Mother             @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
+  measurements             ChildMeasurement[]
 
   @@map("children")
 }
