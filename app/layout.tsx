@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import { UserRoleProvider } from "@/context/UserRoleContext";
+import SWRegister from "@/components/SWRegister";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${inter.className} bg-surface flex h-screen overflow-hidden text-gray-950`}>
         <UserRoleProvider>
+          <SWRegister />
 
           {/* SIDEBAR COMPONENT */}
           <Sidebar />
