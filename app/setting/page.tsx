@@ -387,85 +387,92 @@ function SettingsContent() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="space-y-6">
         
-        {/* Left Side: Bento Menu Tabs */}
-        <div className="lg:col-span-4 bg-card p-6 rounded-bento-md shadow-sm border border-base-border/20 space-y-2">
-          <div className="pb-4 border-b border-base-border/20 mb-4 flex items-center gap-4">
-            <div className="w-12 h-12 bg-brand-soft rounded-full flex items-center justify-center font-bold text-brand-primary border border-brand-primary/20 text-lg">
+        {/* Top Side: Horizontal Bento Menu Tabs */}
+        <div className="bg-card p-4 rounded-bento-md shadow-sm border border-base-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 shrink-0 pb-3 md:pb-0 border-b md:border-b-0 md:border-r border-base-border/20 pr-4">
+            <div className="w-10 h-10 bg-brand-soft rounded-full flex items-center justify-center font-bold text-brand-primary border border-brand-primary/20 text-sm shrink-0">
               {getInitials(formData.name)}
             </div>
             <div>
-              <h2 className="font-bold text-base-text-primary leading-tight text-base">{formData.name}</h2>
-              <p className="text-xs text-base-text-secondary mt-0.5">{formData.role} • {formData.posyandu}</p>
+              <h2 className="font-bold text-base-text-primary leading-tight text-sm">{formData.name}</h2>
+              <p className="text-[10px] text-base-text-secondary mt-0.5">{formData.role} • {formData.posyandu}</p>
             </div>
           </div>
 
-          <button
-            onClick={() => { setActiveTab("profile"); router.push("/setting"); }}
-            className={`flex items-center gap-3.5 w-full p-3.5 rounded-xl text-left transition duration-150 cursor-pointer ${
-              activeTab === "profile" 
-                ? "bg-brand-primary text-base-white font-semibold shadow-md"
-                : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary font-medium"
-            }`}
-          >
-            <UserIcon className="w-5 h-5" />
-            <span>Profil Saya</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("account"); router.push("/setting?tab=account"); }}
-            className={`flex items-center gap-3.5 w-full p-3.5 rounded-xl text-left transition duration-150 cursor-pointer ${
-              activeTab === "account" 
-                ? "bg-brand-primary text-base-white font-semibold shadow-md"
-                : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary font-medium"
-            }`}
-          >
-            <Cog6ToothIcon className="w-5 h-5" />
-            <span>Pengaturan Akun</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("help"); router.push("/setting?tab=help"); }}
-            className={`flex items-center gap-3.5 w-full p-3.5 rounded-xl text-left transition duration-150 cursor-pointer ${
-              activeTab === "help" 
-                ? "bg-brand-primary text-base-white font-semibold shadow-md"
-                : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary font-medium"
-            }`}
-          >
-            <QuestionMarkCircleIcon className="w-5 h-5" />
-            <span>Pusat Bantuan</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab("about"); router.push("/setting?tab=about"); }}
-            className={`flex items-center gap-3.5 w-full p-3.5 rounded-xl text-left transition duration-150 cursor-pointer ${
-              activeTab === "about" 
-                ? "bg-brand-primary text-base-white font-semibold shadow-md"
-                : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary font-medium"
-            }`}
-          >
-            <InformationCircleIcon className="w-5 h-5" />
-            <span>Tentang Aplikasi</span>
-          </button>
-
-          {role === "kader" && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-thin scrollbar-thumb-base-border/50 scrollbar-track-transparent pr-2 w-full">
+            {/* 1. Profil Saya */}
             <button
-              onClick={() => { setActiveTab("users"); router.push("/setting?tab=users"); }}
-              className={`flex items-center gap-3.5 w-full p-3.5 rounded-xl text-left transition duration-150 cursor-pointer ${
-                activeTab === "users" 
+              onClick={() => { setActiveTab("profile"); router.push("/setting"); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition duration-150 cursor-pointer shrink-0 text-xs font-bold ${
+                activeTab === "profile" 
                   ? "bg-brand-primary text-base-white font-semibold shadow-md"
-                  : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary font-medium"
+                  : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary"
               }`}
             >
-              <UsersIcon className="w-5 h-5" />
-              <span>Kelola Pengguna</span>
+              <UserIcon className="w-4 h-4" />
+              <span>Profil Saya</span>
             </button>
-          )}
+
+            {/* 2. Kelola Pengguna (Placed after Profil Saya) */}
+            {role === "kader" && (
+              <button
+                onClick={() => { setActiveTab("users"); router.push("/setting?tab=users"); }}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition duration-150 cursor-pointer shrink-0 text-xs font-bold ${
+                  activeTab === "users" 
+                    ? "bg-brand-primary text-base-white font-semibold shadow-md"
+                    : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary"
+                }`}
+              >
+                <UsersIcon className="w-4 h-4" />
+                <span>Kelola Pengguna</span>
+              </button>
+            )}
+
+            {/* 3. Pengaturan Akun */}
+            <button
+              onClick={() => { setActiveTab("account"); router.push("/setting?tab=account"); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition duration-150 cursor-pointer shrink-0 text-xs font-bold ${
+                activeTab === "account" 
+                  ? "bg-brand-primary text-base-white font-semibold shadow-md"
+                  : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary"
+              }`}
+            >
+              <Cog6ToothIcon className="w-4 h-4" />
+              <span>Pengaturan Akun</span>
+            </button>
+
+            {/* 4. Pusat Bantuan */}
+            <button
+              onClick={() => { setActiveTab("help"); router.push("/setting?tab=help"); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition duration-150 cursor-pointer shrink-0 text-xs font-bold ${
+                activeTab === "help" 
+                  ? "bg-brand-primary text-base-white font-semibold shadow-md"
+                  : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary"
+              }`}
+            >
+              <QuestionMarkCircleIcon className="w-4 h-4" />
+              <span>Pusat Bantuan</span>
+            </button>
+
+            {/* 5. Tentang Aplikasi */}
+            <button
+              onClick={() => { setActiveTab("about"); router.push("/setting?tab=about"); }}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-left transition duration-150 cursor-pointer shrink-0 text-xs font-bold ${
+                activeTab === "about" 
+                  ? "bg-brand-primary text-base-white font-semibold shadow-md"
+                  : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary"
+              }`}
+            >
+              <InformationCircleIcon className="w-4 h-4" />
+              <span>Tentang Aplikasi</span>
+            </button>
+          </div>
         </div>
 
         {/* Right Side: Bento Content Area */}
-        <div className="lg:col-span-8 bg-card p-6 md:p-8 rounded-bento-md shadow-sm border border-base-border/20 min-h-[450px]">
+        <div className="bg-card p-6 md:p-8 rounded-bento-md shadow-sm border border-base-border/20 min-h-[450px]">
           
           {/* TAB 1: PROFIL SAYA */}
           {activeTab === "profile" && (
