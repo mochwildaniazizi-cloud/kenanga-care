@@ -10,16 +10,17 @@ export async function getSchedules() {
     
     if (schedules.length === 0) {
       return [
-        { id: "1", date: "Sabtu, 04 Juli 2026", time: "08:00 - 12:00 WIB", focus: "Imunisasi PCV & Penimbangan", status: "Terjadwal" },
-        { id: "2", date: "Sabtu, 08 Agustus 2026", time: "08:00 - 12:00 WIB", focus: "Bulan Kapsul Vitamin A & Obat Cacing", status: "Terjadwal" },
-        { id: "3", date: "Sabtu, 05 September 2026", time: "08:00 - 12:00 WIB", focus: "Cek Tumbuh Kembang & PMT Rutin", status: "Terjadwal" },
-        { id: "4", date: "Sabtu, 03 Oktober 2026", time: "08:00 - 12:00 WIB", focus: "Imunisasi Dasar & Kelas Ibu Hamil", status: "Terjadwal" }
+        { id: "1", date: "Sabtu, 04 Juli 2026", rawDate: "2026-07-04", time: "08:00 - 12:00 WIB", focus: "Imunisasi PCV & Penimbangan", status: "Terjadwal" },
+        { id: "2", date: "Sabtu, 08 Agustus 2026", rawDate: "2026-08-08", time: "08:00 - 12:00 WIB", focus: "Bulan Kapsul Vitamin A & Obat Cacing", status: "Terjadwal" },
+        { id: "3", date: "Sabtu, 05 September 2026", rawDate: "2026-09-05", time: "08:00 - 12:00 WIB", focus: "Cek Tumbuh Kembang & PMT Rutin", status: "Terjadwal" },
+        { id: "4", date: "Sabtu, 03 Oktober 2026", rawDate: "2026-10-03", time: "08:00 - 12:00 WIB", focus: "Imunisasi Dasar & Kelas Ibu Hamil", status: "Terjadwal" }
       ];
     }
     
     return schedules.map((s: any) => ({
       id: s.schedule_id,
       date: s.schedule_date.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }),
+      rawDate: s.schedule_date.toISOString().split("T")[0],
       time: `${s.start_time || '08:00'} - ${s.end_time || '12:00'} WIB`,
       focus: s.service_focus || "-",
       status: s.status

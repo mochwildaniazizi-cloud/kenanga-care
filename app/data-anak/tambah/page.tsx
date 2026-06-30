@@ -3,13 +3,31 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useUserRole } from "@/context/UserRoleContext";
 import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import { MdOutlineMale, MdOutlineFemale, MdOutlineError } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import { searchMothers, createChild } from "@/app/actions/children";
 
 export default function TambahAnakPage() {
+  const { role } = useUserRole();
   const router = useRouter();
+
+  useEffect(() => {
+    if (role === "ibu") {
+      router.replace("/data-anak");
+    }
+  }, [role, router]);
+
+  if (role === "ibu") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-semibold text-base-text-secondary">Mengalihkan...</p>
+      </div>
+    );
+  }
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);

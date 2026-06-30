@@ -2,6 +2,36 @@
 
 import { prisma } from "@/lib/prisma";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
+import fs from "fs";
+
+const AVATAR_FILE_PATH = "c:/Code/kenanga-care/custom_avatars.json";
+
+function getCustomAvatars() {
+  try {
+    if (fs.existsSync(AVATAR_FILE_PATH)) {
+      const content = fs.readFileSync(AVATAR_FILE_PATH, "utf-8");
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.error("Error reading custom avatars:", err);
+  }
+  return { mothers: {}, children: {} };
+}
+
+function saveCustomAvatar(type: "mothers" | "children", id: string, url: string | null) {
+  try {
+    const data = getCustomAvatars();
+    if (!data[type]) data[type] = {};
+    if (url) {
+      data[type][id] = url;
+    } else {
+      delete data[type][id];
+    }
+    fs.writeFileSync(AVATAR_FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Error saving custom avatar:", err);
+  }
+}
 
 // Fungsi pembantu untuk menghitung umur dalam bulan
 function calculateAgeInMonths(birthDate: Date, targetDate: Date = new Date()) {
@@ -24,11 +54,19 @@ export async function getChildrenData() {
     const children = await prisma.child.findMany({
       include: {
         mother: true,
+        measurements: {
+          orderBy: {
+            visit_date: "asc"
+          }
+        }
       },
       orderBy: {
         created_at: "desc",
       },
     });
+
+    const avatars = getCustomAvatars();
+    const customChildrenAvatars = avatars.children || {};
 
     return children.map((child: any, index: number) => {
       const ageInMonths = child.birth_date ? calculateAgeInMonths(child.birth_date) : 0;
@@ -38,21 +76,38 @@ export async function getChildrenData() {
         const zScoreTB = calculateZScore(Number(child.current_height), ageInMonths, child.gender, "TB");
         status = getNutritionalStatus(zScoreBB, zScoreTB);
       }
+
+      const sortedMeasurements = child.measurements || [];
+      let trend: "up" | "down" | "flat" = "flat";
+      if (sortedMeasurements.length >= 2) {
+        const latestWeight = Number(sortedMeasurements[sortedMeasurements.length - 1].weight || 0);
+        const prevWeight = Number(sortedMeasurements[sortedMeasurements.length - 2].weight || 0);
+        if (latestWeight > prevWeight) trend = "up";
+        else if (latestWeight < prevWeight) trend = "down";
+      }
+
       return {
         id: (index + 1).toString().padStart(2, "0"),
         child_id: child.child_id,
         national_id: child.national_id || "-",
         name: child.child_name,
         age: `${ageInMonths} Bulan`,
+        rawAge: ageInMonths,
         gender: child.gender, // 'M' atau 'F'
         birth_place: child.birth_place || "-",
         dob: child.birth_date ? formatDateIndonesian(child.birth_date) : "-",
         mother: child.mother?.mother_name || "-",
         height: child.current_height ? Number(child.current_height) : 0,
         weight: child.current_weight ? Number(child.current_weight) : 0,
-        trend: "flat", // TODO: Kalkulasi dari riwayat
+        trend,
         status,
         dobRaw: child.birth_date ? child.birth_date.toISOString().split("T")[0] : null,
+        avatarUrl: customChildrenAvatars[child.child_id]
+          || (child.child_name.includes("Rafi")
+            ? "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=150&auto=format&fit=crop"
+            : child.child_name.includes("Giselle")
+            ? "https://images.unsplash.com/photo-1607990283143-e81e7a2c93ab?q=80&w=150&auto=format&fit=crop"
+            : null),
       };
     });
   } catch (error) {
@@ -77,6 +132,20 @@ export async function getMeasurementHistory() {
       take: 50, // Batasi jumlah riwayat
     });
 
+    const childIds = Array.from(new Set(measurements.map((m: any) => m.child_id)));
+    const allMeasurementsForChildren = await prisma.childMeasurement.findMany({
+      where: { child_id: { in: childIds } },
+      orderBy: { visit_date: "asc" }
+    });
+
+    const measurementsByChild: Record<string, any[]> = {};
+    allMeasurementsForChildren.forEach((m: any) => {
+      if (!measurementsByChild[m.child_id]) {
+        measurementsByChild[m.child_id] = [];
+      }
+      measurementsByChild[m.child_id].push(m);
+    });
+
     return measurements.map((measurement: any, index: number) => {
       const ageAtVisit = measurement.child?.birth_date 
         ? calculateAgeInMonths(measurement.child.birth_date, measurement.visit_date)
@@ -89,17 +158,34 @@ export async function getMeasurementHistory() {
         status = getNutritionalStatus(zScoreBB, zScoreTB);
       }
 
+      const history = measurementsByChild[measurement.child_id] || [];
+      const currentIdx = history.findIndex((h: any) => h.measurement_id === measurement.measurement_id);
+      let trend: "up" | "down" | "flat" = "flat";
+      if (currentIdx > 0) {
+        const prevWeight = Number(history[currentIdx - 1].weight || 0);
+        const curWeight = Number(measurement.weight || 0);
+        if (curWeight > prevWeight) trend = "up";
+        else if (curWeight < prevWeight) trend = "down";
+      }
+
       return {
         id: (index + 1).toString().padStart(2, "0"),
         measurement_id: measurement.measurement_id,
         date: formatDateIndonesian(measurement.visit_date),
+        rawDate: measurement.visit_date.toISOString(),
         name: measurement.child?.child_name || "-",
         age: `${ageAtVisit} Bulan`,
+        rawAge: ageAtVisit,
         gender: measurement.child?.gender || "M",
         weight: measurement.weight ? Number(measurement.weight) : 0,
         height: measurement.height ? Number(measurement.height) : 0,
-        trend: "flat", // TODO: Kalkulasi dari riwayat sebelumnya
+        trend,
         status,
+        avatarUrl: measurement.child?.child_name.includes("Rafi")
+          ? "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=150&auto=format&fit=crop"
+          : measurement.child?.child_name.includes("Giselle")
+          ? "https://images.unsplash.com/photo-1607990283143-e81e7a2c93ab?q=80&w=150&auto=format&fit=crop"
+          : null,
       };
     });
   } catch (error) {
@@ -241,6 +327,9 @@ export async function getChildDetail(childId: string) {
 
     const ageInMonths = child.birth_date ? calculateAgeInMonths(child.birth_date) : 0;
 
+    const avatars = getCustomAvatars();
+    const customChildrenAvatars = avatars.children || {};
+
     return {
       child_id: child.child_id,
       national_id: child.national_id || "-",
@@ -250,6 +339,12 @@ export async function getChildDetail(childId: string) {
       dob: child.birth_date ? formatDateIndonesian(child.birth_date) : "-",
       dobRaw: child.birth_date ? child.birth_date.toISOString().split("T")[0] : null,
       gender: child.gender, // 'M' atau 'F'
+      avatarUrl: customChildrenAvatars[child.child_id]
+        || (child.child_name.includes("Rafi")
+          ? "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?q=80&w=150&auto=format&fit=crop"
+          : child.child_name.includes("Giselle")
+          ? "https://images.unsplash.com/photo-1607990283143-e81e7a2c93ab?q=80&w=150&auto=format&fit=crop"
+          : null),
       birth_weight: child.birth_weight ? Number(child.birth_weight) : 0,
       birth_length: child.birth_length ? Number(child.birth_length) : 0,
       current_weight: child.current_weight ? Number(child.current_weight) : 0,
@@ -327,6 +422,11 @@ export async function updateChild(childId: string, data: any) {
           data: { ui_status: newStatus }
         });
       }
+    }
+
+    // Save custom avatar to local file store
+    if (data.avatarUrl !== undefined) {
+      saveCustomAvatar("children", childId, data.avatarUrl);
     }
 
     return { success: true, id: updated.child_id };

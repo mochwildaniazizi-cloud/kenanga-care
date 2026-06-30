@@ -17,16 +17,22 @@ import {
   UserIcon,
   MoonIcon,
   QuestionMarkCircleIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  Bars3Icon
 } from "@heroicons/react/24/solid";
 
 import { MdPregnantWoman } from "react-icons/md";
 import { PiBabyFill } from "react-icons/pi";
+import { useUserRole } from "@/context/UserRoleContext";
 
-const breadcrumbs: Record<string, { label: string; icon: any }> = {
+const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
   "/": { label: "Beranda", icon: HomeIcon },
   "/data-anak": { label: "Data Anak", icon: PiBabyFill },
+  "/data-anak/tambah": { label: "Data Anak", icon: PiBabyFill, parent: "/data-anak", parentLabel: "Tambah Anak" },
+  "/data-anak/[id]": { label: "Data Anak", icon: PiBabyFill, parent: "/data-anak", parentLabel: "Detail Balita" },
   "/data-ibu": { label: "Data Ibu", icon: MdPregnantWoman },
+  "/data-ibu/tambah": { label: "Data Ibu", icon: MdPregnantWoman, parent: "/data-ibu", parentLabel: "Tambah Ibu" },
+  "/data-ibu/[id]": { label: "Data Ibu", icon: MdPregnantWoman, parent: "/data-ibu", parentLabel: "Detail Ibu" },
   "/edukasi": { label: "Edukasi", icon: BookOpenIcon },
   "/jadwal": { label: "Jadwal", icon: CalendarDaysIcon },
   "/setting": { label: "Pengaturan", icon: Cog6ToothIcon },
@@ -41,6 +47,7 @@ export default function Header() {
     name: "Kader Siti",
     posyandu: "Posyandu Kenanga 1"
   });
+  const { role, setRole, logout } = useUserRole();
 
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,11 +55,16 @@ export default function Header() {
   // Sync profile from local storage and custom events
   useEffect(() => {
     const loadProfile = () => {
-      const savedName = localStorage.getItem("kader_name");
-      const savedPosyandu = localStorage.getItem("kader_posyandu");
+      const isIbu = role === "ibu";
+      const savedName = isIbu 
+        ? (localStorage.getItem("ibu_name") || localStorage.getItem("logged_username") || "Siti Aminah")
+        : (localStorage.getItem("kader_name") || "Kader Siti");
+      const savedPosyandu = isIbu
+        ? "Posyandu Kenanga 1"
+        : (localStorage.getItem("kader_posyandu") || "Posyandu Kenanga 1");
       setProfile({
-        name: savedName || "Kader Siti",
-        posyandu: savedPosyandu || "Posyandu Kenanga 1"
+        name: savedName,
+        posyandu: savedPosyandu
       });
     };
 
@@ -72,7 +84,7 @@ export default function Header() {
     return () => {
       window.removeEventListener("profile-updated", loadProfile);
     };
-  }, []);
+  }, [role]);
 
   // Dropdown click outside listener
   useEffect(() => {
@@ -118,25 +130,69 @@ export default function Header() {
     return name.slice(0, 2).toUpperCase();
   };
 
-  // Find matching breadcrumb item
-  const activeKey = Object.keys(breadcrumbs)
-    .sort((a, b) => b.length - a.length)
-    .find(key => key === "/" ? pathname === "/" : pathname.startsWith(key)) || "/";
+  // Match pathname to breadcrumb key (supports dynamic segments)
+  const activeKey = (() => {
+    // Exact match first
+    if (breadcrumbs[pathname]) return pathname;
+    // Try to match known patterns with dynamic segments
+    if (/^\/data-anak\/tambah/.test(pathname)) return "/data-anak/tambah";
+    if (/^\/data-anak\/.+/.test(pathname)) return "/data-anak/[id]";
+    if (/^\/data-ibu\/tambah/.test(pathname)) return "/data-ibu/tambah";
+    if (/^\/data-ibu\/.+/.test(pathname)) return "/data-ibu/[id]";
+    // Prefix match fallback (longest prefix wins)
+    return Object.keys(breadcrumbs)
+      .filter(k => !k.includes("["))
+      .sort((a, b) => b.length - a.length)
+      .find(key => key === "/" ? pathname === "/" : pathname.startsWith(key)) || "/";
+  })();
     
   const currentBreadcrumb = breadcrumbs[activeKey];
   const ActiveIcon = currentBreadcrumb.icon;
 
+  const getBreadcrumbLabel = (key: string, defaultLabel: string) => {
+    if (role === "ibu") {
+      if (key === "/data-anak") return "Kesehatan Anak Saya";
+      if (key === "/data-ibu") return "Kesehatan Saya";
+      if (key === "/edukasi") return "Artikel & Edukasi";
+    }
+    return defaultLabel;
+  };
+
+  if (pathname === "/login") return null;
+
   return (
-    <header className="h-20 bg-base-white border-b border-base-border/40 flex items-center justify-between px-10 shrink-0 z-40 relative">
+    <header className="h-20 bg-base-white border-b border-base-border/40 flex items-center justify-between px-4 sm:px-10 shrink-0 z-40 relative">
       
-      {/* 1. Breadcrumb / Judul Halaman Aktif */}
-      <div className="flex items-center gap-2.5 text-sm font-semibold text-base-text-primary">
-        <ActiveIcon className="w-5 h-5 text-base-text-secondary" />
-        <span>{currentBreadcrumb.label}</span>
+      <div className="flex items-center gap-3">
+        {/* Brand Logo only on mobile */}
+        <div className="flex items-center gap-1.5 lg:hidden border-r border-base-border/30 pr-3 mr-1">
+          <img 
+            src="/Logo.png" 
+            alt="Kenanga Care Logo" 
+            className="w-7 h-7 rounded-lg object-cover" 
+          />
+          <span className="font-extrabold text-brand-primary text-xs tracking-tight">Kenanga Care</span>
+        </div>
+
+        {/* 1. Breadcrumb / Judul Halaman Aktif */}
+        <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-base-text-primary">
+          <ActiveIcon className="w-4 h-4 sm:w-5 sm:h-5 text-base-text-secondary shrink-0" />
+          {currentBreadcrumb.parent ? (
+            <span className="flex items-center gap-1">
+              <Link href={currentBreadcrumb.parent} className="text-base-text-secondary hover:text-brand-primary transition">
+                {getBreadcrumbLabel(currentBreadcrumb.parent, currentBreadcrumb.label)}
+              </Link>
+              <span className="text-base-text-secondary/40">/</span>
+              <span className="text-base-text-primary">{currentBreadcrumb.parentLabel}</span>
+            </span>
+          ) : (
+            <span className="inline">{getBreadcrumbLabel(activeKey, currentBreadcrumb.label)}</span>
+          )}
+        </div>
       </div>
       
       {/* 2. Search Bar */}
-      <div className="relative flex-1 mx-8">
+      <div className="relative flex-1 mx-4 max-w-xs md:max-w-md hidden md:block">
         <input 
           type="search" 
           placeholder="Cari data anak, ibu hamil, atau jadwal..." 
@@ -240,6 +296,27 @@ export default function Header() {
                 </button>
               </div>
 
+              {/* Role Switcher */}
+              <div className="flex items-center justify-between px-4 py-2 text-sm text-base-text-primary transition duration-150 font-medium select-none">
+                <div className="flex items-center gap-3">
+                  <UserIcon className="w-5 h-5 text-base-text-secondary" />
+                  <span>Tampilan {role === "kader" ? "Kader" : "Ibu"}</span>
+                </div>
+                <button
+                  onClick={() => setRole(role === "kader" ? "ibu" : "kader")}
+                  title={role === "kader" ? "Ganti ke tampilan Ibu" : "Ganti ke tampilan Kader"}
+                  className={`w-10 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 focus:outline-none ${
+                    role === "ibu" ? "bg-brand-primary" : "bg-base-border/60"
+                  }`}
+                >
+                  <div
+                    className={`bg-base-white w-4 h-4 rounded-full shadow-md transform duration-200 ease-in-out ${
+                      role === "ibu" ? "translate-x-4" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+
               {/* Help Center */}
               <Link 
                 href="/setting?tab=help"
@@ -295,8 +372,7 @@ export default function Header() {
                 type="button" 
                 onClick={() => {
                   setShowLogoutModal(false);
-                  // Simulasikan logout dengan mengarahkan ke dashboard
-                  window.location.href = "/";
+                  logout();
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-status-red-solid text-base-white font-bold hover:bg-status-red-solid/90 transition shadow-sm cursor-pointer"
               >

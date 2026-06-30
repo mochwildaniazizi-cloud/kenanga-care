@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUserRole } from "@/context/UserRoleContext";
 import { 
   MdSearch, 
   MdOutlineExpandMore, 
@@ -27,7 +28,23 @@ export interface Mother {
 }
 
 export default function InputPemeriksaanIbuPage() {
+  const { role } = useUserRole();
   const router = useRouter();
+
+  useEffect(() => {
+    if (role === "ibu") {
+      router.replace("/data-ibu");
+    }
+  }, [role, router]);
+
+  if (role === "ibu") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-semibold text-base-text-secondary">Mengalihkan...</p>
+      </div>
+    );
+  }
 
   // Combobox State
   const [mothersData, setMothersData] = useState<Mother[]>([]);

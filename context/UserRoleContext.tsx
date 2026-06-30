@@ -1,0 +1,100 @@
+"use client";
+
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
+export type UserRole = "kader" | "ibu";
+
+interface UserRoleContextType {
+  role: UserRole;
+  setRole: (role: UserRole) => void;
+  isLoggedIn: boolean;
+  username: string;
+  login: (role: UserRole, username: string) => void;
+  logout: () => void;
+}
+
+const UserRoleContext = createContext<UserRoleContextType>({
+  role: "kader",
+  setRole: () => {},
+  isLoggedIn: false,
+  username: "",
+  login: () => {},
+  logout: () => {},
+});
+
+export function UserRoleProvider({ children }: { children: ReactNode }) {
+  const [role, setRoleState] = useState<UserRole>("kader");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const savedRole = localStorage.getItem("user_role") as UserRole | null;
+    if (savedRole === "kader" || savedRole === "ibu") {
+      setRoleState(savedRole);
+    }
+
+    const savedLogin = localStorage.getItem("is_logged_in") === "true";
+    const savedUser = localStorage.getItem("logged_username") || "";
+
+    setIsLoggedIn(savedLogin);
+    setUsername(savedUser);
+    setIsInitialized(true);
+  }, []);
+
+  // Client-side Router Guard in useEffect to prevent SSR mismatch
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    if (!isLoggedIn && pathname !== "/login") {
+      router.replace("/login");
+    } else if (isLoggedIn && pathname === "/login") {
+      router.replace("/");
+    }
+  }, [isLoggedIn, pathname, isInitialized, router]);
+
+  const setRole = (newRole: UserRole) => {
+    localStorage.setItem("user_role", newRole);
+    setRoleState(newRole);
+    // Dispatch event so other components can react
+    window.dispatchEvent(new CustomEvent("role-changed", { detail: newRole }));
+  };
+
+  const login = (newRole: UserRole, userVal: string) => {
+    localStorage.setItem("user_role", newRole);
+    localStorage.setItem("is_logged_in", "true");
+    localStorage.setItem("logged_username", userVal);
+    
+    setRoleState(newRole);
+    setIsLoggedIn(true);
+    setUsername(userVal);
+
+    window.dispatchEvent(new CustomEvent("auth-changed", { detail: { isLoggedIn: true, role: newRole, username: userVal } }));
+    router.replace("/");
+  };
+
+  const logout = () => {
+    localStorage.removeItem("is_logged_in");
+    localStorage.removeItem("logged_username");
+    
+    setIsLoggedIn(false);
+    setUsername("");
+    
+    window.dispatchEvent(new CustomEvent("auth-changed", { detail: { isLoggedIn: false } }));
+    router.replace("/login");
+  };
+
+  return (
+    <UserRoleContext.Provider value={{ role, setRole, isLoggedIn, username, login, logout }}>
+      {children}
+    </UserRoleContext.Provider>
+  );
+}
+
+export function useUserRole() {
+  return useContext(UserRoleContext);
+}

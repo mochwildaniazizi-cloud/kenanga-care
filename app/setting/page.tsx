@@ -15,6 +15,8 @@ import {
   ArrowLeftIcon
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
+import { useUserRole } from "@/context/UserRoleContext";
+import { getLoggedInMotherData, getMotherDetail } from "@/app/actions/mothers";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
 export default function SettingsPage() {
@@ -45,7 +47,9 @@ function SettingsContent() {
     role: "Ketua Kader",
     email: "siti.posyandu@gmail.com",
     phone: "0812-3456-7890",
-    address: "Jl. Mawar No. 12, Kel. Kenanga"
+    address: "Jl. Mawar No. 12, Kel. Kenanga",
+    husband_name: "",
+    national_id: ""
   });
 
   // Account Settings Form State
@@ -69,35 +73,81 @@ function SettingsContent() {
     }
   }, [tabParam]);
 
-  // Load from local storage
+  const { role, username } = useUserRole();
+  const [motherDetail, setMotherDetail] = useState<any>(null);
+
+  // Load from local storage or database
   useEffect(() => {
-    const savedName = localStorage.getItem("kader_name");
-    const savedPosyandu = localStorage.getItem("kader_posyandu");
-    const savedRole = localStorage.getItem("kader_role");
-    const savedEmail = localStorage.getItem("kader_email");
-    const savedPhone = localStorage.getItem("kader_phone");
-    const savedAddress = localStorage.getItem("kader_address");
-    
-    setFormData({
-      name: savedName || "Kader Siti",
-      posyandu: savedPosyandu || "Posyandu Kenanga 1",
-      role: savedRole || "Ketua Kader",
-      email: savedEmail || "siti.posyandu@gmail.com",
-      phone: savedPhone || "0812-3456-7890",
-      address: savedAddress || "Jl. Mawar No. 12, Kel. Kenanga"
-    });
-  }, []);
+    async function loadProfileData() {
+      if (role === "ibu") {
+        try {
+          const loggedInMother = await getLoggedInMotherData(username);
+          if (loggedInMother) {
+            const detail = await getMotherDetail(loggedInMother.mother_id);
+            if (detail) {
+              setMotherDetail(detail);
+              
+              const savedName = localStorage.getItem("ibu_name") || detail.name || "";
+              const savedPhone = localStorage.getItem("ibu_phone") || detail.phone_number || "";
+              const savedEmail = localStorage.getItem("ibu_email") || `${detail.name.toLowerCase().replace(/\s+/g, "")}@gmail.com`;
+              const savedAddress = localStorage.getItem("ibu_address") || "Jl. Mawar No. 12, Kel. Kenanga";
+              const savedHusband = localStorage.getItem("ibu_husband") || detail.husband_name || "";
+              
+              setFormData({
+                name: savedName,
+                posyandu: "Posyandu Kenanga 1",
+                role: detail.status || "Ibu Balita",
+                email: savedEmail,
+                phone: savedPhone,
+                address: savedAddress,
+                husband_name: savedHusband,
+                national_id: detail.national_id || ""
+              });
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load mother profile settings:", err);
+        }
+      } else {
+        const savedName = localStorage.getItem("kader_name");
+        const savedPosyandu = localStorage.getItem("kader_posyandu");
+        const savedRole = localStorage.getItem("kader_role");
+        const savedEmail = localStorage.getItem("kader_email");
+        const savedPhone = localStorage.getItem("kader_phone");
+        const savedAddress = localStorage.getItem("kader_address");
+        
+        setFormData({
+          name: savedName || "Kader Siti",
+          posyandu: savedPosyandu || "Posyandu Kenanga 1",
+          role: savedRole || "Ketua Kader",
+          email: savedEmail || "siti.posyandu@gmail.com",
+          phone: savedPhone || "0812-3456-7890",
+          address: savedAddress || "Jl. Mawar No. 12, Kel. Kenanga",
+          husband_name: "",
+          national_id: ""
+        });
+      }
+    }
+    loadProfileData();
+  }, [role, username]);
 
   const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Save to localStorage
-    localStorage.setItem("kader_name", formData.name);
-    localStorage.setItem("kader_posyandu", formData.posyandu);
-    localStorage.setItem("kader_role", formData.role);
-    localStorage.setItem("kader_email", formData.email);
-    localStorage.setItem("kader_phone", formData.phone);
-    localStorage.setItem("kader_address", formData.address);
+    if (role === "ibu") {
+      localStorage.setItem("ibu_name", formData.name);
+      localStorage.setItem("ibu_phone", formData.phone);
+      localStorage.setItem("ibu_email", formData.email);
+      localStorage.setItem("ibu_address", formData.address);
+      localStorage.setItem("ibu_husband", formData.husband_name);
+    } else {
+      localStorage.setItem("kader_name", formData.name);
+      localStorage.setItem("kader_posyandu", formData.posyandu);
+      localStorage.setItem("kader_role", formData.role);
+      localStorage.setItem("kader_email", formData.email);
+      localStorage.setItem("kader_phone", formData.phone);
+      localStorage.setItem("kader_address", formData.address);
+    }
 
     // Dispatch update event for Header sync
     window.dispatchEvent(new Event("profile-updated"));
@@ -247,27 +297,44 @@ function SettingsContent() {
                     />
                   </div>
 
-                  {/* Posyandu */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-base-text-primary block">Posyandu</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={formData.posyandu} 
-                      onChange={(e) => setFormData({...formData, posyandu: e.target.value})}
-                      className="w-full bg-base-bg border border-base-border/40 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-brand-primary text-base-text-primary transition"
-                    />
-                  </div>
+                  {/* NIK or Posyandu */}
+                  {role === "ibu" ? (
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-base-text-primary block">NIK Ibu</label>
+                      <input 
+                        type="text" 
+                        disabled
+                        value={formData.national_id} 
+                        className="w-full bg-base-bg border border-base-border/30 rounded-xl px-4 py-2.5 text-sm text-base-text-secondary transition bg-base-bg/50 cursor-not-allowed font-semibold"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-base-text-primary block">Posyandu</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={formData.posyandu} 
+                        onChange={(e) => setFormData({...formData, posyandu: e.target.value})}
+                        className="w-full bg-base-bg border border-base-border/40 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-brand-primary text-base-text-primary transition"
+                      />
+                    </div>
+                  )}
 
-                  {/* Jabatan */}
+                  {/* Status Ibu or Jabatan */}
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-base-text-primary block">Jabatan</label>
+                    <label className="text-xs font-bold text-base-text-primary block">
+                      {role === "ibu" ? "Status Ibu" : "Jabatan"}
+                    </label>
                     <input 
                       type="text" 
                       required
+                      disabled={role === "ibu"}
                       value={formData.role} 
                       onChange={(e) => setFormData({...formData, role: e.target.value})}
-                      className="w-full bg-base-bg border border-base-border/40 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-brand-primary text-base-text-primary transition"
+                      className={`w-full bg-base-bg border border-base-border/40 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-brand-primary text-base-text-primary transition ${
+                        role === "ibu" ? "bg-base-bg/50 text-base-text-secondary cursor-not-allowed font-semibold" : ""
+                      }`}
                     />
                   </div>
 
@@ -283,6 +350,20 @@ function SettingsContent() {
                     />
                   </div>
 
+                  {/* Nama Suami (Only for Ibu) */}
+                  {role === "ibu" && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-xs font-bold text-base-text-primary block">Nama Suami</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={formData.husband_name} 
+                        onChange={(e) => setFormData({...formData, husband_name: e.target.value})}
+                        className="w-full bg-base-bg border border-base-border/40 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-brand-primary text-base-text-primary transition"
+                      />
+                    </div>
+                  )}
+
                   {/* Email */}
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-xs font-bold text-base-text-primary block">Alamat Email</label>
@@ -297,7 +378,9 @@ function SettingsContent() {
 
                   {/* Alamat */}
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-xs font-bold text-base-text-primary block">Alamat Kerja / Posyandu</label>
+                    <label className="text-xs font-bold text-base-text-primary block">
+                      {role === "ibu" ? "Alamat Rumah" : "Alamat Kerja / Posyandu"}
+                    </label>
                     <textarea 
                       rows={3}
                       value={formData.address} 

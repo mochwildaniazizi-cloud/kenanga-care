@@ -6,10 +6,15 @@ import Link from "next/link";
 import { 
   MdSearch, MdFilterList, MdAdd, 
   MdMonitorWeight, MdOutlineError, MdVaccines, MdTrendingDown,
-  MdMale, MdFemale, MdPerson
+  MdMale, MdFemale, MdPerson, MdCalendarMonth, MdCake, MdFingerprint,
+  MdScale, MdHeight, MdOutlineMonitorWeight as MdOutlineWeight
 } from "react-icons/md";
 import { FiArrowUp, FiArrowDown, FiMinus } from "react-icons/fi";
-import { getChildrenData, getMeasurementHistory, getChildMetrics } from "@/app/actions/children";
+import { FaBaby, FaNotesMedical } from "react-icons/fa";
+import { getChildrenData, getMeasurementHistory, getChildMetrics, getChildDetail } from "@/app/actions/children";
+import { getLoggedInMotherData } from "@/app/actions/mothers";
+import { useUserRole } from "@/context/UserRoleContext";
+import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 
 // ==========================================
 // 1. MOCK DATA (Data Dummy)
@@ -71,15 +76,36 @@ function StatusBadge({ status }: { status: string }) {
       </span>
     );
   }
+  if (status === "Gizi Kurang" || status === "Risiko Stunting") {
+    return (
+      <span className="px-3 py-1 bg-status-yellow-light text-status-yellow-solid border border-status-yellow-solid/25 text-xs font-semibold rounded-full">
+        {status}
+      </span>
+    );
+  }
+  if (status === "Gizi Buruk" || status === "Pendek / Stunting" || status.includes("Stunting")) {
+    return (
+      <span className="px-3 py-1 bg-status-red-light text-status-red-solid border border-status-red-solid/25 text-xs font-semibold rounded-full">
+        {status}
+      </span>
+    );
+  }
   return (
-    <span className="px-3 py-1 bg-base-bg text-base-text-secondary text-xs font-semibold rounded-full">
+    <span className="px-3 py-1 bg-base-bg text-base-text-secondary border border-base-border/50 text-xs font-semibold rounded-full">
       {status}
     </span>
   );
 }
 
 // Komponen Ikon Gender
-function GenderIcon({ gender }: { gender: string }) {
+function GenderIcon({ gender, imageUrl }: { gender: string; imageUrl?: string }) {
+  if (imageUrl) {
+    return (
+      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-base-border/25">
+        <img src={imageUrl} alt="Avatar" className="w-full h-full object-cover" />
+      </div>
+    );
+  }
   const isMale = gender === "M";
   return (
     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isMale ? 'bg-gender-male-bg text-gender-male-solid' : 'bg-gender-female-bg text-gender-female-solid'}`}>
@@ -99,6 +125,51 @@ function TrendArrow({ trend }: { trend: string }) {
 // 3. KOMPONEN UTAMA HALAMAN
 // ==========================================
 export default function DataAnakPage() {
+  const { role, username } = useUserRole();
+  const [motherChildren, setMotherChildren] = useState<any[]>([]);
+  const [selectedChildId, setSelectedChildId] = useState<string>("");
+  const [selectedChildDetail, setSelectedChildDetail] = useState<any>(null);
+  const [isLoadingChildDetail, setIsLoadingChildDetail] = useState(true);
+
+  // Load mother's children if role === "ibu"
+  useEffect(() => {
+    async function loadMotherChildren() {
+      if (role !== "ibu") return;
+      try {
+        const loggedInMother = await getLoggedInMotherData(username);
+        if (loggedInMother && loggedInMother.children.length > 0) {
+          setMotherChildren(loggedInMother.children);
+          setSelectedChildId(loggedInMother.children[0].child_id);
+        } else {
+          setIsLoadingChildDetail(false);
+        }
+      } catch (err) {
+        console.error("Failed to load mother children:", err);
+        setIsLoadingChildDetail(false);
+      }
+    }
+    if (role === "ibu") {
+      loadMotherChildren();
+    }
+  }, [role, username]);
+
+  // Load child details when selectedChildId changes
+  useEffect(() => {
+    async function loadChildDetail() {
+      if (!selectedChildId) return;
+      try {
+        setIsLoadingChildDetail(true);
+        const detail = await getChildDetail(selectedChildId);
+        setSelectedChildDetail(detail);
+      } catch (err) {
+        console.error("Failed to load child detail:", err);
+      } finally {
+        setIsLoadingChildDetail(false);
+      }
+    }
+    loadChildDetail();
+  }, [selectedChildId]);
+
   const [childrenList, setChildrenList] = useState<any[]>([]);
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,6 +191,32 @@ export default function DataAnakPage() {
   const [showHistoryFilter, setShowHistoryFilter] = useState(false);
   const [historyFilterGender, setHistoryFilterGender] = useState("");
   const [historyFilterStatus, setHistoryFilterStatus] = useState("");
+
+  // Sort states for Children list
+  const [childSortField, setChildSortField] = useState<"name" | "age" | "mother" | "status" | null>("name");
+  const [childSortOrder, setChildSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Sort states for History list
+  const [historySortField, setHistorySortField] = useState<"name" | "age" | "date" | "status" | null>(null);
+  const [historySortOrder, setHistorySortOrder] = useState<"asc" | "desc">("asc");
+
+  const handleChildSort = (field: "name" | "age" | "mother" | "status") => {
+    if (childSortField === field) {
+      setChildSortOrder(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setChildSortField(field);
+      setChildSortOrder("asc");
+    }
+  };
+
+  const handleHistorySort = (field: "name" | "age" | "date" | "status") => {
+    if (historySortField === field) {
+      setHistorySortOrder(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setHistorySortField(field);
+      setHistorySortOrder("asc");
+    }
+  };
 
   const [metrics, setMetrics] = useState({ 
     totalChildren: 0, 
@@ -151,11 +248,11 @@ export default function DataAnakPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [childSearch, itemsPerPage, childFilterGender, childFilterStatus, childFilterAge]);
+  }, [childSearch, itemsPerPage, childFilterGender, childFilterStatus, childFilterAge, childSortField, childSortOrder]);
 
   useEffect(() => {
     setCurrentHistoryPage(1);
-  }, [historySearch, historyItemsPerPage, historyFilterGender, historyFilterStatus]);
+  }, [historySearch, historyItemsPerPage, historyFilterGender, historyFilterStatus, historySortField, historySortOrder]);
 
   const filteredChildren = childrenList.filter(child => {
     const matchesSearch = child.name.toLowerCase().includes(childSearch.toLowerCase()) || 
@@ -175,8 +272,25 @@ export default function DataAnakPage() {
     return matchesSearch && matchesGender && matchesStatus && matchesAge;
   });
 
-  const totalPages = Math.ceil(filteredChildren.length / itemsPerPage);
-  const paginatedChildren = filteredChildren.slice(
+  const sortedChildren = [...filteredChildren].sort((a, b) => {
+    if (!childSortField) return 0;
+    
+    let comparison = 0;
+    if (childSortField === "name") {
+      comparison = a.name.localeCompare(b.name);
+    } else if (childSortField === "age") {
+      comparison = (a.rawAge || 0) - (b.rawAge || 0);
+    } else if (childSortField === "mother") {
+      comparison = a.mother.localeCompare(b.mother);
+    } else if (childSortField === "status") {
+      comparison = a.status.localeCompare(b.status);
+    }
+
+    return childSortOrder === "asc" ? comparison : -comparison;
+  });
+
+  const totalPages = Math.ceil(sortedChildren.length / itemsPerPage);
+  const paginatedChildren = sortedChildren.slice(
     (currentPage - 1) * itemsPerPage, 
     currentPage * itemsPerPage
   );
@@ -189,8 +303,25 @@ export default function DataAnakPage() {
     return matchesSearch && matchesGender && matchesStatus;
   });
 
-  const totalHistoryPages = Math.ceil(filteredHistory.length / historyItemsPerPage);
-  const paginatedHistory = filteredHistory.slice(
+  const sortedHistory = [...filteredHistory].sort((a, b) => {
+    if (!historySortField) return 0;
+
+    let comparison = 0;
+    if (historySortField === "name") {
+      comparison = a.name.localeCompare(b.name);
+    } else if (historySortField === "age") {
+      comparison = (a.rawAge || 0) - (b.rawAge || 0);
+    } else if (historySortField === "date") {
+      comparison = new Date(a.rawDate || 0).getTime() - new Date(b.rawDate || 0).getTime();
+    } else if (historySortField === "status") {
+      comparison = a.status.localeCompare(b.status);
+    }
+
+    return historySortOrder === "asc" ? comparison : -comparison;
+  });
+
+  const totalHistoryPages = Math.ceil(sortedHistory.length / historyItemsPerPage);
+  const paginatedHistory = sortedHistory.slice(
     (currentHistoryPage - 1) * historyItemsPerPage,
     currentHistoryPage * historyItemsPerPage
   );
@@ -200,11 +331,413 @@ export default function DataAnakPage() {
     return Math.round((value / metrics.totalChildren) * 100);
   };
 
+  if (role === "ibu") {
+    if (isLoadingChildDetail) {
+      return (
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
+    if (!selectedChildDetail) {
+      return (
+        <div className="bg-base-white p-8 rounded-xl shadow-sm border border-base-border/30 text-center">
+          <p className="text-base-text-secondary font-bold">Data Kesehatan Anak tidak ditemukan.</p>
+        </div>
+      );
+    }
+
+    const child = selectedChildDetail;
+    const zScoreBB = child.zScoreBB;
+    const zScoreTB = child.zScoreTB;
+    const nutritionStatus = child.status;
+
+    const getStatusBadgeStyle = (status: string) => {
+      switch (status) {
+        case "Normal":
+          return "bg-status-green-light text-status-green-solid border border-status-green-solid/25";
+        case "Gizi Kurang":
+          return "bg-status-yellow-light text-status-yellow-solid border border-status-yellow-solid/25";
+        case "Gizi Buruk":
+        case "Pendek / Stunting":
+          return "bg-status-red-light text-status-red-solid border border-status-red-solid/25 font-bold";
+        default:
+          return "bg-base-bg text-base-text-secondary border border-base-border/50";
+      }
+    };
+
+    const getInitials = (name: string) => {
+      if (!name) return "AN";
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return name.slice(0, 2).toUpperCase();
+    };
+
+    const chronologicalMeasurements = [...child.measurements].reverse();
+    const hasHistory = chronologicalMeasurements.length > 1;
+
+    let weightPoints = "";
+    let heightPoints = "";
+    if (hasHistory) {
+      const maxWeight = Math.max(...chronologicalMeasurements.map((m: any) => m.weight), 15);
+      const minWeight = Math.min(...chronologicalMeasurements.map((m: any) => m.weight), 3);
+      const maxHeight = Math.max(...chronologicalMeasurements.map((m: any) => m.height), 110);
+      const minHeight = Math.min(...chronologicalMeasurements.map((m: any) => m.height), 40);
+
+      const wDiff = maxWeight - minWeight || 1;
+      const hDiff = maxHeight - minHeight || 1;
+
+      weightPoints = chronologicalMeasurements.map((m: any, i: number) => {
+        const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
+        const y = 140 - ((m.weight - minWeight) / wDiff) * 100;
+        return `${x},${y}`;
+      }).join(" ");
+
+      heightPoints = chronologicalMeasurements.map((m: any, i: number) => {
+        const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
+        const y = 140 - ((m.height - minHeight) / hDiff) * 100;
+        return `${x},${y}`;
+      }).join(" ");
+    }
+
+    return (
+      <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-in fade-in duration-300">
+        
+        {/* Child Selector Tabs (if multiple children) */}
+        {motherChildren.length > 1 && (
+          <div className="flex bg-base-white p-1 rounded-2xl border border-base-border/30 max-w-md shadow-sm">
+            {motherChildren.map((c) => (
+              <button
+                key={c.child_id}
+                type="button"
+                onClick={() => setSelectedChildId(c.child_id)}
+                className={`flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedChildId === c.child_id
+                    ? "bg-brand-primary text-base-white shadow-md shadow-brand-primary/15"
+                    : "text-base-text-secondary hover:text-base-text-primary"
+                }`}
+              >
+                {c.child_name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Child Identity Card */}
+        <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl border shrink-0 overflow-hidden ${
+              child.gender === "M" 
+                ? "bg-gender-male-bg text-gender-male-solid border-gender-male-solid/10" 
+                : "bg-gender-female-bg text-gender-female-solid border-gender-female-solid/10"
+            }`}>
+              {child.avatarUrl ? (
+                <img src={child.avatarUrl} alt={child.name} className="w-full h-full object-cover" />
+              ) : (
+                getInitials(child.name)
+              )}
+            </div>
+            <div>
+              <h1 className="text-2xl font-extrabold text-base-text-primary tracking-tight">{child.name}</h1>
+              <div className="flex flex-wrap items-center gap-2.5 text-xs text-base-text-secondary mt-1.5 font-semibold">
+                <span>NIK: {child.national_id || "-"}</span>
+                <span>&bull;</span>
+                <span>ID Anak: {child.child_id}</span>
+                <span>&bull;</span>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] ${getStatusBadgeStyle(child.status)}`}>
+                  Status Gizi: {child.status}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          {/* Left Side: Identitas & Kondisi Medis */}
+          <div className="lg:col-span-5 space-y-6">
+            
+            {/* Card: Identitas Balita */}
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                <FaBaby className="w-5 h-5 text-brand-primary" />
+                <h2 className="font-bold text-base-text-primary text-base">Identitas Balita</h2>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Jenis Kelamin</span>
+                  <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                    {child.gender === "M" ? (
+                      <>
+                        <MdMale className="w-4 h-4 text-status-blue-solid" /> Laki-laki
+                      </>
+                    ) : (
+                      <>
+                        <MdFemale className="w-4 h-4 text-brand-primary" /> Perempuan
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Tempat / Tanggal Lahir</span>
+                  <p className="text-sm font-bold text-base-text-primary">{child.birth_place || "-"}, {child.dob}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Usia Saat Ini</span>
+                  <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{child.ageInMonths} Bulan</p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Anak Ke-</span>
+                  <p className="text-sm font-bold text-base-text-primary">Ke-{child.birth_order || 1}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Golongan Darah</span>
+                  <p className="text-sm font-bold text-base-text-primary uppercase">{child.blood_type || "-"}</p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Ibu Kandung</span>
+                  <p className="text-sm font-bold text-base-text-primary">{child.mother_name}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Antropometri Lahir & Pengukuran Terbaru */}
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-6">
+              
+              {/* Lahir */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
+                  <FaBaby className="w-4 h-4 text-brand-primary" />
+                  <h3 className="font-bold text-sm text-base-text-primary">Kondisi Saat Lahir</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="bg-base-bg/30 p-3 rounded-xl">
+                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Lahir</span>
+                    <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_weight} kg</p>
+                  </div>
+                  <div className="bg-base-bg/30 p-3 rounded-xl">
+                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Panjang Lahir</span>
+                    <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_length} cm</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Terbaru */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
+                  <FaNotesMedical className="w-4 h-4 text-brand-primary" />
+                  <h3 className="font-bold text-sm text-base-text-primary">Pengukuran Terbaru</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
+                    <MdMonitorWeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
+                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Sekarang</span>
+                    <p className="text-xl font-bold text-brand-primary mt-1">{child.current_weight} kg</p>
+                  </div>
+                  <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
+                    <MdHeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
+                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Tinggi Sekarang</span>
+                    <p className="text-xl font-bold text-brand-primary mt-1">{child.current_height} cm</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Card: Kondisi Medis & Alergi */}
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                <FaNotesMedical className="w-5 h-5 text-brand-primary" />
+                <h2 className="font-bold text-base-text-primary text-base">Kondisi Medis &amp; Alergi</h2>
+              </div>
+              
+              {(!child.special_conditions || child.special_conditions.length === 0) ? (
+                <p className="text-xs text-base-text-secondary italic">Tidak ada kondisi khusus / riwayat alergi.</p>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {child.special_conditions.map((tag: string) => (
+                      <span key={tag} className="bg-brand-soft/50 text-brand-primary border border-brand-primary/20 rounded-full px-3 py-1 text-xs font-semibold">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  {child.special_conditions.includes("Lainnya...") && child.special_conditions_notes && (
+                    <div className="bg-base-bg/30 p-3 rounded-xl border border-base-border/20">
+                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block mb-1">Catatan Tambahan</span>
+                      <p className="text-xs text-base-text-primary font-medium">{child.special_conditions_notes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* Right Side: Tren Tumbuh Kembang & Z-Score (lg:col-span-7) */}
+          <div className="lg:col-span-7 space-y-6">
+            
+            {/* Card: Grafik Tren */}
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+              <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-pulse"></span>
+                  <h2 className="font-bold text-base-text-primary text-base">Tren Tumbuh Kembang Balita</h2>
+                </div>
+                <span className="text-[10px] font-bold bg-brand-soft text-brand-primary border border-brand-primary/20 px-2.5 py-1 rounded-full uppercase">
+                  {child.measurements.length} kunjungan
+                </span>
+              </div>
+
+              {hasHistory ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold text-base-text-secondary">
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="w-3 h-0.5 bg-brand-primary inline-block"></span>
+                      <span>Berat Badan (kg)</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="w-3 h-0.5 bg-blue-500 inline-block"></span>
+                      <span>Tinggi Badan (cm)</span>
+                    </div>
+                  </div>
+
+                  <div className="relative border border-base-border/20 rounded-2xl p-4 bg-base-bg/5 flex items-center justify-center">
+                    <svg className="w-full max-w-[500px] h-[160px]" viewBox="0 0 500 160">
+                      <line x1="20" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                      <line x1="20" y1="60" x2="480" y2="60" stroke="#f1f5f9" strokeWidth="1" />
+                      <line x1="20" y1="100" x2="480" y2="100" stroke="#f1f5f9" strokeWidth="1" />
+                      <line x1="20" y1="140" x2="480" y2="140" stroke="#e2e8f0" strokeWidth="1.5" />
+
+                      <polyline fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={heightPoints} />
+                      <polyline fill="none" stroke="#ea2986" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={weightPoints} />
+
+                      {chronologicalMeasurements.map((m: any, i: number) => {
+                        const maxWeight = Math.max(...chronologicalMeasurements.map((x: any) => x.weight), 15);
+                        const minWeight = Math.min(...chronologicalMeasurements.map((x: any) => x.weight), 3);
+                        const wDiff = maxWeight - minWeight || 1;
+                        const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
+                        const y = 140 - ((m.weight - minWeight) / wDiff) * 100;
+                        return <circle key={`w-${i}`} cx={x} cy={y} r="4" fill="#ea2986" stroke="#fff" strokeWidth="1.5" />;
+                      })}
+
+                      {chronologicalMeasurements.map((m: any, i: number) => {
+                        const maxHeight = Math.max(...chronologicalMeasurements.map((x: any) => x.height), 110);
+                        const minHeight = Math.min(...chronologicalMeasurements.map((x: any) => x.height), 40);
+                        const hDiff = maxHeight - minHeight || 1;
+                        const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
+                        const y = 140 - ((m.height - minHeight) / hDiff) * 100;
+                        return <circle key={`h-${i}`} cx={x} cy={y} r="4" fill="#3b82f6" stroke="#fff" strokeWidth="1.5" />;
+                      })}
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-12 border border-dashed border-base-border/50 rounded-2xl text-center space-y-2 text-base-text-secondary text-sm">
+                  <p>Belum memiliki riwayat pemeriksaan posyandu yang cukup.</p>
+                  <p className="text-xs">Diperlukan minimal 2 riwayat penimbangan untuk memvisualisasikan tren grafik.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Card: Status Gizi (WHO Z-Score) */}
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                <MdOutlineWeight className="w-5 h-5 text-brand-primary" />
+                <h2 className="font-bold text-base-text-primary text-base">Analisis Status Gizi (WHO Z-Score)</h2>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
+                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Badan vs Umur</span>
+                  <span className={`inline-block mt-2 px-2.5 py-0.5 border text-[10px] font-bold rounded-full ${getStatusBadgeStyle(nutritionStatus)}`}>
+                    {nutritionStatus}
+                  </span>
+                  <p className="text-[10px] text-base-text-secondary mt-1.5 font-semibold">Z-Score: {zScoreBB ? zScoreBB.toFixed(2) : "0.00"} SD</p>
+                </div>
+
+                <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
+                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Tinggi Badan vs Umur</span>
+                  <span className={`inline-block mt-2 px-2.5 py-0.5 border text-[10px] font-bold rounded-full ${getStatusBadgeStyle(nutritionStatus)}`}>
+                    {nutritionStatus}
+                  </span>
+                  <p className="text-[10px] text-base-text-secondary mt-1.5 font-semibold">Z-Score: {zScoreTB ? zScoreTB.toFixed(2) : "0.00"} SD</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* History Table */}
+        <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+            <MdScale className="w-5 h-5 text-brand-primary" />
+            <h2 className="font-bold text-base-text-primary text-base">Riwayat Kunjungan &amp; Penimbangan Balita</h2>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[1000px]">
+              <thead>
+                <tr className="border-b border-gray-100 text-xs font-bold text-base-text-secondary uppercase tracking-wider">
+                  <th className="py-3 px-4">Tanggal Kunjungan</th>
+                  <th className="py-3 px-4 text-center">Umur</th>
+                  <th className="py-3 px-4 text-center">Berat (kg)</th>
+                  <th className="py-3 px-4 text-center">Tinggi (cm)</th>
+                  <th className="py-3 px-4 text-center">Lkr. Kepala (cm)</th>
+                  <th className="py-3 px-4 text-center">Vit A</th>
+                  <th className="py-3 px-4 text-center">Obat Cacing</th>
+                  <th className="py-3 px-4 text-center">Imunisasi</th>
+                  <th className="py-3 px-4 text-center">PMT</th>
+                  <th className="py-3 px-4">Catatan Kader</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {child.measurements.length === 0 ? (
+                  <tr>
+                    <td colSpan={10} className="py-8 text-center text-base-text-secondary text-xs">Belum ada riwayat penimbangan posyandu.</td>
+                  </tr>
+                ) : (
+                  child.measurements.map((m: any, idx: number) => (
+                    <tr key={idx} className="border-b border-gray-50 hover:bg-base-bg/30 transition-colors">
+                      <td className="py-3 px-4 font-bold text-base-text-primary whitespace-nowrap">{m.date}</td>
+                      <td className="py-3 px-4 text-center font-bold text-base-text-primary">{m.ageAtVisit} Bulan</td>
+                      <td className="py-3 px-4 text-center font-bold text-brand-primary">{m.weight ? `${m.weight} kg` : "-"}</td>
+                      <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.height ? `${m.height} cm` : "-"}</td>
+                      <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.head_circumference ? `${m.head_circumference} cm` : "-"}</td>
+                      <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.vitamin_a_capsule || "-"}</td>
+                      <td className="py-3 px-4 text-center">{m.deworming_pill === "Ya" || m.deworming_pill === true ? "✓" : "-"}</td>
+                      <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.immunizations || "-"}</td>
+                      <td className="py-3 px-4 text-center">{m.supplementary_feeding === "Ya" || m.supplementary_feeding === true ? "✓" : "-"}</td>
+                      <td className="py-3 px-4 text-base-text-secondary font-medium italic">{m.cadre_notes || "-"}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 max-w-[1600px] mx-auto pb-10">
       
       {/* --- GRID METRIK (4 KARTU BENTO) --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatMetricCard 
           icon={MdMonitorWeight} 
           title="Belum Ditimbang" 
@@ -289,9 +822,11 @@ export default function DataAnakPage() {
             >
               <span>Filter</span> <MdFilterList className="w-4 h-4" />
             </button>
-            <Link href="/data-anak/tambah" className="flex items-center gap-2 px-4 py-2.5 bg-brand-primary text-base-white rounded-lg text-sm font-semibold hover:bg-status-pink-dark transition shadow-[0_4px_12px_rgba(234,41,134,0.15)]">
-              Tambah Anak <MdAdd className="w-4 h-4" />
-            </Link>
+             {role === "kader" && (
+              <Link href="/data-anak/tambah" className="flex items-center gap-2 px-4 py-2.5 bg-brand-primary text-base-white rounded-lg text-sm font-semibold hover:bg-status-pink-dark transition shadow-[0_4px_12px_rgba(234,41,134,0.15)]">
+                Tambah Anak <MdAdd className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
 
@@ -352,11 +887,43 @@ export default function DataAnakPage() {
             <thead>
               <tr className="border-b border-gray-100 text-xs font-bold text-base-text-secondary uppercase tracking-wider">
                 <th className="py-2.5 px-4 w-12 text-gray-400">NO.</th>
-                <th className="py-2.5 px-4">NAMA ANAK</th>
+                <th className="py-2.5 px-4 select-none">
+                  <div className="flex items-center gap-3">
+                    <span>NAMA ANAK</span>
+                    <div className="flex gap-1.5">
+                      <button 
+                        type="button" 
+                        onClick={() => handleChildSort("name")}
+                        className={`hover:text-brand-primary flex items-center gap-0.5 text-[9px] font-bold tracking-normal cursor-pointer select-none px-1.5 py-0.5 rounded border border-base-border/30 bg-base-white transition-all ${childSortField === "name" ? "text-brand-primary border-brand-primary bg-brand-soft/10" : "text-base-text-secondary"}`}
+                        title="Urutkan Nama"
+                      >
+                        Nama {childSortField === "name" ? (childSortOrder === "asc" ? "↑" : "↓") : "↕"}
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => handleChildSort("age")}
+                        className={`hover:text-brand-primary flex items-center gap-0.5 text-[9px] font-bold tracking-normal cursor-pointer select-none px-1.5 py-0.5 rounded border border-base-border/30 bg-base-white transition-all ${childSortField === "age" ? "text-brand-primary border-brand-primary bg-brand-soft/10" : "text-base-text-secondary"}`}
+                        title="Urutkan Usia"
+                      >
+                        Usia {childSortField === "age" ? (childSortOrder === "asc" ? "↑" : "↓") : "↕"}
+                      </button>
+                    </div>
+                  </div>
+                </th>
                 <th className="py-2.5 px-4">TANGGAL LAHIR</th>
-                <th className="py-2.5 px-4">NAMA IBU</th>
+                <th className="py-2.5 px-4 cursor-pointer select-none hover:text-brand-primary" onClick={() => handleChildSort("mother")}>
+                  <div className="flex items-center gap-1">
+                    <span>NAMA IBU</span>
+                    <span className="text-[10px]">{childSortField === "mother" ? (childSortOrder === "asc" ? "↑" : "↓") : "↕"}</span>
+                  </div>
+                </th>
                 <th className="py-2.5 px-4">TB / BB</th>
-                <th className="py-2.5 px-4">STATUS GIZI</th>
+                <th className="py-2.5 px-4 cursor-pointer select-none hover:text-brand-primary" onClick={() => handleChildSort("status")}>
+                  <div className="flex items-center gap-1">
+                    <span>STATUS GIZI</span>
+                    <span className="text-[10px]">{childSortField === "status" ? (childSortOrder === "asc" ? "↑" : "↓") : "↕"}</span>
+                  </div>
+                </th>
                 <th className="py-2.5 px-4 text-center">AKSI</th>
               </tr>
             </thead>
@@ -386,7 +953,7 @@ export default function DataAnakPage() {
                     <tr key={index} className={`border-b border-gray-50 transition-colors ${hoverColor}`}>
                       <td className="py-2.5 px-4 text-base-text-secondary font-medium">{child.id}</td>
                       <td className="py-2.5 px-4 flex items-center gap-3">
-                        <GenderIcon gender={child.gender} />
+                        <GenderIcon gender={child.gender} imageUrl={child.avatarUrl} />
                         <div>
                           <p className="font-bold text-base-text-primary leading-tight">{child.name}</p>
                           <p className="text-xs text-base-text-secondary mt-0.5">{child.age}</p>
@@ -499,9 +1066,11 @@ export default function DataAnakPage() {
             >
               <span>Filter</span> <MdFilterList className="w-4 h-4" />
             </button>
-            <Link href="/data-anak/input-penimbangan" className="flex items-center gap-2 px-4 py-2.5 bg-brand-primary text-base-white rounded-lg text-sm font-semibold hover:bg-status-pink-dark transition shadow-[0_4px_12px_rgba(234,41,134,0.15)]">
-              Input Penimbangan <MdAdd className="w-4 h-4" />
-            </Link>
+            {role === "kader" && (
+              <Link href="/data-anak/input-penimbangan" className="flex items-center gap-2 px-4 py-2.5 bg-brand-primary text-base-white rounded-lg text-sm font-semibold hover:bg-status-pink-dark transition shadow-[0_4px_12px_rgba(234,41,134,0.15)]">
+                Input Penimbangan <MdAdd className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
 
@@ -545,11 +1114,43 @@ export default function DataAnakPage() {
             <thead>
               <tr className="border-b border-gray-100 text-xs font-bold text-base-text-secondary uppercase tracking-wider">
                 <th className="py-2.5 px-4 w-12 text-gray-400">NO.</th>
-                <th className="py-2.5 px-4">TANGGAL TIMBANG</th>
-                <th className="py-2.5 px-4">NAMA ANAK</th>
+                <th className="py-2.5 px-4 cursor-pointer select-none hover:text-brand-primary" onClick={() => handleHistorySort("date")}>
+                  <div className="flex items-center gap-1">
+                    <span>TANGGAL TIMBANG</span>
+                    <span className="text-[10px]">{historySortField === "date" ? (historySortOrder === "asc" ? "↑" : "↓") : "↕"}</span>
+                  </div>
+                </th>
+                <th className="py-2.5 px-4 select-none">
+                  <div className="flex items-center gap-3">
+                    <span>NAMA ANAK</span>
+                    <div className="flex gap-1.5">
+                      <button 
+                        type="button" 
+                        onClick={() => handleHistorySort("name")}
+                        className={`hover:text-brand-primary flex items-center gap-0.5 text-[9px] font-bold tracking-normal cursor-pointer select-none px-1.5 py-0.5 rounded border border-base-border/30 bg-base-white transition-all ${historySortField === "name" ? "text-brand-primary border-brand-primary bg-brand-soft/10" : "text-base-text-secondary"}`}
+                        title="Urutkan Nama"
+                      >
+                        Nama {historySortField === "name" ? (historySortOrder === "asc" ? "↑" : "↓") : "↕"}
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => handleHistorySort("age")}
+                        className={`hover:text-brand-primary flex items-center gap-0.5 text-[9px] font-bold tracking-normal cursor-pointer select-none px-1.5 py-0.5 rounded border border-base-border/30 bg-base-white transition-all ${historySortField === "age" ? "text-brand-primary border-brand-primary bg-brand-soft/10" : "text-base-text-secondary"}`}
+                        title="Urutkan Usia"
+                      >
+                        Usia {historySortField === "age" ? (historySortOrder === "asc" ? "↑" : "↓") : "↕"}
+                      </button>
+                    </div>
+                  </div>
+                </th>
                 <th className="py-2.5 px-4">BERAT BADAN</th>
                 <th className="py-2.5 px-4">TINGGI BADAN</th>
-                <th className="py-2.5 px-4">STATUS GIZI</th>
+                <th className="py-2.5 px-4 cursor-pointer select-none hover:text-brand-primary" onClick={() => handleHistorySort("status")}>
+                  <div className="flex items-center gap-1">
+                    <span>STATUS GIZI</span>
+                    <span className="text-[10px]">{historySortField === "status" ? (historySortOrder === "asc" ? "↑" : "↓") : "↕"}</span>
+                  </div>
+                </th>
                 <th className="py-2.5 px-4 text-center">AKSI</th>
               </tr>
             </thead>
@@ -579,7 +1180,7 @@ export default function DataAnakPage() {
                       <td className="py-2.5 px-4 text-base-text-secondary font-medium">{item.id}</td>
                       <td className="py-2.5 px-4 text-base-text-primary font-medium">{item.date}</td>
                       <td className="py-2.5 px-4 flex items-center gap-3">
-                        <GenderIcon gender={item.gender} />
+                        <GenderIcon gender={item.gender} imageUrl={item.avatarUrl} />
                         <div>
                           <p className="font-bold text-base-text-primary leading-tight">{item.name}</p>
                           <p className="text-xs text-base-text-secondary mt-0.5">{item.age}</p>

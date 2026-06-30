@@ -1,19 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useUserRole } from "@/context/UserRoleContext";
 import { getMotherDetail, updateMother } from "@/app/actions/mothers";
 import { 
   MdArrowBack, MdPerson, MdCalendarToday, MdPhone, 
   MdPregnantWoman, MdBloodtype, MdOutlineError, MdFemale, MdMale,
-  MdEdit, MdSave, MdClose, MdCheckCircleOutline
+  MdEdit, MdSave, MdClose, MdCheckCircleOutline, MdCameraAlt
 } from "react-icons/md";
 import { FaUserFriends, FaHeartbeat } from "react-icons/fa";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 export default function MotherDetailPage() {
   const { id } = useParams();
+  const { role } = useUserRole();
   const [mother, setMother] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,6 +23,93 @@ export default function MotherDetailPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropOffset, setCropOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Ukuran gambar terlalu besar. Maksimal 5MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropImageSrc(reader.result as string);
+        setCropZoom(1);
+        setCropOffset({ x: 0, y: 0 });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - cropOffset.x, y: e.clientY - cropOffset.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setCropOffset({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    const touch = e.touches[0];
+    setDragStart({ x: touch.clientX - cropOffset.x, y: touch.clientY - cropOffset.y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    setCropOffset({
+      x: touch.clientX - dragStart.x,
+      y: touch.clientY - dragStart.y
+    });
+  };
+
+  const handleCropSave = () => {
+    if (!cropImageSrc) return;
+    const img = new Image();
+    img.src = cropImageSrc;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const size = 200;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.clearRect(0, 0, size, size);
+      ctx.translate(size / 2, size / 2);
+
+      const scaleFactor = size / 192;
+      ctx.translate(cropOffset.x * scaleFactor, cropOffset.y * scaleFactor);
+      ctx.scale(cropZoom, cropZoom);
+
+      const aspect = img.height / img.width;
+      const drawWidth = size;
+      const drawHeight = size * aspect;
+
+      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+      const croppedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+      setEditForm((prev: any) => ({ ...prev, avatarUrl: croppedBase64 }));
+      setCropImageSrc(null);
+    };
+  };
   const [editForm, setEditForm] = useState<any>({
     national_id: "",
     mother_name: "",
@@ -60,7 +149,8 @@ export default function MotherDetailPage() {
       estimated_due_date: mother.estimated_due_date && mother.estimated_due_date !== "-" ? mother.estimated_due_date : "",
       risk_status: mother.condition || "Normal",
       ui_status: mother.status || "Ibu Hamil",
-      number_of_children: mother.number_of_children || 0
+      number_of_children: mother.number_of_children || 0,
+      avatarUrl: mother.avatarUrl || ""
     });
     setIsEditing(true);
   };
@@ -159,10 +249,44 @@ export default function MotherDetailPage() {
         <div className="flex items-center gap-4">
           <Link 
             href="/data-ibu"
-            className="p-2.5 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary bg-base-white rounded-xl hover:bg-brand-soft/20 transition cursor-pointer"
+            className="p-2.5 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary bg-base-white rounded-xl hover:bg-brand-soft/20 transition cursor-pointer shrink-0"
           >
             <MdArrowBack className="w-5 h-5" />
           </Link>
+          
+          {/* Avatar Profile Picture */}
+          {isEditing ? (
+            <div 
+              onClick={() => fileInputRef.current?.click()}
+              className="relative w-16 h-16 rounded-full overflow-hidden border border-brand-primary shadow-sm shrink-0 flex items-center justify-center cursor-pointer group bg-status-yellow-light text-status-yellow-solid"
+              title="Klik untuk ubah foto profil"
+            >
+              {editForm.avatarUrl ? (
+                <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                <MdPerson className="w-9 h-9" />
+              )}
+              <div className="absolute inset-0 bg-base-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <MdCameraAlt className="w-6 h-6 text-base-white" />
+              </div>
+              <input 
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
+          ) : (
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-base-border/30 shadow-sm shrink-0 bg-status-yellow-light text-status-yellow-solid flex items-center justify-center">
+              {mother.avatarUrl ? (
+                <img src={mother.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                <MdPerson className="w-9 h-9" />
+              )}
+            </div>
+          )}
+
           <div>
             <div className="flex items-center gap-3">
               {isEditing ? (
@@ -229,13 +353,15 @@ export default function MotherDetailPage() {
               </button>
             </div>
           ) : (
-            <button 
-              type="button"
-              onClick={handleStartEdit}
-              className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
-            >
-              <MdEdit className="w-4 h-4" /> Edit Data Ibu
-            </button>
+            role !== "ibu" && (
+              <button 
+                type="button"
+                onClick={handleStartEdit}
+                className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
+              >
+                <MdEdit className="w-4 h-4" /> Edit Data Ibu
+              </button>
+            )
           )}
         </div>
       </div>
@@ -544,6 +670,81 @@ export default function MotherDetailPage() {
                 className="w-full max-w-[200px] py-2.5 rounded-xl bg-status-green-solid text-base-white font-bold hover:bg-status-green-solid/90 transition shadow-sm cursor-pointer text-xs"
               >
                 Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Crop Image Modal */}
+      {cropImageSrc && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-2xl max-w-sm w-full p-6 border border-base-border/30 shadow-2xl space-y-6 flex flex-col items-center animate-in zoom-in-95 duration-200">
+            <div className="text-center w-full">
+              <h3 className="text-lg font-bold text-base-text-primary">Sesuaikan Foto Profil</h3>
+              <p className="text-xs text-base-text-secondary mt-1">Geser dan perbesar foto agar pas di dalam lingkaran.</p>
+            </div>
+
+            {/* Crop Viewport container */}
+            <div 
+              className="w-64 h-64 border border-base-border/30 rounded-xl relative overflow-hidden bg-base-bg flex items-center justify-center select-none"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleMouseUp}
+            >
+              {/* Circular view overlay masking everything outside */}
+              <div className="absolute w-48 h-48 rounded-full border-2 border-brand-primary z-10 pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"></div>
+              
+              {/* The Image inside */}
+              <img 
+                src={cropImageSrc} 
+                alt="Raw Preview" 
+                draggable={false}
+                style={{
+                  transform: `translate(${cropOffset.x}px, ${cropOffset.y}px) scale(${cropZoom})`,
+                  maxWidth: 'none',
+                  width: '192px',
+                  height: 'auto'
+                }}
+                className="select-none pointer-events-none origin-center"
+              />
+            </div>
+
+            {/* Slider control */}
+            <div className="w-full space-y-2">
+              <div className="flex justify-between text-xs font-bold text-base-text-secondary">
+                <span>Perkecil</span>
+                <span>Perbesar</span>
+              </div>
+              <input 
+                type="range" 
+                min="1" 
+                max="3" 
+                step="0.02" 
+                value={cropZoom} 
+                onChange={(e) => setCropZoom(parseFloat(e.target.value))} 
+                className="w-full h-1.5 bg-base-border rounded-lg appearance-none cursor-pointer accent-brand-primary" 
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-3 w-full">
+              <button
+                type="button"
+                onClick={() => setCropImageSrc(null)}
+                className="flex-1 py-2.5 rounded-xl border border-base-border/50 text-base-text-secondary font-bold text-xs hover:bg-base-bg transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleCropSave}
+                className="flex-1 py-2.5 rounded-xl bg-brand-primary text-base-white font-bold text-xs hover:bg-brand-primary/95 transition shadow-md shadow-brand-primary/10 cursor-pointer"
+              >
+                Terapkan
               </button>
             </div>
           </div>

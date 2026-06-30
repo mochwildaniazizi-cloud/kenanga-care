@@ -12,6 +12,8 @@ import {
   MdUndo, MdRedo, MdInsertPhoto, MdGridOn,
   MdFormatAlignLeft, MdFormatAlignCenter, MdFormatAlignRight, MdFormatAlignJustify
 } from "react-icons/md";
+import { mockArticles } from "../data";
+import { useUserRole } from "@/context/UserRoleContext";
 
 const AVAILABLE_CATEGORIES = [
   "Gizi & MPASI",
@@ -22,9 +24,26 @@ const AVAILABLE_CATEGORIES = [
 ];
 
 function TambahArtikelForm() {
+  const { role } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get("category");
+  const editId = searchParams.get("edit");
+
+  useEffect(() => {
+    if (role === "ibu") {
+      router.replace("/edukasi");
+    }
+  }, [role, router]);
+
+  if (role === "ibu") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="w-10 h-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-semibold text-base-text-secondary">Mengalihkan...</p>
+      </div>
+    );
+  }
 
   // Form State
   const [title, setTitle] = useState("");
@@ -58,6 +77,9 @@ function TambahArtikelForm() {
   // Table editing states
   const [selectedTable, setSelectedTable] = useState<HTMLTableElement | null>(null);
   const [tableAlign, setTableAlign] = useState<"left" | "center" | "right" | "full">("full");
+  const [selectedCell, setSelectedCell] = useState<HTMLTableCellElement | null>(null);
+  const [cellAlign, setCellAlign] = useState<"left" | "center" | "right">("left");
+  const [columnWidth, setColumnWidth] = useState<string>("");
 
   const handleEditorClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
@@ -86,10 +108,14 @@ function TambahArtikelForm() {
       return;
     }
 
-    // Otherwise find table ancestor
+    // Otherwise find table ancestor (also check for cell)
     let currentElement: HTMLElement | null = target;
     let foundTable: HTMLTableElement | null = null;
+    let foundCell: HTMLTableCellElement | null = null;
     while (currentElement && currentElement !== editorRef.current) {
+      if (currentElement.tagName === "TD" || currentElement.tagName === "TH") {
+        foundCell = currentElement as HTMLTableCellElement;
+      }
       if (currentElement.tagName === "TABLE") {
         foundTable = currentElement as HTMLTableElement;
         break;
@@ -100,6 +126,14 @@ function TambahArtikelForm() {
     if (foundTable) {
       setSelectedTable(foundTable);
       setSelectedImg(null); // Clear image selection
+      if (foundCell) {
+        setSelectedCell(foundCell);
+        setCellAlign((foundCell.style.textAlign as any) || "left");
+        setColumnWidth(foundCell.style.width || "");
+      } else {
+        setSelectedCell(null);
+        setColumnWidth("");
+      }
       if (foundTable.style.float === "left") {
         setTableAlign("left");
       } else if (foundTable.style.float === "right") {
@@ -112,6 +146,7 @@ function TambahArtikelForm() {
     } else {
       setSelectedImg(null);
       setSelectedTable(null);
+      setSelectedCell(null);
     }
   };
 
@@ -192,12 +227,31 @@ function TambahArtikelForm() {
       for (let i = 0; i < cellCount; i++) {
         const newCell = document.createElement("td");
         newCell.className = "border border-base-border/80 p-2";
-        newCell.innerHTML = "Isi baris baru...";
+        newCell.innerHTML = "";
         newRow.appendChild(newCell);
       }
       tbody.appendChild(newRow);
       if (editorRef.current) {
         setContent(editorRef.current.innerHTML);
+      }
+    }
+  };
+
+  const removeRow = () => {
+    if (selectedTable && selectedCell) {
+      const row = selectedCell.closest("tr");
+      if (row) {
+        row.remove();
+        setSelectedCell(null);
+        if (editorRef.current) setContent(editorRef.current.innerHTML);
+      }
+    } else if (selectedTable) {
+      // Remove last row
+      const tbody = selectedTable.querySelector("tbody") || selectedTable;
+      const rows = tbody.querySelectorAll("tr");
+      if (rows.length > 0) {
+        rows[rows.length - 1].remove();
+        if (editorRef.current) setContent(editorRef.current.innerHTML);
       }
     }
   };
@@ -215,7 +269,7 @@ function TambahArtikelForm() {
       rows.forEach(row => {
         const td = document.createElement("td");
         td.className = "border border-base-border/80 p-2";
-        td.innerHTML = "Isi kolom baru...";
+        td.innerHTML = "";
         row.appendChild(td);
       });
       if (rows.length === 0) {
@@ -223,13 +277,58 @@ function TambahArtikelForm() {
         const newRow = document.createElement("tr");
         const td = document.createElement("td");
         td.className = "border border-base-border/80 p-2";
-        td.innerHTML = "Isi kolom baru...";
+        td.innerHTML = "";
         newRow.appendChild(td);
         tbody.appendChild(newRow);
       }
       if (editorRef.current) {
         setContent(editorRef.current.innerHTML);
       }
+    }
+  };
+
+  const removeColumn = () => {
+    if (selectedTable && selectedCell) {
+      const cellIndex = selectedCell.cellIndex;
+      const allRows = selectedTable.querySelectorAll("tr");
+      allRows.forEach(row => {
+        if (row.cells[cellIndex]) {
+          row.deleteCell(cellIndex);
+        }
+      });
+      setSelectedCell(null);
+      if (editorRef.current) setContent(editorRef.current.innerHTML);
+    } else if (selectedTable) {
+      // Remove last column
+      const allRows = selectedTable.querySelectorAll("tr");
+      allRows.forEach(row => {
+        if (row.cells.length > 0) {
+          row.deleteCell(row.cells.length - 1);
+        }
+      });
+      if (editorRef.current) setContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const handleCellAlignChange = (align: "left" | "center" | "right") => {
+    setCellAlign(align);
+    if (selectedCell) {
+      selectedCell.style.textAlign = align;
+      if (editorRef.current) setContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const handleColumnWidthChange = (val: string) => {
+    setColumnWidth(val);
+    if (selectedCell && selectedTable) {
+      const cellIndex = selectedCell.cellIndex;
+      const allRows = selectedTable.querySelectorAll("tr");
+      allRows.forEach(row => {
+        if (row.cells[cellIndex]) {
+          (row.cells[cellIndex] as HTMLElement).style.width = val ? (/^\d+$/.test(val) ? `${val}px` : val) : "";
+        }
+      });
+      if (editorRef.current) setContent(editorRef.current.innerHTML);
     }
   };
 
@@ -387,6 +486,52 @@ function TambahArtikelForm() {
     }
   }, [initialCategory]);
 
+  // Load data for edit mode
+  useEffect(() => {
+    if (editId) {
+      // 1. Check custom articles
+      const local = localStorage.getItem("custom_articles");
+      let found: any = null;
+      if (local) {
+        try {
+          const parsed = JSON.parse(local);
+          found = parsed.find((a: any) => a.id === editId);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      
+      // 2. If not found in custom, check mock articles
+      if (!found) {
+        found = mockArticles.find((a) => a.id === editId);
+        if (found) {
+          const mockContent = getMockContent(found.id, found.title);
+          found = { ...found, content: mockContent };
+        }
+      }
+
+      if (found) {
+        setTitle(found.title);
+        setType(found.type);
+        const durMatch = found.duration.match(/^(\d+)/);
+        setDurationValue(durMatch ? durMatch[1] : "");
+        
+        if (found.imageUrl.startsWith("data:image/")) {
+          setImageSourceType("file");
+        } else {
+          setImageSourceType("url");
+        }
+        setImageUrl(found.imageUrl);
+        setSelectedCategories(found.categories);
+        setContent(found.content || "");
+        
+        if (editorRef.current) {
+          editorRef.current.innerHTML = found.content || "";
+        }
+      }
+    }
+  }, [editId]);
+
   const handleCategoryToggle = (cat: string) => {
     setSelectedCategories(prev =>
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
@@ -406,8 +551,9 @@ function TambahArtikelForm() {
 
     setIsSubmitting(true);
 
+    const isEditMode = !!editId;
     const newArticle = {
-      id: "CUSTOM_" + Date.now(),
+      id: isEditMode ? editId : "CUSTOM_" + Date.now(),
       title,
       categories: selectedCategories,
       type,
@@ -419,8 +565,19 @@ function TambahArtikelForm() {
     // Save to localStorage
     try {
       const existing = localStorage.getItem("custom_articles");
-      const list = existing ? JSON.parse(existing) : [];
-      list.push(newArticle);
+      let list = existing ? JSON.parse(existing) : [];
+      
+      if (isEditMode) {
+        const index = list.findIndex((a: any) => a.id === editId);
+        if (index > -1) {
+          list[index] = newArticle;
+        } else {
+          list.push(newArticle);
+        }
+      } else {
+        list.push(newArticle);
+      }
+      
       localStorage.setItem("custom_articles", JSON.stringify(list));
 
       setShowSuccessModal(true);
@@ -437,15 +594,17 @@ function TambahArtikelForm() {
       {/* Header & Back Link */}
       <div className="mb-6">
         <Link 
-          href="/edukasi" 
+          href={editId ? `/edukasi/${editId}` : "/edukasi"} 
           className="inline-flex items-center gap-2 text-base-text-primary font-bold hover:text-brand-primary transition"
         >
-          <FiArrowLeft className="w-4 h-4" /> Kembali ke Edukasi
+          <FiArrowLeft className="w-4 h-4" /> {editId ? "Kembali ke Detail Artikel" : "Kembali ke Edukasi"}
         </Link>
       </div>
 
       <div className="bg-base-white rounded-bento-lg p-8 shadow-sm border border-base-border/30">
-        <h1 className="text-2xl font-bold text-base-text-primary mb-2">Tulis Artikel / Konten Baru</h1>
+        <h1 className="text-2xl font-bold text-base-text-primary mb-2">
+          {editId ? "Edit Artikel / Konten" : "Tulis Artikel / Konten Baru"}
+        </h1>
         <p className="text-sm text-base-text-secondary mb-8">Berbagi info kesehatan ibu, imunisasi anak, gizi MPASI, dan tumbuh kembang balita.</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -646,7 +805,7 @@ function TambahArtikelForm() {
                 {/* Local Placeholder Styles */}
                 <style>{`
                   .rich-editor[contenteditable]:empty::before {
-                    content: attr(placeholder);
+                    content: attr(data-placeholder);
                     color: #94a3b8;
                     cursor: text;
                   }
@@ -957,86 +1116,114 @@ function TambahArtikelForm() {
 
                   {/* Floating/Inline Table Editor Controls */}
                   {selectedTable && (
-                    <div className="bg-brand-soft/20 border-b border-base-border/50 p-3 flex flex-wrap items-center gap-4 text-xs font-semibold text-base-text-primary animate-in slide-in-from-top duration-200">
-                      <div className="flex items-center gap-2">
-                        <span className="text-brand-primary font-bold">Pengaturan Tabel:</span>
-                      </div>
+                    <div className="bg-brand-soft/20 border-b border-base-border/50 p-3 flex flex-col gap-3 text-xs font-semibold text-base-text-primary animate-in slide-in-from-top duration-200">
                       
-                      {/* Add Row Button */}
-                      <button
-                        type="button"
-                        onClick={addRow}
-                        className="px-2.5 py-1 border border-base-border/50 bg-base-white hover:bg-base-bg rounded text-xs transition cursor-pointer text-base-text-primary"
-                      >
-                        + Baris (Row)
-                      </button>
+                      {/* Row 1: Label + Row/Col actions + table align + delete */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-brand-primary font-bold shrink-0">Tabel:</span>
 
-                      {/* Add Column Button */}
-                      <button
-                        type="button"
-                        onClick={addColumn}
-                        className="px-2.5 py-1 border border-base-border/50 bg-base-white hover:bg-base-bg rounded text-xs transition cursor-pointer text-base-text-primary"
-                      >
-                        + Kolom (Col)
-                      </button>
+                        {/* Separator */}
+                        <span className="text-[10px] text-base-text-secondary font-semibold shrink-0">Baris</span>
+                        <button
+                          type="button"
+                          onClick={addRow}
+                          className="px-2 py-1 border border-status-green-solid/50 bg-status-green-light text-status-green-solid hover:bg-status-green-solid hover:text-white rounded text-[10px] transition cursor-pointer font-bold"
+                        >
+                          + Tambah
+                        </button>
+                        <button
+                          type="button"
+                          onClick={removeRow}
+                          title={selectedCell ? "Hapus baris sel yang dipilih" : "Hapus baris terakhir"}
+                          className="px-2 py-1 border border-red-300 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded text-[10px] transition cursor-pointer font-bold"
+                        >
+                          − Hapus
+                        </button>
 
-                      {/* Align buttons */}
-                      <div className="flex items-center gap-1">
-                        <span>Rata Tabel:</span>
+                        <span className="w-px h-4 bg-base-border/50 mx-1"></span>
+
+                        <span className="text-[10px] text-base-text-secondary font-semibold shrink-0">Kolom</span>
                         <button
                           type="button"
-                          onClick={() => handleTableAlignChange("left")}
-                          className={`px-2.5 py-1 border rounded text-[10px] cursor-pointer transition ${
-                            tableAlign === "left"
-                              ? "bg-brand-primary text-base-white border-brand-primary"
-                              : "bg-base-white border-base-border/50 hover:bg-base-bg text-base-text-secondary"
-                          }`}
+                          onClick={addColumn}
+                          className="px-2 py-1 border border-status-green-solid/50 bg-status-green-light text-status-green-solid hover:bg-status-green-solid hover:text-white rounded text-[10px] transition cursor-pointer font-bold"
                         >
-                          Kiri
+                          + Tambah
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleTableAlignChange("center")}
-                          className={`px-2.5 py-1 border rounded text-[10px] cursor-pointer transition ${
-                            tableAlign === "center"
-                              ? "bg-brand-primary text-base-white border-brand-primary"
-                              : "bg-base-white border-base-border/50 hover:bg-base-bg text-base-text-secondary"
-                          }`}
+                          onClick={removeColumn}
+                          title={selectedCell ? "Hapus kolom sel yang dipilih" : "Hapus kolom terakhir"}
+                          className="px-2 py-1 border border-red-300 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded text-[10px] transition cursor-pointer font-bold"
                         >
-                          Tengah
+                          − Hapus
                         </button>
+
+                        <span className="w-px h-4 bg-base-border/50 mx-1"></span>
+
+                        {/* Table position align */}
+                        <span className="text-[10px] text-base-text-secondary font-semibold shrink-0">Posisi Tabel:</span>
+                        {(["left", "center", "right", "full"] as const).map(a => (
+                          <button
+                            key={a}
+                            type="button"
+                            onClick={() => handleTableAlignChange(a)}
+                            className={`px-2 py-1 border rounded text-[10px] cursor-pointer transition ${
+                              tableAlign === a
+                                ? "bg-brand-primary text-base-white border-brand-primary"
+                                : "bg-base-white border-base-border/50 hover:bg-base-bg text-base-text-secondary"
+                            }`}
+                          >
+                            {a === "left" ? "Kiri" : a === "center" ? "Tengah" : a === "right" ? "Kanan" : "Penuh"}
+                          </button>
+                        ))}
+
+                        {/* Delete Table */}
                         <button
                           type="button"
-                          onClick={() => handleTableAlignChange("right")}
-                          className={`px-2.5 py-1 border rounded text-[10px] cursor-pointer transition ${
-                            tableAlign === "right"
-                              ? "bg-brand-primary text-base-white border-brand-primary"
-                              : "bg-base-white border-base-border/50 hover:bg-base-bg text-base-text-secondary"
-                          }`}
+                          onClick={handleDeleteTable}
+                          className="ml-auto px-3 py-1 bg-red-500 hover:bg-red-600 text-base-white rounded text-[10px] font-bold transition cursor-pointer"
                         >
-                          Kanan
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleTableAlignChange("full")}
-                          className={`px-2.5 py-1 border rounded text-[10px] cursor-pointer transition ${
-                            tableAlign === "full"
-                              ? "bg-brand-primary text-base-white border-brand-primary"
-                              : "bg-base-white border-base-border/50 hover:bg-base-bg text-base-text-secondary"
-                          }`}
-                        >
-                          Lebar Penuh
+                          Hapus Tabel
                         </button>
                       </div>
 
-                      {/* Remove Button */}
-                      <button
-                        type="button"
-                        onClick={handleDeleteTable}
-                        className="ml-auto px-3 py-1 bg-red-500 hover:bg-red-600 text-base-white rounded text-[10px] font-bold transition cursor-pointer"
-                      >
-                        Hapus Tabel
-                      </button>
+                      {/* Row 2: Cell controls (only show when a cell is selected) */}
+                      {selectedCell && (
+                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-base-border/30">
+                          <span className="text-brand-primary/80 font-bold shrink-0">Sel Aktif:</span>
+
+                          {/* Cell text align */}
+                          <span className="text-[10px] text-base-text-secondary font-semibold">Rata Teks:</span>
+                          {(["left", "center", "right"] as const).map(a => (
+                            <button
+                              key={a}
+                              type="button"
+                              onClick={() => handleCellAlignChange(a)}
+                              className={`px-2 py-1 border rounded text-[10px] cursor-pointer transition ${
+                                cellAlign === a
+                                  ? "bg-brand-primary text-base-white border-brand-primary"
+                                  : "bg-base-white border-base-border/50 hover:bg-base-bg text-base-text-secondary"
+                              }`}
+                            >
+                              {a === "left" ? "Kiri" : a === "center" ? "Tengah" : "Kanan"}
+                            </button>
+                          ))}
+
+                          <span className="w-px h-4 bg-base-border/50 mx-1"></span>
+
+                          {/* Column width */}
+                          <span className="text-[10px] text-base-text-secondary font-semibold">Lebar Kolom:</span>
+                          <input
+                            type="text"
+                            value={columnWidth}
+                            onChange={(e) => handleColumnWidthChange(e.target.value)}
+                            placeholder="mis. 120px atau 20%"
+                            className="w-28 px-2 py-1 border border-base-border/50 rounded bg-base-white text-xs text-base-text-primary focus:outline-none focus:border-brand-primary"
+                          />
+                          <span className="text-[10px] text-base-text-secondary">berlaku ke seluruh kolom</span>
+                        </div>
+                      )}
                     </div>
                   )}
                   
@@ -1049,7 +1236,7 @@ function TambahArtikelForm() {
                     onClick={handleEditorClick}
                     onMouseUp={handleEditorMouseUp}
                     className="rich-editor min-h-[300px] p-4 focus:outline-none bg-transparent text-base-text-primary text-sm prose max-w-none dark:prose-invert overflow-y-auto"
-                    placeholder="Tuliskan artikel informatif Anda di sini..."
+                    data-placeholder="Tuliskan artikel informatif Anda di sini..."
                   />
 
                   <input
@@ -1075,7 +1262,7 @@ function TambahArtikelForm() {
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t border-base-border/20">
             <Link
-              href="/edukasi"
+              href={editId ? `/edukasi/${editId}` : "/edukasi"}
               className="px-6 py-2.5 rounded-xl border border-base-border/50 hover:bg-base-bg text-base-text-secondary font-bold transition text-xs flex items-center"
             >
               Batal
@@ -1085,7 +1272,7 @@ function TambahArtikelForm() {
               disabled={isSubmitting}
               className="px-6 py-2.5 bg-brand-primary text-base-white hover:bg-status-pink-dark rounded-xl text-xs font-bold shadow-md shadow-brand-primary/10 transition cursor-pointer"
             >
-              {isSubmitting ? "Menyimpan..." : "Simpan Konten"}
+              {isSubmitting ? "Menyimpan..." : editId ? "Simpan Perubahan" : "Simpan Konten"}
             </button>
           </div>
         </form>
@@ -1099,9 +1286,13 @@ function TambahArtikelForm() {
               <div className="w-16 h-16 bg-status-green-light text-status-green-solid rounded-full flex items-center justify-center mx-auto mb-2">
                 <MdCheckCircleOutline className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-base-text-primary">Berhasil Ditambahkan</h3>
+              <h3 className="text-xl font-bold text-base-text-primary">
+                {editId ? "Berhasil Diperbarui" : "Berhasil Ditambahkan"}
+              </h3>
               <p className="text-sm text-base-text-secondary">
-                Artikel atau video edukasi baru berhasil diterbitkan ke katalog posyandu.
+                {editId 
+                  ? "Artikel atau video edukasi berhasil diperbarui."
+                  : "Artikel atau video edukasi baru berhasil diterbitkan ke katalog posyandu."}
               </p>
             </div>
             <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex justify-center">
@@ -1109,11 +1300,11 @@ function TambahArtikelForm() {
                 type="button"
                 onClick={() => {
                   setShowSuccessModal(false);
-                  router.push("/edukasi");
+                  router.push(editId ? `/edukasi/${editId}` : "/edukasi");
                 }}
                 className="w-full max-w-[200px] py-2.5 rounded-xl bg-status-green-solid text-base-white font-bold hover:bg-status-green-solid/90 transition shadow-sm cursor-pointer text-xs"
               >
-                Kembali ke Edukasi
+                {editId ? "Lihat Artikel" : "Kembali ke Edukasi"}
               </button>
             </div>
           </div>
@@ -1134,4 +1325,180 @@ export default function TambahArtikelPage() {
       <TambahArtikelForm />
     </Suspense>
   );
+}
+
+function getMockContent(id: string, title: string): string {
+  if (id === "L1") {
+    return `
+      <p>Memasuki usia 6 bulan, kebutuhan gizi bayi tidak lagi dapat dipenuhi hanya oleh ASI. Disinilah peran MPASI (Makanan Pendamping ASI) pertama sangat krusial untuk mencegah stunting dan melatih keterampilan motorik oral anak.</p>
+      
+      <h2>1. Jadwal Pemberian MPASI</h2>
+      <p>Jadwal makan sebaiknya teratur agar bayi mengenali rasa lapar dan kenyang. Berikut adalah jadwal yang disarankan untuk bayi usia 6 bulan:</p>
+      <ul>
+        <li><strong>06.00:</strong> ASI</li>
+        <li><strong>08.00:</strong> MPASI Utama Pagi (Porsi 2-3 sendok makan)</li>
+        <li><strong>10.00:</strong> Selingan buah lumat atau ASI</li>
+        <li><strong>12.00:</strong> MPASI Utama Siang</li>
+        <li><strong>14.00:</strong> ASI</li>
+        <li><strong>16.00:</strong> Selingan sore / ASI</li>
+        <li><strong>18.00:</strong> MPASI Utama Sore (opsional/bertahap)</li>
+      </ul>
+
+      <h2>2. Tekstur Makanan</h2>
+      <p>Untuk bayi 6 bulan, tekstur wajib berupa <strong>puree halus (bubur saring)</strong>. Makanan harus disaring menggunakan saringan kawat agar tidak menyisakan serat kasar yang dapat membuat bayi tersedak.</p>
+      
+      <blockquote>
+        "Jangan memberikan makanan yang terlalu encer. Makanan pendamping harus cukup kental sehingga tidak mudah jatuh dari sendok saat dimiringkan." - Panduan Gizi Kemenkes
+      </blockquote>
+
+      <h2>3. Contoh Porsi dan Kandungan Gizi</h2>
+      <p>Gunakan konsep menu lengkap (mengandung karbohidrat, protein hewani, lemak, sedikit sayur/buah). Berikut adalah tabel takaran gizi harian yang direkomendasikan:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Bahan Makanan</th>
+            <th>Fungsi Utama</th>
+            <th>Porsi per Sajian</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Beras Merah/Putih</td>
+            <td>Energi & Karbohidrat</td>
+            <td>1-1.5 sendok makan</td>
+          </tr>
+          <tr>
+            <td>Hati Ayam / Daging Sapi</td>
+            <td>Zat Besi & Protein Hewani</td>
+            <td>1 sendok makan (haluskan)</td>
+          </tr>
+          <tr>
+            <td>Minyak Kelapa / Mentega</td>
+            <td>Lemak Tambahan (Kalori)</td>
+            <td>1/2 sendok teh</td>
+          </tr>
+          <tr>
+            <td>Bayam / Wortel</td>
+            <td>Vitamin & Mineral</td>
+            <td>Seujung sendok (hanya perkenalan)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=600&auto=format&fit=crop" alt="MPASI Sehat Bayi 6 Bulan" />
+
+      <h2>Kesimpulan</h2>
+      <p>Mulailah dengan sabar dan biarkan bayi menikmati proses belajarnya. Tanda MPASI berhasil adalah ketika kenaikan berat badan bayi sesuai kurva KMS di posyandu.</p>
+    `;
+  }
+  
+  if (id === "L2") {
+    return `
+      <p>Imunisasi adalah langkah preventif paling efektif untuk melindungi anak dari penyakit menular berbahaya. Di Indonesia, Kementerian Kesehatan menetapkan jadwal imunisasi dasar wajib yang harus didapatkan lengkap sebelum anak berusia 1 tahun.</p>
+      
+      <blockquote>
+        "Mencegah jauh lebih baik, lebih murah, dan lebih aman daripada mengobati. Imunisasi lengkap melatih sistem imun anak agar siap menghadapi infeksi nyata."
+      </blockquote>
+
+      <h2>Jadwal Imunisasi Lengkap Usia 0 - 12 Bulan</h2>
+      <p>Pastikan buah hati Anda mendapatkan imunisasi berikut tepat waktu sesuai dengan bulannya:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Usia Anak</th>
+            <th>Jenis Imunisasi Wajib</th>
+            <th>Melindungi Dari Penyakit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kurang dari 24 Jam</td>
+            <td>Hepatitis B (HB-0)</td>
+            <td>Kerusakan hati (Hepatitis B)</td>
+          </tr>
+          <tr>
+            <td>1 Bulan</td>
+            <td>BCG & Polio 1</td>
+            <td>TBC (Tuberkulosis) & Kelumpuhan (Polio)</td>
+          </tr>
+          <tr>
+            <td>2 Bulan</td>
+            <td>DPT-HB-Hib 1, Polio 2, PCV 1, Rotavirus 1</td>
+            <td>Difteri, Tetanus, Pertusis, Radang Paru, Diare Akut</td>
+          </tr>
+          <tr>
+            <td>3 Bulan</td>
+            <td>DPT-HB-Hib 2, Polio 3, Rotavirus 2</td>
+            <td>Difteri, Tetanus, Batuk Rejan, Diare Rotavirus</td>
+          </tr>
+          <tr>
+            <td>4 Bulan</td>
+            <td>DPT-HB-Hib 3, Polio 4, IPV (Polio suntik), Rotavirus 3</td>
+            <td>Perlindungan ganda polio dan tetanus infeksius</td>
+          </tr>
+          <tr>
+            <td>9 Bulan</td>
+            <td>Campak-Rubella (MR) 1, PCV 3</td>
+            <td>Campak dan kecacatan janin bawaan (Rubella)</td>
+          </tr>
+          <tr>
+            <td>12 Bulan</td>
+            <td>PCV Lanjutan</td>
+            <td>Penguat kekebalan paru anak</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Apa yang Harus Dilakukan Setelah Imunisasi?</h2>
+      <p>Umumnya anak akan mengalami reaksi ringan atau KIPI (Kejadian Ikutan Pasca Imunisasi) seperti demam ringan atau kemerahan di bekas suntikan. Langkah penanganannya:</p>
+      <ol>
+        <li>Kompres area bekas suntikan dengan kain bersih yang dibasahi air dingin.</li>
+        <li>Berikan ASI lebih sering untuk menjaga hidrasi bayi.</li>
+        <li>Berikan obat penurun panas sesuai dosis rekomendasi dokter atau bidan jika suhu tubuh di atas 38°C.</li>
+      </ol>
+    `;
+  }
+
+  return `
+    <p>Ini adalah isi artikel tentang <strong>${title}</strong>.</p>
+    <p>Artikel ini berisi informasi berharga untuk memantau kesehatan dan asupan nutrisi optimal bagi ibu dan balita Anda di Posyandu.</p>
+    
+    <blockquote>
+      "Keluarga sehat dan bahagia dimulai dari pemahaman gizi dan tumbuh kembang anak sejak 1000 Hari Pertama Kehidupan (HPK)."
+    </blockquote>
+
+    <h2>Panduan Kesehatan Praktis</h2>
+    <p>Lakukan pemeriksaan rutin di Posyandu setiap bulan untuk memantau status gizi anak secara akurat melalui kurva berat badan dan tinggi badan.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Langkah Pemantauan</th>
+          <th>Frekuensi</th>
+          <th>Tujuan Utama</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Penimbangan Berat Badan</td>
+          <td>Setiap Bulan</td>
+          <td>Deteksi dini gagal tumbuh / stunting</td>
+        </tr>
+        <tr>
+          <td>Pengukuran Tinggi Badan</td>
+          <td>Setiap Bulan</td>
+          <td>Mengukur perkembangan tulang linier anak</td>
+        </tr>
+        <tr>
+          <td>Konsultasi Bidan/Kader</td>
+          <td>Setiap Bulan</td>
+          <td>Mendapatkan saran pemberian nutrisi MPASI</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p>Selalu penuhi kebutuhan nutrisi hewani, sayuran hijau, dan air putih berkualitas demi menjaga kebugaran tubuh harian.</p>
+  `;
 }

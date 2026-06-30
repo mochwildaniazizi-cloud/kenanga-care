@@ -5,30 +5,48 @@ import Link from "next/link";
 import { 
   MdDashboard, MdVaccines, MdPregnantWoman, 
   MdChildCare, MdOutlineLocalDining, MdOutlineExtension,
-  MdAdd
+  MdAdd, MdBookmark
 } from "react-icons/md";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import ArticleCard from "@/components/ArticleCard";
 import { mockArticles, CategoryType } from "./data";
+import { useUserRole } from "@/context/UserRoleContext";
 
-type TabType = CategoryType | "Semua";
+type TabType = CategoryType | "Semua" | "Tersimpan";
 
 export default function EdukasiPage() {
+  const { role } = useUserRole();
   const [activeTab, setActiveTab] = useState<TabType>("Semua");
   const [savedArticles, setSavedArticles] = useState<Set<string>>(new Set());
   const [articles, setArticles] = useState<any[]>(mockArticles);
 
   useEffect(() => {
     const local = localStorage.getItem("custom_articles");
+    let customList: any[] = [];
     if (local) {
       try {
-        const parsed = JSON.parse(local);
-        // Ensure id uniqueness and format consistency
-        setArticles([...mockArticles, ...parsed]);
+        customList = JSON.parse(local);
       } catch (e) {
         console.error("Failed to parse custom articles", e);
       }
     }
+
+    const deleted = localStorage.getItem("deleted_articles_ids");
+    let deletedIds = new Set<string>();
+    if (deleted) {
+      try {
+        deletedIds = new Set(JSON.parse(deleted));
+      } catch (e) {
+        console.error("Failed to parse deleted articles list", e);
+      }
+    }
+
+    // Filter and deduplicate
+    const customIds = new Set(customList.map((a: any) => a.id));
+    const filteredMock = mockArticles.filter(a => !deletedIds.has(a.id) && !customIds.has(a.id));
+    const filteredCustom = customList.filter((a: any) => !deletedIds.has(a.id));
+
+    setArticles([...filteredMock, ...filteredCustom]);
 
     // Load saved bookmarks from localStorage
     const bookmarks = localStorage.getItem("saved_articles_ids");
@@ -86,10 +104,15 @@ export default function EdukasiPage() {
       colorStyle: "border-status-cerulean-solid text-status-cerulean-solid", 
       activeStyle: "bg-status-cerulean-solid text-base-white border-status-cerulean-solid" 
     },
+    { 
+      id: "Tersimpan", label: "Tersimpan", icon: MdBookmark, 
+      colorStyle: "border-brand-primary text-brand-primary", 
+      activeStyle: "bg-brand-primary text-base-white border-brand-primary" 
+    },
   ];
 
   return (
-    <div className="max-w-[1200px] mx-auto pb-10 space-y-8">
+    <div className="w-full pb-10 space-y-8">
       
       {/* TABS SECTION */}
       <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar">
@@ -265,6 +288,44 @@ export default function EdukasiPage() {
           </div>
 
         </div>
+      ) : activeTab === "Tersimpan" ? (
+        // --- TERSIMPAN VIEW ---
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-brand-primary flex items-center gap-2">
+              <MdBookmark className="w-5 h-5" /> Artikel Tersimpan
+            </h2>
+            <span className="text-sm text-base-text-secondary font-medium">{savedArticles.size} artikel</span>
+          </div>
+          {savedArticles.size === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+              <div className="w-20 h-20 rounded-full bg-brand-soft/50 flex items-center justify-center">
+                <MdBookmark className="w-10 h-10 text-brand-primary/40" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-base font-bold text-base-text-primary">Belum Ada Artikel Tersimpan</p>
+                <p className="text-sm text-base-text-secondary max-w-[280px] leading-relaxed">Tekan ikon bookmark pada artikel mana pun untuk menyimpannya di sini.</p>
+              </div>
+              <button 
+                onClick={() => setActiveTab("Semua")}
+                className="mt-2 px-6 py-2.5 bg-brand-primary text-base-white font-bold text-sm rounded-full hover:bg-brand-primary/90 transition shadow-sm cursor-pointer"
+              >
+                Jelajahi Artikel
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {articles.filter(a => savedArticles.has(a.id)).map(article => (
+                <ArticleCard 
+                  key={article.id} 
+                  article={article} 
+                  isSaved={true}
+                  onToggleSave={() => toggleBookmark(article.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       ) : (
         // --- KATEGORI VIEW ---
         <div className="space-y-6">
@@ -274,14 +335,16 @@ export default function EdukasiPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Add New Article Card */}
-            <Link 
-              href={`/edukasi/tambah?category=${encodeURIComponent(activeTab)}`}
-              className="border-2 border-dashed border-base-border/60 rounded-2xl flex flex-col items-center justify-center p-6 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary hover:bg-brand-soft/10 transition-all group min-h-[300px]"
-            >
-              <MdAdd className="w-12 h-12 mb-2 text-base-text-secondary group-hover:text-brand-primary transition-colors" />
-              <span className="font-bold text-sm text-base-text-primary group-hover:text-brand-primary">Tulis Artikel Baru</span>
-              <span className="text-xs text-center mt-1">Berbagi Ilmu untuk Kesehatan Ibu dan Anak</span>
-            </Link>
+            {role !== "ibu" && (
+              <Link 
+                href={`/edukasi/tambah?category=${encodeURIComponent(activeTab)}`}
+                className="border-2 border-dashed border-base-border/60 rounded-2xl flex flex-col items-center justify-center p-6 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary hover:bg-brand-soft/10 transition-all group min-h-[300px]"
+              >
+                <MdAdd className="w-12 h-12 mb-2 text-base-text-secondary group-hover:text-brand-primary transition-colors" />
+                <span className="font-bold text-sm text-base-text-primary group-hover:text-brand-primary">Tulis Artikel Baru</span>
+                <span className="text-xs text-center mt-1">Berbagi Ilmu untuk Kesehatan Ibu dan Anak</span>
+              </Link>
+            )}
 
             {/* Articles List */}
             {articles.filter(a => a.categories.includes(activeTab as CategoryType)).map(article => (

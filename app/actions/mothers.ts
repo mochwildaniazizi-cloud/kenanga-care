@@ -1,9 +1,42 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import fs from "fs";
 
-function determineMotherStatus(uiStatus: string | null, childrenCount: number, children: any[]) {
+const AVATAR_FILE_PATH = "c:/Code/kenanga-care/custom_avatars.json";
+
+function getCustomAvatars() {
+  try {
+    if (fs.existsSync(AVATAR_FILE_PATH)) {
+      const content = fs.readFileSync(AVATAR_FILE_PATH, "utf-8");
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.error("Error reading custom avatars:", err);
+  }
+  return { mothers: {}, children: {} };
+}
+
+function saveCustomAvatar(type: "mothers" | "children", id: string, url: string | null) {
+  try {
+    const data = getCustomAvatars();
+    if (!data[type]) data[type] = {};
+    if (url) {
+      data[type][id] = url;
+    } else {
+      delete data[type][id];
+    }
+    fs.writeFileSync(AVATAR_FILE_PATH, JSON.stringify(data, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Error saving custom avatar:", err);
+  }
+}
+
+function determineMotherStatus(uiStatus: string | null, childrenCount: number, children: any[], estimatedDueDate: Date | null) {
   let status = uiStatus || "Ibu Balita";
+  if (estimatedDueDate) {
+    return "Ibu Hamil";
+  }
   if ((status === "Calon Ibu" || status === "Ibu Hamil") && (childrenCount > 0 || children.length > 0)) {
     // Check if any child is born within 42 days (Nifas)
     const hasRecentChild = children.some((c: any) => {
@@ -17,6 +50,34 @@ function determineMotherStatus(uiStatus: string | null, childrenCount: number, c
   }
   return status;
 }
+function calculateGestationalOrNifasAge(status: string, estimatedDueDate: Date | null, children: any[]) {
+  if (status === "Ibu Hamil" && estimatedDueDate) {
+    const hplDate = new Date(estimatedDueDate);
+    const now = new Date();
+    const diffTime = hplDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffWeeks = Math.floor(diffDays / 7);
+    const gestationalWeeks = Math.max(1, Math.min(42, 40 - diffWeeks));
+    return `${gestationalWeeks} Minggu`;
+  }
+  
+  if (status === "Ibu Nifas") {
+    let nifasDays = 0;
+    if (children.length > 0) {
+      const birthDates = children
+        .map((c: any) => c.birth_date ? new Date(c.birth_date) : null)
+        .filter(Boolean) as Date[];
+      if (birthDates.length > 0) {
+        const newestBirth = new Date(Math.max(...birthDates.map(d => d.getTime())));
+        const diffTime = Math.abs(new Date().getTime() - newestBirth.getTime());
+        nifasDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      }
+    }
+    return nifasDays > 0 ? `Nifas Hari ke-${nifasDays}` : "Masa Nifas";
+  }
+
+  return "-";
+}
 
 export async function getMothersData() {
   try {
@@ -29,18 +90,15 @@ export async function getMothersData() {
       }
     });
 
+    const avatars = getCustomAvatars();
+    const customMothersAvatars = avatars.mothers || {};
+
     return mothers.map((mother, index) => {
       const children = mother.children || [];
       const childrenCount = mother.number_of_children || children.length || 0;
-      const status = determineMotherStatus(mother.ui_status, childrenCount, children);
+      const status = determineMotherStatus(mother.ui_status, childrenCount, children, mother.estimated_due_date);
 
-      const isPregnant = status === "Ibu Hamil";
-      let gestationalAge = "-";
-      if (isPregnant && mother.estimated_due_date) {
-        gestationalAge = "24 Minggu"; 
-      } else if (status === "Ibu Nifas") {
-        gestationalAge = "Masa Nifas";
-      }
+      const gestationalAge = calculateGestationalOrNifasAge(status, mother.estimated_due_date, children);
 
       const hpl = mother.estimated_due_date 
         ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(mother.estimated_due_date)
@@ -52,9 +110,19 @@ export async function getMothersData() {
         national_id: mother.national_id,
         name: mother.mother_name,
         age: mother.age ? `${mother.age} Tahun` : "-",
+        rawAge: mother.age || 0,
         status,
         gestationalAge,
         hpl,
+        rawHpl: mother.estimated_due_date ? mother.estimated_due_date.toISOString() : "",
+        avatarUrl: customMothersAvatars[mother.mother_id] 
+          || (mother.mother_name.includes("Dewi") 
+            ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+            : mother.mother_name.includes("Wulandari")
+            ? "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop"
+            : mother.mother_name.includes("Fitriani")
+            ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop"
+            : null),
         condition: mother.risk_status || "Normal"
       };
     });
@@ -83,6 +151,7 @@ export async function getMaternalHistory() {
       return {
         id: (index + 1).toString().padStart(2, "0"),
         date,
+        rawDate: record.visit_date.toISOString(),
         name: record.mother.mother_name,
         weight: record.weight ? Number(record.weight) : null,
         bloodPressure: record.blood_pressure || "-",
@@ -216,15 +285,9 @@ export async function getMotherDetail(motherId: string) {
 
     const children = mother.children || [];
     const childrenCount = mother.number_of_children || children.length || 0;
-    const status = determineMotherStatus(mother.ui_status, childrenCount, children);
+    const status = determineMotherStatus(mother.ui_status, childrenCount, children, mother.estimated_due_date);
 
-    const isPregnant = status === "Ibu Hamil";
-    let gestationalAge = "-";
-    if (isPregnant && mother.estimated_due_date) {
-      gestationalAge = "24 Minggu"; 
-    } else if (status === "Ibu Nifas") {
-      gestationalAge = "Masa Nifas";
-    }
+    const gestationalAge = calculateGestationalOrNifasAge(status, mother.estimated_due_date, children);
 
     const hpl = mother.estimated_due_date 
       ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(mother.estimated_due_date)
@@ -233,6 +296,9 @@ export async function getMotherDetail(motherId: string) {
     const dobIndo = mother.birth_date
       ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(mother.birth_date)
       : "-";
+
+    const avatars = getCustomAvatars();
+    const customMothersAvatars = avatars.mothers || {};
 
     return {
       mother_id: mother.mother_id,
@@ -249,6 +315,14 @@ export async function getMotherDetail(motherId: string) {
       hpl,
       condition: mother.risk_status || "Normal",
       number_of_children: childrenCount,
+      avatarUrl: customMothersAvatars[mother.mother_id] 
+        || (mother.mother_name.includes("Dewi") 
+          ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+          : mother.mother_name.includes("Wulandari")
+          ? "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop"
+          : mother.mother_name.includes("Fitriani")
+          ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop"
+          : null),
       children: mother.children.map((c: any) => {
         const birthDate = c.birth_date ? new Date(c.birth_date) : null;
         let ageStr = "-";
@@ -320,12 +394,77 @@ export async function updateMother(motherId: string, data: any) {
       }
     });
 
+    // Save custom avatar to local file store
+    if (data.avatarUrl !== undefined) {
+      saveCustomAvatar("mothers", motherId, data.avatarUrl);
+    }
+
     return { success: true, id: updated.mother_id };
   } catch (error: any) {
     console.error("Error updating mother:", error);
     return { success: false, error: error.message || "Gagal memperbarui data ibu." };
   }
 }
+
+export async function getLoggedInMotherData(username: string) {
+  try {
+    if (!username) return null;
+
+    // Clean username (e.g. "Ibu Aminah (Demo)" -> "Siti Aminah")
+    let cleanUsername = username.replace(/\s*\(Demo\)\s*/gi, "").trim();
+    // Map common demo variants
+    if (cleanUsername.toLowerCase() === "ibu aminah" || cleanUsername.toLowerCase() === "ibu") {
+      cleanUsername = "Siti Aminah";
+    }
+
+    // Try to find by name, national_id, or phone_number
+    let mother = await prisma.mother.findFirst({
+      where: {
+        OR: [
+          { mother_name: { equals: cleanUsername, mode: "insensitive" } },
+          { mother_name: { contains: cleanUsername, mode: "insensitive" } },
+          { national_id: cleanUsername },
+          { phone_number: cleanUsername }
+        ]
+      },
+      include: {
+        children: true
+      }
+    });
+
+    // Fallback if not found to "Siti Aminah" or first mother in database
+    if (!mother) {
+      mother = await prisma.mother.findFirst({
+        where: { mother_name: { contains: "Aminah", mode: "insensitive" } },
+        include: { children: true }
+      });
+    }
+
+    if (!mother) {
+      mother = await prisma.mother.findFirst({
+        include: { children: true }
+      });
+    }
+
+    if (!mother) return null;
+
+    return {
+      mother_id: mother.mother_id,
+      mother_name: mother.mother_name,
+      national_id: mother.national_id,
+      children: mother.children.map(c => ({
+        child_id: c.child_id,
+        child_name: c.child_name,
+        gender: c.gender,
+        birth_date: c.birth_date ? c.birth_date.toISOString() : null,
+      }))
+    };
+  } catch (error) {
+    console.error("Error in getLoggedInMotherData:", error);
+    return null;
+  }
+}
+
 
 
 

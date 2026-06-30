@@ -1,4 +1,4 @@
-// src/components/ActivityTableCard.tsx
+import Link from "next/link";
 import StatusBadge, { StatusType } from "./StatusBadge";
 
 interface ActivityTableCardProps {
@@ -6,16 +6,20 @@ interface ActivityTableCardProps {
   description: string;
   columns: string[];
   data: { time: string; name: string; detail: string; status: StatusType; avatar: string }[];
+  viewAllHref?: string;
 }
 
-export default function ActivityTableCard({ title, description, columns, data }: ActivityTableCardProps) {
+export default function ActivityTableCard({ title, description, columns, data, viewAllHref }: ActivityTableCardProps) {
   return (
     // Menggunakan rounded-bento-lg dan bg-card
     <div className="bg-card p-8 rounded-bento-lg shadow-sm border border-gray-100 h-full flex flex-col">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-        {/* Menggunakan text-kenanga-pink */}
-        <a href="#" className="text-sm font-medium text-kenanga-pink hover:underline">Lihat Semua</a>
+        {viewAllHref && (
+          <Link href={viewAllHref} className="text-sm font-medium text-brand-primary hover:underline transition">
+            Lihat Semua
+          </Link>
+        )}
       </div>
       <p className="text-sm text-gray-500 mb-8">{description}</p>
       
