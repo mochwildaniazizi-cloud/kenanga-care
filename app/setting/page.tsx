@@ -12,11 +12,12 @@ import {
   LockClosedIcon,
   GlobeAltIcon,
   CheckIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  UsersIcon
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData } from "@/app/actions/mothers";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
 export default function SettingsPage() {
@@ -68,13 +69,46 @@ function SettingsContent() {
       setActiveTab("account");
     } else if (tabParam === "about") {
       setActiveTab("about");
+    } else if (tabParam === "users" && role === "kader") {
+      setActiveTab("users");
     } else {
       setActiveTab("profile");
     }
-  }, [tabParam]);
+  }, [tabParam, role]);
 
   const { role, username } = useUserRole();
   const [motherDetail, setMotherDetail] = useState<any>(null);
+
+  // Users Management states
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Load mothers for user management if kader
+  useEffect(() => {
+    if (role === "kader") {
+      getMothersData().then((data) => {
+        const mothersList = data.map((m) => ({
+          name: m.name,
+          username: m.phone || m.nik || "Tidak ada",
+          role: m.status || "Ibu Balita",
+          type: "Ibu / Orang Tua",
+          phone: m.phone,
+          status: "Aktif",
+        }));
+        
+        const kaderUser = {
+          name: "Kader Siti",
+          username: "kader",
+          role: "Ketua Kader",
+          type: "Kader Posyandu",
+          phone: "0812-3456-7890",
+          status: "Aktif",
+        };
+
+        setAllUsers([kaderUser, ...mothersList]);
+      });
+    }
+  }, [role]);
 
   // Load from local storage or database
   useEffect(() => {
@@ -255,6 +289,20 @@ function SettingsContent() {
             <InformationCircleIcon className="w-5 h-5" />
             <span>Tentang Aplikasi</span>
           </button>
+
+          {role === "kader" && (
+            <button
+              onClick={() => { setActiveTab("users"); router.push("/setting?tab=users"); }}
+              className={`flex items-center gap-3.5 w-full p-3.5 rounded-xl text-left transition duration-150 cursor-pointer ${
+                activeTab === "users" 
+                  ? "bg-brand-primary text-base-white font-semibold shadow-md"
+                  : "text-base-text-secondary hover:bg-brand-soft hover:text-brand-primary font-medium"
+              }`}
+            >
+              <UsersIcon className="w-5 h-5" />
+              <span>Kelola Pengguna</span>
+            </button>
+          )}
         </div>
 
         {/* Right Side: Bento Content Area */}
@@ -547,6 +595,90 @@ function SettingsContent() {
 
               <div className="text-[11px] text-base-text-secondary/70">
                 © 2026 Posyandu Kenanga. All rights reserved.
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: KELOLA PENGGUNA (Only for Kader) */}
+          {activeTab === "users" && role === "kader" && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-base-text-primary">Kelola Pengguna</h3>
+                  <p className="text-xs md:text-sm text-base-text-secondary">Daftar akun Kader dan Ibu yang terdaftar di database Posyandu Kenanga 1.</p>
+                </div>
+                
+                {/* Search Input */}
+                <div className="relative max-w-xs w-full">
+                  <input
+                    type="text"
+                    placeholder="Cari nama atau username..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-base-bg border border-base-border/40 focus:border-brand-primary rounded-xl py-2 px-4 pl-9 text-xs outline-none transition-colors text-base-text-primary focus:bg-base-white"
+                  />
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute left-3 top-2.5 w-4 h-4 text-base-text-secondary">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Table / Cards */}
+              <div className="border border-base-border/20 rounded-2xl overflow-hidden shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-base-bg/50 border-b border-base-border/20 text-xs font-bold text-base-text-secondary uppercase">
+                        <th className="py-3 px-4">Nama Lengkap</th>
+                        <th className="py-3 px-4">Username (Akses)</th>
+                        <th className="py-3 px-4">Tipe Akun</th>
+                        <th className="py-3 px-4">Peran / Status</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4 text-right">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-base-border/10 text-xs">
+                      {(allUsers.filter(user => 
+                        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+                      )).length > 0 ? (
+                        (allUsers.filter(user => 
+                          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          user.username.toLowerCase().includes(searchTerm.toLowerCase())
+                        )).map((user, idx) => (
+                          <tr key={idx} className="hover:bg-base-bg/25 transition duration-150">
+                            <td className="py-3.5 px-4 font-bold text-base-text-primary">{user.name}</td>
+                            <td className="py-3.5 px-4 font-mono text-base-text-secondary">{user.username}</td>
+                            <td className="py-3.5 px-4 font-semibold text-base-text-secondary">{user.type}</td>
+                            <td className="py-3.5 px-4 font-semibold text-base-text-secondary">{user.role}</td>
+                            <td className="py-3.5 px-4">
+                              <span className="px-2 py-0.5 rounded-full bg-status-green-light text-status-green-solid font-bold text-[10px]">
+                                {user.status}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right space-x-2">
+                              <button 
+                                onClick={() => {
+                                  setSuccessMessage(`Akses & Kata sandi untuk ${user.name} berhasil di-reset ke default.`);
+                                  setShowSuccessModal(true);
+                                }}
+                                className="px-3 py-1.5 rounded-lg border border-base-border/50 text-[10px] text-base-text-primary font-bold hover:bg-brand-soft hover:text-brand-primary transition cursor-pointer"
+                              >
+                                Reset Kata Sandi
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-sm text-base-text-secondary font-medium">
+                            Tidak ada pengguna ditemukan.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
