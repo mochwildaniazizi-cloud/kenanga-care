@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import fs from "fs";
+import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 
 const AVATAR_FILE_PATH = "c:/Code/kenanga-care/custom_avatars.json";
 
@@ -326,19 +327,31 @@ export async function getMotherDetail(motherId: string) {
       children: mother.children.map((c: any) => {
         const birthDate = c.birth_date ? new Date(c.birth_date) : null;
         let ageStr = "-";
+        let ageInMonths = 0;
         if (birthDate) {
           const now = new Date();
           const yearsDiff = now.getFullYear() - birthDate.getFullYear();
           const monthsDiff = now.getMonth() - birthDate.getMonth();
-          const totalMonths = yearsDiff * 12 + monthsDiff;
-          ageStr = `${totalMonths} Bulan`;
+          ageInMonths = yearsDiff * 12 + monthsDiff;
+          ageStr = `${ageInMonths} Bulan`;
         }
+
+        let status = "Normal";
+        if (c.current_weight && c.current_height && birthDate) {
+          const zScoreBB = calculateZScore(Number(c.current_weight), ageInMonths, c.gender, "BB");
+          const zScoreTB = calculateZScore(Number(c.current_height), ageInMonths, c.gender, "TB");
+          status = getNutritionalStatus(zScoreBB, zScoreTB);
+        }
+
         return {
           child_id: c.child_id,
           name: c.child_name,
           gender: c.gender,
           age: ageStr,
           dob: birthDate ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(birthDate) : "-",
+          current_weight: c.current_weight ? Number(c.current_weight) : null,
+          current_height: c.current_height ? Number(c.current_height) : null,
+          status,
         };
       }),
       maternal_records: mother.maternal_records.map((r: any) => {
