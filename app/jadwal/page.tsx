@@ -643,10 +643,20 @@ export default function JadwalPage() {
                   <div>
                     <label className="block text-xs font-bold text-base-text-primary mb-1.5">Tanggal Kegiatan</label>
                     <CustomDatePicker 
-                      value={editingSchedule.date}
-                      onChange={(val) => setEditingSchedule({...editingSchedule, date: val})}
+                      value={editingSchedule.rawDate}
+                      onChange={(val) => {
+                        if (!val) return;
+                        const parts = val.split("-");
+                        const parsedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        const verbalStr = parsedDate.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+                        setEditingSchedule({
+                          ...editingSchedule,
+                          rawDate: val,
+                          date: verbalStr
+                        });
+                      }}
                       label="Select a day"
-                      outputFormat="verbal"
+                      outputFormat="iso"
                     />
                   </div>
 
