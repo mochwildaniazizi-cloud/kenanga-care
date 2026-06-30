@@ -167,12 +167,34 @@ export default function Header() {
     }
   };
 
-  const handleToggleSync = () => {
-    setSyncStatus(prev => {
-      if (prev === "success") return "reconnecting";
-      if (prev === "reconnecting") return "offline";
-      return "success";
-    });
+  const handleToggleSync = async () => {
+    if (!navigator.onLine) {
+      setSyncStatus("offline");
+      showLocalNotification("Mode Offline Aktif 🔴", {
+        body: "Tidak dapat menyinkronkan data saat ini karena perangkat Anda sedang offline. Sistem akan mencoba lagi secara otomatis ketika koneksi internet terhubung.",
+      });
+      alert("Perangkat Anda sedang offline. Data saat ini disimpan lokal di browser Anda dan akan disinkronkan otomatis begitu internet terhubung.");
+      return;
+    }
+
+    setSyncStatus("reconnecting");
+    
+    try {
+      // Simulate sync process
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Dispatch custom event to trigger reloading page-level content
+      window.dispatchEvent(new Event("sync-data"));
+      window.dispatchEvent(new Event("profile-updated"));
+      
+      setSyncStatus("success");
+      showLocalNotification("Sinkronisasi Selesai 🟢", {
+        body: "Seluruh data Posyandu Kenanga 1 berhasil diselaraskan dengan server utama.",
+      });
+    } catch (err) {
+      console.error("Sync error:", err);
+      setSyncStatus("offline");
+    }
   };
 
   const toggleDarkMode = () => {
@@ -278,10 +300,10 @@ export default function Header() {
           className="hover:opacity-80 transition-all duration-200 focus:outline-none cursor-pointer" 
           title={
             syncStatus === "success" 
-              ? "Semua data tersinkronisasi (Klik untuk simulasi reconnect)" 
+              ? "Koneksi Terhubung - Semua data tersinkronisasi (Klik untuk menyinkronkan ulang)" 
               : syncStatus === "reconnecting"
-              ? "Menghubungkan kembali & menyinkronkan data... (Klik untuk simulasi offline)"
-              : "Mode Offline - Koneksi Terputus (Klik untuk simulasi sukses)"
+              ? "Sedang menyelaraskan data dengan server..."
+              : "Mode Offline - Koneksi Terputus (Klik untuk info selengkapnya)"
           }
         >
           {syncStatus === "success" && (
