@@ -67,7 +67,7 @@ export async function getDashboardStats() {
 
     // Calculate problematic nutrition kids dynamically
     let problematicNutrition = 0;
-    allChildren.forEach((c) => {
+    allChildren.forEach((c: any) => {
       if (c.current_weight && c.current_height && c.birth_date) {
         const ageInMonths = calculateAgeInMonths(c.birth_date);
         const zScoreBB = calculateZScore(Number(c.current_weight), ageInMonths, c.gender, "BB");
