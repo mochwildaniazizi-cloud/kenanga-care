@@ -1,7 +1,12 @@
-const CACHE_NAME = "kenanga-care-cache-v1";
+const CACHE_NAME = "kenanga-care-cache-v2";
 const ASSETS_TO_CACHE = [
   "/",
   "/login",
+  "/data-anak",
+  "/data-ibu",
+  "/edukasi",
+  "/setting",
+  "/jadwal",
   "/manifest.json",
   "/Logo.png",
   "/file.svg",

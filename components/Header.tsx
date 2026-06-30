@@ -49,6 +49,17 @@ export default function Header() {
   const [hasUnreadNotif, setHasUnreadNotif] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [alertModal, setAlertModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    type: "success" | "error" | "info";
+  }>({
+    show: false,
+    title: "",
+    message: "",
+    type: "info"
+  });
   const [profile, setProfile] = useState({
     name: "Kader Siti",
     posyandu: "Posyandu Kenanga 1"
@@ -228,7 +239,12 @@ export default function Header() {
       showLocalNotification("Mode Offline Aktif 🔴", {
         body: "Tidak dapat menyinkronkan data saat ini karena perangkat Anda sedang offline. Sistem akan mencoba lagi secara otomatis ketika koneksi internet terhubung.",
       });
-      alert("Perangkat Anda sedang offline. Data saat ini disimpan lokal di browser Anda dan akan disinkronkan otomatis begitu internet terhubung.");
+      setAlertModal({
+        show: true,
+        title: "Perangkat Offline",
+        message: "Perangkat Anda sedang offline. Data saat ini disimpan lokal di browser Anda dan akan disinkronkan otomatis begitu internet terhubung.",
+        type: "info"
+      });
       return;
     }
 
@@ -248,7 +264,12 @@ export default function Header() {
           : "Seluruh data Posyandu Kenanga 1 berhasil diselaraskan dengan server utama.",
       });
       if (count > 0) {
-        alert(`Sinkronisasi selesai! Berhasil mengirimkan ${count} data pemeriksaan offline ke database.`);
+        setAlertModal({
+          show: true,
+          title: "Sinkronisasi Berhasil",
+          message: `Sinkronisasi selesai! Berhasil mengirimkan ${count} data pemeriksaan offline ke database.`,
+          type: "success"
+        });
       }
     } catch (err) {
       console.error("Sync error:", err);
@@ -580,6 +601,37 @@ export default function Header() {
                 Ya, Keluar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Design System Alert Modal */}
+      {alertModal.show && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-2xl shadow-xl w-[90%] max-w-sm overflow-hidden border border-base-border/20 p-6 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center space-y-3">
+              {alertModal.type === "success" ? (
+                <div className="w-12 h-12 bg-status-green-light text-status-green-solid rounded-full flex items-center justify-center text-xl font-bold">
+                  ✓
+                </div>
+              ) : alertModal.type === "error" ? (
+                <div className="w-12 h-12 bg-status-red-light text-status-red-solid rounded-full flex items-center justify-center text-xl font-bold">
+                  ✕
+                </div>
+              ) : (
+                <div className="w-12 h-12 bg-brand-soft text-brand-primary rounded-full flex items-center justify-center text-xl font-bold">
+                  i
+                </div>
+              )}
+              <h3 className="text-base font-bold text-base-text-primary">{alertModal.title}</h3>
+              <p className="text-xs text-base-text-secondary leading-relaxed font-semibold">{alertModal.message}</p>
+            </div>
+            <button
+              onClick={() => setAlertModal(prev => ({ ...prev, show: false }))}
+              className="w-full bg-brand-primary hover:bg-brand-primary/95 text-base-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer shadow-sm shadow-brand-primary/10"
+            >
+              OK
+            </button>
           </div>
         </div>
       )}

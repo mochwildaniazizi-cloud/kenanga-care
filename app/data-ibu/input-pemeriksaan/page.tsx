@@ -72,6 +72,10 @@ export default function InputPemeriksaanIbuPage() {
   // Modals state
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successModalContent, setSuccessModalContent] = useState({
+    title: "Berhasil Disimpan",
+    message: "Data riwayat pemeriksaan kesehatan ibu berhasil disimpan ke database."
+  });
 
   // Fetch mothers list on mount
   useEffect(() => {
@@ -202,7 +206,10 @@ export default function InputPemeriksaanIbuPage() {
       showLocalNotification("Data Ibu Disimpan Offline", {
         body: `Pemeriksaan kesehatan untuk ${selectedMother.name} disimpan secara offline.`,
       });
-      alert("Koneksi Anda offline. Data pemeriksaan ibu telah disimpan secara lokal di cache peramban dan akan otomatis disinkronkan saat terhubung kembali.");
+      setSuccessModalContent({
+        title: "Disimpan Offline",
+        message: "Koneksi Anda offline. Data pemeriksaan ibu telah disimpan secara lokal di cache peramban dan akan otomatis disinkronkan saat terhubung kembali."
+      });
       setShowSuccessModal(true);
       return;
     }
@@ -214,6 +221,10 @@ export default function InputPemeriksaanIbuPage() {
       if (result.success) {
         showLocalNotification("Data Pemeriksaan Ibu Disimpan", {
           body: `Pemeriksaan kesehatan untuk ${selectedMother.name} telah berhasil disimpan.`,
+        });
+        setSuccessModalContent({
+          title: "Berhasil Disimpan",
+          message: "Data riwayat pemeriksaan kesehatan ibu berhasil disimpan ke database."
         });
         setShowSuccessModal(true);
       } else {
@@ -229,7 +240,10 @@ export default function InputPemeriksaanIbuPage() {
       showLocalNotification("Data Ibu Disimpan Offline", {
         body: `Pemeriksaan kesehatan untuk ${selectedMother.name} disimpan secara offline.`,
       });
-      alert("Gagal menghubungi server. Data pemeriksaan ibu disimpan lokal di cache peramban dan akan disinkronkan otomatis saat jaringan kembali stabil.");
+      setSuccessModalContent({
+        title: "Disimpan Offline",
+        message: "Gagal menghubungi server. Data pemeriksaan ibu disimpan lokal di cache peramban dan akan disinkronkan otomatis saat jaringan kembali stabil."
+      });
       setShowSuccessModal(true);
     }
   };
@@ -542,9 +556,9 @@ export default function InputPemeriksaanIbuPage() {
               <div className="w-16 h-16 bg-status-green-light text-status-green-solid rounded-full flex items-center justify-center mx-auto mb-2">
                 <CheckIcon className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-base-text-primary">Berhasil Disimpan</h3>
+              <h3 className="text-xl font-bold text-base-text-primary">{successModalContent.title}</h3>
               <p className="text-sm text-base-text-secondary">
-                Data riwayat pemeriksaan kesehatan ibu berhasil disimpan ke database.
+                {successModalContent.message}
               </p>
             </div>
             <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex justify-center">

@@ -226,24 +226,49 @@ export default function DataAnakPage() {
     downwardTrend: 0 
   });
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [children, history, fetchedMetrics] = await Promise.all([
-          getChildrenData(),
-          getMeasurementHistory(),
-          getChildMetrics()
-        ]);
-        setChildrenList(children);
-        setHistoryList(history);
-        setMetrics(fetchedMetrics);
-      } catch (error) {
-        console.error("Failed to load data:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  const loadData = async () => {
+    try {
+      const [children, history, fetchedMetrics] = await Promise.all([
+        getChildrenData(),
+        getMeasurementHistory(),
+        getChildMetrics()
+      ]);
+      setChildrenList(children);
+      setHistoryList(history);
+      setMetrics(fetchedMetrics);
+      
+      localStorage.setItem("offline_children_list", JSON.stringify(children));
+      localStorage.setItem("offline_children_history", JSON.stringify(history));
+      localStorage.setItem("offline_children_metrics", JSON.stringify(fetchedMetrics));
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const cachedChildren = localStorage.getItem("offline_children_list");
+    const cachedHistory = localStorage.getItem("offline_children_history");
+    const cachedMetrics = localStorage.getItem("offline_children_metrics");
+
+    if (cachedChildren) setChildrenList(JSON.parse(cachedChildren));
+    if (cachedHistory) setHistoryList(JSON.parse(cachedHistory));
+    if (cachedMetrics) setMetrics(JSON.parse(cachedMetrics));
+    
+    if (cachedChildren || cachedHistory || cachedMetrics) {
+      setIsLoading(false);
+    }
+
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const handleSync = () => {
+      loadData();
+    };
+    window.addEventListener("sync-data", handleSync);
+    return () => window.removeEventListener("sync-data", handleSync);
   }, []);
 
   useEffect(() => {

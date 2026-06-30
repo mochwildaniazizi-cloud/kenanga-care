@@ -192,24 +192,49 @@ export default function DataIbuPage() {
     }
   };
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [mothers, history, fetchedMetrics] = await Promise.all([
-          getMothersData(),
-          getMaternalHistory(),
-          getMotherMetrics()
-        ]);
-        setMothersList(mothers);
-        setHistoryList(history);
-        setMetrics(fetchedMetrics);
-      } catch (error) {
-        console.error("Failed to load data:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  const loadData = async () => {
+    try {
+      const [mothers, history, fetchedMetrics] = await Promise.all([
+        getMothersData(),
+        getMaternalHistory(),
+        getMotherMetrics()
+      ]);
+      setMothersList(mothers);
+      setHistoryList(history);
+      setMetrics(fetchedMetrics);
+      
+      localStorage.setItem("offline_mothers_list", JSON.stringify(mothers));
+      localStorage.setItem("offline_mothers_history", JSON.stringify(history));
+      localStorage.setItem("offline_mothers_metrics", JSON.stringify(fetchedMetrics));
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const cachedMothers = localStorage.getItem("offline_mothers_list");
+    const cachedHistory = localStorage.getItem("offline_mothers_history");
+    const cachedMetrics = localStorage.getItem("offline_mothers_metrics");
+
+    if (cachedMothers) setMothersList(JSON.parse(cachedMothers));
+    if (cachedHistory) setHistoryList(JSON.parse(cachedHistory));
+    if (cachedMetrics) setMetrics(JSON.parse(cachedMetrics));
+    
+    if (cachedMothers || cachedHistory || cachedMetrics) {
+      setIsLoading(false);
+    }
+
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const handleSync = () => {
+      loadData();
+    };
+    window.addEventListener("sync-data", handleSync);
+    return () => window.removeEventListener("sync-data", handleSync);
   }, []);
 
   useEffect(() => {

@@ -316,7 +316,6 @@ function SettingsContent() {
       }
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan sistem. Menyimpan secara offline lokal...");
       // Fallback save offline
       const usernameVal = newUserForm.phone;
       const fallbackData = {
@@ -332,7 +331,7 @@ function SettingsContent() {
       pending.push(fallbackData);
       localStorage.setItem("pending_create_mothers", JSON.stringify(pending));
 
-      setSuccessMessage(`Gagal tersambung ke jaringan. Akun ${newUserForm.name} disimpan secara offline.`);
+      setSuccessMessage(`Gagal menghubungi server. Akun ${newUserForm.name} disimpan secara offline.`);
       setShowSuccessModal(true);
       setShowAddUserModal(false);
       refreshUsersList();
