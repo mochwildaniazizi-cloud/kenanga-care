@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -47,6 +47,9 @@ function SettingsContent() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
   // Profile Form State
   const [formData, setFormData] = useState({
     name: "Kader Siti",
@@ -274,6 +277,10 @@ function SettingsContent() {
   // Load from local storage or database
   useEffect(() => {
     async function loadProfileData() {
+      const savedAvatar = localStorage.getItem("user_profile_avatar");
+      if (savedAvatar) {
+        setAvatarUrl(savedAvatar);
+      }
       if (role === "ibu") {
         try {
           const loggedInMother = await getLoggedInMotherData(username);
@@ -349,6 +356,25 @@ function SettingsContent() {
 
     setSuccessMessage("Informasi profil Anda telah berhasil diperbarui dan disimpan.");
     setShowSuccessModal(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Ukuran file maksimal 2 MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setAvatarUrl(base64String);
+      localStorage.setItem("user_profile_avatar", base64String);
+      window.dispatchEvent(new Event("profile-updated"));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handlePasswordSave = (e: React.FormEvent) => {
@@ -487,8 +513,15 @@ function SettingsContent() {
               <form onSubmit={handleProfileSave} className="space-y-5">
                 {/* Avatar change */}
                 <div className="flex flex-col sm:flex-row items-center gap-4 p-4 bg-base-bg/30 border border-base-border/20 rounded-2xl w-fit">
-                  <div className="relative group cursor-pointer w-20 h-20 bg-brand-soft rounded-full flex items-center justify-center font-bold text-brand-primary border border-brand-primary/20 text-3xl">
-                    {getInitials(formData.name)}
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="relative group cursor-pointer w-20 h-20 bg-brand-soft rounded-full flex items-center justify-center font-bold text-brand-primary border border-brand-primary/20 text-3xl overflow-hidden"
+                  >
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={formData.name} className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(formData.name)
+                    )}
                     <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition duration-150">
                       <CameraIcon className="w-6 h-6 text-white" />
                     </div>
@@ -496,7 +529,20 @@ function SettingsContent() {
                   <div className="text-center sm:text-left space-y-1">
                     <h4 className="font-semibold text-sm text-base-text-primary">Foto Profil</h4>
                     <p className="text-[11px] text-base-text-secondary">Unggah foto format JPG/PNG, ukuran maks. 2 MB</p>
-                    <button type="button" className="px-3 py-1 bg-base-white border border-base-border/50 text-[11px] rounded-lg text-base-text-primary hover:bg-brand-soft hover:text-brand-primary transition">Pilih File</button>
+                    <button 
+                      type="button" 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-1 bg-base-white border border-base-border/50 text-[11px] rounded-lg text-base-text-primary hover:bg-brand-soft hover:text-brand-primary transition cursor-pointer"
+                    >
+                      Pilih File
+                    </button>
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      onChange={handleFileChange} 
+                      accept="image/*" 
+                      className="hidden" 
+                    />
                   </div>
                 </div>
 

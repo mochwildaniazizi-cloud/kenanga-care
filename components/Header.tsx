@@ -51,6 +51,7 @@ export default function Header() {
     name: "Kader Siti",
     posyandu: "Posyandu Kenanga 1"
   });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const { role, setRole, logout, isLoggedIn } = useUserRole();
 
   const pathname = usePathname();
@@ -71,6 +72,9 @@ export default function Header() {
         name: savedName,
         posyandu: savedPosyandu
       });
+      
+      const savedAvatar = localStorage.getItem("user_profile_avatar");
+      setAvatarUrl(savedAvatar);
     };
 
     loadProfile();
@@ -366,8 +370,12 @@ export default function Header() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-3.5 border-l border-base-border/50 pl-3 sm:pl-6 focus:outline-none cursor-pointer group text-left"
           >
-            <div className="w-10 h-10 bg-base-bg rounded-full flex items-center justify-center font-bold text-base-text-secondary border border-base-border/50 group-hover:border-brand-primary transition duration-150 shrink-0">
-              {getInitials(profile.name)}
+            <div className="w-10 h-10 bg-base-bg rounded-full flex items-center justify-center font-bold text-base-text-secondary border border-base-border/50 group-hover:border-brand-primary transition duration-150 shrink-0 overflow-hidden">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={profile.name} className="w-full h-full object-cover" />
+              ) : (
+                getInitials(profile.name)
+              )}
             </div>
             <div className="hidden lg:block">
               <p className="font-semibold text-base-text-primary text-sm leading-tight group-hover:text-brand-primary transition duration-150">{profile.name}</p>

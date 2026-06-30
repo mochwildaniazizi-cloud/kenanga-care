@@ -107,13 +107,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Role badge */}
-        {role === "ibu" && (
-          <div className="mb-4 px-3 py-2 bg-brand-soft rounded-xl flex items-center gap-2 text-xs font-semibold text-brand-primary border border-brand-primary/20">
-            <MdFavorite className="w-4 h-4 shrink-0" />
-            <span>Mode Pengguna Ibu</span>
-          </div>
-        )}
+
         
         <nav className="flex-1 space-y-1.5">
           {navItems.map((item) => {
@@ -141,15 +135,7 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Bottom: role indicator for kader */}
-        {role === "kader" && (
-          <div className="mt-4 pt-4 border-t border-base-border/20">
-            <div className="px-3 py-2 bg-base-bg rounded-xl flex items-center gap-2 text-xs text-base-text-secondary">
-              <MdPeopleAlt className="w-4 h-4 text-brand-primary shrink-0" />
-              <span className="font-medium">Mode Kader Posyandu</span>
-            </div>
-          </div>
-        )}
+
       </aside>
     </>
   );
