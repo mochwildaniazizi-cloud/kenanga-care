@@ -124,7 +124,8 @@ export async function getMothersData() {
             : mother.mother_name.includes("Fitriani")
             ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop"
             : null),
-        condition: mother.risk_status || "Normal"
+        condition: mother.risk_status || "Normal",
+        phone_number: mother.phone_number || "-"
       };
     });
   } catch (error) {

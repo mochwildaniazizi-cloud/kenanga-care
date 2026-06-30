@@ -89,10 +89,10 @@ function SettingsContent() {
       getMothersData().then((data) => {
         const mothersList = data.map((m) => ({
           name: m.name,
-          username: m.phone || m.nik || "Tidak ada",
+          username: m.phone_number !== "-" ? m.phone_number : (m.national_id || "Tidak ada"),
           role: m.status || "Ibu Balita",
           type: "Ibu / Orang Tua",
-          phone: m.phone,
+          phone: m.phone_number,
           status: "Aktif",
         }));
         
