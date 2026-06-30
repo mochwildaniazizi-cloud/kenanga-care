@@ -180,7 +180,8 @@ export default function InputPemeriksaanIbuPage() {
     }
 
     setIsSubmitting(true);
-    const result = await createMaternalRecord({
+    
+    const recordData = {
       mother_id: selectedMother.mother_id,
       visit_date: formData.visit_date,
       weight: formData.weight || null,
@@ -190,16 +191,46 @@ export default function InputPemeriksaanIbuPage() {
       fetal_heart_rate: formData.fetal_heart_rate || null,
       iron_pills_given: formData.iron_pills_given || "0",
       cadre_notes: formData.cadre_notes || null
-    });
-    setIsSubmitting(false);
+    };
 
-    if (result.success) {
-      showLocalNotification("Data Pemeriksaan Ibu Disimpan", {
-        body: `Pemeriksaan kesehatan untuk ${selectedMother.name} telah berhasil disimpan.`,
+    if (!navigator.onLine) {
+      const pending = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
+      pending.push(recordData);
+      localStorage.setItem("pending_maternal_records", JSON.stringify(pending));
+      
+      setIsSubmitting(false);
+      showLocalNotification("Data Ibu Disimpan Offline", {
+        body: `Pemeriksaan kesehatan untuk ${selectedMother.name} disimpan secara offline.`,
       });
+      alert("Koneksi Anda offline. Data pemeriksaan ibu telah disimpan secara lokal di cache peramban dan akan otomatis disinkronkan saat terhubung kembali.");
       setShowSuccessModal(true);
-    } else {
-      setErrorMsg(result.error || "Gagal menyimpan hasil pemeriksaan.");
+      return;
+    }
+
+    try {
+      const result = await createMaternalRecord(recordData);
+      setIsSubmitting(false);
+
+      if (result.success) {
+        showLocalNotification("Data Pemeriksaan Ibu Disimpan", {
+          body: `Pemeriksaan kesehatan untuk ${selectedMother.name} telah berhasil disimpan.`,
+        });
+        setShowSuccessModal(true);
+      } else {
+        setErrorMsg(result.error || "Gagal menyimpan hasil pemeriksaan.");
+      }
+    } catch (err) {
+      console.error(err);
+      const pending = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
+      pending.push(recordData);
+      localStorage.setItem("pending_maternal_records", JSON.stringify(pending));
+      
+      setIsSubmitting(false);
+      showLocalNotification("Data Ibu Disimpan Offline", {
+        body: `Pemeriksaan kesehatan untuk ${selectedMother.name} disimpan secara offline.`,
+      });
+      alert("Gagal menghubungi server. Data pemeriksaan ibu disimpan lokal di cache peramban dan akan disinkronkan otomatis saat jaringan kembali stabil.");
+      setShowSuccessModal(true);
     }
   };
 

@@ -24,6 +24,8 @@ import {
 import { MdPregnantWoman } from "react-icons/md";
 import { PiBabyFill } from "react-icons/pi";
 import { useUserRole } from "@/context/UserRoleContext";
+import { createChildMeasurement } from "@/app/actions/children";
+import { createMaternalRecord, createMother } from "@/app/actions/mothers";
 
 const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
   "/": { label: "Beranda", icon: HomeIcon },
@@ -101,14 +103,23 @@ export default function Header() {
 
     setSyncStatus(navigator.onLine ? "success" : "offline");
 
-    const handleOnline = () => {
+    const handleOnline = async () => {
       setSyncStatus("reconnecting");
-      setTimeout(() => {
+      try {
+        const count = await runActualSync();
+        setTimeout(() => {
+          setSyncStatus("success");
+          window.dispatchEvent(new Event("sync-data"));
+          window.dispatchEvent(new Event("profile-updated"));
+          showLocalNotification("Koneksi Terhubung 🟢", {
+            body: count > 0 
+              ? `Aplikasi kembali online. Berhasil menyinkronkan ${count} data baru ke server!`
+              : "Aplikasi kembali online. Semua data tersinkronisasi.",
+          });
+        }, 1500);
+      } catch (err) {
         setSyncStatus("success");
-        showLocalNotification("Koneksi Terhubung 🟢", {
-          body: "Aplikasi kembali online. Menyinkronkan perubahan lokal ke server...",
-        });
-      }, 1500);
+      }
     };
 
     const handleOffline = () => {
@@ -167,6 +178,50 @@ export default function Header() {
     }
   };
 
+  const runActualSync = async () => {
+    const pendingChildMeas = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
+    const pendingMaternal = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
+    const pendingMothers = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
+
+    let syncedCount = 0;
+
+    // Sync new mothers
+    for (const m of pendingMothers) {
+      try {
+        const res = await createMother(m);
+        if (res.success) syncedCount++;
+      } catch (e) {
+        console.error("Failed to sync mother creation offline record:", e);
+      }
+    }
+
+    // Sync child measurements
+    for (const m of pendingChildMeas) {
+      try {
+        const res = await createChildMeasurement(m);
+        if (res.success) syncedCount++;
+      } catch (e) {
+        console.error("Failed to sync child measurement offline record:", e);
+      }
+    }
+
+    // Sync maternal records
+    for (const m of pendingMaternal) {
+      try {
+        const res = await createMaternalRecord(m);
+        if (res.success) syncedCount++;
+      } catch (e) {
+        console.error("Failed to sync maternal offline record:", e);
+      }
+    }
+
+    localStorage.removeItem("pending_child_measurements");
+    localStorage.removeItem("pending_maternal_records");
+    localStorage.removeItem("pending_create_mothers");
+
+    return syncedCount;
+  };
+
   const handleToggleSync = async () => {
     if (!navigator.onLine) {
       setSyncStatus("offline");
@@ -180,8 +235,7 @@ export default function Header() {
     setSyncStatus("reconnecting");
     
     try {
-      // Simulate sync process
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const count = await runActualSync();
       
       // Dispatch custom event to trigger reloading page-level content
       window.dispatchEvent(new Event("sync-data"));
@@ -189,8 +243,13 @@ export default function Header() {
       
       setSyncStatus("success");
       showLocalNotification("Sinkronisasi Selesai 🟢", {
-        body: "Seluruh data Posyandu Kenanga 1 berhasil diselaraskan dengan server utama.",
+        body: count > 0 
+          ? `Berhasil mengunggah ${count} data pemeriksaan baru dari cache lokal ke database.`
+          : "Seluruh data Posyandu Kenanga 1 berhasil diselaraskan dengan server utama.",
       });
+      if (count > 0) {
+        alert(`Sinkronisasi selesai! Berhasil mengirimkan ${count} data pemeriksaan offline ke database.`);
+      }
     } catch (err) {
       console.error("Sync error:", err);
       setSyncStatus("offline");

@@ -196,9 +196,7 @@ function SettingsContent() {
     setIsCreatingUser(true);
     try {
       if (newUserForm.type === "Kader Posyandu") {
-        const usernameVal = newUserForm.phone;
-        
-        const res = await createMother({
+        const motherData = {
           national_id: "KADER-" + newUserForm.national_id,
           mother_name: newUserForm.name,
           phone_number: newUserForm.phone,
@@ -206,7 +204,32 @@ function SettingsContent() {
           risk_status: newUserForm.role || "Kader Posyandu",
           husband_name: "Kader",
           number_of_children: 0
-        });
+        };
+
+        if (!navigator.onLine) {
+          const pending = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
+          pending.push(motherData);
+          localStorage.setItem("pending_create_mothers", JSON.stringify(pending));
+
+          setSuccessMessage(`Akun Kader ${newUserForm.name} disimpan secara offline di browser Anda.`);
+          setShowSuccessModal(true);
+          setShowAddUserModal(false);
+          refreshUsersList();
+          
+          setNewUserForm({
+            type: "Ibu / Orang Tua",
+            name: "",
+            national_id: "",
+            phone: "",
+            birth_date: "",
+            husband_name: "",
+            status: "Ibu Hamil",
+            role: "Kader Posyandu"
+          });
+          return;
+        }
+
+        const res = await createMother(motherData);
 
         if (res.success) {
           setSuccessMessage(`Akun Kader ${newUserForm.name} berhasil ditambahkan ke database.`);
@@ -234,7 +257,7 @@ function SettingsContent() {
           ageVal = new Date().getFullYear() - birthDateObj.getFullYear();
         }
 
-        const res = await createMother({
+        const motherData = {
           national_id: newUserForm.national_id,
           mother_name: newUserForm.name,
           birth_date: newUserForm.birth_date,
@@ -244,7 +267,32 @@ function SettingsContent() {
           ui_status: newUserForm.status,
           risk_status: "Normal",
           number_of_children: 0
-        });
+        };
+
+        if (!navigator.onLine) {
+          const pending = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
+          pending.push(motherData);
+          localStorage.setItem("pending_create_mothers", JSON.stringify(pending));
+
+          setSuccessMessage(`Akun Ibu ${newUserForm.name} disimpan secara offline di browser Anda.`);
+          setShowSuccessModal(true);
+          setShowAddUserModal(false);
+          refreshUsersList();
+          
+          setNewUserForm({
+            type: "Ibu / Orang Tua",
+            name: "",
+            national_id: "",
+            phone: "",
+            birth_date: "",
+            husband_name: "",
+            status: "Ibu Hamil",
+            role: "Kader Posyandu"
+          });
+          return;
+        }
+
+        const res = await createMother(motherData);
 
         if (res.success) {
           setSuccessMessage(`Akun Ibu ${newUserForm.name} berhasil ditambahkan ke database.`);
@@ -268,7 +316,26 @@ function SettingsContent() {
       }
     } catch (err) {
       console.error(err);
-      alert("Terjadi kesalahan.");
+      alert("Terjadi kesalahan sistem. Menyimpan secara offline lokal...");
+      // Fallback save offline
+      const usernameVal = newUserForm.phone;
+      const fallbackData = {
+        national_id: newUserForm.type === "Kader Posyandu" ? "KADER-" + newUserForm.national_id : newUserForm.national_id,
+        mother_name: newUserForm.name,
+        phone_number: newUserForm.phone,
+        ui_status: newUserForm.type === "Kader Posyandu" ? "Kader Posyandu" : newUserForm.status,
+        risk_status: newUserForm.type === "Kader Posyandu" ? (newUserForm.role || "Kader Posyandu") : "Normal",
+        husband_name: newUserForm.type === "Kader Posyandu" ? "Kader" : newUserForm.husband_name,
+        number_of_children: 0
+      };
+      const pending = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
+      pending.push(fallbackData);
+      localStorage.setItem("pending_create_mothers", JSON.stringify(pending));
+
+      setSuccessMessage(`Gagal tersambung ke jaringan. Akun ${newUserForm.name} disimpan secara offline.`);
+      setShowSuccessModal(true);
+      setShowAddUserModal(false);
+      refreshUsersList();
     } finally {
       setIsCreatingUser(false);
     }

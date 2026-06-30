@@ -186,11 +186,31 @@ export default function InputPenimbanganPage() {
     if (!selectedChild) return;
     setShowSaveModal(false);
     
-    try {
-      const res = await createChildMeasurement({
-        child_id: selectedChild.child_id,
-        ...formData
+    const measurementData = {
+      child_id: selectedChild.child_id,
+      ...formData
+    };
+
+    if (!navigator.onLine) {
+      const pending = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
+      pending.push(measurementData);
+      localStorage.setItem("pending_child_measurements", JSON.stringify(pending));
+
+      showLocalNotification("Data Disimpan Offline", {
+        body: `Data pemeriksaan untuk ${selectedChild.name} disimpan secara offline.`,
       });
+      setAlertModal({
+        show: true,
+        type: 'success',
+        title: 'Disimpan Offline!',
+        message: 'Koneksi Anda offline. Data telah disimpan secara lokal di cache peramban dan akan otomatis diunggah ketika internet kembali aktif.',
+        onConfirm: () => router.push("/data-anak")
+      });
+      return;
+    }
+    
+    try {
+      const res = await createChildMeasurement(measurementData);
       if (res.success) {
         showLocalNotification("Data Penimbangan Disimpan", {
           body: `Data pemeriksaan untuk ${selectedChild.name} telah berhasil disimpan.`,
@@ -212,11 +232,19 @@ export default function InputPenimbanganPage() {
       }
     } catch (err) {
       console.error("Error saving child measurement:", err);
+      const pending = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
+      pending.push(measurementData);
+      localStorage.setItem("pending_child_measurements", JSON.stringify(pending));
+
+      showLocalNotification("Data Disimpan Offline", {
+        body: `Data pemeriksaan untuk ${selectedChild.name} disimpan secara offline.`,
+      });
       setAlertModal({
         show: true,
-        type: 'error',
-        title: 'Error',
-        message: 'Terjadi kesalahan sistem saat menyimpan data.'
+        type: 'success',
+        title: 'Disimpan Offline (Error Jaringan)!',
+        message: 'Gagal menghubungi server. Data telah disimpan secara lokal di cache peramban dan akan disinkronkan otomatis begitu jaringan stabil.',
+        onConfirm: () => router.push("/data-anak")
       });
     }
   };
