@@ -36,6 +36,7 @@ function SettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
+  const { role, username } = useUserRole();
 
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -76,7 +77,6 @@ function SettingsContent() {
     }
   }, [tabParam, role]);
 
-  const { role, username } = useUserRole();
   const [motherDetail, setMotherDetail] = useState<any>(null);
 
   // Users Management states
