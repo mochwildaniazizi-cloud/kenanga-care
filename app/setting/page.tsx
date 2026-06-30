@@ -13,11 +13,16 @@ import {
   GlobeAltIcon,
   CheckIcon,
   ArrowLeftIcon,
-  UsersIcon
+  UsersIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  PlusIcon,
+  TrashIcon
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother } from "@/app/actions/mothers";
+import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
 export default function SettingsPage() {
@@ -82,33 +87,187 @@ function SettingsContent() {
   // Users Management states
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
+  const [newUserForm, setNewUserForm] = useState({
+    type: "Ibu / Orang Tua",
+    name: "",
+    national_id: "",
+    phone: "",
+    birth_date: "",
+    husband_name: "",
+    status: "Ibu Hamil",
+    role: "Kader Posyandu"
+  });
+
+  const refreshUsersList = async () => {
+    if (role !== "kader") return;
+    try {
+      const data = await getMothersData();
+      const mothersList = data.map((m) => ({
+        name: m.name,
+        username: m.phone_number !== "-" ? m.phone_number : (m.national_id || "Tidak ada"),
+        role: m.status || "Ibu Balita",
+        type: "Ibu / Orang Tua",
+        phone: m.phone_number,
+        status: "Aktif",
+        mother_id: m.mother_id,
+      }));
+      const customCadresRaw = localStorage.getItem("custom_cadre_users");
+      const customCadres = customCadresRaw ? JSON.parse(customCadresRaw) : [];
+      
+      const defaultKader = {
+        name: "Kader Siti",
+        username: "kader",
+        role: "Ketua Kader",
+        type: "Kader Posyandu",
+        phone: "0812-3456-7890",
+        status: "Aktif",
+      };
+
+      setAllUsers([defaultKader, ...customCadres, ...mothersList]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   // Load mothers for user management if kader
   useEffect(() => {
     if (role === "kader") {
-      getMothersData().then((data) => {
-        const mothersList = data.map((m) => ({
-          name: m.name,
-          username: m.phone_number !== "-" ? m.phone_number : (m.national_id || "Tidak ada"),
-          role: m.status || "Ibu Balita",
-          type: "Ibu / Orang Tua",
-          phone: m.phone_number,
-          status: "Aktif",
-        }));
+      refreshUsersList();
+    }
+  }, [role]);
+
+  const handleDeleteUser = async (user: any) => {
+    if (user.username === "kader") {
+      alert("Akun Kader Utama tidak dapat dihapus.");
+      return;
+    }
+    const confirmDelete = window.confirm(`Apakah Anda yakin ingin menghapus akun ${user.name}?`);
+    if (!confirmDelete) return;
+
+    if (user.type === "Kader Posyandu") {
+      const customCadresRaw = localStorage.getItem("custom_cadre_users");
+      const customCadres = customCadresRaw ? JSON.parse(customCadresRaw) : [];
+      const updated = customCadres.filter((c: any) => c.username !== user.username);
+      localStorage.setItem("custom_cadre_users", JSON.stringify(updated));
+      setSuccessMessage(`Akun Kader ${user.name} berhasil dihapus.`);
+      setShowSuccessModal(true);
+      refreshUsersList();
+    } else {
+      if (!user.mother_id) {
+        alert("ID Ibu tidak valid.");
+        return;
+      }
+      try {
+        const res = await deleteMother(user.mother_id);
+        if (res.success) {
+          setSuccessMessage(`Akun Ibu ${user.name} berhasil dihapus.`);
+          setShowSuccessModal(true);
+          refreshUsersList();
+        } else {
+          alert(res.error || "Gagal menghapus akun.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Terjadi kesalahan sistem saat menghapus.");
+      }
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserForm.name || !newUserForm.national_id || !newUserForm.phone) {
+      alert("Nama, NIK, dan Nomor WhatsApp wajib diisi.");
+      return;
+    }
+
+    setIsCreatingUser(true);
+    try {
+      if (newUserForm.type === "Kader Posyandu") {
+        const customCadresRaw = localStorage.getItem("custom_cadre_users");
+        const customCadres = customCadresRaw ? JSON.parse(customCadresRaw) : [];
         
-        const kaderUser = {
-          name: "Kader Siti",
-          username: "kader",
-          role: "Ketua Kader",
+        const usernameVal = newUserForm.phone;
+        if (usernameVal === "kader" || customCadres.some((c: any) => c.username === usernameVal)) {
+          alert("Nomor WhatsApp/Username sudah digunakan.");
+          return;
+        }
+
+        const newCadre = {
+          name: newUserForm.name,
+          username: usernameVal,
+          role: newUserForm.role || "Kader Posyandu",
           type: "Kader Posyandu",
-          phone: "0812-3456-7890",
+          phone: newUserForm.phone,
           status: "Aktif",
         };
 
-        setAllUsers([kaderUser, ...mothersList]);
-      });
+        customCadres.push(newCadre);
+        localStorage.setItem("custom_cadre_users", JSON.stringify(customCadres));
+        
+        setSuccessMessage(`Akun Kader ${newUserForm.name} berhasil ditambahkan.`);
+        setShowSuccessModal(true);
+        setShowAddUserModal(false);
+        refreshUsersList();
+        
+        setNewUserForm({
+          type: "Ibu / Orang Tua",
+          name: "",
+          national_id: "",
+          phone: "",
+          birth_date: "",
+          husband_name: "",
+          status: "Ibu Hamil",
+          role: "Kader Posyandu"
+        });
+      } else {
+        const birthDateObj = newUserForm.birth_date ? new Date(newUserForm.birth_date) : null;
+        let ageVal = 0;
+        if (birthDateObj) {
+          ageVal = new Date().getFullYear() - birthDateObj.getFullYear();
+        }
+
+        const res = await createMother({
+          national_id: newUserForm.national_id,
+          mother_name: newUserForm.name,
+          birth_date: newUserForm.birth_date,
+          age: ageVal.toString(),
+          husband_name: newUserForm.husband_name,
+          phone_number: newUserForm.phone,
+          ui_status: newUserForm.status,
+          risk_status: "Normal",
+          number_of_children: 0
+        });
+
+        if (res.success) {
+          setSuccessMessage(`Akun Ibu ${newUserForm.name} berhasil ditambahkan.`);
+          setShowSuccessModal(true);
+          setShowAddUserModal(false);
+          refreshUsersList();
+          
+          setNewUserForm({
+            type: "Ibu / Orang Tua",
+            name: "",
+            national_id: "",
+            phone: "",
+            birth_date: "",
+            husband_name: "",
+            status: "Ibu Hamil",
+            role: "Kader Posyandu"
+          });
+        } else {
+          alert(res.error || "Gagal membuat akun.");
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan.");
+    } finally {
+      setIsCreatingUser(false);
     }
-  }, [role]);
+  };
 
   // Load from local storage or database
   useEffect(() => {
@@ -213,7 +372,7 @@ function SettingsContent() {
   };
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto p-4 md:p-8 animate-in fade-in duration-300">
+    <div className="space-y-6 max-w-[1400px] mx-auto p-4 md:p-8 pb-28 lg:pb-8 animate-in fade-in duration-300">
       
       {/* Back to dashboard & header */}
       <div className="flex items-center justify-between">
@@ -601,25 +760,36 @@ function SettingsContent() {
 
           {/* TAB 5: KELOLA PENGGUNA (Only for Kader) */}
           {activeTab === "users" && role === "kader" && (
-            <div className="space-y-6">
+            <div className="space-y-6 pb-24">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="text-lg font-bold text-base-text-primary">Kelola Pengguna</h3>
                   <p className="text-xs md:text-sm text-base-text-secondary">Daftar akun Kader dan Ibu yang terdaftar di database Posyandu Kenanga 1.</p>
                 </div>
                 
-                {/* Search Input */}
-                <div className="relative max-w-xs w-full">
-                  <input
-                    type="text"
-                    placeholder="Cari nama atau username..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-base-bg border border-base-border/40 focus:border-brand-primary rounded-xl py-2 px-4 pl-9 text-xs outline-none transition-colors text-base-text-primary focus:bg-base-white"
-                  />
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute left-3 top-2.5 w-4 h-4 text-base-text-secondary">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
-                  </svg>
+                <div className="flex items-center gap-3">
+                  {/* Search Input */}
+                  <div className="relative max-w-xs w-full">
+                    <input
+                      type="text"
+                      placeholder="Cari nama atau username..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full bg-base-bg border border-base-border/40 focus:border-brand-primary rounded-xl py-2 px-4 pl-9 text-xs outline-none transition-colors text-base-text-primary focus:bg-base-white"
+                    />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="absolute left-3 top-2.5 w-4 h-4 text-base-text-secondary">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
+                    </svg>
+                  </div>
+
+                  {/* Add User Button */}
+                  <button
+                    onClick={() => setShowAddUserModal(true)}
+                    className="px-4 py-2 rounded-xl bg-brand-primary text-base-white text-xs font-bold hover:bg-status-pink-dark transition flex items-center gap-1.5 shrink-0 shadow-md shadow-brand-primary/10 cursor-pointer"
+                  >
+                    <PlusIcon className="w-3.5 h-3.5" />
+                    <span>Tambah</span>
+                  </button>
                 </div>
               </div>
 
@@ -631,9 +801,9 @@ function SettingsContent() {
                       <tr className="bg-base-bg/50 border-b border-base-border/20 text-xs font-bold text-base-text-secondary uppercase">
                         <th className="py-3 px-4">Nama Lengkap</th>
                         <th className="py-3 px-4">Username (Akses)</th>
+                        <th className="py-3 px-4">Kata Sandi</th>
                         <th className="py-3 px-4">Tipe Akun</th>
                         <th className="py-3 px-4">Peran / Status</th>
-                        <th className="py-3 px-4">Status</th>
                         <th className="py-3 px-4 text-right">Aksi</th>
                       </tr>
                     </thead>
@@ -649,13 +819,30 @@ function SettingsContent() {
                           <tr key={idx} className="hover:bg-base-bg/25 transition duration-150">
                             <td className="py-3.5 px-4 font-bold text-base-text-primary">{user.name}</td>
                             <td className="py-3.5 px-4 font-mono text-base-text-secondary">{user.username}</td>
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-base-text-primary font-semibold">
+                                  {visiblePasswords[user.username] 
+                                    ? (user.type === "Kader Posyandu" ? "kader123" : "ibu123") 
+                                    : "••••••"
+                                  }
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setVisiblePasswords(prev => ({ ...prev, [user.username]: !prev[user.username] }))}
+                                  className="text-base-text-secondary hover:text-brand-primary p-0.5 rounded cursor-pointer"
+                                  title="Tampilkan Sandi"
+                                >
+                                  {visiblePasswords[user.username] ? (
+                                    <EyeSlashIcon className="w-3.5 h-3.5" />
+                                  ) : (
+                                    <EyeIcon className="w-3.5 h-3.5" />
+                                  )}
+                                </button>
+                              </div>
+                            </td>
                             <td className="py-3.5 px-4 font-semibold text-base-text-secondary">{user.type}</td>
                             <td className="py-3.5 px-4 font-semibold text-base-text-secondary">{user.role}</td>
-                            <td className="py-3.5 px-4">
-                              <span className="px-2 py-0.5 rounded-full bg-status-green-light text-status-green-solid font-bold text-[10px]">
-                                {user.status}
-                              </span>
-                            </td>
                             <td className="py-3.5 px-4 text-right space-x-2">
                               <button 
                                 onClick={() => {
@@ -664,7 +851,14 @@ function SettingsContent() {
                                 }}
                                 className="px-3 py-1.5 rounded-lg border border-base-border/50 text-[10px] text-base-text-primary font-bold hover:bg-brand-soft hover:text-brand-primary transition cursor-pointer"
                               >
-                                Reset Kata Sandi
+                                Reset
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteUser(user)}
+                                disabled={user.username === "kader"}
+                                className="px-3 py-1.5 rounded-lg border border-status-red-solid/20 text-[10px] text-status-red-solid font-bold hover:bg-status-red-solid/10 disabled:opacity-50 transition cursor-pointer"
+                              >
+                                Hapus
                               </button>
                             </td>
                           </tr>
@@ -680,6 +874,146 @@ function SettingsContent() {
                   </table>
                 </div>
               </div>
+
+              {/* Modal Tambah Pengguna */}
+              {showAddUserModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+                  <div className="bg-base-white rounded-2xl shadow-xl w-[95%] max-w-lg overflow-y-auto max-h-[90vh] border border-base-border/20">
+                    <form onSubmit={handleCreateUser}>
+                      <div className="p-6 space-y-4">
+                        <h3 className="text-xl font-bold text-base-text-primary">Registrasi Pengguna Baru</h3>
+                        <p className="text-xs text-base-text-secondary">Daftarkan akun Kader baru atau Ibu baru ke database sistem.</p>
+                        
+                        <div className="space-y-4">
+                          {/* Account Type */}
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-base-text-primary">Tipe Akun</label>
+                            <select
+                              value={newUserForm.type}
+                              onChange={(e) => setNewUserForm({ ...newUserForm, type: e.target.value })}
+                              className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                            >
+                              <option value="Ibu / Orang Tua">Ibu / Orang Tua (Simpan di Database)</option>
+                              <option value="Kader Posyandu">Kader Posyandu (Simpan di LocalStorage)</option>
+                            </select>
+                          </div>
+
+                          {/* Full Name */}
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-base-text-primary">Nama Lengkap</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="Masukkan nama lengkap"
+                              value={newUserForm.name}
+                              onChange={(e) => setNewUserForm({ ...newUserForm, name: e.target.value })}
+                              className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                            />
+                          </div>
+
+                          {/* NIK */}
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-base-text-primary">NIK (Nomor Induk Kependudukan)</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="Masukkan NIK 16 digit"
+                              value={newUserForm.national_id}
+                              onChange={(e) => setNewUserForm({ ...newUserForm, national_id: e.target.value })}
+                              className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                            />
+                          </div>
+
+                          {/* WhatsApp/Phone (Username) */}
+                          <div className="space-y-1">
+                            <label className="block text-xs font-bold text-base-text-primary">Nomor WhatsApp (Digunakan untuk Login)</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="Contoh: 081222575562"
+                              value={newUserForm.phone}
+                              onChange={(e) => setNewUserForm({ ...newUserForm, phone: e.target.value })}
+                              className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                            />
+                          </div>
+
+                          {/* Conditional inputs for Mother */}
+                          {newUserForm.type === "Ibu / Orang Tua" ? (
+                            <>
+                              {/* Husband's Name */}
+                              <div className="space-y-1">
+                                <label className="block text-xs font-bold text-base-text-primary">Nama Suami</label>
+                                <input
+                                  type="text"
+                                  placeholder="Masukkan nama suami"
+                                  value={newUserForm.husband_name}
+                                  onChange={(e) => setNewUserForm({ ...newUserForm, husband_name: e.target.value })}
+                                  className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                                />
+                              </div>
+
+                              {/* Birth Date */}
+                              <div className="space-y-1">
+                                <label className="block text-xs font-bold text-base-text-primary">Tanggal Lahir Ibu</label>
+                                <CustomDatePicker
+                                  value={newUserForm.birth_date}
+                                  onChange={(val) => setNewUserForm({ ...newUserForm, birth_date: val })}
+                                />
+                              </div>
+
+                              {/* Status */}
+                              <div className="space-y-1">
+                                <label className="block text-xs font-bold text-base-text-primary">Status Ibu</label>
+                                <select
+                                  value={newUserForm.status}
+                                  onChange={(e) => setNewUserForm({ ...newUserForm, status: e.target.value })}
+                                  className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                                >
+                                  <option value="Ibu Hamil">Ibu Hamil</option>
+                                  <option value="Ibu Menyusui">Ibu Menyusui</option>
+                                  <option value="Ibu Nifas">Ibu Nifas</option>
+                                </select>
+                              </div>
+                            </>
+                          ) : (
+                            /* Conditional inputs for Kader */
+                            <div className="space-y-1">
+                              <label className="block text-xs font-bold text-base-text-primary">Peran / Jabatan Kader</label>
+                              <select
+                                value={newUserForm.role}
+                                onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value })}
+                                className="w-full px-4 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
+                              >
+                                <option value="Kader Posyandu">Kader Posyandu</option>
+                                <option value="Ketua Kader">Ketua Kader</option>
+                                <option value="Bidan Desa">Bidan Desa</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Modal Actions */}
+                      <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex gap-3 rounded-b-2xl">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddUserModal(false)}
+                          className="flex-1 py-2 rounded-xl border border-base-border/50 text-base-text-secondary hover:text-base-text-primary font-bold text-xs hover:bg-base-white transition cursor-pointer"
+                        >
+                          Batal
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isCreatingUser}
+                          className="flex-1 py-2 rounded-xl bg-brand-primary text-base-white font-bold text-xs hover:bg-status-pink-dark transition shadow-sm disabled:opacity-50 cursor-pointer"
+                        >
+                          {isCreatingUser ? "Mendaftarkan..." : "Daftarkan Pengguna"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

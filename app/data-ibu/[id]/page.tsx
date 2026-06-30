@@ -262,7 +262,7 @@ export default function MotherDetailPage() {
   const displayAge = isEditing ? getAgeInYears(editForm.birth_date) : parseInt(mother.age);
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-in fade-in duration-300">
+    <div className="space-y-6 max-w-[1600px] mx-auto pb-28 lg:pb-10 animate-in fade-in duration-300">
       
       {/* Header & Back Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/20 pb-4">

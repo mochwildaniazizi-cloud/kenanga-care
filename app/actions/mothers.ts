@@ -479,6 +479,18 @@ export async function getLoggedInMotherData(username: string) {
   }
 }
 
+export async function deleteMother(id: string) {
+  try {
+    await prisma.mother.delete({
+      where: { mother_id: id }
+    });
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting mother:", error);
+    return { success: false, error: error.message || "Gagal menghapus data ibu." };
+  }
+}
+
 
 
 

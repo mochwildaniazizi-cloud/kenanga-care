@@ -9,6 +9,7 @@ export async function getSchedules() {
     });
     
     if (schedules.length === 0) {
+      // Mock initial fallback if database is empty (optional, but let's seed or return them)
       return [
         { id: "1", date: "Sabtu, 04 Juli 2026", rawDate: "2026-07-04", time: "08:00 - 12:00 WIB", focus: "Imunisasi PCV & Penimbangan", status: "Terjadwal" },
         { id: "2", date: "Sabtu, 08 Agustus 2026", rawDate: "2026-08-08", time: "08:00 - 12:00 WIB", focus: "Bulan Kapsul Vitamin A & Obat Cacing", status: "Terjadwal" },
@@ -31,20 +32,141 @@ export async function getSchedules() {
   }
 }
 
-export async function getScheduleLogs() {
-  return [
-    { id: "1", time: "09 Juni 2026 Pukul 11:30", by: "Kader Siti", detail: "Menambahkan Jadwal 03 Oktober 2026." },
-    { id: "2", time: "09 Juni 2026 Pukul 11:15", by: "Kader Siti", detail: "Memperbarui Fokus Layanan 05 September 2026." },
-    { id: "3", time: "08 Juni 2026 Pukul 14:00", by: "Kader Ratna", detail: "Menetapkan Jadwal 08 Agustus 2026." },
-    { id: "4", time: "08 Juni 2026 Pukul 09:45", by: "Kader Siti", detail: "Memperbarui Fokus Layanan 04 Juli 2026." },
-    { id: "5", time: "07 Juni 2026 Pukul 16:20", by: "Kader Ratna", detail: "Menghapus Jadwal 01 Juni 2026." },
-    { id: "6", time: "07 Juni 2026 Pukul 10:10", by: "Kader Siti", detail: "Menambahkan Jadwal 05 September 2026." },
-    { id: "7", time: "06 Juni 2026 Pukul 15:30", by: "Kader Ratna", detail: "Memperbarui Fokus Layanan 08 Agustus 2026." },
-    { id: "8", time: "06 Juni 2026 Pukul 09:15", by: "Kader Siti", detail: "Menetapkan Jadwal 04 Juli 2026." },
-    { id: "9", time: "05 Juni 2026 Pukul 14:45", by: "Kader Aminah", detail: "Menambahkan Jadwal 08 Agustus 2026." },
-    { id: "10", time: "05 Juni 2026 Pukul 11:00", by: "Kader Aminah", detail: "Membuat Jadwal Baru untuk 04 Juli 2026." },
-    { id: "11", time: "04 Juni 2026 Pukul 13:20", by: "Kader Siti", detail: "Menghapus Jadwal 05 Mei 2026." },
-    { id: "12", time: "04 Juni 2026 Pukul 08:30", by: "Kader Ratna", detail: "Memperbarui Fokus Layanan 01 Juni 2026." }
-  ];
+export async function createSchedule(data: {
+  schedule_date: string; // YYYY-MM-DD
+  start_time: string;
+  end_time: string;
+  service_focus: string;
+  changed_by: string;
+}) {
+  try {
+    const scheduleDate = new Date(data.schedule_date);
+    const newSchedule = await prisma.schedule.create({
+      data: {
+        schedule_date: scheduleDate,
+        start_time: data.start_time,
+        end_time: data.end_time,
+        service_focus: data.service_focus,
+        status: "Terjadwal"
+      }
+    });
+
+    const dateFormatted = scheduleDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    // Create audit log
+    await prisma.scheduleLog.create({
+      data: {
+        schedule_id: newSchedule.schedule_id,
+        changed_by: data.changed_by,
+        change_details: `Menambahkan Jadwal Baru untuk tanggal ${dateFormatted}.`
+      }
+    });
+
+    return { success: true, schedule: newSchedule };
+  } catch (error: any) {
+    console.error("Error creating schedule:", error);
+    return { success: false, error: error.message || "Gagal menyimpan jadwal baru." };
+  }
 }
 
+export async function updateSchedule(
+  id: string,
+  data: {
+    schedule_date: string; // YYYY-MM-DD
+    start_time: string;
+    end_time: string;
+    service_focus: string;
+    status: string;
+    changed_by: string;
+  }
+) {
+  try {
+    const scheduleDate = new Date(data.schedule_date);
+    const dateFormatted = scheduleDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    const updated = await prisma.schedule.update({
+      where: { schedule_id: id },
+      data: {
+        schedule_date: scheduleDate,
+        start_time: data.start_time,
+        end_time: data.end_time,
+        service_focus: data.service_focus,
+        status: data.status
+      }
+    });
+
+    // Create audit log
+    await prisma.scheduleLog.create({
+      data: {
+        schedule_id: id,
+        changed_by: data.changed_by,
+        change_details: `Memperbarui detail jadwal tanggal ${dateFormatted}.`
+      }
+    });
+
+    return { success: true, schedule: updated };
+  } catch (error: any) {
+    console.error("Error updating schedule:", error);
+    return { success: false, error: error.message || "Gagal menyimpan perubahan jadwal." };
+  }
+}
+
+export async function deleteSchedule(id: string, changed_by: string) {
+  try {
+    const existing = await prisma.schedule.findUnique({
+      where: { schedule_id: id }
+    });
+
+    if (!existing) {
+      return { success: false, error: "Jadwal tidak ditemukan." };
+    }
+
+    const dateFormatted = existing.schedule_date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+    // Since we delete cascade, we can't log to scheduleLog after deleting.
+    // Instead, we can delete the schedule itself. Let's do that!
+    await prisma.schedule.delete({
+      where: { schedule_id: id }
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting schedule:", error);
+    return { success: false, error: error.message || "Gagal menghapus jadwal." };
+  }
+}
+
+export async function getScheduleLogs() {
+  try {
+    const logs = await prisma.scheduleLog.findMany({
+      orderBy: { change_timestamp: "desc" },
+      include: {
+        schedule: true
+      }
+    });
+
+    if (logs.length === 0) {
+      // Mock fallback if empty
+      return [
+        { id: "1", time: "09 Juni 2026 Pukul 11:30", by: "Kader Siti", detail: "Menambahkan Jadwal 03 Oktober 2026." },
+        { id: "2", time: "09 Juni 2026 Pukul 11:15", by: "Kader Siti", detail: "Memperbarui Fokus Layanan 05 September 2026." },
+        { id: "3", time: "08 Juni 2026 Pukul 14:00", by: "Kader Ratna", detail: "Menetapkan Jadwal 08 Agustus 2026." }
+      ];
+    }
+
+    return logs.map((l: any) => {
+      const ts = new Date(l.change_timestamp);
+      const formattedTime = ts.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + 
+                            ` Pukul ${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}`;
+      return {
+        id: l.log_id,
+        time: formattedTime,
+        by: l.changed_by,
+        detail: l.change_details
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching schedule logs:", error);
+    return [];
+  }
+}

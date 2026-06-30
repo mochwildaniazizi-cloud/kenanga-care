@@ -11,6 +11,9 @@ import Link from "next/link";
 import { useUserRole } from "@/context/UserRoleContext";
 import { getLoggedInMotherData, getMotherDetail } from "@/app/actions/mothers";
 import LandingPage from "@/components/LandingPage";
+import { getSchedules } from "@/app/actions/schedule";
+import PWAInstallBanner from "@/components/PWAInstallBanner";
+import { MdArrowForward } from "react-icons/md";
 
 function StatCard({ icon: Icon, label, value, sub, color }: {
   icon: any; label: string; value: string | number; sub?: string; color: string;
@@ -40,18 +43,69 @@ export default function DashboardPage() {
 
   // Mother dashboard state
   const [motherDetail, setMotherDetail] = useState<any>(null);
+  const [nextSchedule, setNextSchedule] = useState<any>(null);
+
+  // Load cached data immediately on mount/role change to ensure 0ms load speed
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    if (role === "ibu") {
+      const cachedMother = localStorage.getItem("mother_dashboard_detail");
+      const cachedSchedule = localStorage.getItem("dashboard_next_schedule");
+      if (cachedMother) {
+        setMotherDetail(JSON.parse(cachedMother));
+        setIsLoading(false);
+      }
+      if (cachedSchedule) {
+        setNextSchedule(JSON.parse(cachedSchedule));
+      }
+    } else {
+      const cachedStats = localStorage.getItem("kader_dashboard_stats");
+      const cachedChild = localStorage.getItem("kader_dashboard_child_activity");
+      const cachedMotherAct = localStorage.getItem("kader_dashboard_mother_activity");
+      const cachedSchedule = localStorage.getItem("dashboard_next_schedule");
+      if (cachedStats && cachedChild && cachedMotherAct) {
+        setKaderStats(JSON.parse(cachedStats));
+        setChildActivity(JSON.parse(cachedChild));
+        setMotherActivity(JSON.parse(cachedMotherAct));
+        setIsLoading(false);
+      }
+      if (cachedSchedule) {
+        setNextSchedule(JSON.parse(cachedSchedule));
+      }
+    }
+  }, [role, isLoggedIn]);
 
   useEffect(() => {
     if (!isInitialized || !isLoggedIn) return;
 
     async function loadData() {
-      setIsLoading(true);
+      const hasCache = role === "ibu" 
+        ? !!localStorage.getItem("mother_dashboard_detail")
+        : (!!localStorage.getItem("kader_dashboard_stats") && !!localStorage.getItem("kader_dashboard_child_activity"));
+      
+      if (!hasCache) {
+        setIsLoading(true);
+      }
+
       try {
+        const fetchedSchedules = await getSchedules();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const futureSchedule = fetchedSchedules.find((s: any) => new Date(s.rawDate) >= today);
+        const resolvedSchedule = futureSchedule || fetchedSchedules[0] || null;
+        
+        setNextSchedule(resolvedSchedule);
+        if (resolvedSchedule) {
+          localStorage.setItem("dashboard_next_schedule", JSON.stringify(resolvedSchedule));
+        }
+
         if (role === "ibu") {
           const loggedInMother = await getLoggedInMotherData(username);
           if (loggedInMother) {
             const detail = await getMotherDetail(loggedInMother.mother_id);
             setMotherDetail(detail);
+            localStorage.setItem("mother_dashboard_detail", JSON.stringify(detail));
           }
         } else {
           const [stats, cAct, mAct] = await Promise.all([
@@ -62,6 +116,10 @@ export default function DashboardPage() {
           setKaderStats(stats);
           setChildActivity(cAct);
           setMotherActivity(mAct);
+
+          localStorage.setItem("kader_dashboard_stats", JSON.stringify(stats));
+          localStorage.setItem("kader_dashboard_child_activity", JSON.stringify(cAct));
+          localStorage.setItem("kader_dashboard_mother_activity", JSON.stringify(mAct));
         }
       } catch (err) {
         console.error("Error loading dashboard data:", err);
@@ -70,7 +128,7 @@ export default function DashboardPage() {
       }
     }
     loadData();
-  }, [role, username]);
+  }, [role, username, isInitialized, isLoggedIn]);
 
   const formatDate = (dateString: string | Date | null) => {
     if (!dateString) return "-";
@@ -128,6 +186,31 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* PWA Installation Banner */}
+        <PWAInstallBanner />
+
+        {/* Next Schedule Banner */}
+        {nextSchedule && (
+          <div className="bg-base-white border border-brand-primary/20 rounded-bento-lg p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
+                <MdCalendarMonth className="w-6 h-6" />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-bold bg-brand-primary/10 text-brand-primary px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Jadwal Posyandu Terdekat
+                </span>
+                <h4 className="font-extrabold text-sm text-base-text-primary mt-1.5">
+                  {nextSchedule.date} • {nextSchedule.time}
+                </h4>
+                <p className="text-xs text-base-text-secondary">
+                  Fokus Pelayanan: <span className="font-semibold text-base-text-primary">{nextSchedule.focus}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* --- MOTHER STAT CARDS --- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -321,6 +404,39 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
+
+      {/* PWA Installation Banner */}
+      <PWAInstallBanner />
+
+      {/* Next Schedule Banner */}
+      {nextSchedule && (
+        <div className="bg-base-white border border-brand-primary/20 rounded-bento-lg p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
+              <MdCalendarMonth className="w-6 h-6" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold bg-brand-primary/10 text-brand-primary px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                Jadwal Posyandu Terdekat
+              </span>
+              <h4 className="font-extrabold text-sm text-base-text-primary mt-1.5">
+                {nextSchedule.date} • {nextSchedule.time}
+              </h4>
+              <p className="text-xs text-base-text-secondary">
+                Fokus Pelayanan: <span className="font-semibold text-base-text-primary">{nextSchedule.focus}</span>
+              </p>
+            </div>
+          </div>
+          
+          <Link 
+            href="/jadwal" 
+            className="px-4 py-2 rounded-xl border border-brand-primary/20 text-brand-primary hover:bg-brand-primary hover:text-base-white text-xs font-bold transition flex items-center gap-1.5 shrink-0 cursor-pointer text-center"
+          >
+            <span>Kelola Jadwal</span>
+            <MdArrowForward className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
 
       {/* --- STAT CARDS 2x2 on sm, 4-col on lg --- */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

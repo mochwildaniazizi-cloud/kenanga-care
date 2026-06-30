@@ -222,7 +222,7 @@ export default function InputPenimbanganPage() {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto pb-8">
+    <div className="max-w-[1200px] mx-auto pb-28 lg:pb-8 p-4 md:p-8 animate-in fade-in duration-300">
       {/* Header & Back Button */}
       <div className="mb-6">
         <Link href="/data-anak" className="inline-flex items-center gap-2 text-base-text-primary font-bold hover:text-brand-primary transition">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { getSchedules, getScheduleLogs } from "@/app/actions/schedule";
+import { getSchedules, getScheduleLogs, updateSchedule, deleteSchedule } from "@/app/actions/schedule";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import { 
   ChevronLeftIcon, 
@@ -204,7 +204,7 @@ function CustomTimePicker({ value, onChange, label }: CustomTimePickerProps) {
 }
 
 export default function JadwalPage() {
-  const { role } = useUserRole();
+  const { role, username } = useUserRole();
   const router = useRouter();
   const [schedules, setSchedules] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
@@ -288,114 +288,76 @@ export default function JadwalPage() {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!deletingSchedule) return;
 
-    // Filter out the deleted schedule
-    setSchedules(prev => prev.filter(s => s.id !== deletingSchedule.id));
+    setIsLoading(true);
+    try {
+      const res = await deleteSchedule(deletingSchedule.id, username || "Kader Siti");
+      if (res.success) {
+        const fetchedSchedules = await getSchedules();
+        setSchedules(fetchedSchedules);
 
-    // Create log entry dynamically
-    const now = new Date();
-    const formattedLogTime = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + 
-                             ` Pukul ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    const newLog = {
-      id: (logs.length + 1).toString(),
-      time: formattedLogTime,
-      by: "Kader Siti",
-      detail: `Menghapus Jadwal ${deletingSchedule.date}.`
-    };
+        const fetchedLogs = await getScheduleLogs();
+        setLogs(fetchedLogs);
 
-    setLogs(prev => [newLog, ...prev]);
-    setShowDeleteModal(false);
-
-    // Show Success Modal
-    setSuccessMessage(`Jadwal tanggal ${deletingSchedule.date} berhasil dihapus.`);
-    setShowSuccessModal(true);
-    setDeletingSchedule(null);
+        setShowDeleteModal(false);
+        setSuccessMessage(`Jadwal tanggal ${deletingSchedule.date} berhasil dihapus.`);
+        setShowSuccessModal(true);
+      } else {
+        alert(res.error || "Gagal menghapus jadwal.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem saat menghapus.");
+    } finally {
+      setIsLoading(false);
+      setDeletingSchedule(null);
+    }
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingSchedule) return;
 
-    // Update schedules list in local state
-    setSchedules(prev => 
-      prev.map(s => s.id === editingSchedule.id ? editingSchedule : s)
-    );
+    setIsLoading(true);
+    try {
+      const timeParts = editingSchedule.time.split("-");
+      const startTime = timeParts[0]?.trim() || "08:00";
+      const endTime = timeParts[1]?.replace("WIB", "").trim() || "12:00";
 
-    // Create a new change log entry dynamically
-    const now = new Date();
-    const formattedLogTime = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + 
-                             ` Pukul ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    const newLog = {
-      id: (logs.length + 1).toString(),
-      time: formattedLogTime,
-      by: "Kader Siti",
-      detail: `Memperbarui Fokus Layanan ${editingSchedule.date}.`
-    };
+      const res = await updateSchedule(editingSchedule.id, {
+        schedule_date: editingSchedule.rawDate,
+        start_time: startTime,
+        end_time: endTime,
+        service_focus: editingSchedule.focus,
+        status: editingSchedule.status || "Terjadwal",
+        changed_by: username || "Kader Siti"
+      });
 
-    setLogs(prev => [newLog, ...prev]);
-    setShowEditModal(false);
+      if (res.success) {
+        const fetchedSchedules = await getSchedules();
+        setSchedules(fetchedSchedules);
 
-    // Display Success popup
-    setSuccessMessage(`Jadwal tanggal ${editingSchedule.date} berhasil diperbarui.`);
-    setShowSuccessModal(true);
-  };
+        const fetchedLogs = await getScheduleLogs();
+        setLogs(fetchedLogs);
 
-  const handleSaveAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newSchedule.date || !newSchedule.focus) {
-      alert("Mohon lengkapi Tanggal dan Fokus Layanan.");
-      return;
+        setShowEditModal(false);
+        setSuccessMessage(`Jadwal berhasil diperbarui.`);
+        setShowSuccessModal(true);
+      } else {
+        alert(res.error || "Gagal menyimpan perubahan.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem.");
+    } finally {
+      setIsLoading(false);
     }
-
-    // Format input date (YYYY-MM-DD) to Indonesian style: "Sabtu, 03 Oktober 2026"
-    const dateObj = new Date(newSchedule.date);
-    const formattedDate = dateObj.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-    const formattedTime = `${newSchedule.waktuMulai} - ${newSchedule.waktuSelesai} WIB`;
-
-    const addedItem = {
-      id: (schedules.length + 1).toString(),
-      date: formattedDate,
-      time: formattedTime,
-      focus: newSchedule.focus,
-      status: "Terjadwal"
-    };
-
-    setSchedules(prev => [...prev, addedItem]);
-
-    // Create a new change log entry dynamically
-    const now = new Date();
-    const formattedLogTime = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + 
-                             ` Pukul ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    const newLog = {
-      id: (logs.length + 1).toString(),
-      time: formattedLogTime,
-      by: "Kader Siti",
-      detail: `Menambahkan Jadwal ${formattedDate}.`
-    };
-
-    setLogs(prev => [newLog, ...prev]);
-    setShowAddModal(false);
-    
-    // Reset form states
-    setNewSchedule({
-      date: "",
-      waktuMulai: "08:00",
-      waktuSelesai: "12:00",
-      focus: ""
-    });
-
-    // Display Success popup
-    setSuccessMessage(`Jadwal baru tanggal ${formattedDate} berhasil ditambahkan.`);
-    setShowSuccessModal(true);
   };
 
   return (
-    <div className="w-full pb-10 space-y-6 animate-in fade-in duration-300">
+    <div className="w-full pb-28 lg:pb-8 space-y-6 animate-in fade-in duration-300">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column (span 5): Next Schedule & Calendar */}
@@ -497,7 +459,7 @@ export default function JadwalPage() {
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-base-text-primary text-base">Jadwal Posyandu</h3>
               <button 
-                onClick={() => setShowAddModal(true)}
+                onClick={() => router.push("/jadwal/tambah")}
                 className="bg-brand-primary hover:bg-brand-primary/95 text-base-white text-xs font-bold px-4 py-2.5 rounded-full shadow-md shadow-brand-primary/10 transition cursor-pointer flex items-center gap-1.5"
               >
                 <span>Tambah Jadwal</span>
@@ -571,7 +533,7 @@ export default function JadwalPage() {
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-base-text-primary text-base">Riwayat Perubahan Jadwal</h3>
               <button 
-                onClick={() => setShowLogsModal(true)}
+                onClick={() => router.push("/jadwal/riwayat")}
                 className="text-brand-primary text-xs font-bold hover:underline transition cursor-pointer"
               >
                 Lihat Selengkapnya &rarr;
@@ -622,79 +584,6 @@ export default function JadwalPage() {
         </div>
 
       </div>
-
-      {/* Modal Tambah Jadwal */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
-          <div className="bg-base-white rounded-2xl shadow-xl w-[95%] max-w-md overflow-visible border border-base-border/20">
-            <form onSubmit={handleSaveAdd}>
-              <div className="p-6 space-y-4">
-                <h3 className="text-xl font-bold text-base-text-primary">Tambah Jadwal Posyandu</h3>
-                <p className="text-xs text-base-text-secondary">Masukkan tanggal, waktu, dan fokus layanan posyandu baru.</p>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-base-text-primary mb-1.5">Tanggal Kegiatan</label>
-                    <CustomDatePicker 
-                      value={newSchedule.date}
-                      onChange={(val) => setNewSchedule({...newSchedule, date: val})}
-                      label="Select a day"
-                      outputFormat="iso"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-base-text-primary mb-1.5">Waktu Mulai</label>
-                      <CustomTimePicker 
-                        label="Start with"
-                        value={newSchedule.waktuMulai}
-                        onChange={(val) => setNewSchedule({...newSchedule, waktuMulai: val})}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-base-text-primary mb-1.5">Waktu Selesai</label>
-                      <CustomTimePicker 
-                        label="End with"
-                        value={newSchedule.waktuSelesai}
-                        onChange={(val) => setNewSchedule({...newSchedule, waktuSelesai: val})}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-base-text-primary mb-1.5">Fokus Layanan</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={newSchedule.focus}
-                      onChange={(e) => setNewSchedule({...newSchedule, focus: e.target.value})}
-                      placeholder="Contoh: Imunisasi PCV & Penimbangan"
-                      className="w-full px-4 py-2.5 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-sm text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex gap-3 rounded-b-2xl">
-                <button 
-                  type="button" 
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 py-2.5 rounded-xl border border-base-border/50 text-base-text-secondary hover:text-base-text-primary font-bold text-xs hover:bg-base-white transition cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button 
-                  type="submit" 
-                  className="flex-1 py-2.5 rounded-xl bg-brand-primary text-base-white font-bold text-xs hover:bg-brand-primary/90 transition shadow-sm cursor-pointer"
-                >
-                  Simpan Jadwal
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Modal Edit Jadwal */}
       {showEditModal && editingSchedule && (
@@ -787,154 +676,7 @@ export default function JadwalPage() {
         </div>
       )}
 
-      {/* Modal Riwayat Log Selengkapnya */}
-      {showLogsModal && (() => {
-        const filteredLogs = logs.filter(log => 
-          log.detail.toLowerCase().includes(logSearch.toLowerCase()) ||
-          log.by.toLowerCase().includes(logSearch.toLowerCase()) ||
-          log.time.toLowerCase().includes(logSearch.toLowerCase())
-        );
-        const sortedFilteredLogs = [...filteredLogs].sort((a, b) => {
-          const idA = parseInt(a.id) || 0;
-          const idB = parseInt(b.id) || 0;
-          return logSortOrder === "asc" ? idA - idB : idB - idA;
-        });
-        const totalLogPages = Math.ceil(sortedFilteredLogs.length / logItemsPerPage);
-        const paginatedLogs = sortedFilteredLogs.slice(
-          (logCurrentPage - 1) * logItemsPerPage,
-          logCurrentPage * logItemsPerPage
-        );
-        const startIdx = sortedFilteredLogs.length > 0 ? (logCurrentPage - 1) * logItemsPerPage + 1 : 0;
-        const endIdx = Math.min(logCurrentPage * logItemsPerPage, sortedFilteredLogs.length);
 
-        return (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
-            <div className="bg-base-white rounded-2xl shadow-xl w-[95%] max-w-2xl overflow-visible border border-base-border/20 flex flex-col">
-              <div className="p-6 pb-4 space-y-4 flex flex-col">
-                <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
-                  <h3 className="text-xl font-bold text-base-text-primary">Riwayat Lengkap Perubahan Jadwal</h3>
-                  <button 
-                    onClick={() => { setShowLogsModal(false); setLogSearch(""); }}
-                    className="text-base-text-secondary hover:text-base-text-primary text-sm font-semibold cursor-pointer"
-                  >
-                    Tutup
-                  </button>
-                </div>
-
-                {/* Search Bar inside Modal */}
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    placeholder="Cari riwayat perubahan (berdasarkan detail, oleh, atau waktu)..." 
-                    value={logSearch}
-                    onChange={(e) => setLogSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs text-base-text-primary transition bg-base-bg/10 focus:bg-base-white"
-                  />
-                  <svg className="absolute left-3.5 top-3 w-4 h-4 text-base-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-
-                {/* Table Container */}
-                <div className="overflow-y-auto max-h-80 pr-1 border border-base-border/10 rounded-xl">
-                  <table className="w-full text-left border-collapse min-w-[500px]">
-                    <thead className="sticky top-0 bg-base-white z-10 border-b border-base-border/20">
-                      <tr className="text-xs font-bold text-base-text-secondary uppercase tracking-wider select-none">
-                        <th className="py-3 px-4 w-1/4 cursor-pointer hover:text-brand-primary" onClick={() => setLogSortOrder(prev => prev === "asc" ? "desc" : "asc")}>
-                          <div className="flex items-center gap-1">
-                            <span>Waktu</span>
-                            <span className="text-[10px]">{logSortOrder === "asc" ? "↑" : "↓"}</span>
-                          </div>
-                        </th>
-                        <th className="py-3 px-4 w-1/4">Oleh</th>
-                        <th className="py-3 px-4 w-1/2">Detail</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-sm">
-                      {paginatedLogs.map((log, i) => (
-                        <tr key={i} className="border-b border-gray-50 hover:bg-base-bg/30 transition-colors">
-                          <td className="py-3 px-4 text-base-text-secondary font-medium whitespace-nowrap">{log.time}</td>
-                          <td className="py-3 px-4 text-base-text-primary font-semibold">{log.by}</td>
-                          <td className="py-3 px-4 text-base-text-primary font-medium">{log.detail}</td>
-                        </tr>
-                      ))}
-                      {paginatedLogs.length === 0 && (
-                        <tr>
-                          <td colSpan={3} className="py-10 text-center text-sm text-base-text-secondary">
-                            Tidak ada riwayat perubahan yang cocok.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Pagination Controls */}
-                {filteredLogs.length > 0 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between pt-3 text-xs text-base-text-secondary font-semibold gap-3 border-t border-base-border/10">
-                    <div className="flex items-center gap-2">
-                      <span>Tampilkan</span>
-                      <select 
-                        value={logItemsPerPage} 
-                        onChange={(e) => setLogItemsPerPage(Number(e.target.value))}
-                        className="border border-base-border/50 rounded-lg px-2 py-1 bg-base-white focus:outline-none focus:border-brand-primary text-xs"
-                      >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
-                        <option value={50}>50</option>
-                      </select>
-                      <span>dari {filteredLogs.length} Riwayat (Menampilkan {startIdx}-{endIdx})</span>
-                    </div>
-
-                    <div className="flex items-center gap-1.5">
-                      <button 
-                        onClick={() => setLogCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={logCurrentPage === 1}
-                        className="px-2.5 py-1.5 border border-base-border/40 rounded-lg text-base-text-secondary hover:text-brand-primary hover:border-brand-primary disabled:opacity-50 disabled:hover:text-base-text-secondary transition select-none cursor-pointer"
-                      >
-                        &lt; Seb
-                      </button>
-                      
-                      {Array.from({ length: totalLogPages }, (_, i) => i + 1).map(page => (
-                        <button 
-                          key={page}
-                          onClick={() => setLogCurrentPage(page)}
-                          className={`w-7.5 h-7.5 flex items-center justify-center rounded-lg transition select-none cursor-pointer ${
-                            logCurrentPage === page 
-                              ? 'bg-brand-primary text-base-white font-bold shadow-sm shadow-brand-primary/10' 
-                              : 'border border-base-border/30 text-base-text-primary hover:bg-base-bg/60'
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-
-                      <button 
-                        onClick={() => setLogCurrentPage(prev => Math.min(prev + 1, totalLogPages))}
-                        disabled={logCurrentPage === totalLogPages}
-                        className="px-2.5 py-1.5 border border-base-border/40 rounded-lg text-base-text-secondary hover:text-brand-primary hover:border-brand-primary disabled:opacity-50 disabled:hover:text-base-text-secondary transition select-none cursor-pointer"
-                      >
-                        Sel &gt;
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex justify-end rounded-b-2xl">
-                <button 
-                  type="button" 
-                  onClick={() => { setShowLogsModal(false); setLogSearch(""); }}
-                  className="px-6 py-2.5 rounded-xl bg-brand-primary text-base-white font-semibold text-xs hover:bg-brand-primary/90 transition shadow-sm cursor-pointer"
-                >
-                  Kembali
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Modal Konfirmasi Hapus Jadwal */}
       {showDeleteModal && deletingSchedule && (

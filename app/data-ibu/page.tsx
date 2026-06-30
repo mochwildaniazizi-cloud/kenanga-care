@@ -317,7 +317,7 @@ export default function DataIbuPage() {
     };
 
     return (
-      <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-in fade-in duration-300">
+      <div className="space-y-6 max-w-[1600px] mx-auto pb-28 lg:pb-10 animate-in fade-in duration-300">
         
         {/* Header Profil */}
         <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">

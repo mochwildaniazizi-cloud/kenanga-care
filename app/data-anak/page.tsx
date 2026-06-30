@@ -404,7 +404,7 @@ export default function DataAnakPage() {
     }
 
     return (
-      <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-in fade-in duration-300">
+      <div className="space-y-6 max-w-[1600px] mx-auto pb-28 lg:pb-10 animate-in fade-in duration-300">
         
         {/* Child Selector Tabs (if multiple children) */}
         {motherChildren.length > 1 && (
@@ -1252,7 +1252,6 @@ export default function DataAnakPage() {
                 Selanjutnya &gt;
               </button>
             </div>
-            <p>{currentHistoryPage} dari {totalHistoryPages}</p>
           </div>
         )}
       </div>

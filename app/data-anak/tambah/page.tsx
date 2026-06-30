@@ -123,7 +123,7 @@ export default function TambahAnakPage() {
       };
 
       return (
-        <div className="max-w-[1200px] mx-auto pb-4">
+        <div className="max-w-[1200px] mx-auto pb-28 lg:pb-8">
           
           {/* Header & Back Button */}
           <div>
