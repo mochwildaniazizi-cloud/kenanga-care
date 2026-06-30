@@ -191,7 +191,7 @@ export default function InputPenimbanganPage() {
         child_id: selectedChild.child_id,
         ...formData
       });
-      
+      if (res.success) {
         showLocalNotification("Data Penimbangan Disimpan", {
           body: `Data pemeriksaan untuk ${selectedChild.name} telah berhasil disimpan.`,
         });
