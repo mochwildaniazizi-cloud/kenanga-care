@@ -76,9 +76,9 @@ export default function Header() {
     loadProfile();
     window.addEventListener("profile-updated", loadProfile);
 
-    // Initial check for dark mode
+    // Initial check for dark mode (defaults to light mode)
     const savedTheme = localStorage.getItem("theme");
-    const isDark = savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const isDark = savedTheme === "dark";
     setIsDarkMode(isDark);
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -229,13 +229,13 @@ export default function Header() {
       
       <div className="flex items-center gap-3">
         {/* Brand Logo only on mobile */}
-        <div className="flex items-center gap-1.5 lg:hidden border-r border-base-border/30 pr-3 mr-1">
+        <div className="flex items-center gap-1.5 lg:hidden border-r border-base-border/30 pr-3 mr-1 shrink-0">
           <img 
             src="/Logo.png" 
             alt="Kenanga Care Logo" 
             className="w-7 h-7 rounded-lg object-cover" 
           />
-          <span className="font-extrabold text-brand-primary text-xs tracking-tight">Kenanga Care</span>
+          <span className="font-extrabold text-brand-primary text-xs tracking-tight hidden sm:inline">Kenanga Care</span>
         </div>
 
         {/* 1. Breadcrumb / Judul Halaman Aktif */}
@@ -266,7 +266,7 @@ export default function Header() {
       </div>
 
       {/* 3. Aksi Sisi Kanan (Status Sync, Notifikasi, & Profil) */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         
         {/* Indikator Status Sinkronisasi Data PWA */}
         <button 
@@ -364,7 +364,7 @@ export default function Header() {
         <div className="relative" ref={dropdownRef}>
           <button 
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-3.5 border-l border-base-border/50 pl-6 focus:outline-none cursor-pointer group text-left"
+            className="flex items-center gap-3.5 border-l border-base-border/50 pl-3 sm:pl-6 focus:outline-none cursor-pointer group text-left"
           >
             <div className="w-10 h-10 bg-base-bg rounded-full flex items-center justify-center font-bold text-base-text-secondary border border-base-border/50 group-hover:border-brand-primary transition duration-150 shrink-0">
               {getInitials(profile.name)}
