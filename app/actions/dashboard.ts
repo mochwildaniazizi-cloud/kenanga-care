@@ -63,6 +63,7 @@ export async function getDashboardStats() {
       })
     ]);
 
+    // FORCE SYNC: Triggering git detection
     const totalKunjungan = checkedChildren.length + checkedMothers.length;
 
     // Calculate problematic nutrition kids dynamically
