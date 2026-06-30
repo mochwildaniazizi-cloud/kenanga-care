@@ -241,6 +241,15 @@ export default function JadwalPage() {
 
   const [scheduleSortOrder, setScheduleSortOrder] = useState<"asc" | "desc">("asc");
   const [logSortOrder, setLogSortOrder] = useState<"asc" | "desc">("desc");
+  const [scheduleTab, setScheduleTab] = useState<"upcoming" | "past">("upcoming");
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingSchedules = schedules.filter((s) => new Date(s.rawDate) >= today);
+  const pastSchedules = schedules.filter((s) => new Date(s.rawDate) < today);
+
+  const displayedSchedules = scheduleTab === "upcoming" ? upcomingSchedules : pastSchedules;
 
   useEffect(() => {
     setShareUrl(window.location.href);
@@ -384,24 +393,27 @@ export default function JadwalPage() {
               ) : (
                 <>
                   <h2 className="text-3xl font-bold text-base-text-primary leading-tight">
-                    {schedules[0]?.date || "Sabtu, 04 Juli 2026"}
+                    {upcomingSchedules[0]?.date || "Tidak ada jadwal mendatang"}
                   </h2>
-                  <p className="text-sm font-semibold text-base-text-primary mt-1">
-                    {schedules[0]?.time || "08:00 - 12:00 WIB"}
-                  </p>
+                  {upcomingSchedules[0] && (
+                    <p className="text-sm font-semibold text-base-text-primary mt-1">
+                      {upcomingSchedules[0].time}
+                    </p>
+                  )}
                 </>
               )}
             </div>
             
             <div className="border-t border-base-border/20 pt-4">
               <p className="text-sm text-base-text-secondary font-medium">
-                Fokus Bulan Ini: <span className="font-semibold text-base-text-primary">{schedules[0]?.focus || "Imunisasi PCV & Penimbangan"}</span>
+                Fokus Bulan Ini: <span className="font-semibold text-base-text-primary">{upcomingSchedules[0]?.focus || "-"}</span>
               </p>
             </div>
 
             <button 
-              onClick={() => schedules.length > 0 && openEditModal(schedules[0])}
-              className="w-full border border-brand-primary text-brand-primary hover:bg-brand-soft/20 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer flex items-center justify-center gap-2"
+              disabled={upcomingSchedules.length === 0}
+              onClick={() => upcomingSchedules.length > 0 && openEditModal(upcomingSchedules[0])}
+              className="w-full border border-brand-primary text-brand-primary hover:bg-brand-soft/20 py-2.5 rounded-xl text-sm font-semibold transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>Edit Jadwal</span>
               <PencilIcon className="w-4 h-4 text-brand-primary" />
@@ -456,11 +468,37 @@ export default function JadwalPage() {
           
           {/* Card: Daftar Jadwal */}
           <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base-text-primary text-base">Jadwal Posyandu</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/10 pb-4">
+              <div className="flex items-center gap-3">
+                <h3 className="font-bold text-base-text-primary text-base">Jadwal Posyandu</h3>
+                <div className="flex bg-base-bg p-0.5 rounded-lg border border-base-border/20 text-[10px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setScheduleTab("upcoming")}
+                    className={`px-3 py-1 rounded-md transition cursor-pointer ${
+                      scheduleTab === "upcoming"
+                        ? "bg-base-white text-brand-primary shadow-sm"
+                        : "text-base-text-secondary hover:text-base-text-primary"
+                    }`}
+                  >
+                    Mendatang ({upcomingSchedules.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setScheduleTab("past")}
+                    className={`px-3 py-1 rounded-md transition cursor-pointer ${
+                      scheduleTab === "past"
+                        ? "bg-base-white text-brand-primary shadow-sm"
+                        : "text-base-text-secondary hover:text-base-text-primary"
+                    }`}
+                  >
+                    Riwayat Selesai ({pastSchedules.length})
+                  </button>
+                </div>
+              </div>
               <button 
                 onClick={() => router.push("/jadwal/tambah")}
-                className="bg-brand-primary hover:bg-brand-primary/95 text-base-white text-xs font-bold px-4 py-2.5 rounded-full shadow-md shadow-brand-primary/10 transition cursor-pointer flex items-center gap-1.5"
+                className="bg-brand-primary hover:bg-brand-primary/95 text-base-white text-xs font-bold px-4 py-2.5 rounded-full shadow-md shadow-brand-primary/10 transition cursor-pointer flex items-center gap-1.5 self-end sm:self-auto"
               >
                 <span>Tambah Jadwal</span>
                 <PlusIcon className="w-3.5 h-3.5 text-base-white stroke-[3]" />
@@ -493,7 +531,7 @@ export default function JadwalPage() {
                       </tr>
                     ))
                   ) : (
-                    [...schedules].sort((a, b) => {
+                    [...displayedSchedules].sort((a, b) => {
                       const dateA = new Date(a.rawDate || 0).getTime();
                       const dateB = new Date(b.rawDate || 0).getTime();
                       return scheduleSortOrder === "asc" ? dateA - dateB : dateB - dateA;
@@ -522,6 +560,13 @@ export default function JadwalPage() {
                         </td>
                       </tr>
                     ))
+                  )}
+                  {displayedSchedules.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-12 text-center text-sm text-base-text-secondary font-semibold">
+                        Tidak ada jadwal {scheduleTab === "upcoming" ? "mendatang" : "riwayat selesai"} yang terdaftar.
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </table>
@@ -808,21 +853,21 @@ export default function JadwalPage() {
                   </svg>
                   <span className="text-[9px] font-semibold text-[#6B7280] group-hover:text-[#1E1E1E] transition-colors">Facebook</span>
                 </a>
-                <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('Jadwal Posyandu ' + (schedules[0]?.date || ''))}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 group">
+                <a href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('Jadwal Posyandu ' + (upcomingSchedules[0]?.date || ''))}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 group">
                   <svg className="w-10 h-10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 ease-out" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="20" cy="20" r="20" fill="black"/>
                     <path d="M26 11H28.5L22.5 17.5L29.5 27H24L19.5 21.25L14.75 27H12L18.5 20.25L12 11H17.5L21.75 16.5L26 11ZM25 25.5H26.5L16.5 12.5H15L25 25.5Z" fill="white"/>
                   </svg>
                   <span className="text-[9px] font-semibold text-[#6B7280] group-hover:text-[#1E1E1E] transition-colors">X</span>
                 </a>
-                <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent('Jadwal Posyandu ' + (schedules[0]?.date || '') + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 group">
+                <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent('Jadwal Posyandu ' + (upcomingSchedules[0]?.date || '') + ' ' + shareUrl)}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 group">
                   <svg className="w-10 h-10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 ease-out" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="20" cy="20" r="20" fill="#25D366"/>
                     <path d="M20 9C13.9 9 9 13.9 9 20C9 22 9.5 23.9 10.5 25.6L9 31L14.6 29.5C16.2 30.5 18.1 31 20 31C26.1 31 31 26.1 31 20C31 13.9 26.1 9 20 9ZM25.2 24.1C24.9 25 23.9 25.7 23 25.9C22.4 26 21.6 26.1 18.8 24.9C15.2 23.4 12.9 19.7 12.7 19.5C12.5 19.3 11 17.3 11 15.2C11 13.1 12 12.1 12.4 11.6C12.8 11.1 13.5 10.9 14.1 10.9C14.3 10.9 14.5 10.9 14.7 10.9C15.2 10.9 15.5 10.9 15.8 11.6C16.2 12.5 17.1 14.7 17.2 14.9C17.3 15.1 17.4 15.4 17.2 15.7C17.1 16 16.9 16.2 16.7 16.5C16.5 16.7 16.2 17 16 17.2C15.8 17.4 15.5 17.6 15.8 18.1C16.1 18.6 17.1 20.3 18.7 21.7C20.7 23.5 22.4 24.1 22.9 24.3C23.4 24.5 23.7 24.4 24 24.1C24.3 23.8 24.9 23.1 25.2 22.6C25.5 22.1 25.9 22.2 26.3 22.3C26.7 22.4 28.7 23.4 29.1 23.6C29.5 23.8 29.8 23.9 29.9 24.1C30 24.3 30 25.1 29.6 25.9C29.2 26.7 27 27.5 25.2 24.1Z" fill="white"/>
                   </svg>
                   <span className="text-[9px] font-semibold text-[#6B7280] group-hover:text-[#1E1E1E] transition-colors">Whatsapp</span>
                 </a>
-                <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('Jadwal Posyandu ' + (schedules[0]?.date || ''))}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 group">
+                <a href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent('Jadwal Posyandu ' + (upcomingSchedules[0]?.date || ''))}`} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 group">
                   <svg className="w-10 h-10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 ease-out" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="20" cy="20" r="20" fill="#179CDE"/>
                     <path d="M27.5 12.5L11.5 18.7C10.4 19.1 10.4 19.8 11.3 20.1L15.4 21.4L24.9 15.4C25.3 15.1 25.7 15.3 25.4 15.6L17.7 22.6L17.4 26.8C17.8 26.8 18 26.6 18.2 26.4L20.2 24.5L24.4 27.6C25.2 28 25.8 27.8 26 26.9L28.8 13.8C29.1 12.6 28.3 12.1 27.5 12.5Z" fill="white"/>

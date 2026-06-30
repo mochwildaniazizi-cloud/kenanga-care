@@ -93,7 +93,7 @@ export default function DashboardPage() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const futureSchedule = fetchedSchedules.find((s: any) => new Date(s.rawDate) >= today);
-        const resolvedSchedule = futureSchedule || fetchedSchedules[0] || null;
+        const resolvedSchedule = futureSchedule || null;
         
         setNextSchedule(resolvedSchedule);
         if (resolvedSchedule) {
