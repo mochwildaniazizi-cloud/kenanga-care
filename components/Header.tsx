@@ -51,7 +51,7 @@ export default function Header() {
     name: "Kader Siti",
     posyandu: "Posyandu Kenanga 1"
   });
-  const { role, setRole, logout } = useUserRole();
+  const { role, setRole, logout, isLoggedIn } = useUserRole();
 
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -222,7 +222,7 @@ export default function Header() {
     return defaultLabel;
   };
 
-  if (pathname === "/login") return null;
+  if (!isLoggedIn || pathname === "/login") return null;
 
   return (
     <header className="h-20 bg-base-white border-b border-base-border/40 flex items-center justify-between px-4 sm:px-10 shrink-0 z-40 relative">

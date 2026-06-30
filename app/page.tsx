@@ -10,6 +10,7 @@ import { FaBaby, FaNotesMedical, FaBookOpen } from "react-icons/fa";
 import Link from "next/link";
 import { useUserRole } from "@/context/UserRoleContext";
 import { getLoggedInMotherData, getMotherDetail } from "@/app/actions/mothers";
+import LandingPage from "@/components/LandingPage";
 
 function StatCard({ icon: Icon, label, value, sub, color }: {
   icon: any; label: string; value: string | number; sub?: string; color: string;
@@ -29,7 +30,7 @@ function StatCard({ icon: Icon, label, value, sub, color }: {
 }
 
 export default function DashboardPage() {
-  const { role, username } = useUserRole();
+  const { role, username, isLoggedIn, isInitialized } = useUserRole();
   const [isLoading, setIsLoading] = useState(true);
   
   // Kader dashboard state
@@ -41,6 +42,8 @@ export default function DashboardPage() {
   const [motherDetail, setMotherDetail] = useState<any>(null);
 
   useEffect(() => {
+    if (!isInitialized || !isLoggedIn) return;
+
     async function loadData() {
       setIsLoading(true);
       try {
@@ -75,6 +78,18 @@ export default function DashboardPage() {
     const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return <LandingPage />;
+  }
 
   if (isLoading) {
     return (

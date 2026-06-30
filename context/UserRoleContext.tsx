@@ -12,6 +12,7 @@ interface UserRoleContextType {
   username: string;
   login: (role: UserRole, username: string) => void;
   logout: () => void;
+  isInitialized: boolean;
 }
 
 const UserRoleContext = createContext<UserRoleContextType>({
@@ -21,6 +22,7 @@ const UserRoleContext = createContext<UserRoleContextType>({
   username: "",
   login: () => {},
   logout: () => {},
+  isInitialized: false,
 });
 
 export function UserRoleProvider({ children }: { children: ReactNode }) {
@@ -50,7 +52,8 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isInitialized) return;
 
-    if (!isLoggedIn && pathname !== "/login") {
+    const publicPaths = ["/", "/login"];
+    if (!isLoggedIn && !publicPaths.includes(pathname)) {
       router.replace("/login");
     } else if (isLoggedIn && pathname === "/login") {
       router.replace("/");
@@ -89,7 +92,7 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <UserRoleContext.Provider value={{ role, setRole, isLoggedIn, username, login, logout }}>
+    <UserRoleContext.Provider value={{ role, setRole, isLoggedIn, username, login, logout, isInitialized }}>
       {children}
     </UserRoleContext.Provider>
   );

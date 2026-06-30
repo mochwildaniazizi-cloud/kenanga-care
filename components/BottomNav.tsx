@@ -30,9 +30,9 @@ const ibuItems = [
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { role } = useUserRole();
+  const { role, isLoggedIn } = useUserRole();
 
-  if (pathname === "/login") return null;
+  if (!isLoggedIn || pathname === "/login") return null;
 
   const items = role === "ibu" ? ibuItems : kaderItems;
 

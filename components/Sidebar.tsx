@@ -37,7 +37,7 @@ const ibuNavItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const { role } = useUserRole();
+  const { role, isLoggedIn } = useUserRole();
 
   const navItems = role === "ibu" ? ibuNavItems : kaderNavItems;
 
@@ -66,7 +66,7 @@ export default function Sidebar() {
     return pathname.startsWith(href);
   };
 
-  if (pathname === "/login") return null;
+  if (!isLoggedIn || pathname === "/login") return null;
 
   return (
     <>
