@@ -105,17 +105,6 @@ function SettingsContent() {
     if (role !== "kader") return;
     try {
       const data = await getMothersData();
-      const mothersList = data.map((m) => ({
-        name: m.name,
-        username: m.phone_number !== "-" ? m.phone_number : (m.national_id || "Tidak ada"),
-        role: m.status || "Ibu Balita",
-        type: "Ibu / Orang Tua",
-        phone: m.phone_number,
-        status: "Aktif",
-        mother_id: m.mother_id,
-      }));
-      const customCadresRaw = localStorage.getItem("custom_cadre_users");
-      const customCadres = customCadresRaw ? JSON.parse(customCadresRaw) : [];
       
       const defaultKader = {
         name: "Kader Siti",
@@ -126,7 +115,35 @@ function SettingsContent() {
         status: "Aktif",
       };
 
-      setAllUsers([defaultKader, ...customCadres, ...mothersList]);
+      const mappedUsers = data.map((m) => {
+        const isDbCadre = m.status === "Kader Posyandu" || m.national_id.startsWith("KADER-");
+        if (isDbCadre) {
+          const cleanUsername = m.phone_number !== "-" ? m.phone_number : m.national_id.replace("KADER-", "");
+          return {
+            name: m.name,
+            username: cleanUsername,
+            role: m.condition || "Kader Posyandu",
+            type: "Kader Posyandu",
+            phone: m.phone_number,
+            status: "Aktif",
+            mother_id: m.mother_id,
+          };
+        } else {
+          return {
+            name: m.name,
+            username: m.phone_number !== "-" ? m.phone_number : (m.national_id || "Tidak ada"),
+            role: m.status || "Ibu Balita",
+            type: "Ibu / Orang Tua",
+            phone: m.phone_number,
+            status: "Aktif",
+            mother_id: m.mother_id,
+          };
+        }
+      });
+
+      const filteredMapped = mappedUsers.filter(u => u.username !== "kader");
+
+      setAllUsers([defaultKader, ...filteredMapped]);
     } catch (err) {
       console.error(err);
     }
@@ -147,81 +164,66 @@ function SettingsContent() {
     const confirmDelete = window.confirm(`Apakah Anda yakin ingin menghapus akun ${user.name}?`);
     if (!confirmDelete) return;
 
-    if (user.type === "Kader Posyandu") {
-      const customCadresRaw = localStorage.getItem("custom_cadre_users");
-      const customCadres = customCadresRaw ? JSON.parse(customCadresRaw) : [];
-      const updated = customCadres.filter((c: any) => c.username !== user.username);
-      localStorage.setItem("custom_cadre_users", JSON.stringify(updated));
-      setSuccessMessage(`Akun Kader ${user.name} berhasil dihapus.`);
-      setShowSuccessModal(true);
-      refreshUsersList();
-    } else {
-      if (!user.mother_id) {
-        alert("ID Ibu tidak valid.");
-        return;
+    if (!user.mother_id) {
+      alert("ID Pengguna tidak valid.");
+      return;
+    }
+    try {
+      const res = await deleteMother(user.mother_id);
+      if (res.success) {
+        setSuccessMessage(`Akun ${user.name} berhasil dihapus.`);
+        setShowSuccessModal(true);
+        refreshUsersList();
+      } else {
+        alert(res.error || "Gagal menghapus akun.");
       }
-      try {
-        const res = await deleteMother(user.mother_id);
-        if (res.success) {
-          setSuccessMessage(`Akun Ibu ${user.name} berhasil dihapus.`);
-          setShowSuccessModal(true);
-          refreshUsersList();
-        } else {
-          alert(res.error || "Gagal menghapus akun.");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Terjadi kesalahan sistem saat menghapus.");
-      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem saat menghapus.");
     }
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUserForm.name || !newUserForm.national_id || !newUserForm.phone) {
-      alert("Nama, NIK, dan Nomor WhatsApp wajib diisi.");
+      alert("Nama, NIK/Identitas, dan Nomor WhatsApp wajib diisi.");
       return;
     }
 
     setIsCreatingUser(true);
     try {
       if (newUserForm.type === "Kader Posyandu") {
-        const customCadresRaw = localStorage.getItem("custom_cadre_users");
-        const customCadres = customCadresRaw ? JSON.parse(customCadresRaw) : [];
-        
         const usernameVal = newUserForm.phone;
-        if (usernameVal === "kader" || customCadres.some((c: any) => c.username === usernameVal)) {
-          alert("Nomor WhatsApp/Username sudah digunakan.");
-          return;
-        }
-
-        const newCadre = {
-          name: newUserForm.name,
-          username: usernameVal,
-          role: newUserForm.role || "Kader Posyandu",
-          type: "Kader Posyandu",
-          phone: newUserForm.phone,
-          status: "Aktif",
-        };
-
-        customCadres.push(newCadre);
-        localStorage.setItem("custom_cadre_users", JSON.stringify(customCadres));
         
-        setSuccessMessage(`Akun Kader ${newUserForm.name} berhasil ditambahkan.`);
-        setShowSuccessModal(true);
-        setShowAddUserModal(false);
-        refreshUsersList();
-        
-        setNewUserForm({
-          type: "Ibu / Orang Tua",
-          name: "",
-          national_id: "",
-          phone: "",
-          birth_date: "",
-          husband_name: "",
-          status: "Ibu Hamil",
-          role: "Kader Posyandu"
+        const res = await createMother({
+          national_id: "KADER-" + newUserForm.national_id,
+          mother_name: newUserForm.name,
+          phone_number: newUserForm.phone,
+          ui_status: "Kader Posyandu",
+          risk_status: newUserForm.role || "Kader Posyandu",
+          husband_name: "Kader",
+          number_of_children: 0
         });
+
+        if (res.success) {
+          setSuccessMessage(`Akun Kader ${newUserForm.name} berhasil ditambahkan ke database.`);
+          setShowSuccessModal(true);
+          setShowAddUserModal(false);
+          refreshUsersList();
+          
+          setNewUserForm({
+            type: "Ibu / Orang Tua",
+            name: "",
+            national_id: "",
+            phone: "",
+            birth_date: "",
+            husband_name: "",
+            status: "Ibu Hamil",
+            role: "Kader Posyandu"
+          });
+        } else {
+          alert(res.error || "Gagal membuat akun Kader.");
+        }
       } else {
         const birthDateObj = newUserForm.birth_date ? new Date(newUserForm.birth_date) : null;
         let ageVal = 0;
@@ -242,7 +244,7 @@ function SettingsContent() {
         });
 
         if (res.success) {
-          setSuccessMessage(`Akun Ibu ${newUserForm.name} berhasil ditambahkan.`);
+          setSuccessMessage(`Akun Ibu ${newUserForm.name} berhasil ditambahkan ke database.`);
           setShowSuccessModal(true);
           setShowAddUserModal(false);
           refreshUsersList();

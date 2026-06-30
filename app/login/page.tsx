@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserRole, UserRole } from "@/context/UserRoleContext";
 import { MdPerson, MdLock, MdErrorOutline } from "react-icons/md";
+import { getMothersData } from "@/app/actions/mothers";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function LoginPage() {
     }
   }, [isLoggedIn, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -34,29 +35,49 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
-    // Authentication Logic
-    setTimeout(() => {
+    try {
       const u = usernameInput.trim().toLowerCase();
       const p = passwordInput;
+      
+      const allMothers = await getMothersData();
 
       if (selRole === "kader") {
         if (u === "kader" && p === "kader123") {
           login("kader", "Kader Siti");
+          return;
+        }
+
+        // Search database-backed Kader
+        const matchingKader = allMothers.find(m => 
+          (m.status === "Kader Posyandu" || m.national_id.startsWith("KADER-")) &&
+          (m.phone_number.toLowerCase() === u || m.national_id.toLowerCase() === u || m.national_id.toLowerCase() === "kader-" + u || m.name.toLowerCase() === u)
+        );
+
+        if (matchingKader && p === "kader123") {
+          login("kader", matchingKader.name);
         } else {
           setErrorMsg("Username atau password Kader salah!");
           setIsLoading(false);
         }
       } else {
-        if ((u === "081222575562" || u === "3573019963334018" || u === "siti aminah") && p === "ibu123") {
-          login("ibu", "Siti Aminah");
-        } else if ((u === "081239958838" || u === "3573013746317213" || u === "dewi sartika") && p === "ibu123") {
-          login("ibu", "Dewi Sartika");
+        // Search database-backed Mother
+        const matchingMother = allMothers.find(m => 
+          !(m.status === "Kader Posyandu" || m.national_id.startsWith("KADER-")) &&
+          (m.phone_number.toLowerCase() === u || m.national_id.toLowerCase() === u || m.name.toLowerCase() === u)
+        );
+
+        if (matchingMother && p === "ibu123") {
+          login("ibu", matchingMother.name);
         } else {
           setErrorMsg("No. WhatsApp / NIK atau password Ibu salah!");
           setIsLoading(false);
         }
       }
-    }, 800);
+    } catch (err) {
+      console.error(err);
+      setErrorMsg("Terjadi kesalahan sistem saat masuk.");
+      setIsLoading(false);
+    }
   };
 
   if (isLoggedIn) {
