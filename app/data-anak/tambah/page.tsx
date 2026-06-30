@@ -8,6 +8,7 @@ import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import { MdOutlineMale, MdOutlineFemale, MdOutlineError } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import { searchMothers, createChild } from "@/app/actions/children";
+import { showLocalNotification } from "@/utils/notifications";
 
 export default function TambahAnakPage() {
   const { role } = useUserRole();
@@ -100,6 +101,9 @@ export default function TambahAnakPage() {
     setIsSubmitting(false);
 
     if (result.success) {
+      showLocalNotification("Data Anak Berhasil Disimpan", {
+        body: `Data profil untuk ${formData.child_name} telah berhasil disimpan ke database.`,
+      });
       router.push("/data-anak");
     } else {
       setErrorMsg(result.error || "Terjadi kesalahan.");

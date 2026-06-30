@@ -1,0 +1,18 @@
+{
+  "theme_color": "#ea2986",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "name": "Kenanga Care",
+  "short_name": "KenangaCare",
+  "description": "Dashboard Pemantauan Kesehatan Balita & Ibu Hamil Posyandu Kenanga 1",
+  "icons": [
+    {
+      "src": "/Logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -34,39 +34,29 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
-    // Mock Authentication Logic
+    // Authentication Logic
     setTimeout(() => {
       const u = usernameInput.trim().toLowerCase();
       const p = passwordInput;
 
       if (selRole === "kader") {
-        if (u === "kader" && p === "kader") {
+        if (u === "kader" && p === "kader123") {
           login("kader", "Kader Siti");
         } else {
           setErrorMsg("Username atau password Kader salah!");
           setIsLoading(false);
         }
       } else {
-        if (u === "ibu" && p === "ibu") {
-          login("ibu", "Ibu Aminah");
+        if ((u === "081222575562" || u === "3573019963334018" || u === "siti aminah") && p === "ibu123") {
+          login("ibu", "Siti Aminah");
+        } else if ((u === "081239958838" || u === "3573013746317213" || u === "dewi sartika") && p === "ibu123") {
+          login("ibu", "Dewi Sartika");
         } else {
           setErrorMsg("No. WhatsApp / NIK atau password Ibu salah!");
           setIsLoading(false);
         }
       }
     }, 800);
-  };
-
-  const handleDemoLogin = (roleType: UserRole) => {
-    setErrorMsg("");
-    setIsLoading(true);
-    setTimeout(() => {
-      if (roleType === "kader") {
-        login("kader", "Kader Siti (Demo)");
-      } else {
-        login("ibu", "Ibu Aminah (Demo)");
-      }
-    }, 400);
   };
 
   if (isLoggedIn) {
@@ -158,7 +148,7 @@ export default function LoginPage() {
             <div className="relative">
               <input
                 type="text"
-                placeholder={selRole === "kader" ? "Masukkan username (contoh: kader)" : "Masukkan NIK / No. WA (contoh: ibu)"}
+                placeholder={selRole === "kader" ? "Masukkan username..." : "Masukkan NIK / No. WA..."}
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
                 disabled={isLoading}
@@ -202,48 +192,6 @@ export default function LoginPage() {
             )}
           </button>
         </form>
-
-        <div className="w-full h-px bg-base-border/10"></div>
-
-        {/* Demo Credentials Box */}
-        <div className="bg-brand-soft/40 dark:bg-brand-soft/10 p-4 rounded-xl border border-brand-primary/10 space-y-3">
-          <p className="text-[10px] uppercase font-bold text-brand-primary tracking-wider text-center">Akun Uji Coba (Demo Mode)</p>
-          <div className="grid grid-cols-2 gap-2 text-center text-xs">
-            
-            {/* Kader Demo */}
-            <div className="p-2 bg-base-white/60 dark:bg-base-white/5 rounded-lg border border-base-border/10 flex flex-col justify-between">
-              <div>
-                <p className="font-bold text-base-text-primary">Kader Posyandu</p>
-                <p className="text-[10px] text-base-text-secondary mt-0.5">kader / kader</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleDemoLogin("kader")}
-                disabled={isLoading}
-                className="mt-2 py-1 bg-brand-primary/10 hover:bg-brand-primary hover:text-base-white text-[10px] text-brand-primary font-bold rounded-md transition-colors cursor-pointer"
-              >
-                Masuk Instan
-              </button>
-            </div>
-            
-            {/* Ibu Demo */}
-            <div className="p-2 bg-base-white/60 dark:bg-base-white/5 rounded-lg border border-base-border/10 flex flex-col justify-between">
-              <div>
-                <p className="font-bold text-base-text-primary">Ibu Balita</p>
-                <p className="text-[10px] text-base-text-secondary mt-0.5">ibu / ibu</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleDemoLogin("ibu")}
-                disabled={isLoading}
-                className="mt-2 py-1 bg-brand-primary/10 hover:bg-brand-primary hover:text-base-white text-[10px] text-brand-primary font-bold rounded-md transition-colors cursor-pointer"
-              >
-                Masuk Instan
-              </button>
-            </div>
-
-          </div>
-        </div>
 
       </div>
     </div>

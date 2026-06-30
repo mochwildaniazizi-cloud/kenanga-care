@@ -7,6 +7,7 @@ import { useUserRole } from "@/context/UserRoleContext";
 import { FiArrowLeft } from "react-icons/fi";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { createMother } from "@/app/actions/mothers";
+import { showLocalNotification } from "@/utils/notifications";
 
 export default function TambahIbuPage() {
   const { role } = useUserRole();
@@ -99,6 +100,9 @@ export default function TambahIbuPage() {
     setIsSubmitting(false);
 
     if (result.success) {
+      showLocalNotification("Data Ibu Berhasil Terdaftar", {
+        body: `Data profil untuk ${formData.mother_name} telah berhasil disimpan ke database.`,
+      });
       setShowSuccessModal(true);
     } else {
       setErrorMsg(result.error || "Gagal mendaftarkan data ibu.");

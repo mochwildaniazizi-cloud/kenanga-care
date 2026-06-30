@@ -11,6 +11,7 @@ import {
 import { FiArrowLeft } from "react-icons/fi";
 
 import { getChildrenData, createChildMeasurement } from "@/app/actions/children";
+import { showLocalNotification } from "@/utils/notifications";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 
@@ -191,7 +192,9 @@ export default function InputPenimbanganPage() {
         ...formData
       });
       
-      if (res.success) {
+        showLocalNotification("Data Penimbangan Disimpan", {
+          body: `Data pemeriksaan untuk ${selectedChild.name} telah berhasil disimpan.`,
+        });
         setAlertModal({
           show: true,
           type: 'success',

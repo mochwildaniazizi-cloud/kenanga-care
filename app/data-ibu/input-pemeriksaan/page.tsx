@@ -13,6 +13,7 @@ import {
 } from "react-icons/md";
 import { FiArrowLeft } from "react-icons/fi";
 import { getMothersData, createMaternalRecord } from "@/app/actions/mothers";
+import { showLocalNotification } from "@/utils/notifications";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 export interface Mother {
@@ -193,6 +194,9 @@ export default function InputPemeriksaanIbuPage() {
     setIsSubmitting(false);
 
     if (result.success) {
+      showLocalNotification("Data Pemeriksaan Ibu Disimpan", {
+        body: `Pemeriksaan kesehatan untuk ${selectedMother.name} telah berhasil disimpan.`,
+      });
       setShowSuccessModal(true);
     } else {
       setErrorMsg(result.error || "Gagal menyimpan hasil pemeriksaan.");

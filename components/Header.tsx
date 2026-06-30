@@ -38,9 +38,13 @@ const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; p
   "/setting": { label: "Pengaturan", icon: Cog6ToothIcon },
 };
 
+import { showLocalNotification, requestNotificationPermission } from "@/utils/notifications";
+
 export default function Header() {
   const [syncStatus, setSyncStatus] = useState<"success" | "reconnecting" | "offline">("success");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [hasUnreadNotif, setHasUnreadNotif] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [profile, setProfile] = useState({
@@ -51,6 +55,7 @@ export default function Header() {
 
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   // Sync profile from local storage and custom events
   useEffect(() => {
@@ -86,11 +91,46 @@ export default function Header() {
     };
   }, [role]);
 
+  // Online/Offline listener
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    setSyncStatus(navigator.onLine ? "success" : "offline");
+
+    const handleOnline = () => {
+      setSyncStatus("reconnecting");
+      setTimeout(() => {
+        setSyncStatus("success");
+        showLocalNotification("Koneksi Terhubung 🟢", {
+          body: "Aplikasi kembali online. Menyinkronkan perubahan lokal ke server...",
+        });
+      }, 1500);
+    };
+
+    const handleOffline = () => {
+      setSyncStatus("offline");
+      showLocalNotification("Mode Offline Aktif 🔴", {
+        body: "Koneksi terputus. Data Anda akan disimpan secara lokal di cache peramban.",
+      });
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
   // Dropdown click outside listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setIsNotifOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -98,6 +138,30 @@ export default function Header() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const kaderNotifications = [
+    { category: "Jadwal Posyandu", time: "1 jam yang lalu", message: "Pelaksanaan Posyandu Kenanga 1 dijadwalkan besok mulai pukul 08:00 WIB." },
+    { category: "Balita Kurang Gizi", time: "4 jam yang lalu", message: "Sistem mendeteksi 3 balita di wilayah Anda memiliki kurva pertumbuhan menurun. Mohon pantau PMT." },
+    { category: "Imunisasi Balita", time: "1 hari yang lalu", message: "Pengingat: Jadwal imunisasi Campak & BCG untuk Balita sudah siap diinput bulan ini." }
+  ];
+
+  const ibuNotifications = [
+    { category: "Jadwal Rutin", time: "1 jam yang lalu", message: "Halo Ibu, Posyandu Kenanga 1 akan mengadakan imunisasi balita besok pagi. Jangan lupa membawa KIA." },
+    { category: "Vitamin A Anak", time: "6 jam yang lalu", message: "Jadwal pembagian Vitamin A untuk Balita Anda (Bagas Pratama) sudah dibuka di Kader." },
+    { category: "Status Gizi", time: "1 hari yang lalu", message: "Grafik tumbuh kembang Giselle Putri bulan ini terpantau Normal & Baik. Pertahankan!" }
+  ];
+
+  const notificationsList = role === "ibu" ? ibuNotifications : kaderNotifications;
+
+  const handleEnableSystemNotif = async () => {
+    setIsNotifOpen(false);
+    const granted = await requestNotificationPermission();
+    if (granted) {
+      showLocalNotification("Kenanga Care Aktif 🌸", {
+        body: "Notifikasi sistem berhasil diaktifkan. Anda akan mendapatkan pengingat kesehatan secara berkala.",
+      });
+    }
+  };
 
   const handleToggleSync = () => {
     setSyncStatus(prev => {
@@ -242,11 +306,59 @@ export default function Header() {
           )}
         </button>
         
-        {/* Tombol Notifikasi dengan Badge Merah */}
-        <button className="text-base-text-secondary hover:text-brand-primary relative transition-colors cursor-pointer">
-          <BellIcon className="w-6 h-6" />
-          <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-status-red-solid rounded-full border-2 border-base-white" />
-        </button>
+        {/* Tombol Notifikasi dengan Badge Merah & Dropdown */}
+        <div className="relative" ref={notifRef}>
+          <button 
+            onClick={() => {
+              setIsNotifOpen(!isNotifOpen);
+              setHasUnreadNotif(false);
+            }}
+            className="text-base-text-secondary hover:text-brand-primary relative transition-colors cursor-pointer focus:outline-none flex items-center justify-center"
+          >
+            <BellIcon className="w-6 h-6" />
+            {hasUnreadNotif && (
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-status-red-solid rounded-full border-2 border-base-white animate-pulse" />
+            )}
+          </button>
+
+          {/* Dropdown Notifikasi */}
+          {isNotifOpen && (
+            <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-base-white border border-base-border/30 rounded-2xl shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-3 duration-200">
+              <div className="px-4 pb-2 border-b border-base-border/20 flex items-center justify-between">
+                <span className="font-bold text-sm text-base-text-primary">Notifikasi Posyandu</span>
+                {hasUnreadNotif && (
+                  <button 
+                    onClick={() => setHasUnreadNotif(false)} 
+                    className="text-[11px] font-bold text-brand-primary hover:underline cursor-pointer"
+                  >
+                    Tandai dibaca
+                  </button>
+                )}
+              </div>
+              
+              <div className="max-h-72 overflow-y-auto divide-y divide-base-border/10 text-xs">
+                {notificationsList.map((notif, idx) => (
+                  <div key={idx} className="p-3.5 hover:bg-base-bg/30 transition duration-150 text-left space-y-1">
+                    <div className="flex items-center justify-between font-bold">
+                      <span className="text-brand-primary uppercase text-[9px] tracking-wider">{notif.category}</span>
+                      <span className="text-[10px] text-base-text-secondary font-medium">{notif.time}</span>
+                    </div>
+                    <p className="font-semibold text-base-text-primary text-xs leading-normal">{notif.message}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="px-4 pt-2 border-t border-base-border/20 text-center">
+                <button 
+                  onClick={handleEnableSystemNotif}
+                  className="text-xs font-bold text-brand-primary hover:underline cursor-pointer"
+                >
+                  Aktifkan Notifikasi Sistem 🔔
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
         {/* Informasi Profil Pengguna (Kader) dengan Dropdown */}
         <div className="relative" ref={dropdownRef}>
