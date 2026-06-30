@@ -102,7 +102,6 @@ export default function TambahJadwalPage() {
           <CustomDatePicker 
             value={formData.schedule_date}
             onChange={handleDateChange}
-            placeholder="Pilih Tanggal Pelaksanaan"
           />
         </div>
 
