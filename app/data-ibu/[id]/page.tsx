@@ -155,7 +155,27 @@ export default function MotherDetailPage() {
     setIsEditing(true);
   };
 
+  const isFormDirty = () => {
+    if (!mother) return false;
+    return (
+      editForm.mother_name !== (mother.name || "") ||
+      editForm.national_id !== (mother.national_id || "") ||
+      editForm.birth_date !== (mother.dobRaw || "") ||
+      editForm.husband_name !== (mother.husband_name === "-" ? "" : mother.husband_name) ||
+      editForm.phone_number !== (mother.phone_number === "-" ? "" : mother.phone_number) ||
+      editForm.blood_type !== (mother.blood_type === "-" ? "" : mother.blood_type) ||
+      editForm.estimated_due_date !== (mother.estimated_due_date && mother.estimated_due_date !== "-" ? mother.estimated_due_date : "") ||
+      editForm.risk_status !== (mother.condition || "Normal") ||
+      editForm.ui_status !== (mother.status || "Ibu Hamil") ||
+      editForm.number_of_children !== (mother.number_of_children || 0)
+    );
+  };
+
   const handleCancelEdit = () => {
+    if (isFormDirty()) {
+      const confirmCancel = window.confirm("Perubahan yang Anda buat belum disimpan. Apakah Anda yakin ingin membatalkan?");
+      if (!confirmCancel) return;
+    }
     setIsEditing(false);
   };
 

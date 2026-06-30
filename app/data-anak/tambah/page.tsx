@@ -110,15 +110,37 @@ export default function TambahAnakPage() {
     }
   };
 
-  return (
-    <div className="max-w-[1200px] mx-auto pb-4">
-      
-      {/* Header & Back Button */}
-      <div>
-        <Link href="/data-anak" className="inline-flex items-center gap-2 text-base-text-primary font-bold hover:text-brand-primary transition mb-4">
-          <FiArrowLeft className="w-4 h-4" /> Kembali
-        </Link>
-      </div>
+      const isFormDirty = () => {
+        return (
+          formData.child_name !== "" ||
+          formData.birth_date !== "" ||
+          formData.mother_id !== "" ||
+          formData.national_id !== "" ||
+          formData.birth_place !== "" ||
+          formData.birth_weight !== "" ||
+          formData.birth_length !== ""
+        );
+      };
+
+      return (
+        <div className="max-w-[1200px] mx-auto pb-4">
+          
+          {/* Header & Back Button */}
+          <div>
+            <button 
+              type="button"
+              onClick={() => {
+                if (isFormDirty()) {
+                  setShowCancelModal(true);
+                } else {
+                  router.push("/data-anak");
+                }
+              }}
+              className="inline-flex items-center gap-2 text-base-text-primary font-bold hover:text-brand-primary transition mb-4 cursor-pointer focus:outline-none"
+            >
+              <FiArrowLeft className="w-4 h-4" /> Kembali
+            </button>
+          </div>
 
       {errorMsg && (
         <div className="mb-6 p-4 bg-status-pink-light border border-status-pink-solid/30 text-brand-primary rounded-lg font-medium text-sm">

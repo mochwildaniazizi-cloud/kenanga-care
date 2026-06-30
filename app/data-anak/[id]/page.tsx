@@ -207,7 +207,27 @@ export default function ChildDetailPage() {
     setIsEditing(true);
   };
 
+  const isFormDirty = () => {
+    if (!child) return false;
+    return (
+      editForm.child_name !== (child.name || "") ||
+      editForm.national_id !== (child.national_id || "") ||
+      editForm.gender !== (child.gender || "M") ||
+      editForm.birth_place !== (child.birth_place || "") ||
+      editForm.birth_date !== (child.birth_date ? child.birth_date.split('T')[0] : "") ||
+      editForm.birth_order !== (child.birth_order || 1).toString() ||
+      editForm.birth_weight !== (child.birth_weight || "").toString() ||
+      editForm.birth_length !== (child.birth_length || "").toString() ||
+      editForm.blood_type !== (child.blood_type || "-") ||
+      editForm.special_conditions_notes !== (child.special_conditions_notes || "")
+    );
+  };
+
   const handleCancelEdit = () => {
+    if (isFormDirty()) {
+      const confirmCancel = window.confirm("Perubahan yang Anda buat belum disimpan. Apakah Anda yakin ingin membatalkan?");
+      if (!confirmCancel) return;
+    }
     setIsEditing(false);
   };
 

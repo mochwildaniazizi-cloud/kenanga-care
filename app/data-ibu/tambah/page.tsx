@@ -109,13 +109,30 @@ export default function TambahIbuPage() {
     }
   };
 
+  const isFormDirty = () => {
+    return (
+      formData.mother_name !== "" ||
+      formData.national_id !== "" ||
+      formData.birth_date !== "" ||
+      formData.husband_name !== "" ||
+      formData.phone_number !== "" ||
+      formData.estimated_due_date !== ""
+    );
+  };
+
   return (
     <div className="max-w-[1200px] mx-auto pb-8 p-4 md:p-8 animate-in fade-in duration-300">
       
       {/* Header & Back Button */}
       <div>
         <button 
-          onClick={() => setShowCancelModal(true)} 
+          onClick={() => {
+            if (isFormDirty()) {
+              setShowCancelModal(true);
+            } else {
+              router.push("/data-ibu");
+            }
+          }} 
           className="inline-flex items-center gap-2 text-base-text-primary font-bold hover:text-brand-primary transition mb-6 cursor-pointer"
         >
           <FiArrowLeft className="w-4 h-4" /> Kembali
