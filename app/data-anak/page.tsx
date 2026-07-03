@@ -980,7 +980,9 @@ export default function DataAnakPage() {
                   
                   return (
                     <tr key={index} className={`border-b border-gray-50 transition-colors ${hoverColor}`}>
-                      <td className="py-2.5 px-4 text-base-text-secondary font-medium">{child.id}</td>
+                      <td className="py-2.5 px-4 text-base-text-secondary font-medium">
+                        {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, "0")}
+                      </td>
                       <td className="py-2.5 px-4 flex items-center gap-3">
                         <GenderIcon gender={child.gender} imageUrl={child.avatarUrl} />
                         <div>
@@ -1206,7 +1208,9 @@ export default function DataAnakPage() {
                   
                   return (
                     <tr key={index} className={`border-b border-gray-50 transition-colors ${hoverColor}`}>
-                      <td className="py-2.5 px-4 text-base-text-secondary font-medium">{item.id}</td>
+                      <td className="py-2.5 px-4 text-base-text-secondary font-medium">
+                        {String((currentHistoryPage - 1) * historyItemsPerPage + index + 1).padStart(2, "0")}
+                      </td>
                       <td className="py-2.5 px-4 text-base-text-primary font-medium">{item.date}</td>
                       <td className="py-2.5 px-4 flex items-center gap-3">
                         <GenderIcon gender={item.gender} imageUrl={item.avatarUrl} />

@@ -175,9 +175,51 @@ export default function ChildDetailPage() {
   useEffect(() => {
     async function fetchDetail() {
       if (!id) return;
+      
+      // Attempt load full cached detail
+      const cached = localStorage.getItem(`offline_child_detail_${id}`);
+      if (cached) {
+        setChild(JSON.parse(cached));
+        setIsLoading(false);
+      } else {
+        // Build basic child fallback from master list cache
+        const cachedList = localStorage.getItem("offline_children_list");
+        if (cachedList) {
+          const children = JSON.parse(cachedList);
+          const basicChild = children.find((c: any) => c.child_id === id);
+          if (basicChild) {
+            setChild({
+              child_id: basicChild.child_id,
+              name: basicChild.name,
+              gender: basicChild.gender,
+              national_id: basicChild.national_id,
+              dob: basicChild.dob,
+              dobRaw: basicChild.dobRaw,
+              age: basicChild.age,
+              birth_place: basicChild.birth_place,
+              birth_weight: basicChild.weight,
+              birth_length: basicChild.height,
+              current_weight: basicChild.weight,
+              current_height: basicChild.height,
+              mother: {
+                mother_name: basicChild.mother
+              },
+              measurements: []
+            });
+            setIsLoading(false);
+          }
+        }
+      }
+
+      if (!navigator.onLine) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const data = await getChildDetail(id as string);
         setChild(data);
+        localStorage.setItem(`offline_child_detail_${id}`, JSON.stringify(data));
       } catch (err) {
         console.error("Failed to load child detail", err);
       } finally {

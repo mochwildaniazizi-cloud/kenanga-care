@@ -754,7 +754,9 @@ export default function DataIbuPage() {
               ) : (
                 paginatedMothers.map((mother, index) => (
                   <tr key={index} className="border-b border-gray-50 hover:bg-base-bg/40 transition-colors">
-                    <td className="py-2.5 px-3 text-base-text-secondary font-medium">{mother.id}</td>
+                    <td className="py-2.5 px-3 text-base-text-secondary font-medium">
+                      {String((currentPage - 1) * itemsPerPage + index + 1).padStart(2, "0")}
+                    </td>
                     <td className="py-2.5 px-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-status-yellow-light text-status-yellow-solid flex items-center justify-center shrink-0 overflow-hidden border border-base-border/10">
@@ -949,7 +951,9 @@ export default function DataIbuPage() {
               ) : (
                 paginatedHistory.map((item, index) => (
                   <tr key={index} className="border-b border-gray-50 hover:bg-base-bg/40 transition-colors">
-                    <td className="py-2.5 px-4 text-base-text-secondary font-medium">{item.id}</td>
+                    <td className="py-2.5 px-4 text-base-text-secondary font-medium">
+                      {String((currentHistoryPage - 1) * historyItemsPerPage + index + 1).padStart(2, "0")}
+                    </td>
                     <td className="py-2.5 px-4 text-base-text-primary font-medium">{item.date}</td>
                     <td className="py-2.5 px-4 flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-status-purple-light text-status-purple-solid flex items-center justify-center shrink-0">

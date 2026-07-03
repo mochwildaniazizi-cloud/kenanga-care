@@ -126,9 +126,46 @@ export default function MotherDetailPage() {
   useEffect(() => {
     async function fetchDetail() {
       if (!id) return;
+
+      // Attempt load full cached detail
+      const cached = localStorage.getItem(`offline_mother_detail_${id}`);
+      if (cached) {
+        setMother(JSON.parse(cached));
+        setIsLoading(false);
+      } else {
+        // Build basic mother fallback from master list cache
+        const cachedList = localStorage.getItem("offline_mothers_list");
+        if (cachedList) {
+          const mothers = JSON.parse(cachedList);
+          const basicMother = mothers.find((m: any) => m.mother_id === id);
+          if (basicMother) {
+            setMother({
+              mother_id: basicMother.mother_id,
+              national_id: basicMother.national_id,
+              name: basicMother.name,
+              age: basicMother.rawAge?.toString() || "",
+              status: basicMother.status,
+              condition: basicMother.condition,
+              phone_number: basicMother.phone_number,
+              husband_name: "-",
+              number_of_children: 0,
+              measurements: [],
+              children: []
+            });
+            setIsLoading(false);
+          }
+        }
+      }
+
+      if (!navigator.onLine) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const data = await getMotherDetail(id as string);
         setMother(data);
+        localStorage.setItem(`offline_mother_detail_${id}`, JSON.stringify(data));
       } catch (err) {
         console.error("Failed to load mother detail", err);
       } finally {

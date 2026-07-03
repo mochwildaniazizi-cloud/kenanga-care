@@ -13,10 +13,23 @@ export default function RiwayatJadwalPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    getScheduleLogs()
-      .then((data) => setLogs(data))
-      .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
+    const cached = localStorage.getItem("offline_schedule_logs");
+    if (cached) {
+      setLogs(JSON.parse(cached));
+      setIsLoading(false);
+    }
+
+    if (navigator.onLine) {
+      getScheduleLogs()
+        .then((data) => {
+          setLogs(data);
+          localStorage.setItem("offline_schedule_logs", JSON.stringify(data));
+        })
+        .catch((err) => console.error(err))
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   const filteredLogs = logs.filter((log) => 
