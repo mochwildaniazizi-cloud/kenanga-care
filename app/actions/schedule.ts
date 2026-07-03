@@ -168,3 +168,79 @@ export async function getScheduleLogs() {
     throw error;
   }
 }
+
+export async function getRealtimeNotifications(role: "kader" | "ibu") {
+  try {
+    const notifications: any[] = [];
+
+    // 1. Fetch recent schedule logs (last 3 entries)
+    const logs = await prisma.scheduleLog.findMany({
+      orderBy: { change_timestamp: "desc" },
+      take: 3
+    });
+
+    logs.forEach((log: any) => {
+      const ts = new Date(log.change_timestamp);
+      const timeStr = ts.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+      
+      notifications.push({
+        id: `log-${log.log_id}`,
+        category: "Jadwal Posyandu",
+        time: timeStr,
+        message: log.change_details,
+        timestamp: ts.getTime()
+      });
+    });
+
+    // 2. Health alert logic for Kader
+    if (role === "kader") {
+      const stuntingCount = await prisma.child.count({
+        where: {
+          OR: [
+            { current_weight: { lte: 5.0 } },
+            { special_conditions: { contains: "Prematur" } }
+          ]
+        }
+      });
+
+      if (stuntingCount > 0) {
+        notifications.push({
+          id: "alert-nutrition",
+          category: "Status Pertumbuhan",
+          time: "Baru saja",
+          message: `Sistem mendeteksi ${stuntingCount} balita dalam pemantauan khusus (kurva berat rendah / prematur).`,
+          timestamp: Date.now()
+        });
+      }
+
+      const highRiskMothers = await prisma.mother.count({
+        where: { risk_status: "Risiko Tinggi" }
+      });
+
+      if (highRiskMothers > 0) {
+        notifications.push({
+          id: "alert-risk-mothers",
+          category: "Risiko Tinggi",
+          time: "Baru saja",
+          message: `Pengingat: Terdapat ${highRiskMothers} ibu hamil dengan status Risiko Tinggi di database.`,
+          timestamp: Date.now()
+        });
+      }
+    } else {
+      // 3. Health alert logic for Ibu
+      notifications.push({
+        id: "alert-ibu-kia",
+        category: "Pemberitahuan PWA",
+        time: "Baru saja",
+        message: "Selalu bawa buku KIA (Kesehatan Ibu dan Anak) setiap berkunjung ke Posyandu Kenanga.",
+        timestamp: Date.now()
+      });
+    }
+
+    // Sort by timestamp desc
+    return notifications.sort((a, b) => b.timestamp - a.timestamp);
+  } catch (error) {
+    console.error("Error generating realtime notifications:", error);
+    return [];
+  }
+}

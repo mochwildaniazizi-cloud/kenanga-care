@@ -26,6 +26,7 @@ import { PiBabyFill } from "react-icons/pi";
 import { useUserRole } from "@/context/UserRoleContext";
 import { createChildMeasurement } from "@/app/actions/children";
 import { createMaternalRecord, createMother } from "@/app/actions/mothers";
+import { getRealtimeNotifications } from "@/app/actions/schedule";
 
 const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
   "/": { label: "Beranda", icon: HomeIcon },
@@ -65,6 +66,7 @@ export default function Header() {
     posyandu: "Posyandu Kenanga 1"
   });
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const { role, setRole, logout, isLoggedIn } = useUserRole();
 
   const pathname = usePathname();
@@ -165,6 +167,35 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!isLoggedIn) return;
+      try {
+        const liveNotifs = await getRealtimeNotifications(role);
+        setNotifications((prev) => {
+          // Compare with previous to trigger system notification on new item
+          if (prev.length > 0 && liveNotifs.length > 0) {
+            const hasNew = liveNotifs.some(n => !prev.some(p => p.id === n.id));
+            if (hasNew) {
+              const newest = liveNotifs[0];
+              showLocalNotification(`Notifikasi Baru: ${newest.category}`, {
+                body: newest.message,
+              });
+            }
+          }
+          return liveNotifs;
+        });
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+      }
+    };
+
+    fetchNotifications();
+
+    const interval = setInterval(fetchNotifications, 15000);
+    return () => clearInterval(interval);
+  }, [role, isLoggedIn]);
+
   const kaderNotifications = [
     { category: "Jadwal Posyandu", time: "1 jam yang lalu", message: "Pelaksanaan Posyandu Kenanga 1 dijadwalkan besok mulai pukul 08:00 WIB." },
     { category: "Balita Kurang Gizi", time: "4 jam yang lalu", message: "Sistem mendeteksi 3 balita di wilayah Anda memiliki kurva pertumbuhan menurun. Mohon pantau PMT." },
@@ -177,7 +208,7 @@ export default function Header() {
     { category: "Status Gizi", time: "1 hari yang lalu", message: "Grafik tumbuh kembang Giselle Putri bulan ini terpantau Normal & Baik. Pertahankan!" }
   ];
 
-  const notificationsList = role === "ibu" ? ibuNotifications : kaderNotifications;
+  const notificationsList = notifications.length > 0 ? notifications : (role === "ibu" ? ibuNotifications : kaderNotifications);
 
   const handleEnableSystemNotif = async () => {
     setIsNotifOpen(false);
