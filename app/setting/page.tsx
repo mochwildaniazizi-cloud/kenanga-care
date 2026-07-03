@@ -347,63 +347,61 @@ function SettingsContent() {
       if (savedAvatar) {
         setAvatarUrl(savedAvatar);
       }
-      if (role === "ibu") {
-        try {
-          const loggedInMother = await getLoggedInMotherData(username);
-          if (loggedInMother) {
-            const detail = await getMotherDetail(loggedInMother.mother_id);
-            if (detail) {
-              setMotherDetail(detail);
-              if (detail.avatarUrl) {
-                setAvatarUrl(detail.avatarUrl);
-                localStorage.setItem("user_profile_avatar", detail.avatarUrl);
-              }
-              
-              const savedName = localStorage.getItem("ibu_name") || detail.name || "";
-              const savedPhone = localStorage.getItem("ibu_phone") || detail.phone_number || "";
-              const savedEmail = localStorage.getItem("ibu_email") || `${detail.name.toLowerCase().replace(/\s+/g, "")}@gmail.com`;
-              const savedAddress = localStorage.getItem("ibu_address") || "Jl. Mawar No. 12, Kel. Kenanga";
-              const savedHusband = localStorage.getItem("ibu_husband") || detail.husband_name || "";
-              
-              setFormData({
-                name: savedName,
-                posyandu: "Posyandu Kenanga 1",
-                role: detail.status || "Ibu Balita",
-                email: savedEmail,
-                phone: savedPhone,
-                address: savedAddress,
-                husband_name: savedHusband,
-                national_id: detail.national_id || ""
-              });
+      
+      try {
+        const loggedInUser = await getLoggedInMotherData(username);
+        if (loggedInUser) {
+          const detail = await getMotherDetail(loggedInUser.mother_id);
+          if (detail) {
+            setMotherDetail(detail);
+            if (detail.avatarUrl) {
+              setAvatarUrl(detail.avatarUrl);
+              localStorage.setItem("user_profile_avatar", detail.avatarUrl);
             }
+            
+            const savedEmail = localStorage.getItem(`${role}_email`) || `${detail.name.toLowerCase().replace(/\s+/g, "")}@gmail.com`;
+            const savedAddress = localStorage.getItem(`${role}_address`) || "Jl. Mawar No. 12, Kel. Kenanga";
+            
+            setFormData({
+              name: detail.name || "",
+              posyandu: "Posyandu Kenanga 1",
+              role: detail.status || (role === "kader" ? "Kader Posyandu" : "Ibu Balita"),
+              email: savedEmail,
+              phone: detail.phone_number || "",
+              address: savedAddress,
+              husband_name: detail.husband_name || "",
+              national_id: detail.national_id || ""
+            });
+            return;
           }
-        } catch (err) {
-          console.error("Failed to load mother profile settings:", err);
         }
-      } else {
-        const savedName = localStorage.getItem("kader_name");
-        const savedPosyandu = localStorage.getItem("kader_posyandu");
-        const savedRole = localStorage.getItem("kader_role");
-        const savedEmail = localStorage.getItem("kader_email");
-        const savedPhone = localStorage.getItem("kader_phone");
-        const savedAddress = localStorage.getItem("kader_address");
-        
-        setFormData({
-          name: savedName || "Kader Siti",
-          posyandu: savedPosyandu || "Posyandu Kenanga 1",
-          role: savedRole || "Ketua Kader",
-          email: savedEmail || "siti.posyandu@gmail.com",
-          phone: savedPhone || "0812-3456-7890",
-          address: savedAddress || "Jl. Mawar No. 12, Kel. Kenanga",
-          husband_name: "",
-          national_id: ""
-        });
+      } catch (err) {
+        console.error("Failed to load user profile from database:", err);
       }
+
+      // Fallback for static bypass kader account or offline mode
+      const savedName = localStorage.getItem("kader_name");
+      const savedPosyandu = localStorage.getItem("kader_posyandu");
+      const savedRole = localStorage.getItem("kader_role");
+      const savedEmail = localStorage.getItem("kader_email");
+      const savedPhone = localStorage.getItem("kader_phone");
+      const savedAddress = localStorage.getItem("kader_address");
+      
+      setFormData({
+        name: savedName || "Kader Siti",
+        posyandu: savedPosyandu || "Posyandu Kenanga 1",
+        role: savedRole || "Ketua Kader",
+        email: savedEmail || "siti.posyandu@gmail.com",
+        phone: savedPhone || "0812-3456-7890",
+        address: savedAddress || "Jl. Mawar No. 12, Kel. Kenanga",
+        husband_name: "",
+        national_id: ""
+      });
     }
     loadProfileData();
   }, [role, username]);
 
-  const handleProfileSave = (e: React.FormEvent) => {
+  const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (role === "ibu") {
@@ -419,6 +417,30 @@ function SettingsContent() {
       localStorage.setItem("kader_email", formData.email);
       localStorage.setItem("kader_phone", formData.phone);
       localStorage.setItem("kader_address", formData.address);
+    }
+
+    // Save to PostgreSQL database if backed by database record
+    if (motherDetail && motherDetail.mother_id) {
+      try {
+        const res = await updateMother(motherDetail.mother_id, {
+          national_id: formData.national_id || motherDetail.national_id,
+          mother_name: formData.name,
+          birth_date: motherDetail.dobRaw || null,
+          husband_name: formData.husband_name || null,
+          phone_number: formData.phone || null,
+          blood_type: motherDetail.blood_type || null,
+          estimated_due_date: motherDetail.rawHpl || null,
+          risk_status: motherDetail.condition || null,
+          ui_status: formData.role || motherDetail.status
+        });
+        
+        if (res && !res.success) {
+          alert(res.error || "Gagal memperbarui data profil di database.");
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to update profile to database:", err);
+      }
     }
 
     // Dispatch update event for Header sync
