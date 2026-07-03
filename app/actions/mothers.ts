@@ -408,10 +408,10 @@ export async function updateMother(motherId: string, data: any) {
         risk_status: data.risk_status || "Normal",
         ui_status: data.ui_status || "Ibu Hamil",
         number_of_children: data.number_of_children ? parseInt(data.number_of_children.toString()) : 0,
+        avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : undefined,
       }
     });
 
-    // Save custom avatar to local file store
     if (data.avatarUrl !== undefined) {
       saveCustomAvatar("mothers", motherId, data.avatarUrl);
     }
@@ -618,14 +618,25 @@ export async function updateUserAvatar(username: string, base64Avatar: string) {
   try {
     const u = username.trim().toLowerCase();
     
-    // Find mother
+    let cleanU = u;
+    if (cleanU.startsWith("ibu ")) {
+      cleanU = cleanU.substring(4).trim();
+    } else if (cleanU.startsWith("kader ")) {
+      cleanU = cleanU.substring(6).trim();
+    }
+
+    const digitsOnly = u.replace(/\D/g, "");
+
+    // Find mother with robust fallback options
     const mother = await prisma.mother.findFirst({
       where: {
         OR: [
           { phone_number: { equals: u, mode: 'insensitive' } },
+          { phone_number: { contains: digitsOnly && digitsOnly.length > 5 ? digitsOnly : "NONMATCH" } },
           { national_id: { equals: u, mode: 'insensitive' } },
           { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
-          { mother_name: { equals: u, mode: 'insensitive' } }
+          { mother_name: { equals: u, mode: 'insensitive' } },
+          { mother_name: { contains: cleanU, mode: 'insensitive' } }
         ]
       }
     });
