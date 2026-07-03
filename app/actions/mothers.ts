@@ -426,7 +426,21 @@ export async function updateMother(motherId: string, data: any) {
 export async function getLoggedInMotherData(username: string) {
   try {
     if (!username) return null;
-    if (username.toLowerCase() === "kader") return null;
+    // For the default kader account, look up by the reserved NIK
+    if (username.toLowerCase() === "kader") {
+      const kaderRecord = await prisma.mother.findFirst({
+        where: { national_id: "KADER-DEFAULT" },
+        include: { children: true }
+      });
+      if (!kaderRecord) return null;
+      return {
+        mother_id: kaderRecord.mother_id,
+        mother_name: kaderRecord.mother_name,
+        national_id: kaderRecord.national_id,
+        avatarUrl: kaderRecord.avatarUrl,
+        children: []
+      };
+    }
 
     let cleanUsername = username.replace(/\s*\(Demo\)\s*/gi, "").trim();
     if (cleanUsername.toLowerCase() === "ibu aminah" || cleanUsername.toLowerCase() === "ibu") {
@@ -555,13 +569,57 @@ export async function updateUserPassword(username: string, currentPass: string, 
   }
 }
 
+export async function ensureKaderProfileExists(name: string, phone?: string, password?: string) {
+  try {
+    const existing = await prisma.mother.findFirst({
+      where: { national_id: "KADER-DEFAULT" }
+    });
+
+    if (existing) {
+      // Update any changed fields
+      const updated = await prisma.mother.update({
+        where: { mother_id: existing.mother_id },
+        data: {
+          mother_name: name || existing.mother_name,
+          phone_number: phone || existing.phone_number,
+          ...(password ? { password } : {})
+        }
+      });
+      return { mother_id: updated.mother_id, avatarUrl: updated.avatarUrl };
+    }
+
+    // Create for the first time
+    const created = await prisma.mother.create({
+      data: {
+        national_id: "KADER-DEFAULT",
+        mother_name: name || "Kader Siti",
+        phone_number: phone || "0812-3456-7890",
+        ui_status: "Kader Posyandu",
+        risk_status: "Ketua Kader",
+        husband_name: "Kader",
+        password: password || "kader123",
+        number_of_children: 0
+      }
+    });
+    return { mother_id: created.mother_id, avatarUrl: null };
+  } catch (error: any) {
+    console.error("Error ensuring kader profile:", error);
+    return null;
+  }
+}
+
 export async function verifyUserLogin(username: string, pass: string, role: "kader" | "ibu") {
   try {
     const u = username.trim().toLowerCase();
     
-    // 1. Bypass default kader account
+    // 1. Bypass default kader account — ensure DB record exists
     if (role === "kader" && u === "kader" && pass === "kader123") {
-      return { success: true, name: "Kader Utama" };
+      const kaderProfile = await ensureKaderProfileExists("Kader Siti");
+      // Get current name from existing record
+      const kaderName = kaderProfile ? 
+        ((await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Siti")
+        : "Kader Siti";
+      return { success: true, name: kaderName, avatarUrl: kaderProfile?.avatarUrl ?? null };
     }
 
     let cleanU = u;

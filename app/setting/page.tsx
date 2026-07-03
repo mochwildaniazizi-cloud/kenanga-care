@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother, ensureKaderProfileExists } from "@/app/actions/mothers";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
@@ -465,6 +465,13 @@ function SettingsContent() {
       } catch (err) {
         console.error("Failed to update profile to database:", err);
       }
+    } else if (role === "kader" && username === "kader") {
+      // Default kader account — upsert into Supabase
+      try {
+        await ensureKaderProfileExists(formData.name, formData.phone);
+      } catch (err) {
+        console.error("Failed to upsert default kader profile to database:", err);
+      }
     }
 
     // Dispatch update event for Header sync
@@ -526,12 +533,30 @@ function SettingsContent() {
       setAvatarUrl(compressedBase64);
       localStorage.setItem("user_profile_avatar", compressedBase64);
       
-      const res = await updateUserAvatar(username, compressedBase64);
-      if (res && res.success) {
+      // For the default kader account, ensure DB record exists first, then update avatar there
+      if (username === "kader" || username.toLowerCase() === "kader") {
+        try {
+          const kaderProfile = await ensureKaderProfileExists(formData.name || "Kader Siti", formData.phone || undefined);
+          if (kaderProfile?.mother_id) {
+            // Use updateMother to write avatarUrl to DB for kader
+            await updateMother(kaderProfile.mother_id, { 
+              national_id: "KADER-DEFAULT",
+              mother_name: formData.name || "Kader Siti",
+              avatarUrl: compressedBase64
+            });
+          }
+        } catch (err) {
+          console.error("Failed to persist kader avatar to database:", err);
+        }
         window.dispatchEvent(new Event("profile-updated"));
       } else {
-        console.warn("Avatar sync failed:", res?.error);
-        window.dispatchEvent(new Event("profile-updated"));
+        const res = await updateUserAvatar(username, compressedBase64);
+        if (res && res.success) {
+          window.dispatchEvent(new Event("profile-updated"));
+        } else {
+          console.warn("Avatar sync failed:", res?.error);
+          window.dispatchEvent(new Event("profile-updated"));
+        }
       }
     } catch (err) {
       console.error(err);
