@@ -11,7 +11,7 @@ import {
   TrashIcon
 } from "@heroicons/react/24/solid";
 import { MdCheckCircleOutline } from "react-icons/md";
-import { FiShare2, FiCopy, FiCheck, FiX } from "react-icons/fi";
+import { FiShare2, FiCopy, FiCheck, FiX, FiRefreshCw } from "react-icons/fi";
 import { useUserRole } from "@/context/UserRoleContext";
 import { useRouter } from "next/navigation";
 
@@ -209,6 +209,7 @@ export default function JadwalPage() {
   const [schedules, setSchedules] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     if (role === "ibu") {
@@ -269,14 +270,23 @@ export default function JadwalPage() {
     focus: ""
   });
 
-  const loadData = async () => {
+  const loadData = async (forceRefresh = false) => {
     if (!navigator.onLine) {
-      alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
+      if (forceRefresh) alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
       setIsLoading(false);
+      setIsRefreshing(false);
       return;
     }
 
-    setIsLoading(true);
+    const cachedSchedules = localStorage.getItem("offline_schedules");
+    if (!cachedSchedules && !forceRefresh) {
+      setIsLoading(true);
+    }
+
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    }
+
     try {
       const [fetchedSchedules, fetchedLogs] = await Promise.all([
         getSchedules(),
@@ -289,9 +299,12 @@ export default function JadwalPage() {
       localStorage.setItem("offline_schedule_logs", JSON.stringify(fetchedLogs));
     } catch (error: any) {
       console.error("Failed to load jadwal", error);
-      alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
+      if (forceRefresh) {
+        alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
+      }
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -307,7 +320,7 @@ export default function JadwalPage() {
     }
 
     if (navigator.onLine) {
-      loadData();
+      loadData(false);
     } else {
       setIsLoading(false);
     }
@@ -315,7 +328,7 @@ export default function JadwalPage() {
 
   useEffect(() => {
     const handleSync = () => {
-      loadData();
+      loadData(false);
     };
     window.addEventListener("sync-data", handleSync);
     return () => window.removeEventListener("sync-data", handleSync);
@@ -604,13 +617,12 @@ export default function JadwalPage() {
                           </p>
                           <button
                             type="button"
-                            onClick={loadData}
+                            onClick={() => loadData(true)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-soft text-brand-primary border border-brand-primary/20 rounded-xl text-xs font-bold hover:bg-brand-soft/80 transition cursor-pointer"
+                            disabled={isRefreshing}
                           >
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 20v-5h-.581m0 0a8.003 8.003 0 11-15.357-2" />
-                            </svg>
-                            Segarkan Data
+                            <FiRefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+                            {isRefreshing ? "Menyegarkan..." : "Segarkan Data"}
                           </button>
                         </div>
                       </td>

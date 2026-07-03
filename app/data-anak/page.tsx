@@ -9,7 +9,7 @@ import {
   MdMale, MdFemale, MdPerson, MdCalendarMonth, MdCake, MdFingerprint,
   MdScale, MdHeight, MdOutlineMonitorWeight as MdOutlineWeight
 } from "react-icons/md";
-import { FiArrowUp, FiArrowDown, FiMinus } from "react-icons/fi";
+import { FiArrowUp, FiArrowDown, FiMinus, FiRefreshCw } from "react-icons/fi";
 import { FaBaby, FaNotesMedical } from "react-icons/fa";
 import { getChildrenData, getMeasurementHistory, getChildMetrics, getChildDetail } from "@/app/actions/children";
 import { getLoggedInMotherData } from "@/app/actions/mothers";
@@ -173,6 +173,7 @@ export default function DataAnakPage() {
   const [childrenList, setChildrenList] = useState<any[]>([]);
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [childSearch, setChildSearch] = useState("");
   const [historySearch, setHistorySearch] = useState("");
@@ -226,14 +227,23 @@ export default function DataAnakPage() {
     downwardTrend: 0 
   });
 
-  const loadData = async () => {
+  const loadData = async (forceRefresh = false) => {
     if (!navigator.onLine) {
-      alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
+      if (forceRefresh) alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
       setIsLoading(false);
+      setIsRefreshing(false);
       return;
     }
     
-    setIsLoading(true);
+    const cachedChildren = localStorage.getItem("offline_children_list");
+    if (!cachedChildren && !forceRefresh) {
+      setIsLoading(true);
+    }
+
+    if (forceRefresh) {
+      setIsRefreshing(true);
+    }
+
     try {
       const [children, history, fetchedMetrics] = await Promise.all([
         getChildrenData(),
@@ -249,9 +259,12 @@ export default function DataAnakPage() {
       localStorage.setItem("offline_children_metrics", JSON.stringify(fetchedMetrics));
     } catch (error: any) {
       console.error("Failed to load data:", error);
-      alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
+      if (forceRefresh) {
+        alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
+      }
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -269,7 +282,7 @@ export default function DataAnakPage() {
     }
 
     if (navigator.onLine) {
-      loadData();
+      loadData(false);
     } else {
       setIsLoading(false);
     }
@@ -277,7 +290,7 @@ export default function DataAnakPage() {
 
   useEffect(() => {
     const handleSync = () => {
-      loadData();
+      loadData(false);
     };
     window.addEventListener("sync-data", handleSync);
     return () => window.removeEventListener("sync-data", handleSync);
@@ -985,13 +998,12 @@ export default function DataAnakPage() {
                       <p className="text-sm text-base-text-secondary font-semibold">Tidak ada data ditemukan</p>
                       <button
                         type="button"
-                        onClick={loadData}
+                        onClick={() => loadData(true)}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-soft text-brand-primary border border-brand-primary/20 rounded-xl text-xs font-bold hover:bg-brand-soft/80 transition cursor-pointer"
+                        disabled={isRefreshing}
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 20v-5h-.581m0 0a8.003 8.003 0 11-15.357-2" />
-                        </svg>
-                        Segarkan Data
+                        <FiRefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+                        {isRefreshing ? "Menyegarkan..." : "Segarkan Data"}
                       </button>
                     </div>
                   </td>
@@ -1227,13 +1239,12 @@ export default function DataAnakPage() {
                       <p className="text-sm text-base-text-secondary font-semibold">Tidak ada data ditemukan</p>
                       <button
                         type="button"
-                        onClick={loadData}
+                        onClick={() => loadData(true)}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-soft text-brand-primary border border-brand-primary/20 rounded-xl text-xs font-bold hover:bg-brand-soft/80 transition cursor-pointer"
+                        disabled={isRefreshing}
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 20v-5h-.581m0 0a8.003 8.003 0 11-15.357-2" />
-                        </svg>
-                        Segarkan Data
+                        <FiRefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+                        {isRefreshing ? "Menyegarkan..." : "Segarkan Data"}
                       </button>
                     </div>
                   </td>
