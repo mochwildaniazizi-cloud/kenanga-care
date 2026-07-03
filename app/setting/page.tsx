@@ -119,29 +119,32 @@ function SettingsContent() {
       };
 
       const mappedUsers = data.map((m) => {
-        const isDbCadre = m.status === "Kader Posyandu" || m.national_id.startsWith("KADER-");
+        const isDbCadre = m.status === "Kader Posyandu" || (m.national_id && m.national_id.startsWith("KADER-"));
+        const rawPhone = m.phone_number || "";
+        const rawNik = m.national_id || "";
+        
         if (isDbCadre) {
-          const cleanUsername = m.phone_number !== "-" ? m.phone_number : m.national_id.replace("KADER-", "");
+          const cleanUsername = (rawPhone && rawPhone !== "-") ? rawPhone : (rawNik.replace("KADER-", "") || "Tidak ada");
           return {
-            name: m.name,
+            name: m.name || "Tanpa Nama",
             username: cleanUsername,
             role: m.condition || "Kader Posyandu",
             type: "Kader Posyandu",
-            phone: m.phone_number,
+            phone: rawPhone || "-",
             status: "Aktif",
             mother_id: m.mother_id,
-            password: m.password
+            password: m.password || ""
           };
         } else {
           return {
-            name: m.name,
-            username: m.phone_number !== "-" ? m.phone_number : (m.national_id || "Tidak ada"),
+            name: m.name || "Tanpa Nama",
+            username: (rawPhone && rawPhone !== "-") ? rawPhone : (rawNik || "Tidak ada"),
             role: m.status || "Ibu Balita",
             type: "Ibu / Orang Tua",
-            phone: m.phone_number,
+            phone: rawPhone || "-",
             status: "Aktif",
             mother_id: m.mother_id,
-            password: m.password
+            password: m.password || ""
           };
         }
       });
@@ -1037,12 +1040,12 @@ function SettingsContent() {
                     </thead>
                     <tbody className="divide-y divide-base-border/10 text-xs">
                       {(allUsers.filter(user => 
-                        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+                        (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (user.username || "").toLowerCase().includes(searchTerm.toLowerCase())
                       )).length > 0 ? (
                         (allUsers.filter(user => 
-                          user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          user.username.toLowerCase().includes(searchTerm.toLowerCase())
+                          (user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (user.username || "").toLowerCase().includes(searchTerm.toLowerCase())
                         )).map((user, idx) => (
                           <tr key={idx} className="hover:bg-base-bg/25 transition duration-150">
                             <td className="py-3.5 px-4 font-bold text-base-text-primary">{user.name}</td>

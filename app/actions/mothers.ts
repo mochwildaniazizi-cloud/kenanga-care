@@ -426,6 +426,7 @@ export async function updateMother(motherId: string, data: any) {
 export async function getLoggedInMotherData(username: string) {
   try {
     if (!username) return null;
+    if (username.toLowerCase() === "kader") return null;
 
     let cleanUsername = username.replace(/\s*\(Demo\)\s*/gi, "").trim();
     if (cleanUsername.toLowerCase() === "ibu aminah" || cleanUsername.toLowerCase() === "ibu") {
