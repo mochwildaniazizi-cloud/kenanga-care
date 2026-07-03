@@ -382,23 +382,42 @@ function SettingsContent() {
       }
 
       // Fallback for static bypass kader account or offline mode
-      const savedName = localStorage.getItem("kader_name");
-      const savedPosyandu = localStorage.getItem("kader_posyandu");
-      const savedRole = localStorage.getItem("kader_role");
-      const savedEmail = localStorage.getItem("kader_email");
-      const savedPhone = localStorage.getItem("kader_phone");
-      const savedAddress = localStorage.getItem("kader_address");
-      
-      setFormData({
-        name: savedName || "Kader Siti",
-        posyandu: savedPosyandu || "Posyandu Kenanga 1",
-        role: savedRole || "Ketua Kader",
-        email: savedEmail || "siti.posyandu@gmail.com",
-        phone: savedPhone || "0812-3456-7890",
-        address: savedAddress || "Jl. Mawar No. 12, Kel. Kenanga",
-        husband_name: "",
-        national_id: ""
-      });
+      if (role === "ibu") {
+        const savedName = localStorage.getItem("ibu_name") || "Siti Aminah";
+        const savedPhone = localStorage.getItem("ibu_phone") || "0899-1234-5678";
+        const savedEmail = localStorage.getItem("ibu_email") || "ibu.aminah@gmail.com";
+        const savedAddress = localStorage.getItem("ibu_address") || "Jl. Mawar No. 12, Kel. Kenanga";
+        const savedHusband = localStorage.getItem("ibu_husband") || "Budi Santoso";
+        
+        setFormData({
+          name: savedName,
+          posyandu: "Posyandu Kenanga 1",
+          role: "Ibu Balita",
+          email: savedEmail,
+          phone: savedPhone,
+          address: savedAddress,
+          husband_name: savedHusband,
+          national_id: ""
+        });
+      } else {
+        const savedName = localStorage.getItem("kader_name") || "Kader Siti";
+        const savedPosyandu = localStorage.getItem("kader_posyandu") || "Posyandu Kenanga 1";
+        const savedRole = localStorage.getItem("kader_role") || "Ketua Kader";
+        const savedEmail = localStorage.getItem("kader_email") || "siti.posyandu@gmail.com";
+        const savedPhone = localStorage.getItem("kader_phone") || "0812-3456-7890";
+        const savedAddress = localStorage.getItem("kader_address") || "Jl. Mawar No. 12, Kel. Kenanga";
+        
+        setFormData({
+          name: savedName,
+          posyandu: savedPosyandu,
+          role: savedRole,
+          email: savedEmail,
+          phone: savedPhone,
+          address: savedAddress,
+          husband_name: "",
+          national_id: ""
+        });
+      }
     }
     loadProfileData();
   }, [role, username]);

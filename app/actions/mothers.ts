@@ -427,21 +427,31 @@ export async function getLoggedInMotherData(username: string) {
   try {
     if (!username) return null;
 
-    // Clean username (e.g. "Ibu Aminah (Demo)" -> "Siti Aminah")
     let cleanUsername = username.replace(/\s*\(Demo\)\s*/gi, "").trim();
-    // Map common demo variants
     if (cleanUsername.toLowerCase() === "ibu aminah" || cleanUsername.toLowerCase() === "ibu") {
       cleanUsername = "Siti Aminah";
     }
 
-    // Try to find by name, national_id, or phone_number
+    const u = cleanUsername.toLowerCase();
+    let cleanU = u;
+    if (cleanU.startsWith("ibu ")) {
+      cleanU = cleanU.substring(4).trim();
+    } else if (cleanU.startsWith("kader ")) {
+      cleanU = cleanU.substring(6).trim();
+    }
+
+    const digitsOnly = u.replace(/\D/g, "");
+
+    // Try to find by name, contains name, cleaned search pattern, national_id, or phone_number
     let mother = await prisma.mother.findFirst({
       where: {
         OR: [
           { mother_name: { equals: cleanUsername, mode: "insensitive" } },
           { mother_name: { contains: cleanUsername, mode: "insensitive" } },
+          { mother_name: { contains: cleanU, mode: "insensitive" } },
           { national_id: cleanUsername },
-          { phone_number: cleanUsername }
+          { phone_number: cleanUsername },
+          { phone_number: { contains: digitsOnly && digitsOnly.length > 5 ? digitsOnly : "NONMATCH" } }
         ]
       },
       include: {
@@ -553,13 +563,24 @@ export async function verifyUserLogin(username: string, pass: string, role: "kad
       return { success: true, name: "Kader Utama" };
     }
 
+    let cleanU = u;
+    if (cleanU.startsWith("ibu ")) {
+      cleanU = cleanU.substring(4).trim();
+    } else if (cleanU.startsWith("kader ")) {
+      cleanU = cleanU.substring(6).trim();
+    }
+
+    const digitsOnly = u.replace(/\D/g, "");
+
     const mother = await prisma.mother.findFirst({
       where: {
         OR: [
           { phone_number: { equals: u, mode: 'insensitive' } },
+          { phone_number: { contains: digitsOnly && digitsOnly.length > 5 ? digitsOnly : "NONMATCH" } },
           { national_id: { equals: u, mode: 'insensitive' } },
           { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
-          { mother_name: { equals: u, mode: 'insensitive' } }
+          { mother_name: { equals: u, mode: 'insensitive' } },
+          { mother_name: { contains: cleanU, mode: 'insensitive' } }
         ]
       }
     });
