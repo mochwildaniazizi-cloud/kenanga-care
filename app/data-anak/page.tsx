@@ -1039,7 +1039,7 @@ export default function DataAnakPage() {
                     <td className="py-2.5 px-4"><StatusBadge status={child.status} /></td>
                     <td className="py-2.5 px-4 text-center">
                       <Link 
-                        href={`/data-anak/${child.child_id}`}
+                        href={`/data-anak/${encodeURIComponent(child.child_id)}`}
                         className="inline-block px-3 py-1.5 border border-base-border/50 text-base-text-primary rounded-lg text-xs font-semibold hover:text-brand-primary hover:border-brand-primary hover:bg-brand-soft/20 transition-all cursor-pointer"
                       >
                         Lihat Detail

@@ -179,8 +179,11 @@ export default function ChildDetailPage() {
       if (!id) return;
       setError(null);
       
+      // Decode URL-encoded id (e.g., spaces encoded as %20)
+      const decodedId = decodeURIComponent(id as string);
+
       // Attempt load full cached detail
-      const cached = localStorage.getItem(`offline_child_detail_${id}`);
+      const cached = localStorage.getItem(`offline_child_detail_${decodedId}`);
       if (cached) {
         setChild(JSON.parse(cached));
         setIsLoading(false);
@@ -189,7 +192,7 @@ export default function ChildDetailPage() {
         const cachedList = localStorage.getItem("offline_children_list");
         if (cachedList) {
           const children = JSON.parse(cachedList);
-          const basicChild = children.find((c: any) => c.child_id === id);
+          const basicChild = children.find((c: any) => c.child_id === decodedId);
           if (basicChild) {
             setChild({
               child_id: basicChild.child_id,
@@ -220,12 +223,12 @@ export default function ChildDetailPage() {
       }
 
       try {
-        const data = await getChildDetail(id as string);
+        const data = await getChildDetail(decodedId);
         if (!data) {
           setError("Rekam medis balita yang Anda cari tidak terdaftar atau telah dihapus.");
         } else {
           setChild(data);
-          localStorage.setItem(`offline_child_detail_${id}`, JSON.stringify(data));
+          localStorage.setItem(`offline_child_detail_${decodedId}`, JSON.stringify(data));
         }
       } catch (err: any) {
         console.error("Failed to load child detail", err);
@@ -295,9 +298,9 @@ export default function ChildDetailPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await updateChild(id as string, editForm);
+      const res = await updateChild(decodeURIComponent(id as string), editForm);
       if (res.success) {
-        const data = await getChildDetail(id as string);
+        const data = await getChildDetail(decodeURIComponent(id as string));
         setChild(data);
         setIsEditing(false);
         setShowSuccessModal(true);

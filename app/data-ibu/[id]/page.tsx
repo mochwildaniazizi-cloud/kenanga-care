@@ -130,8 +130,11 @@ export default function MotherDetailPage() {
       if (!id) return;
       setError(null);
 
+      // Decode URL-encoded id (e.g., spaces encoded as %20)
+      const decodedId = decodeURIComponent(id as string);
+
       // Attempt load full cached detail
-      const cached = localStorage.getItem(`offline_mother_detail_${id}`);
+      const cached = localStorage.getItem(`offline_mother_detail_${decodedId}`);
       if (cached) {
         setMother(JSON.parse(cached));
         setIsLoading(false);
@@ -140,7 +143,7 @@ export default function MotherDetailPage() {
         const cachedList = localStorage.getItem("offline_mothers_list");
         if (cachedList) {
           const mothers = JSON.parse(cachedList);
-          const basicMother = mothers.find((m: any) => m.mother_id === id);
+          const basicMother = mothers.find((m: any) => m.mother_id === decodedId);
           if (basicMother) {
             setMother({
               mother_id: basicMother.mother_id,
@@ -166,12 +169,12 @@ export default function MotherDetailPage() {
       }
 
       try {
-        const data = await getMotherDetail(id as string);
+        const data = await getMotherDetail(decodedId);
         if (!data) {
           setError("Rekam medis ibu yang Anda cari tidak terdaftar atau telah dihapus.");
         } else {
           setMother(data);
-          localStorage.setItem(`offline_mother_detail_${id}`, JSON.stringify(data));
+          localStorage.setItem(`offline_mother_detail_${decodedId}`, JSON.stringify(data));
         }
       } catch (err: any) {
         console.error("Failed to load mother detail", err);

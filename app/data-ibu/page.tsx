@@ -813,7 +813,7 @@ export default function DataIbuPage() {
                     <td className="py-2.5 px-3"><StatusBadge status={mother.condition} /></td>
                     <td className="py-2.5 px-3 text-center">
                       <Link 
-                        href={`/data-ibu/${mother.mother_id}`}
+                        href={`/data-ibu/${encodeURIComponent(mother.mother_id)}`}
                         className="inline-block px-3 py-1.5 border border-base-border/50 text-base-text-primary rounded-lg text-xs font-semibold hover:text-brand-primary hover:border-brand-primary hover:bg-brand-soft/20 transition-all cursor-pointer whitespace-nowrap"
                       >
                         Lihat Detail
