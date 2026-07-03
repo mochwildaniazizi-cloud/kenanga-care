@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar } from "@/app/actions/mothers";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
@@ -354,6 +354,10 @@ function SettingsContent() {
             const detail = await getMotherDetail(loggedInMother.mother_id);
             if (detail) {
               setMotherDetail(detail);
+              if (detail.avatarUrl) {
+                setAvatarUrl(detail.avatarUrl);
+                localStorage.setItem("user_profile_avatar", detail.avatarUrl);
+              }
               
               const savedName = localStorage.getItem("ibu_name") || detail.name || "";
               const savedPhone = localStorage.getItem("ibu_phone") || detail.phone_number || "";
@@ -424,23 +428,69 @@ function SettingsContent() {
     setShowSuccessModal(true);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressAvatar = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 150;
+          const MAX_HEIGHT = 150;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+            resolve(compressedBase64);
+          } else {
+            resolve(event.target?.result as string);
+          }
+        };
+        img.onerror = () => reject(new Error("Failed to load image"));
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Ukuran file maksimal 2 MB.");
-      return;
+    try {
+      const compressedBase64 = await compressAvatar(file);
+      setAvatarUrl(compressedBase64);
+      localStorage.setItem("user_profile_avatar", compressedBase64);
+      
+      const res = await updateUserAvatar(username, compressedBase64);
+      if (res && res.success) {
+        window.dispatchEvent(new Event("profile-updated"));
+      } else {
+        console.warn("Avatar sync failed:", res?.error);
+        window.dispatchEvent(new Event("profile-updated"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Gagal memproses foto profil.");
     }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      setAvatarUrl(base64String);
-      localStorage.setItem("user_profile_avatar", base64String);
-      window.dispatchEvent(new Event("profile-updated"));
-    };
-    reader.readAsDataURL(file);
   };
 
   const handlePasswordSave = async (e: React.FormEvent) => {

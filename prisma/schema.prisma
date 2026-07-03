@@ -12,6 +12,7 @@ model Mother {
   national_id          String                 @unique
   mother_name          String
   password             String?
+  avatarUrl            String?
   birth_date           DateTime?
   age                  Int?
   husband_name         String?

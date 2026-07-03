@@ -116,7 +116,8 @@ export async function getMothersData() {
         gestationalAge,
         hpl,
         rawHpl: mother.estimated_due_date ? mother.estimated_due_date.toISOString() : "",
-        avatarUrl: customMothersAvatars[mother.mother_id] 
+        avatarUrl: mother.avatarUrl 
+          || customMothersAvatars[mother.mother_id] 
           || (mother.mother_name.includes("Dewi") 
             ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
             : mother.mother_name.includes("Wulandari")
@@ -317,7 +318,8 @@ export async function getMotherDetail(motherId: string) {
       hpl,
       condition: mother.risk_status || "Normal",
       number_of_children: childrenCount,
-      avatarUrl: customMothersAvatars[mother.mother_id] 
+      avatarUrl: mother.avatarUrl 
+        || customMothersAvatars[mother.mother_id] 
         || (mother.mother_name.includes("Dewi") 
           ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
           : mother.mother_name.includes("Wulandari")
@@ -466,6 +468,7 @@ export async function getLoggedInMotherData(username: string) {
       mother_id: mother.mother_id,
       mother_name: mother.mother_name,
       national_id: mother.national_id,
+      avatarUrl: mother.avatarUrl,
       children: mother.children.map(c => ({
         child_id: c.child_id,
         child_name: c.child_name,
@@ -582,10 +585,45 @@ export async function verifyUserLogin(username: string, pass: string, role: "kad
       return { success: false, error: "Kata sandi salah." };
     }
 
-    return { success: true, name: mother.mother_name };
+    return { success: true, name: mother.mother_name, avatarUrl: mother.avatarUrl };
   } catch (error: any) {
     console.error("Error in verifyUserLogin:", error);
     return { success: false, error: error.message || "Gagal melakukan otentikasi." };
+  }
+}
+
+export async function updateUserAvatar(username: string, base64Avatar: string) {
+  try {
+    const u = username.trim().toLowerCase();
+    
+    // Find mother
+    const mother = await prisma.mother.findFirst({
+      where: {
+        OR: [
+          { phone_number: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
+          { mother_name: { equals: u, mode: 'insensitive' } }
+        ]
+      }
+    });
+
+    if (!mother) {
+      if (u === "kader") {
+        return { success: false, error: "Akun Kader utama bawaan tidak dapat diubah foto profilnya. Buat akun Kader baru untuk fitur ini." };
+      }
+      return { success: false, error: "Pengguna tidak ditemukan." };
+    }
+
+    await prisma.mother.update({
+      where: { mother_id: mother.mother_id },
+      data: { avatarUrl: base64Avatar }
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating avatar:", error);
+    return { success: false, error: error.message || "Gagal memperbarui foto profil." };
   }
 }
 

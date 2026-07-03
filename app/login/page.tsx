@@ -39,6 +39,11 @@ export default function LoginPage() {
       const res = await verifyUserLogin(usernameInput, passwordInput, selRole);
       
       if (res.success && res.name) {
+        if (res.avatarUrl) {
+          localStorage.setItem("user_profile_avatar", res.avatarUrl);
+        } else {
+          localStorage.removeItem("user_profile_avatar");
+        }
         // Log in using the entered username so we can locate the profile easily
         login(selRole, usernameInput.trim());
       } else {
