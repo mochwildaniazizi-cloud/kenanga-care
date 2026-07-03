@@ -11,6 +11,7 @@ model Mother {
   mother_id            String                 @id @default(uuid())
   national_id          String                 @unique
   mother_name          String
+  password             String?
   birth_date           DateTime?
   age                  Int?
   husband_name         String?

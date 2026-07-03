@@ -491,6 +491,104 @@ export async function deleteMother(id: string) {
   }
 }
 
+export async function updateUserPassword(username: string, currentPass: string, newPass: string, role: "kader" | "ibu") {
+  try {
+    const u = username.trim().toLowerCase();
+    
+    // Find the user by username (phone_number, national_id, or name)
+    const mother = await prisma.mother.findFirst({
+      where: {
+        OR: [
+          { phone_number: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
+          { mother_name: { equals: u, mode: 'insensitive' } }
+        ]
+      }
+    });
+
+    if (!mother) {
+      // Special case: default kader main account bypass (not in DB)
+      if (u === "kader") {
+        return { success: false, error: "Akun Kader utama bawaan tidak dapat diubah kata sandinya. Silakan buat akun Kader baru untuk menggunakan fitur ini." };
+      }
+      return { success: false, error: "Pengguna tidak ditemukan." };
+    }
+
+    // Verify current password
+    const dbPassword = mother.password;
+    const defaultPassword = (mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-")) 
+      ? "kader123" 
+      : "ibu123";
+
+    const expectedCurrentPassword = dbPassword || defaultPassword;
+
+    if (currentPass !== expectedCurrentPassword) {
+      return { success: false, error: "Kata sandi saat ini salah." };
+    }
+
+    // Update password
+    await prisma.mother.update({
+      where: { mother_id: mother.mother_id },
+      data: { password: newPass }
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating user password:", error);
+    return { success: false, error: error.message || "Gagal mengubah kata sandi." };
+  }
+}
+
+export async function verifyUserLogin(username: string, pass: string, role: "kader" | "ibu") {
+  try {
+    const u = username.trim().toLowerCase();
+    
+    // 1. Bypass default kader account
+    if (role === "kader" && u === "kader" && pass === "kader123") {
+      return { success: true, name: "Kader Utama" };
+    }
+
+    const mother = await prisma.mother.findFirst({
+      where: {
+        OR: [
+          { phone_number: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
+          { mother_name: { equals: u, mode: 'insensitive' } }
+        ]
+      }
+    });
+
+    if (!mother) {
+      return { success: false, error: "Username / WhatsApp tidak terdaftar." };
+    }
+
+    // Role check
+    const isDbKader = mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-");
+    if (role === "kader" && !isDbKader) {
+      return { success: false, error: "Identitas ini tidak terdaftar sebagai Kader." };
+    }
+    if (role === "ibu" && isDbKader) {
+      return { success: false, error: "Identitas ini tidak terdaftar sebagai Ibu." };
+    }
+
+    // Verify password
+    const dbPassword = mother.password;
+    const defaultPassword = isDbKader ? "kader123" : "ibu123";
+    const expectedPassword = dbPassword || defaultPassword;
+
+    if (pass !== expectedPassword) {
+      return { success: false, error: "Kata sandi salah." };
+    }
+
+    return { success: true, name: mother.mother_name };
+  } catch (error: any) {
+    console.error("Error in verifyUserLogin:", error);
+    return { success: false, error: error.message || "Gagal melakukan otentikasi." };
+  }
+}
+
 
 
 

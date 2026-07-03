@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUserRole, UserRole } from "@/context/UserRoleContext";
 import { MdPerson, MdLock, MdErrorOutline } from "react-icons/md";
-import { getMothersData } from "@/app/actions/mothers";
+import { verifyUserLogin } from "@/app/actions/mothers";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,42 +36,14 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const u = usernameInput.trim().toLowerCase();
-      const p = passwordInput;
+      const res = await verifyUserLogin(usernameInput, passwordInput, selRole);
       
-      const allMothers = await getMothersData();
-
-      if (selRole === "kader") {
-        if (u === "kader" && p === "kader123") {
-          login("kader", "Kader Siti");
-          return;
-        }
-
-        // Search database-backed Kader
-        const matchingKader = allMothers.find(m => 
-          (m.status === "Kader Posyandu" || m.national_id.startsWith("KADER-")) &&
-          (m.phone_number.toLowerCase() === u || m.national_id.toLowerCase() === u || m.national_id.toLowerCase() === "kader-" + u || m.name.toLowerCase() === u)
-        );
-
-        if (matchingKader && p === "kader123") {
-          login("kader", matchingKader.name);
-        } else {
-          setErrorMsg("Username atau password Kader salah!");
-          setIsLoading(false);
-        }
+      if (res.success && res.name) {
+        // Log in using the entered username so we can locate the profile easily
+        login(selRole, usernameInput.trim());
       } else {
-        // Search database-backed Mother
-        const matchingMother = allMothers.find(m => 
-          !(m.status === "Kader Posyandu" || m.national_id.startsWith("KADER-")) &&
-          (m.phone_number.toLowerCase() === u || m.national_id.toLowerCase() === u || m.name.toLowerCase() === u)
-        );
-
-        if (matchingMother && p === "ibu123") {
-          login("ibu", matchingMother.name);
-        } else {
-          setErrorMsg("No. WhatsApp / NIK atau password Ibu salah!");
-          setIsLoading(false);
-        }
+        setErrorMsg(res.error || "Gagal masuk. Periksa kembali input Anda.");
+        setIsLoading(false);
       }
     } catch (err) {
       console.error(err);

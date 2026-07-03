@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword } from "@/app/actions/mothers";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
@@ -443,17 +443,31 @@ function SettingsContent() {
     reader.readAsDataURL(file);
   };
 
-  const handlePasswordSave = (e: React.FormEvent) => {
+  const handlePasswordSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      alert("Harap isi semua kolom kata sandi.");
+      return;
+    }
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       alert("Konfirmasi kata sandi baru tidak cocok!");
       return;
     }
-    
-    // Simulate password saving
-    setSuccessMessage("Kata sandi Anda berhasil diperbarui.");
-    setShowSuccessModal(true);
-    setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+
+    try {
+      const res = await updateUserPassword(username, passwordData.currentPassword, passwordData.newPassword, role);
+      if (res && res.success) {
+        setSuccessMessage("Kata sandi Anda berhasil diperbarui.");
+        setShowSuccessModal(true);
+        setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      } else {
+        alert(res?.error || "Gagal mengubah kata sandi. Periksa kata sandi saat ini.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem saat menyimpan kata sandi.");
+    }
   };
 
   const getInitials = (name: string) => {
