@@ -172,9 +172,12 @@ export default function ChildDetailPage() {
     }
   };
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     async function fetchDetail() {
       if (!id) return;
+      setError(null);
       
       // Attempt load full cached detail
       const cached = localStorage.getItem(`offline_child_detail_${id}`);
@@ -218,10 +221,15 @@ export default function ChildDetailPage() {
 
       try {
         const data = await getChildDetail(id as string);
-        setChild(data);
-        localStorage.setItem(`offline_child_detail_${id}`, JSON.stringify(data));
-      } catch (err) {
+        if (!data) {
+          setError("Rekam medis balita yang Anda cari tidak terdaftar atau telah dihapus.");
+        } else {
+          setChild(data);
+          localStorage.setItem(`offline_child_detail_${id}`, JSON.stringify(data));
+        }
+      } catch (err: any) {
         console.error("Failed to load child detail", err);
+        setError("Gagal memuat rekam medis dari database: " + (err.message || err.toString()));
       } finally {
         setIsLoading(false);
       }
@@ -318,6 +326,24 @@ export default function ChildDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
         <p className="text-sm font-semibold text-base-text-secondary">Memuat rekam medis anak...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-2xl mx-auto text-center py-16 space-y-6">
+        <div className="w-20 h-20 bg-status-red-light text-status-red-solid rounded-full flex items-center justify-center mx-auto shadow-sm">
+          <MdOutlineError className="w-10 h-10" />
+        </div>
+        <h2 className="text-2xl font-bold text-base-text-primary">Gagal Memuat Data</h2>
+        <p className="text-base-text-secondary max-w-md mx-auto">{error}</p>
+        <Link 
+          href="/data-anak"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-base-white font-bold rounded-xl text-sm hover:bg-brand-primary/95 transition shadow-md cursor-pointer"
+        >
+          <MdArrowBack className="w-4 h-4" /> Kembali ke Daftar Anak
+        </Link>
       </div>
     );
   }

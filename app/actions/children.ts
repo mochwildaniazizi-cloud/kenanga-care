@@ -380,7 +380,7 @@ export async function getChildDetail(childId: string) {
     };
   } catch (error) {
     console.error("Error fetching child detail:", error);
-    return null;
+    throw error;
   }
 }
 

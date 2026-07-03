@@ -374,7 +374,7 @@ export async function getMotherDetail(motherId: string) {
     };
   } catch (error) {
     console.error("Error fetching mother detail:", error);
-    return null;
+    throw error;
   }
 }
 
