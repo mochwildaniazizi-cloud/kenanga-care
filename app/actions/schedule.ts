@@ -140,9 +140,7 @@ export async function getScheduleLogs() {
   try {
     const logs = await prisma.scheduleLog.findMany({
       orderBy: { change_timestamp: "desc" },
-      include: {
-        schedule: true
-      }
+      take: 50
     });
 
     if (logs.length === 0) {
