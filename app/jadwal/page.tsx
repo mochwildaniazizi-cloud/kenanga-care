@@ -270,6 +270,13 @@ export default function JadwalPage() {
   });
 
   const loadData = async () => {
+    if (!navigator.onLine) {
+      alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const [fetchedSchedules, fetchedLogs] = await Promise.all([
         getSchedules(),
@@ -280,8 +287,9 @@ export default function JadwalPage() {
       
       localStorage.setItem("offline_schedules", JSON.stringify(fetchedSchedules));
       localStorage.setItem("offline_schedule_logs", JSON.stringify(fetchedLogs));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to load jadwal", error);
+      alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
     } finally {
       setIsLoading(false);
     }

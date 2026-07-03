@@ -227,6 +227,13 @@ export default function DataAnakPage() {
   });
 
   const loadData = async () => {
+    if (!navigator.onLine) {
+      alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
+      setIsLoading(false);
+      return;
+    }
+    
+    setIsLoading(true);
     try {
       const [children, history, fetchedMetrics] = await Promise.all([
         getChildrenData(),
@@ -240,8 +247,9 @@ export default function DataAnakPage() {
       localStorage.setItem("offline_children_list", JSON.stringify(children));
       localStorage.setItem("offline_children_history", JSON.stringify(history));
       localStorage.setItem("offline_children_metrics", JSON.stringify(fetchedMetrics));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to load data:", error);
+      alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
     } finally {
       setIsLoading(false);
     }

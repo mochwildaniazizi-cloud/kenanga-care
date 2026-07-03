@@ -193,6 +193,13 @@ export default function DataIbuPage() {
   };
 
   const loadData = async () => {
+    if (!navigator.onLine) {
+      alert("Perangkat Anda offline. Tidak dapat menyegarkan data dari server.");
+      setIsLoading(false);
+      return;
+    }
+    
+    setIsLoading(true);
     try {
       const [mothers, history, fetchedMetrics] = await Promise.all([
         getMothersData(),
@@ -206,8 +213,9 @@ export default function DataIbuPage() {
       localStorage.setItem("offline_mothers_list", JSON.stringify(mothers));
       localStorage.setItem("offline_mothers_history", JSON.stringify(history));
       localStorage.setItem("offline_mothers_metrics", JSON.stringify(fetchedMetrics));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to load data:", error);
+      alert("Gagal memuat data dari server. Pastikan skema database Anda sudah disinkronkan dengan menjalankan 'npx prisma db push' di terminal.");
     } finally {
       setIsLoading(false);
     }
