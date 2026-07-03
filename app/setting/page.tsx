@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother } from "@/app/actions/mothers";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
