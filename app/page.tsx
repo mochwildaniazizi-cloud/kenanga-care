@@ -88,6 +88,11 @@ export default function DashboardPage() {
         setIsLoading(true);
       }
 
+      if (!navigator.onLine) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const fetchedSchedules = await getSchedules();
         const today = new Date();

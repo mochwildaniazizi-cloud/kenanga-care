@@ -269,22 +269,48 @@ export default function JadwalPage() {
     focus: ""
   });
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [fetchedSchedules, fetchedLogs] = await Promise.all([
-          getSchedules(),
-          getScheduleLogs()
-        ]);
-        setSchedules(fetchedSchedules);
-        setLogs(fetchedLogs);
-      } catch (error) {
-        console.error("Failed to load jadwal", error);
-      } finally {
-        setIsLoading(false);
-      }
+  const loadData = async () => {
+    try {
+      const [fetchedSchedules, fetchedLogs] = await Promise.all([
+        getSchedules(),
+        getScheduleLogs()
+      ]);
+      setSchedules(fetchedSchedules);
+      setLogs(fetchedLogs);
+      
+      localStorage.setItem("offline_schedules", JSON.stringify(fetchedSchedules));
+      localStorage.setItem("offline_schedule_logs", JSON.stringify(fetchedLogs));
+    } catch (error) {
+      console.error("Failed to load jadwal", error);
+    } finally {
+      setIsLoading(false);
     }
-    loadData();
+  };
+
+  useEffect(() => {
+    const cachedSchedules = localStorage.getItem("offline_schedules");
+    const cachedLogs = localStorage.getItem("offline_schedule_logs");
+
+    if (cachedSchedules) setSchedules(JSON.parse(cachedSchedules));
+    if (cachedLogs) setLogs(JSON.parse(cachedLogs));
+
+    if (cachedSchedules || cachedLogs) {
+      setIsLoading(false);
+    }
+
+    if (navigator.onLine) {
+      loadData();
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleSync = () => {
+      loadData();
+    };
+    window.addEventListener("sync-data", handleSync);
+    return () => window.removeEventListener("sync-data", handleSync);
   }, []);
 
   const openEditModal = (schedule: any) => {

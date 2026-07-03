@@ -226,7 +226,11 @@ export default function DataIbuPage() {
       setIsLoading(false);
     }
 
-    loadData();
+    if (navigator.onLine) {
+      loadData();
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {

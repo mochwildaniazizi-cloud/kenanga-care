@@ -260,7 +260,11 @@ export default function DataAnakPage() {
       setIsLoading(false);
     }
 
-    loadData();
+    if (navigator.onLine) {
+      loadData();
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
