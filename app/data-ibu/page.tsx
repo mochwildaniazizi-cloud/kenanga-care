@@ -749,7 +749,21 @@ export default function DataIbuPage() {
                 ))
               ) : paginatedMothers.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-10 text-base-text-secondary">Tidak ada data ditemukan</td>
+                  <td colSpan={7} className="text-center py-12">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <p className="text-sm text-base-text-secondary font-semibold">Tidak ada data ditemukan</p>
+                      <button
+                        type="button"
+                        onClick={loadData}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-soft text-brand-primary border border-brand-primary/20 rounded-xl text-xs font-bold hover:bg-brand-soft/80 transition cursor-pointer"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 20v-5h-.581m0 0a8.003 8.003 0 11-15.357-2" />
+                        </svg>
+                        Segarkan Data
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 paginatedMothers.map((mother, index) => (
@@ -946,7 +960,21 @@ export default function DataIbuPage() {
                 ))
               ) : paginatedHistory.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-10 text-base-text-secondary">Tidak ada data ditemukan</td>
+                  <td colSpan={8} className="text-center py-12">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <p className="text-sm text-base-text-secondary font-semibold">Tidak ada data ditemukan</p>
+                      <button
+                        type="button"
+                        onClick={loadData}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-soft text-brand-primary border border-brand-primary/20 rounded-xl text-xs font-bold hover:bg-brand-soft/80 transition cursor-pointer"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 20v-5h-.581m0 0a8.003 8.003 0 11-15.357-2" />
+                        </svg>
+                        Segarkan Data
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 paginatedHistory.map((item, index) => (

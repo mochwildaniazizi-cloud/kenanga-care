@@ -589,8 +589,22 @@ export default function JadwalPage() {
                   )}
                   {displayedSchedules.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-12 text-center text-sm text-base-text-secondary font-semibold">
-                        Tidak ada jadwal {scheduleTab === "upcoming" ? "mendatang" : "riwayat selesai"} yang terdaftar.
+                      <td colSpan={4} className="py-12 text-center">
+                        <div className="flex flex-col items-center justify-center space-y-3">
+                          <p className="text-sm text-base-text-secondary font-semibold">
+                            Tidak ada jadwal {scheduleTab === "upcoming" ? "mendatang" : "riwayat selesai"} yang terdaftar.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={loadData}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-soft text-brand-primary border border-brand-primary/20 rounded-xl text-xs font-bold hover:bg-brand-soft/80 transition cursor-pointer"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M21 20v-5h-.581m0 0a8.003 8.003 0 11-15.357-2" />
+                            </svg>
+                            Segarkan Data
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -634,6 +648,12 @@ export default function JadwalPage() {
                         <td className="py-3 px-3"><div className="w-48 h-4 bg-gray-200 animate-pulse rounded"></div></td>
                       </tr>
                     ))
+                  ) : logs.length === 0 ? (
+                    <tr>
+                      <td colSpan={3} className="py-8 text-center text-sm text-base-text-secondary font-semibold">
+                        Tidak ada riwayat aktivitas log.
+                      </td>
+                    </tr>
                   ) : (
                     [...logs].sort((a, b) => {
                       const idA = parseInt(a.id) || 0;
