@@ -25,7 +25,7 @@ import { MdPregnantWoman } from "react-icons/md";
 import { PiBabyFill } from "react-icons/pi";
 import { useUserRole } from "@/context/UserRoleContext";
 import { createChildMeasurement } from "@/app/actions/children";
-import { createMaternalRecord, createMother } from "@/app/actions/mothers";
+import { createMaternalRecord, createMother, getLoggedInMotherData } from "@/app/actions/mothers";
 import { getRealtimeNotifications } from "@/app/actions/schedule";
 
 const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
@@ -67,29 +67,49 @@ export default function Header() {
   });
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const { role, setRole, logout, isLoggedIn } = useUserRole();
+  const { role, setRole, logout, isLoggedIn, username } = useUserRole();
 
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Sync profile from local storage and custom events
+  // Sync profile from local storage, database, and custom events
   useEffect(() => {
-    const loadProfile = () => {
+    const loadProfile = async () => {
       const isIbu = role === "ibu";
-      const savedName = isIbu 
-        ? (localStorage.getItem("ibu_name") || localStorage.getItem("logged_username") || "Siti Aminah")
+      let name = isIbu 
+        ? (localStorage.getItem("ibu_name") || "Siti Aminah")
         : (localStorage.getItem("kader_name") || "Kader Siti");
+      
+      if (isLoggedIn && username) {
+        try {
+          const dbData = await getLoggedInMotherData(username);
+          if (dbData && dbData.mother_name) {
+            name = dbData.mother_name;
+            localStorage.setItem(isIbu ? "ibu_name" : "kader_name", dbData.mother_name);
+            if (dbData.avatarUrl) {
+              setAvatarUrl(dbData.avatarUrl);
+              localStorage.setItem("user_profile_avatar", dbData.avatarUrl);
+            }
+          }
+        } catch (e) {
+          console.error("Header failed to load user from database:", e);
+        }
+      }
+
       const savedPosyandu = isIbu
         ? "Posyandu Kenanga 1"
         : (localStorage.getItem("kader_posyandu") || "Posyandu Kenanga 1");
+
       setProfile({
-        name: savedName,
+        name,
         posyandu: savedPosyandu
       });
       
       const savedAvatar = localStorage.getItem("user_profile_avatar");
-      setAvatarUrl(savedAvatar);
+      if (savedAvatar) {
+        setAvatarUrl(savedAvatar);
+      }
     };
 
     loadProfile();
@@ -108,7 +128,7 @@ export default function Header() {
     return () => {
       window.removeEventListener("profile-updated", loadProfile);
     };
-  }, [role]);
+  }, [role, username, isLoggedIn]);
 
   // Online/Offline listener
   useEffect(() => {

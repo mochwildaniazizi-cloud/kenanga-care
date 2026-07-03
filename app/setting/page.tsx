@@ -130,6 +130,7 @@ function SettingsContent() {
             phone: m.phone_number,
             status: "Aktif",
             mother_id: m.mother_id,
+            password: m.password
           };
         } else {
           return {
@@ -140,6 +141,7 @@ function SettingsContent() {
             phone: m.phone_number,
             status: "Aktif",
             mother_id: m.mother_id,
+            password: m.password
           };
         }
       });
@@ -1030,7 +1032,7 @@ function SettingsContent() {
                               <div className="flex items-center gap-2">
                                 <span className="font-mono text-base-text-primary font-semibold">
                                   {visiblePasswords[user.username] 
-                                    ? (user.type === "Kader Posyandu" ? "kader123" : "ibu123") 
+                                    ? (user.password || (user.type === "Kader Posyandu" ? "kader123" : "ibu123")) 
                                     : "••••••"
                                   }
                                 </span>

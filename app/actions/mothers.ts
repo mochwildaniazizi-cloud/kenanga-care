@@ -110,6 +110,7 @@ export async function getMothersData() {
         mother_id: mother.mother_id,
         national_id: mother.national_id,
         name: mother.mother_name,
+        password: mother.password,
         age: mother.age ? `${mother.age} Tahun` : "-",
         rawAge: mother.age || 0,
         status,
