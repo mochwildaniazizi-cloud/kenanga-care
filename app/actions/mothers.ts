@@ -130,7 +130,7 @@ export async function getMothersData() {
     });
   } catch (error) {
     console.error("Error fetching mothers:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -164,7 +164,7 @@ export async function getMaternalHistory() {
     });
   } catch (error) {
     console.error("Error fetching maternal history:", error);
-    return [];
+    throw error;
   }
 }
 

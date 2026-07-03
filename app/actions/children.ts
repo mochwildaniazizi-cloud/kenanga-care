@@ -112,7 +112,7 @@ export async function getChildrenData() {
     });
   } catch (error) {
     console.error("Error fetching children:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -190,7 +190,7 @@ export async function getMeasurementHistory() {
     });
   } catch (error) {
     console.error("Error fetching measurement history:", error);
-    return [];
+    throw error;
   }
 }
 

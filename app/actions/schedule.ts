@@ -28,7 +28,7 @@ export async function getSchedules() {
     }));
   } catch (error) {
     console.error("Error fetching schedules:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -165,6 +165,6 @@ export async function getScheduleLogs() {
     });
   } catch (error) {
     console.error("Error fetching schedule logs:", error);
-    return [];
+    throw error;
   }
 }
