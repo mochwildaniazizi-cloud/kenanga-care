@@ -24,8 +24,8 @@ import {
 import { MdPregnantWoman } from "react-icons/md";
 import { PiBabyFill } from "react-icons/pi";
 import { useUserRole } from "@/context/UserRoleContext";
-import { createChildMeasurement } from "@/app/actions/children";
-import { createMaternalRecord, createMother, getLoggedInMotherData } from "@/app/actions/mothers";
+import { createChildMeasurement, createChild, updateChild } from "@/app/actions/children";
+import { createMaternalRecord, createMother, getLoggedInMotherData, updateMother } from "@/app/actions/mothers";
 import { getRealtimeNotifications } from "@/app/actions/schedule";
 
 const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
@@ -244,42 +244,144 @@ export default function Header() {
     const pendingChildMeas = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
     const pendingMaternal = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
     const pendingMothers = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
+    const pendingCreateChildren = JSON.parse(localStorage.getItem("pending_create_children") || "[]");
+    const pendingUpdateMothers = JSON.parse(localStorage.getItem("pending_update_mothers") || "[]");
+    const pendingUpdateChildren = JSON.parse(localStorage.getItem("pending_update_children") || "[]");
 
     let syncedCount = 0;
 
     // Sync new mothers
+    const failedMothers = [];
     for (const m of pendingMothers) {
       try {
         const res = await createMother(m);
-        if (res.success) syncedCount++;
+        if (res.success) {
+          syncedCount++;
+        } else {
+          failedMothers.push(m);
+        }
       } catch (e) {
         console.error("Failed to sync mother creation offline record:", e);
+        failedMothers.push(m);
+      }
+    }
+
+    // Sync new children
+    const failedChildren = [];
+    for (const c of pendingCreateChildren) {
+      try {
+        const res = await createChild(c);
+        if (res.success) {
+          syncedCount++;
+        } else {
+          failedChildren.push(c);
+        }
+      } catch (e) {
+        console.error("Failed to sync child creation offline record:", e);
+        failedChildren.push(c);
+      }
+    }
+
+    // Sync updated mothers
+    const failedUpdateMothers = [];
+    for (const item of pendingUpdateMothers) {
+      try {
+        const res = await updateMother(item.mother_id, item.data);
+        if (res.success) {
+          syncedCount++;
+        } else {
+          failedUpdateMothers.push(item);
+        }
+      } catch (e) {
+        console.error(`Failed to sync mother update offline record for ${item.mother_id}:`, e);
+        failedUpdateMothers.push(item);
+      }
+    }
+
+    // Sync updated children
+    const failedUpdateChildren = [];
+    for (const item of pendingUpdateChildren) {
+      try {
+        const res = await updateChild(item.child_id, item.data);
+        if (res.success) {
+          syncedCount++;
+        } else {
+          failedUpdateChildren.push(item);
+        }
+      } catch (e) {
+        console.error(`Failed to sync child update offline record for ${item.child_id}:`, e);
+        failedUpdateChildren.push(item);
       }
     }
 
     // Sync child measurements
+    const failedChildMeas = [];
     for (const m of pendingChildMeas) {
       try {
         const res = await createChildMeasurement(m);
-        if (res.success) syncedCount++;
+        if (res.success) {
+          syncedCount++;
+        } else {
+          failedChildMeas.push(m);
+        }
       } catch (e) {
         console.error("Failed to sync child measurement offline record:", e);
+        failedChildMeas.push(m);
       }
     }
 
     // Sync maternal records
+    const failedMaternal = [];
     for (const m of pendingMaternal) {
       try {
         const res = await createMaternalRecord(m);
-        if (res.success) syncedCount++;
+        if (res.success) {
+          syncedCount++;
+        } else {
+          failedMaternal.push(m);
+        }
       } catch (e) {
         console.error("Failed to sync maternal offline record:", e);
+        failedMaternal.push(m);
       }
     }
 
-    localStorage.removeItem("pending_child_measurements");
-    localStorage.removeItem("pending_maternal_records");
-    localStorage.removeItem("pending_create_mothers");
+    // Save failed queues back or remove if empty
+    if (failedChildMeas.length > 0) {
+      localStorage.setItem("pending_child_measurements", JSON.stringify(failedChildMeas));
+    } else {
+      localStorage.removeItem("pending_child_measurements");
+    }
+
+    if (failedMaternal.length > 0) {
+      localStorage.setItem("pending_maternal_records", JSON.stringify(failedMaternal));
+    } else {
+      localStorage.removeItem("pending_maternal_records");
+    }
+
+    if (failedMothers.length > 0) {
+      localStorage.setItem("pending_create_mothers", JSON.stringify(failedMothers));
+    } else {
+      localStorage.removeItem("pending_create_mothers");
+    }
+
+    if (failedChildren.length > 0) {
+      localStorage.setItem("pending_create_children", JSON.stringify(failedChildren));
+    } else {
+      localStorage.removeItem("pending_create_children");
+    }
+
+    if (failedUpdateMothers.length > 0) {
+      localStorage.setItem("pending_update_mothers", JSON.stringify(failedUpdateMothers));
+    } else {
+      localStorage.removeItem("pending_update_mothers");
+    }
+
+    if (failedUpdateChildren.length > 0) {
+      localStorage.setItem("pending_update_children", JSON.stringify(failedUpdateChildren));
+    } else {
+      localStorage.removeItem("pending_update_children");
+    }
 
     return syncedCount;
   };

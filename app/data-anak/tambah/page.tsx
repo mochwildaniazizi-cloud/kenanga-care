@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserRole } from "@/context/UserRoleContext";
 import { FiArrowLeft, FiSearch } from "react-icons/fi";
-import { MdOutlineMale, MdOutlineFemale, MdOutlineError } from "react-icons/md";
+import { MdOutlineMale, MdOutlineFemale, MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { FaCalendarAlt } from "react-icons/fa";
 import { searchMothers, createChild } from "@/app/actions/children";
 import { showLocalNotification } from "@/utils/notifications";
@@ -32,6 +32,8 @@ export default function TambahAnakPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isOfflineSaved, setIsOfflineSaved] = useState(false);
 
   // Form States
   const [formData, setFormData] = useState({
@@ -96,15 +98,34 @@ export default function TambahAnakPage() {
       return;
     }
 
+    if (!navigator.onLine) {
+      const pending = JSON.parse(localStorage.getItem("pending_create_children") || "[]");
+      pending.push({
+        ...formData,
+        birth_order: formData.birth_order ? parseInt(formData.birth_order) : 1,
+        birth_weight: formData.birth_weight ? parseFloat(formData.birth_weight) : null,
+        birth_length: formData.birth_length ? parseFloat(formData.birth_length) : null,
+      });
+      localStorage.setItem("pending_create_children", JSON.stringify(pending));
+
+      setIsOfflineSaved(true);
+      showLocalNotification("Data Anak Disimpan Offline", {
+        body: `Data profil untuk ${formData.child_name} disimpan secara lokal di browser Anda.`,
+      });
+      setShowSuccessModal(true);
+      return;
+    }
+
     setIsSubmitting(true);
     const result = await createChild(formData);
     setIsSubmitting(false);
 
     if (result.success) {
+      setIsOfflineSaved(false);
       showLocalNotification("Data Anak Berhasil Disimpan", {
         body: `Data profil untuk ${formData.child_name} telah berhasil disimpan ke database.`,
       });
-      router.push("/data-anak");
+      setShowSuccessModal(true);
     } else {
       setErrorMsg(result.error || "Terjadi kesalahan.");
     }
@@ -415,6 +436,39 @@ export default function TambahAnakPage() {
                 className="flex-1 py-2.5 rounded-xl bg-brand-primary text-base-white font-bold hover:bg-brand-primary/90 transition shadow-sm"
               >
                 Ya, Batalkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-2xl shadow-xl w-[90%] max-w-md overflow-hidden border border-base-border/20">
+            <div className="p-6 text-center space-y-4">
+              <div className={`w-16 h-16 ${isOfflineSaved ? 'bg-status-blue-light text-status-blue-solid' : 'bg-status-green-light text-status-green-solid'} rounded-full flex items-center justify-center mx-auto mb-2`}>
+                <MdCheckCircleOutline className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-base-text-primary">
+                {isOfflineSaved ? "Tersimpan Offline 🔴" : "Berhasil Disimpan"}
+              </h3>
+              <p className="text-sm text-base-text-secondary">
+                {isOfflineSaved 
+                  ? "Registrasi data anak telah disimpan secara lokal di browser Anda dan akan disinkronkan otomatis saat koneksi internet terhubung kembali."
+                  : "Registrasi data balita baru berhasil disimpan ke database."
+                }
+              </p>
+            </div>
+            <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex justify-center">
+              <button 
+                type="button" 
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  router.push("/data-anak");
+                }}
+                className="w-full max-w-[200px] py-2.5 rounded-xl bg-status-green-solid text-base-white font-bold hover:bg-status-green-solid/90 transition shadow-sm cursor-pointer animate-in fade-in"
+              >
+                Mengerti
               </button>
             </div>
           </div>

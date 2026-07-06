@@ -296,11 +296,68 @@ export default function ChildDetailPage() {
       return;
     }
 
+    const decodedId = decodeURIComponent(id as string);
+
+    if (!navigator.onLine) {
+      const updatedChild = {
+        ...child,
+        national_id: editForm.national_id || "-",
+        name: editForm.child_name,
+        gender: editForm.gender,
+        birth_place: editForm.birth_place || "-",
+        dobRaw: editForm.birth_date,
+        dob: editForm.birth_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.birth_date)) : "-",
+        age: getAgeInMonths(editForm.birth_date) + " Bulan",
+        birth_order: editForm.birth_order ? parseInt(editForm.birth_order.toString()) : 1,
+        birth_weight: editForm.birth_weight ? parseFloat(editForm.birth_weight.toString()) : null,
+        birth_length: editForm.birth_length ? parseFloat(editForm.birth_length.toString()) : null,
+        current_weight: editForm.current_weight ? parseFloat(editForm.current_weight.toString()) : null,
+        current_height: editForm.current_height ? parseFloat(editForm.current_height.toString()) : null,
+        blood_type: editForm.blood_type || "-",
+        special_conditions: editForm.special_conditions,
+        special_conditions_notes: editForm.special_conditions_notes || "",
+        avatarUrl: editForm.avatarUrl
+      };
+      setChild(updatedChild);
+      localStorage.setItem("offline_child_detail_" + decodedId, JSON.stringify(updatedChild));
+
+      const cachedList = localStorage.getItem("offline_children_list");
+      if (cachedList) {
+        const list = JSON.parse(cachedList);
+        const idx = list.findIndex((c: any) => c.child_id === decodedId);
+        if (idx !== -1) {
+          list[idx] = {
+            ...list[idx],
+            national_id: editForm.national_id || "-",
+            name: editForm.child_name,
+            gender: editForm.gender,
+            dob: editForm.birth_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.birth_date)) : "-",
+            dobRaw: editForm.birth_date,
+            age: getAgeInMonths(editForm.birth_date) + " Bulan",
+            birth_place: editForm.birth_place || "-",
+            weight: editForm.current_weight || editForm.birth_weight,
+            height: editForm.current_height || editForm.birth_length,
+            avatarUrl: editForm.avatarUrl
+          };
+          localStorage.setItem("offline_children_list", JSON.stringify(list));
+        }
+      }
+
+      const pendingUpdates = JSON.parse(localStorage.getItem("pending_update_children") || "[]");
+      const cleanPending = pendingUpdates.filter((item: any) => item.child_id !== decodedId);
+      cleanPending.push({ child_id: decodedId, data: editForm });
+      localStorage.setItem("pending_update_children", JSON.stringify(cleanPending));
+
+      setIsEditing(false);
+      setShowSuccessModal(true);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const res = await updateChild(decodeURIComponent(id as string), editForm);
+      const res = await updateChild(decodedId, editForm);
       if (res.success) {
-        const data = await getChildDetail(decodeURIComponent(id as string));
+        const data = await getChildDetail(decodedId);
         setChild(data);
         setIsEditing(false);
         setShowSuccessModal(true);

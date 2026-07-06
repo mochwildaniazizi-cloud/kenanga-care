@@ -31,6 +31,7 @@ export default function TambahIbuPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isOfflineSaved, setIsOfflineSaved] = useState(false);
 
   // Form States
   const [formData, setFormData] = useState({
@@ -95,11 +96,29 @@ export default function TambahIbuPage() {
       return;
     }
 
+    if (!navigator.onLine) {
+      const pending = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
+      pending.push({
+        ...formData,
+        age: formData.age ? parseInt(formData.age) : 0,
+        number_of_children: formData.number_of_children ? parseInt(formData.number_of_children) : 0
+      });
+      localStorage.setItem("pending_create_mothers", JSON.stringify(pending));
+
+      setIsOfflineSaved(true);
+      showLocalNotification("Data Ibu Disimpan Offline", {
+        body: `Data profil untuk ${formData.mother_name} disimpan secara lokal di browser Anda.`,
+      });
+      setShowSuccessModal(true);
+      return;
+    }
+
     setIsSubmitting(true);
     const result = await createMother(formData);
     setIsSubmitting(false);
 
     if (result.success) {
+      setIsOfflineSaved(false);
       showLocalNotification("Data Ibu Berhasil Terdaftar", {
         body: `Data profil untuk ${formData.mother_name} telah berhasil disimpan ke database.`,
       });
@@ -395,12 +414,17 @@ export default function TambahIbuPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm transition-all animate-in fade-in duration-200">
           <div className="bg-base-white rounded-2xl shadow-xl w-[90%] max-w-md overflow-hidden border border-base-border/20">
             <div className="p-6 text-center space-y-4">
-              <div className="w-16 h-16 bg-status-green-light text-status-green-solid rounded-full flex items-center justify-center mx-auto mb-2">
+              <div className={`w-16 h-16 ${isOfflineSaved ? 'bg-status-blue-light text-status-blue-solid' : 'bg-status-green-light text-status-green-solid'} rounded-full flex items-center justify-center mx-auto mb-2`}>
                 <MdCheckCircleOutline className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-base-text-primary">Berhasil Disimpan</h3>
+              <h3 className="text-xl font-bold text-base-text-primary">
+                {isOfflineSaved ? "Tersimpan Offline 🔴" : "Berhasil Disimpan"}
+              </h3>
               <p className="text-sm text-base-text-secondary">
-                Registrasi data ibu hamil/nifas baru berhasil disimpan ke database.
+                {isOfflineSaved 
+                  ? "Registrasi data ibu telah disimpan secara lokal di browser Anda dan akan disinkronkan otomatis saat koneksi internet terhubung kembali."
+                  : "Registrasi data ibu hamil/nifas baru berhasil disimpan ke database."
+                }
               </p>
             </div>
             <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex justify-center">

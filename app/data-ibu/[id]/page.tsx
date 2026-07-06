@@ -239,11 +239,65 @@ export default function MotherDetailPage() {
       return;
     }
 
+    const decodedId = decodeURIComponent(id as string);
+
+    if (!navigator.onLine) {
+      const updatedMother = {
+        ...mother,
+        national_id: editForm.national_id,
+        name: editForm.mother_name,
+        dobRaw: editForm.birth_date,
+        dob: editForm.birth_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.birth_date)) : "-",
+        age: getAgeInYears(editForm.birth_date) + " Tahun",
+        husband_name: editForm.husband_name || "-",
+        phone_number: editForm.phone_number || "-",
+        blood_type: editForm.blood_type || "-",
+        estimated_due_date: editForm.estimated_due_date || "-",
+        hpl: editForm.estimated_due_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.estimated_due_date)) : "-",
+        condition: editForm.risk_status,
+        status: editForm.ui_status,
+        number_of_children: editForm.number_of_children ? parseInt(editForm.number_of_children.toString()) : 0,
+        avatarUrl: editForm.avatarUrl
+      };
+      setMother(updatedMother);
+      localStorage.setItem("offline_mother_detail_" + decodedId, JSON.stringify(updatedMother));
+
+      const cachedList = localStorage.getItem("offline_mothers_list");
+      if (cachedList) {
+        const list = JSON.parse(cachedList);
+        const idx = list.findIndex((m: any) => m.mother_id === decodedId);
+        if (idx !== -1) {
+          list[idx] = {
+            ...list[idx],
+            national_id: editForm.national_id,
+            name: editForm.mother_name,
+            age: getAgeInYears(editForm.birth_date) + " Tahun",
+            rawAge: getAgeInYears(editForm.birth_date),
+            status: editForm.ui_status,
+            condition: editForm.risk_status,
+            phone_number: editForm.phone_number || "-",
+            hpl: editForm.estimated_due_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.estimated_due_date)) : "-",
+            avatarUrl: editForm.avatarUrl
+          };
+          localStorage.setItem("offline_mothers_list", JSON.stringify(list));
+        }
+      }
+
+      const pendingUpdates = JSON.parse(localStorage.getItem("pending_update_mothers") || "[]");
+      const cleanPending = pendingUpdates.filter((item: any) => item.mother_id !== decodedId);
+      cleanPending.push({ mother_id: decodedId, data: editForm });
+      localStorage.setItem("pending_update_mothers", JSON.stringify(cleanPending));
+
+      setIsEditing(false);
+      setShowSuccessModal(true);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const res = await updateMother(id as string, editForm);
+      const res = await updateMother(decodedId, editForm);
       if (res.success) {
-        const data = await getMotherDetail(id as string);
+        const data = await getMotherDetail(decodedId);
         setMother(data);
         setIsEditing(false);
         setShowSuccessModal(true);

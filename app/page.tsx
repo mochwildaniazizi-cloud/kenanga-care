@@ -133,6 +133,14 @@ export default function DashboardPage() {
       }
     }
     loadData();
+
+    const handleSync = () => {
+      loadData();
+    };
+    window.addEventListener("sync-data", handleSync);
+    return () => {
+      window.removeEventListener("sync-data", handleSync);
+    };
   }, [role, username, isInitialized, isLoggedIn]);
 
   const formatDate = (dateString: string | Date | null) => {
