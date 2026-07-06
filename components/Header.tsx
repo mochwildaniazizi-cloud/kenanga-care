@@ -191,16 +191,20 @@ export default function Header() {
     const fetchNotifications = async () => {
       if (!isLoggedIn) return;
       try {
-        const liveNotifs = await getRealtimeNotifications(role);
+        const liveNotifs = await getRealtimeNotifications(role, username || undefined);
         setNotifications((prev) => {
-          // Compare with previous to trigger system notification on new item
-          if (prev.length > 0 && liveNotifs.length > 0) {
-            const hasNew = liveNotifs.some(n => !prev.some(p => p.id === n.id));
-            if (hasNew) {
-              const newest = liveNotifs[0];
-              showLocalNotification(`Notifikasi Baru: ${newest.category}`, {
-                body: newest.message,
-              });
+          if (liveNotifs.length > 0) {
+            if (prev.length === 0) {
+              setHasUnreadNotif(true);
+            } else {
+              const hasNew = liveNotifs.some(n => !prev.some(p => p.id === n.id));
+              if (hasNew) {
+                const newest = liveNotifs[0];
+                showLocalNotification(`Notifikasi Baru: ${newest.category}`, {
+                  body: newest.message,
+                });
+                setHasUnreadNotif(true);
+              }
             }
           }
           return liveNotifs;
@@ -214,7 +218,7 @@ export default function Header() {
 
     const interval = setInterval(fetchNotifications, 15000);
     return () => clearInterval(interval);
-  }, [role, isLoggedIn]);
+  }, [role, username, isLoggedIn]);
 
   const kaderNotifications = [
     { category: "Jadwal Posyandu", time: "1 jam yang lalu", message: "Pelaksanaan Posyandu Kenanga 1 dijadwalkan besok mulai pukul 08:00 WIB." },

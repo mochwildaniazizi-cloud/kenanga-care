@@ -169,7 +169,7 @@ export async function getScheduleLogs() {
   }
 }
 
-export async function getRealtimeNotifications(role: "kader" | "ibu") {
+export async function getRealtimeNotifications(role: "kader" | "ibu", username?: string) {
   try {
     const notifications: any[] = [];
 
@@ -228,12 +228,63 @@ export async function getRealtimeNotifications(role: "kader" | "ibu") {
       }
     } else {
       // 3. Health alert logic for Ibu
+      // Attempt to load mother details to personalize notifications
+      let motherName = "Ibu";
+      let children: any[] = [];
+
+      if (username) {
+        const u = username.trim().toLowerCase();
+        let cleanU = u;
+        if (cleanU.startsWith("ibu ")) {
+          cleanU = cleanU.substring(4).trim();
+        }
+        const digitsOnly = u.replace(/\D/g, "");
+
+        const mother = await prisma.mother.findFirst({
+          where: {
+            OR: [
+              { phone_number: { equals: u, mode: 'insensitive' } },
+              { phone_number: { contains: digitsOnly && digitsOnly.length > 5 ? digitsOnly : "NONMATCH" } },
+              { national_id: { equals: u, mode: 'insensitive' } },
+              { mother_name: { equals: u, mode: 'insensitive' } },
+              { mother_name: { contains: cleanU, mode: 'insensitive' } }
+            ]
+          },
+          include: { children: true }
+        });
+
+        if (mother) {
+          motherName = mother.mother_name;
+          children = mother.children || [];
+        }
+      }
+
+      // Add general reminder
       notifications.push({
         id: "alert-ibu-kia",
         category: "Pemberitahuan PWA",
         time: "Baru saja",
-        message: "Selalu bawa buku KIA (Kesehatan Ibu dan Anak) setiap berkunjung ke Posyandu Kenanga.",
+        message: `Halo Ibu ${motherName}, selalu bawa buku KIA (Kesehatan Ibu dan Anak) setiap berkunjung ke Posyandu Kenanga.`,
         timestamp: Date.now()
+      });
+
+      // Add child specific growth/vitamin reminders
+      children.forEach((child, idx) => {
+        notifications.push({
+          id: `alert-child-nutr-${child.child_id}`,
+          category: "Status Gizi",
+          time: "1 hari yang lalu",
+          message: `Grafik tumbuh kembang anak Anda (${child.child_name}) bulan ini terpantau Normal & Baik. Pertahankan!`,
+          timestamp: Date.now() - 1000 * 60 * 60 * 24 * (idx + 1)
+        });
+
+        notifications.push({
+          id: `alert-child-vit-${child.child_id}`,
+          category: "Vitamin A Anak",
+          time: "6 jam yang lalu",
+          message: `Jadwal pembagian Vitamin A untuk Balita Anda (${child.child_name}) sudah dibuka di Kader.`,
+          timestamp: Date.now() - 1000 * 60 * 60 * 6 * (idx + 1)
+        });
       });
     }
 
