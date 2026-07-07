@@ -1,12 +1,19 @@
-const CACHE_NAME = "kenanga-care-cache-v3";
+const CACHE_NAME = "kenanga-care-cache-v4";
 const ASSETS_TO_CACHE = [
   "/",
   "/login",
   "/data-anak",
+  "/data-anak/tambah",
+  "/data-anak/input-penimbangan",
   "/data-ibu",
+  "/data-ibu/tambah",
+  "/data-ibu/input-pemeriksaan",
   "/edukasi",
+  "/edukasi/tambah",
   "/setting",
   "/jadwal",
+  "/jadwal/tambah",
+  "/jadwal/riwayat",
   "/manifest.json",
   "/Logo.png",
   "/file.svg",
