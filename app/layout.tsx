@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import { UserRoleProvider } from "@/context/UserRoleContext";
 import SWRegister from "@/components/SWRegister";
 import PullToRefresh from "@/components/PullToRefresh";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,7 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             
             {/* DYNAMIC CONTENT AREA WITH PULL TO REFRESH */}
             <PullToRefresh>
-              {children}
+              <ErrorBoundary>
+                {children}
+              </ErrorBoundary>
             </PullToRefresh>
             
           </div>
