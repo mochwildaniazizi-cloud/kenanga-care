@@ -1,4 +1,4 @@
-const CACHE_NAME = "kenanga-care-cache-v2";
+const CACHE_NAME = "kenanga-care-cache-v3";
 const ASSETS_TO_CACHE = [
   "/",
   "/login",
@@ -75,7 +75,13 @@ self.addEventListener("fetch", (event) => {
             return cachedResponse;
           }
           if (event.request.mode === "navigate") {
-            return caches.match("/");
+            const url = new URL(event.request.url);
+            return caches.match(url.pathname).then((pathMatch) => {
+              if (pathMatch) {
+                return pathMatch;
+              }
+              return caches.match("/");
+            });
           }
         });
       })
