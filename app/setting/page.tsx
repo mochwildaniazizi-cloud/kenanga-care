@@ -50,6 +50,13 @@ function SettingsContent() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
+  // Crop States
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropOffset, setCropOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
   // Profile Form State
   const [formData, setFormData] = useState({
     name: "Kader Siti",
@@ -348,7 +355,7 @@ function SettingsContent() {
   // Load from local storage or database
   useEffect(() => {
     async function loadProfileData() {
-      const savedAvatar = localStorage.getItem("user_profile_avatar");
+      const savedAvatar = username ? localStorage.getItem(`user_profile_avatar_${username}`) : null;
       if (savedAvatar) {
         setAvatarUrl(savedAvatar);
       }
@@ -361,7 +368,10 @@ function SettingsContent() {
             setMotherDetail(detail);
             if (detail.avatarUrl) {
               setAvatarUrl(detail.avatarUrl);
-              localStorage.setItem("user_profile_avatar", detail.avatarUrl);
+              localStorage.setItem(`user_profile_avatar_${username}`, detail.avatarUrl);
+            } else {
+              setAvatarUrl(null);
+              localStorage.removeItem(`user_profile_avatar_${username}`);
             }
             
             const savedEmail = localStorage.getItem(`${role}_email`) || `${detail.name.toLowerCase().replace(/\s+/g, "")}@gmail.com`;
@@ -524,25 +534,94 @@ function SettingsContent() {
     });
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Ukuran gambar terlalu besar. Maksimal 5MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropImageSrc(reader.result as string);
+        setCropZoom(1);
+        setCropOffset({ x: 0, y: 0 });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    try {
-      const compressedBase64 = await compressAvatar(file);
-      setAvatarUrl(compressedBase64);
-      localStorage.setItem("user_profile_avatar", compressedBase64);
-      
-      // For the default kader account, ensure DB record exists first, then update avatar there
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - cropOffset.x, y: e.clientY - cropOffset.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setCropOffset({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    const touch = e.touches[0];
+    setDragStart({ x: touch.clientX - cropOffset.x, y: touch.clientY - cropOffset.y });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    setCropOffset({
+      x: touch.clientX - dragStart.x,
+      y: touch.clientY - dragStart.y
+    });
+  };
+
+  const handleCropSave = () => {
+    if (!cropImageSrc) return;
+    const img = new Image();
+    img.src = cropImageSrc;
+    img.onload = async () => {
+      const canvas = document.createElement("canvas");
+      const size = 200;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.clearRect(0, 0, size, size);
+      ctx.translate(size / 2, size / 2);
+
+      const scaleFactor = size / 192;
+      ctx.translate(cropOffset.x * scaleFactor, cropOffset.y * scaleFactor);
+      ctx.scale(cropZoom, cropZoom);
+
+      const aspect = img.height / img.width;
+      const drawWidth = size;
+      const drawHeight = size * aspect;
+
+      ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+
+      const croppedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+      setAvatarUrl(croppedBase64);
+      localStorage.setItem(`user_profile_avatar_${username}`, croppedBase64);
+      setCropImageSrc(null);
+
+      // Save to Supabase DB or default kader upsert
       if (username === "kader" || username.toLowerCase() === "kader") {
         try {
           const kaderProfile = await ensureKaderProfileExists(formData.name || "Kader Siti", formData.phone || undefined);
           if (kaderProfile?.mother_id) {
-            // Use updateMother to write avatarUrl to DB for kader
             await updateMother(kaderProfile.mother_id, { 
               national_id: "KADER-DEFAULT",
               mother_name: formData.name || "Kader Siti",
-              avatarUrl: compressedBase64
+              avatarUrl: croppedBase64
             });
           }
         } catch (err) {
@@ -550,7 +629,7 @@ function SettingsContent() {
         }
         window.dispatchEvent(new Event("profile-updated"));
       } else {
-        const res = await updateUserAvatar(username, compressedBase64);
+        const res = await updateUserAvatar(username, croppedBase64);
         if (res && res.success) {
           window.dispatchEvent(new Event("profile-updated"));
         } else {
@@ -558,10 +637,7 @@ function SettingsContent() {
           window.dispatchEvent(new Event("profile-updated"));
         }
       }
-    } catch (err) {
-      console.error(err);
-      alert("Gagal memproses foto profil.");
-    }
+    };
   };
 
   const handlePasswordSave = async (e: React.FormEvent) => {
@@ -1297,6 +1373,82 @@ function SettingsContent() {
                 className="w-full max-w-[200px] py-2.5 rounded-xl bg-status-green-solid text-base-white font-bold hover:bg-status-green-solid/90 transition shadow-sm cursor-pointer"
               >
                 Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Crop Image Modal */}
+      {cropImageSrc && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-2xl max-w-sm w-full p-6 border border-base-border/30 shadow-2xl space-y-6 flex flex-col items-center animate-in zoom-in-95 duration-200">
+            <div className="text-center w-full">
+              <h3 className="text-lg font-bold text-base-text-primary">Sesuaikan Foto Profil</h3>
+              <p className="text-xs text-base-text-secondary mt-1">Geser dan perbesar foto agar pas di dalam lingkaran.</p>
+            </div>
+
+            {/* Crop Viewport container */}
+            <div 
+              className="w-64 h-64 border border-base-border/30 rounded-xl relative overflow-hidden bg-base-bg flex items-center justify-center select-none"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleMouseUp}
+            >
+              {/* Circular view overlay masking everything outside */}
+              <div className="absolute w-48 h-48 rounded-full border-2 border-brand-primary z-10 pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"></div>
+              
+              {/* The Image inside */}
+              <img 
+                src={cropImageSrc} 
+                alt="Raw Preview" 
+                draggable={false}
+                style={{
+                  transform: `translate(${cropOffset.x}px, ${cropOffset.y}px) scale(${cropZoom})`,
+                  maxWidth: 'none',
+                  width: '192px',
+                  height: 'auto'
+                }}
+                className="select-none pointer-events-none origin-center"
+              />
+            </div>
+
+            {/* Slider control */}
+            <div className="w-full space-y-2">
+              <div className="flex justify-between text-xs font-bold text-base-text-secondary">
+                <span>Perkecil</span>
+                <span>Perbesar</span>
+              </div>
+              <input 
+                type="range" 
+                min="1" 
+                max="3" 
+                step="0.02" 
+                value={cropZoom} 
+                onChange={(e) => setCropZoom(parseFloat(e.target.value))} 
+                className="w-full h-1.5 bg-base-border rounded-lg appearance-none cursor-pointer accent-brand-primary" 
+              />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-3 w-full">
+              <button
+                type="button"
+                onClick={() => setCropImageSrc(null)}
+                className="flex-1 py-2.5 rounded-xl border border-base-border/50 text-base-text-secondary font-bold text-xs hover:bg-base-bg transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleCropSave}
+                className="flex-1 py-2.5 rounded-xl bg-brand-primary text-base-white font-bold text-xs hover:bg-brand-primary/95 transition shadow-md shadow-brand-primary/10 cursor-pointer"
+              >
+                Terapkan
               </button>
             </div>
           </div>

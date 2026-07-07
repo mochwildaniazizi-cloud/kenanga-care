@@ -89,7 +89,10 @@ export default function Header() {
             localStorage.setItem(isIbu ? "ibu_name" : "kader_name", dbData.mother_name);
             if (dbData.avatarUrl) {
               setAvatarUrl(dbData.avatarUrl);
-              localStorage.setItem("user_profile_avatar", dbData.avatarUrl);
+              localStorage.setItem(`user_profile_avatar_${username}`, dbData.avatarUrl);
+            } else {
+              setAvatarUrl(null);
+              localStorage.removeItem(`user_profile_avatar_${username}`);
             }
           }
         } catch (e) {
@@ -106,9 +109,11 @@ export default function Header() {
         posyandu: savedPosyandu
       });
       
-      const savedAvatar = localStorage.getItem("user_profile_avatar");
+      const savedAvatar = username ? localStorage.getItem(`user_profile_avatar_${username}`) : null;
       if (savedAvatar) {
         setAvatarUrl(savedAvatar);
+      } else {
+        setAvatarUrl(null);
       }
     };
 
@@ -675,26 +680,6 @@ export default function Header() {
                 </button>
               </div>
 
-              {/* Role Switcher */}
-              <div className="flex items-center justify-between px-4 py-2 text-sm text-base-text-primary transition duration-150 font-medium select-none">
-                <div className="flex items-center gap-3">
-                  <UserIcon className="w-5 h-5 text-base-text-secondary" />
-                  <span>Tampilan {role === "kader" ? "Kader" : "Ibu"}</span>
-                </div>
-                <button
-                  onClick={() => setRole(role === "kader" ? "ibu" : "kader")}
-                  title={role === "kader" ? "Ganti ke tampilan Ibu" : "Ganti ke tampilan Kader"}
-                  className={`w-10 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 focus:outline-none ${
-                    role === "ibu" ? "bg-brand-primary" : "bg-base-border/60"
-                  }`}
-                >
-                  <div
-                    className={`bg-base-white w-4 h-4 rounded-full shadow-md transform duration-200 ease-in-out ${
-                      role === "ibu" ? "translate-x-4" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-              </div>
 
               {/* Help Center */}
               <Link 
