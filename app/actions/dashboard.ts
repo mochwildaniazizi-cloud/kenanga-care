@@ -37,20 +37,23 @@ export async function getDashboardStats() {
       mothersHamil
     ] = await Promise.all([
       prisma.child.count(),
-      prisma.mother.count(),
       prisma.mother.count({
         where: {
-          risk_status: { in: ["Risiko Tinggi", "KEK"] }
+          ui_status: { not: "Kader Posyandu" }
         }
       }),
-      prisma.childMeasurement.groupBy({
-        by: ['child_id'],
+      prisma.mother.count({
+        where: {
+          risk_status: { in: ["Risiko Tinggi", "KEK"] },
+          ui_status: { not: "Kader Posyandu" }
+        }
+      }),
+      prisma.childMeasurement.count({
         where: {
           visit_date: { gte: startOfMonth, lte: endOfMonth }
         }
       }),
-      prisma.maternalHealthRecord.groupBy({
-        by: ['mother_id'],
+      prisma.maternalHealthRecord.count({
         where: {
           visit_date: { gte: startOfMonth, lte: endOfMonth }
         }
@@ -59,12 +62,15 @@ export async function getDashboardStats() {
         select: { birth_date: true, gender: true, current_weight: true, current_height: true }
       }),
       prisma.mother.count({
-        where: { estimated_due_date: { not: null } }
+        where: { 
+          estimated_due_date: { not: null },
+          ui_status: { not: "Kader Posyandu" }
+        }
       })
     ]);
 
-    // FORCE SYNC: Triggering git detection
-    const totalKunjungan = checkedChildren.length + checkedMothers.length;
+    // Force sync: total checkup visits count
+    const totalKunjungan = checkedChildren + checkedMothers;
 
     // Calculate problematic nutrition kids dynamically
     let problematicNutrition = 0;
