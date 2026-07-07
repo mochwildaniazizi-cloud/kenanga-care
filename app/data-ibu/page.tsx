@@ -7,7 +7,7 @@ import {
   MdOutlineError, MdPerson, MdCalendarMonth, MdPregnantWoman,
   MdPhone, MdBloodtype, MdMale, MdFemale
 } from "react-icons/md";
-import { FaUserNurse, FaUserFriends, FaHeartbeat } from "react-icons/fa";
+import { FaUserNurse, FaUserFriends, FaHeartbeat, FaUser, FaFileMedical } from "react-icons/fa";
 import { getMothersData, getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
 import { useUserRole } from "@/context/UserRoleContext";
 import { FiRefreshCw } from "react-icons/fi";
@@ -123,6 +123,7 @@ export default function DataIbuPage() {
   const { role, username } = useUserRole();
   const [motherDetail, setMotherDetail] = useState<any>(null);
   const [isLoadingMother, setIsLoadingMother] = useState(true);
+  const [activeIbuSubTab, setActiveIbuSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
 
   useEffect(() => {
     async function loadMotherDetail() {
@@ -445,74 +446,237 @@ export default function DataIbuPage() {
           {/* Left Column: Identitas & Kehamilan */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Card: Identitas Ibu */}
-            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
-                <MdPerson className="w-5 h-5 text-brand-primary" />
-                <h2 className="font-bold text-base-text-primary text-base">Identitas Ibu</h2>
+            {/* Card: TABBED BENTO CONTAINER */}
+            <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden">
+              {/* Tabs Selector */}
+              <div className="flex border-b text-xs font-bold text-base-text-secondary select-none">
+                <button 
+                  type="button" 
+                  onClick={() => setActiveIbuSubTab('ibu')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeIbuSubTab === 'ibu' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <FaUser className="w-3.5 h-3.5" /> Identitas Ibu
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveIbuSubTab('husband')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeIbuSubTab === 'husband' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <FaUserFriends className="w-3.5 h-3.5" /> Suami / Keluarga
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveIbuSubTab('health')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeIbuSubTab === 'health' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <FaFileMedical className="w-3.5 h-3.5" /> Riwayat &amp; Risiko
+                </button>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Tanggal Lahir</span>
-                  <p className="text-sm font-bold text-base-text-primary">{motherDetail.dob}</p>
-                </div>
 
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Usia Saat Ini</span>
-                  <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{motherDetail.age}</p>
-                </div>
+              {/* Content Body */}
+              <div className="p-6">
+                
+                {/* TAB 1: IDENTITAS IBU */}
+                {activeIbuSubTab === 'ibu' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. JKN / BPJS</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.jkn_number || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tempat Lahir</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.birth_place || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tanggal Lahir</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.dob}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Golongan Darah</span>
+                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                        <MdBloodtype className="w-4 h-4 text-status-red-solid" /> {motherDetail.blood_type || "-"}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Pendidikan</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.education || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Pekerjaan</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.occupation || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Telepon / WA</span>
+                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                        <MdPhone className="w-3.5 h-3.5 text-base-text-secondary" /> {motherDetail.phone_number || "-"}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Faskes Tingkat 1</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.faskes_1 || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Faskes Rujukan</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.faskes_referral || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Puskesmas Domisili</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.puskesmas_domicile || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Reg Kohort Ibu</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.cohort_register_number || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Catatan Medik RS</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.medical_record_number || "-"}</p>
+                    </div>
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-base-text-secondary block">Alamat Rumah</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.address || "-"}</p>
+                    </div>
 
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Nama Suami</span>
-                  <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_name}</p>
-                </div>
+                    <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Pembiayaan Lain</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.other_financing || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Asuransi Lain</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.insurance_other || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Nomor Asuransi</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.insurance_number || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.insurance_validity || "-"}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">No. Telepon / WA</span>
-                  <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
-                    <MdPhone className="w-3.5 h-3.5 text-base-text-secondary" /> {motherDetail.phone_number}
-                  </p>
-                </div>
+                {/* TAB 2: IDENTITAS SUAMI */}
+                {activeIbuSubTab === 'husband' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Nama Lengkap Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_name || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">NIK Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_national_id || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. JKN / BPJS Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_jkn_number || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tempat Lahir Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_birth_place || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tanggal Lahir Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_birth_date || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Golongan Darah Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_blood_type || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Pendidikan Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_education || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Pekerjaan Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_occupation || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Nomor Telepon Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_phone_number || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Faskes Tingkat 1 Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_faskes_1 || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Faskes Rujukan Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_faskes_referral || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Catatan Medik RS Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_medical_record_number || "-"}</p>
+                    </div>
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-base-text-secondary block">Alamat Rumah Suami</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_address || "-"}</p>
+                    </div>
+                    
+                    <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Pembiayaan Lain Suami</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_other_financing || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Asuransi Lain Suami</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_insurance_other || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Nomor Asuransi Suami</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_insurance_number || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi Suami</span>
+                        <p className="text-sm font-bold text-base-text-primary">{motherDetail.husband_insurance_validity || "-"}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Golongan Darah</span>
-                  <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
-                    <MdBloodtype className="w-4 h-4 text-status-red-solid" /> {motherDetail.blood_type}
-                  </p>
-                </div>
+                {/* TAB 3: RIWAYAT KESEHATAN IBU */}
+                {activeIbuSubTab === 'health' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Kehamilan Ke-</span>
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{motherDetail.pregnancy_number ?? "1"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Jumlah Anak Lahir Hidup</span>
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{motherDetail.children_born_alive ?? "0"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Riwayat Keguguran</span>
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{motherDetail.miscarriage_history ?? "0"} kali</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Jumlah Anak Hidup Posyandu</span>
+                      <p className="text-sm font-bold text-base-text-primary">{motherDetail.number_of_children} anak</p>
+                    </div>
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-base-text-secondary block">Riwayat Penyakit Ibu</span>
+                      <p className="text-sm font-bold text-base-text-primary italic">{motherDetail.disease_history || "-"}</p>
+                    </div>
 
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Jumlah Anak</span>
-                  <p className="text-sm font-bold text-base-text-primary">{motherDetail.number_of_children} anak</p>
-                </div>
-              </div>
-            </div>
+                    <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-3 gap-4">
+                      <div className="bg-base-bg/30 p-2.5 rounded-xl text-center">
+                        <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Status Ibu</span>
+                        <p className="text-xs font-bold text-base-text-primary mt-1">{motherDetail.status}</p>
+                      </div>
+                      <div className="bg-base-bg/30 p-2.5 rounded-xl text-center">
+                        <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Kondisi Risiko</span>
+                        <span className={`inline-block mt-1 px-2 py-0.5 border text-[10px] font-bold rounded-full ${getConditionColor(motherDetail.condition)}`}>
+                          {motherDetail.condition}
+                        </span>
+                      </div>
+                      <div className="bg-base-bg/30 p-2.5 rounded-xl text-center">
+                        <span className="text-[10px] font-bold text-base-text-secondary uppercase block">HPL / Bersalin</span>
+                        <p className="text-xs font-bold text-base-text-primary mt-1 whitespace-nowrap overflow-hidden text-ellipsis">{motherDetail.hpl}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-            {/* Card: Status Kehamilan / Nifas */}
-            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
-                <MdPregnantWoman className="w-5 h-5 text-brand-primary" />
-                <h2 className="font-bold text-base-text-primary text-base">Status Kehamilan & Persalinan</h2>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Status Ibu</span>
-                  <p className="text-sm font-bold text-base-text-primary mt-1">{motherDetail.status}</p>
-                </div>
-
-                <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Kondisi Risiko</span>
-                  <span className={`inline-block mt-1.5 px-2.5 py-0.5 border text-[10px] font-bold rounded-full ${getConditionColor(motherDetail.condition)}`}>
-                    {motherDetail.condition}
-                  </span>
-                </div>
-
-                <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">HPL / Bersalin</span>
-                  <p className="text-sm font-bold text-base-text-primary mt-1 whitespace-nowrap overflow-hidden text-ellipsis">{motherDetail.hpl}</p>
-                </div>
               </div>
             </div>
 

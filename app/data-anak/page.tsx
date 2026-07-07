@@ -130,6 +130,7 @@ export default function DataAnakPage() {
   const [selectedChildId, setSelectedChildId] = useState<string>("");
   const [selectedChildDetail, setSelectedChildDetail] = useState<any>(null);
   const [isLoadingChildDetail, setIsLoadingChildDetail] = useState(true);
+  const [activeChildSubTab, setActiveChildSubTab] = useState<'info' | 'growth'>('info');
 
   // Load mother's children if role === "ibu"
   useEffect(() => {
@@ -664,97 +665,185 @@ export default function DataAnakPage() {
           {/* Left Side: Identitas & Kondisi Medis */}
           <div className="lg:col-span-5 space-y-6">
             
-            {/* Card: Identitas Balita */}
-            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
-                <FaBaby className="w-5 h-5 text-brand-primary" />
-                <h2 className="font-bold text-base-text-primary text-base">Identitas Balita</h2>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Jenis Kelamin</span>
-                  <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
-                    {child.gender === "M" ? (
-                      <>
-                        <MdMale className="w-4 h-4 text-status-blue-solid" /> Laki-laki
-                      </>
-                    ) : (
-                      <>
-                        <MdFemale className="w-4 h-4 text-brand-primary" /> Perempuan
-                      </>
-                    )}
-                  </p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Tempat / Tanggal Lahir</span>
-                  <p className="text-sm font-bold text-base-text-primary">{child.birth_place || "-"}, {child.dob}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Usia Saat Ini</span>
-                  <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{child.ageInMonths} Bulan</p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Anak Ke-</span>
-                  <p className="text-sm font-bold text-base-text-primary">Ke-{child.birth_order || 1}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Golongan Darah</span>
-                  <p className="text-sm font-bold text-base-text-primary uppercase">{child.blood_type || "-"}</p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-base-text-secondary block">Ibu Kandung</span>
-                  <p className="text-sm font-bold text-base-text-primary">{child.mother_name}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Card: Antropometri Lahir & Pengukuran Terbaru */}
-            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-6">
-              
-              {/* Lahir */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
-                  <FaBaby className="w-4 h-4 text-brand-primary" />
-                  <h3 className="font-bold text-sm text-base-text-primary">Kondisi Saat Lahir</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="bg-base-bg/30 p-3 rounded-xl">
-                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Lahir</span>
-                    <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_weight} kg</p>
-                  </div>
-                  <div className="bg-base-bg/30 p-3 rounded-xl">
-                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Panjang Lahir</span>
-                    <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_length} cm</p>
-                  </div>
-                </div>
+            {/* Card: TABBED BENTO CONTAINER */}
+            <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden">
+              {/* Tabs Selector */}
+              <div className="flex border-b text-xs font-bold text-base-text-secondary select-none">
+                <button 
+                  type="button" 
+                  onClick={() => setActiveChildSubTab('info')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeChildSubTab === 'info' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <FaBaby className="w-3.5 h-3.5" /> Identitas Balita
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveChildSubTab('growth')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeChildSubTab === 'growth' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <MdScale className="w-3.5 h-3.5" /> Tumbuh Kembang
+                </button>
               </div>
 
-              {/* Terbaru */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
-                  <FaNotesMedical className="w-4 h-4 text-brand-primary" />
-                  <h3 className="font-bold text-sm text-base-text-primary">Pengukuran Terbaru</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
-                    <MdMonitorWeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
-                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Sekarang</span>
-                    <p className="text-xl font-bold text-brand-primary mt-1">{child.current_weight} kg</p>
-                  </div>
-                  <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
-                    <MdHeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
-                    <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Tinggi Sekarang</span>
-                    <p className="text-xl font-bold text-brand-primary mt-1">{child.current_height} cm</p>
-                  </div>
-                </div>
-              </div>
+              {/* Content Body */}
+              <div className="p-6">
+                
+                {/* TAB 1: IDENTITAS BALITA */}
+                {activeChildSubTab === 'info' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. JKN / BPJS Anak</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.jkn_number || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Akta Kelahiran</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.birth_certificate_number || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Jenis Kelamin</span>
+                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                        {child.gender === "M" ? <><MdMale className="w-4 h-4 text-status-blue-solid" /> Laki-laki</> : <><MdFemale className="w-4 h-4 text-brand-primary" /> Perempuan</>}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tempat Lahir</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.birth_place || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tanggal Lahir</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.dob}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Usia Saat Ini</span>
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{child.ageInMonths} Bulan</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Anak Ke-</span>
+                      <p className="text-sm font-bold text-base-text-primary">Ke-{child.birth_order || 1}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Golongan Darah</span>
+                      <p className="text-sm font-bold text-base-text-primary uppercase">{child.blood_type || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Ibu Kandung</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.mother_name || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Telp Orang Tua</span>
+                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                        <MdPhone className="w-3.5 h-3.5 text-base-text-secondary" /> {child.phone_number || "-"}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Faskes Pertama</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.faskes_1 || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Faskes Rujukan</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.faskes_referral || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Puskesmas Domisili</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.puskesmas_domicile || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Reg Kohort Bayi</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.cohort_register_number_baby || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Reg Kohort Balita</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.cohort_register_number_toddler || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Catatan Medik RS</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.medical_record_number || "-"}</p>
+                    </div>
+                    <div className="sm:col-span-2 space-y-1">
+                      <span className="text-base-text-secondary block">Alamat Rumah</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.address || "-"}</p>
+                    </div>
 
+                    <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Pembiayaan Lain</span>
+                        <p className="text-sm font-bold text-base-text-primary">{child.other_financing || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Asuransi Lain</span>
+                        <p className="text-sm font-bold text-base-text-primary">{child.insurance_other || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Nomor Asuransi</span>
+                        <p className="text-sm font-bold text-base-text-primary">{child.insurance_number || "-"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi</span>
+                        <p className="text-sm font-bold text-base-text-primary">{child.insurance_validity || "-"}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 2: TUMBUH KEMBANG */}
+                {activeChildSubTab === 'growth' && (
+                  <div className="space-y-6 animate-in fade-in duration-200">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
+                        <FaBaby className="w-4 h-4 text-brand-primary" />
+                        <h3 className="font-bold text-xs text-base-text-primary uppercase tracking-wider">Kondisi Saat Lahir</h3>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="bg-base-bg/30 p-3 rounded-xl">
+                          <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Lahir</span>
+                          <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_weight} kg</p>
+                        </div>
+                        <div className="bg-base-bg/30 p-3 rounded-xl">
+                          <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Panjang Lahir</span>
+                          <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_length} cm</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
+                        <FaNotesMedical className="w-4 h-4 text-brand-primary" />
+                        <h3 className="font-bold text-xs text-base-text-primary uppercase tracking-wider">Pengukuran Terbaru</h3>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
+                          <MdMonitorWeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
+                          <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Sekarang</span>
+                          <p className="text-xl font-bold text-brand-primary mt-1">{child.current_weight} kg</p>
+                        </div>
+                        <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
+                          <MdHeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
+                          <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Tinggi Sekarang</span>
+                          <p className="text-xl font-bold text-brand-primary mt-1">{child.current_height} cm</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-3 space-y-3">
+                      <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
+                        <MdScale className="w-4 h-4 text-brand-primary" />
+                        <h3 className="font-bold text-xs text-base-text-primary uppercase tracking-wider">Kalkulasi Status Z-Score</h3>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="bg-base-bg/30 p-2.5 rounded-xl">
+                          <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Z-Score Berat Badan</span>
+                          <p className="text-sm font-extrabold text-base-text-primary mt-1">{zScoreBB ? `${zScoreBB.toFixed(2)} SD` : "-"}</p>
+                        </div>
+                        <div className="bg-base-bg/30 p-2.5 rounded-xl">
+                          <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Z-Score Tinggi Badan</span>
+                          <p className="text-sm font-extrabold text-base-text-primary mt-1">{zScoreTB ? `${zScoreTB.toFixed(2)} SD` : "-"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
             </div>
 
             {/* Card: Kondisi Medis & Alergi */}

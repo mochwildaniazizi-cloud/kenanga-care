@@ -5,9 +5,9 @@ import Link from "next/link";
 import { 
   MdDashboard, MdVaccines, MdPregnantWoman, 
   MdChildCare, MdOutlineLocalDining, MdOutlineExtension,
-  MdAdd, MdBookmark
+  MdAdd, MdBookmark, MdSearch, MdMenuBook
 } from "react-icons/md";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import ArticleCard from "@/components/ArticleCard";
 import { mockArticles } from "./data";
 import type { CategoryType } from "./data";
@@ -20,6 +20,7 @@ export default function EdukasiPage() {
   const [activeTab, setActiveTab] = useState<TabType>("Semua");
   const [savedArticles, setSavedArticles] = useState<Set<string>>(new Set());
   const [articles, setArticles] = useState<any[]>(mockArticles);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const local = localStorage.getItem("custom_articles");
@@ -112,32 +113,125 @@ export default function EdukasiPage() {
     },
   ];
 
+  // Filtering based on search query
+  const searchedArticles = articles.filter(a => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    const titleMatch = a.title?.toLowerCase().includes(query);
+    const categoryMatch = a.categories?.some((c: string) => c.toLowerCase().includes(query));
+    const typeMatch = a.type?.toLowerCase().includes(query);
+    return titleMatch || categoryMatch || typeMatch;
+  });
+
   return (
-    <div className="w-full pb-10 space-y-8">
+    <div className="w-full pb-10 space-y-6 animate-in fade-in duration-300">
       
-      {/* TABS SECTION */}
-      <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar">
-        {TABS.map(tab => {
-          const isActive = activeTab === tab.id;
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all border-2 ${
-                isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
-              }`}
+      {/* HEADER & SEARCH AREA */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-base-border/20 pb-5">
+        <div>
+          <h1 className="text-2xl font-extrabold text-base-text-primary tracking-tight">Artikel &amp; Edukasi KIA</h1>
+          <p className="text-xs text-base-text-secondary mt-1">Dapatkan informasi tepercaya seputar kesehatan ibu, bayi, dan tumbuh kembang anak.</p>
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 md:w-80">
+            <input 
+              type="text" 
+              placeholder="Cari materi edukasi, topik, atau kata kunci..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 border border-base-border/40 bg-base-bg/30 focus:bg-base-white rounded-full text-sm outline-none focus:border-brand-primary transition-all text-base-text-primary"
+            />
+            <MdSearch className="absolute left-3.5 top-3 text-base-text-secondary w-5 h-5" />
+            {searchQuery && (
+              <button 
+                type="button" 
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3.5 top-3 text-base-text-secondary hover:text-base-text-primary transition"
+              >
+                <FiX className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          {role !== "ibu" && (
+            <Link 
+              href="/edukasi/tambah" 
+              className="flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-base-white rounded-xl text-xs font-bold hover:bg-status-pink-dark transition shadow-md shadow-brand-primary/10 cursor-pointer shrink-0"
             >
-              <div className={`p-1 rounded-full ${isActive ? "bg-base-white" : ""}`}>
-                <Icon className={`w-5 h-5 ${tab.colorStyle.split(" ")[1]}`} />
-              </div>
-              {tab.label}
-            </button>
-          );
-        })}
+              <MdAdd className="w-4.5 h-4.5" /> Tulis Artikel
+            </Link>
+          )}
+        </div>
       </div>
 
-      {activeTab === "Semua" ? (
+      {/* TABS SECTION */}
+      {!searchQuery && (
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar select-none">
+          {TABS.map(tab => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all border-2 cursor-pointer ${
+                  isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                }`}
+              >
+                <div className={`p-1 rounded-full ${isActive ? "bg-base-white" : ""}`}>
+                  <Icon className={`w-4 h-4 ${tab.colorStyle.split(" ")[1]}`} />
+                </div>
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* RENDER DYNAMIC BODY */}
+      {searchQuery ? (
+        // --- SEARCH RESULTS VIEW ---
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b pb-2 border-base-border/10">
+            <h2 className="text-base font-bold text-base-text-primary">
+              Hasil Pencarian: &ldquo;{searchQuery}&rdquo;
+            </h2>
+            <span className="text-xs bg-brand-soft text-brand-primary font-bold px-3 py-1 rounded-full">
+              {searchedArticles.length} Materi ditemukan
+            </span>
+          </div>
+
+          {searchedArticles.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 max-w-md mx-auto">
+              <div className="w-16 h-16 rounded-full bg-base-bg flex items-center justify-center text-base-text-secondary">
+                <MdMenuBook className="w-8 h-8 text-base-text-secondary" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-base font-bold text-base-text-primary">Tidak Ada Hasil Ditemukan</p>
+                <p className="text-xs text-base-text-secondary leading-relaxed">
+                  Coba gunakan kata kunci lain seperti &ldquo;MPASI&rdquo;, &ldquo;Imunisasi&rdquo;, atau &ldquo;Kehamilan&rdquo;.
+                </p>
+              </div>
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 text-xs font-bold rounded-xl transition cursor-pointer"
+              >
+                Bersihkan Pencarian
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {searchedArticles.map(article => (
+                <ArticleCard 
+                  key={article.id} 
+                  article={article} 
+                  isSaved={savedArticles.has(article.id)}
+                  onToggleSave={() => toggleBookmark(article.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : activeTab === "Semua" ? (
         // --- SEMUA VIEW ---
         articles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center space-y-5 bg-base-white border border-base-border/30 rounded-2xl p-8 max-w-xl mx-auto shadow-sm animate-in fade-in duration-300">
@@ -167,10 +261,10 @@ export default function EdukasiPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-base-text-primary">Lanjutkan Membaca</h2>
                 <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full border border-base-border/50 flex items-center justify-center text-base-text-secondary hover:text-brand-primary transition-colors">
+                  <button className="w-8 h-8 rounded-full border border-base-border/50 flex items-center justify-center text-base-text-secondary hover:text-brand-primary transition-colors cursor-pointer">
                     <FiChevronLeft className="w-4 h-4" />
                   </button>
-                  <button className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center text-base-white hover:bg-status-pink-dark transition-colors shadow-sm">
+                  <button className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center text-base-white hover:bg-status-pink-dark transition-colors shadow-sm cursor-pointer">
                     <FiChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -213,9 +307,9 @@ export default function EdukasiPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-status-green-solid flex items-center gap-2">
-                  <MdOutlineLocalDining className="w-5 h-5" /> Gizi & MPASI
+                  <MdOutlineLocalDining className="w-5 h-5" /> Gizi &amp; MPASI
                 </h2>
-                <button onClick={() => setActiveTab("Gizi & MPASI")} className="text-brand-primary text-sm font-bold hover:underline">Lihat Selengkapnya &gt;</button>
+                <button onClick={() => setActiveTab("Gizi & MPASI")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {articles.filter(a => a.categories.includes("Gizi & MPASI") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
@@ -235,7 +329,7 @@ export default function EdukasiPage() {
                 <h2 className="text-lg font-bold text-status-orange-solid flex items-center gap-2">
                   <MdVaccines className="w-5 h-5" /> Imunisasi
                 </h2>
-                <button onClick={() => setActiveTab("Imunisasi")} className="text-brand-primary text-sm font-bold hover:underline">Lihat Selengkapnya &gt;</button>
+                <button onClick={() => setActiveTab("Imunisasi")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {articles.filter(a => a.categories.includes("Imunisasi") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
@@ -255,7 +349,7 @@ export default function EdukasiPage() {
                 <h2 className="text-lg font-bold text-status-blue-solid flex items-center gap-2">
                   <MdPregnantWoman className="w-5 h-5" /> Ibu Hamil
                 </h2>
-                <button onClick={() => setActiveTab("Ibu Hamil")} className="text-brand-primary text-sm font-bold hover:underline">Lihat Selengkapnya &gt;</button>
+                <button onClick={() => setActiveTab("Ibu Hamil")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {articles.filter(a => a.categories.includes("Ibu Hamil") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
@@ -275,7 +369,7 @@ export default function EdukasiPage() {
                 <h2 className="text-lg font-bold text-status-purple-solid flex items-center gap-2">
                   <MdChildCare className="w-5 h-5" /> Ibu Nifas
                 </h2>
-                <button onClick={() => setActiveTab("Ibu Nifas")} className="text-brand-primary text-sm font-bold hover:underline">Lihat Selengkapnya &gt;</button>
+                <button onClick={() => setActiveTab("Ibu Nifas")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {articles.filter(a => a.categories.includes("Ibu Nifas") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
@@ -295,7 +389,7 @@ export default function EdukasiPage() {
                 <h2 className="text-lg font-bold text-status-cerulean-solid flex items-center gap-2">
                   <MdOutlineExtension className="w-5 h-5" /> Tumbuh Kembang
                 </h2>
-                <button onClick={() => setActiveTab("Tumbuh Kembang")} className="text-brand-primary text-sm font-bold hover:underline">Lihat Selengkapnya &gt;</button>
+                <button onClick={() => setActiveTab("Tumbuh Kembang")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {articles.filter(a => a.categories.includes("Tumbuh Kembang") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
@@ -331,7 +425,7 @@ export default function EdukasiPage() {
               </div>
               <button 
                 onClick={() => setActiveTab("Semua")}
-                className="mt-2 px-6 py-2.5 bg-brand-primary text-base-white font-bold text-sm rounded-full hover:bg-brand-primary/90 transition shadow-sm cursor-pointer"
+                className="mt-2 px-6 py-2.5 bg-brand-primary text-base-white font-bold text-sm rounded-full hover:bg-brand-primary/95 transition shadow-sm cursor-pointer"
               >
                 Jelajahi Artikel
               </button>
