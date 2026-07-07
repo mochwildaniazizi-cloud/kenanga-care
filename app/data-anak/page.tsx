@@ -365,6 +365,24 @@ export default function DataAnakPage() {
       localStorage.setItem("offline_children_list", JSON.stringify(children));
       localStorage.setItem("offline_children_history", JSON.stringify(history));
       localStorage.setItem("offline_children_metrics", JSON.stringify(fetchedMetrics));
+
+      // Proactive background caching of all children detailed records
+      if (children.length > 0) {
+        setTimeout(async () => {
+          for (const c of children) {
+            try {
+              if (navigator.onLine) {
+                const detail = await getChildDetail(c.child_id);
+                if (detail) {
+                  localStorage.setItem(`offline_child_detail_${c.child_id}`, JSON.stringify(detail));
+                }
+              }
+            } catch (err) {
+              console.error(`Background caching failed for child ${c.child_id}:`, err);
+            }
+          }
+        }, 1000);
+      }
     } catch (error: any) {
       console.error("Failed to load data:", error);
       if (forceRefresh) {

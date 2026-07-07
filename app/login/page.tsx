@@ -35,6 +35,22 @@ export default function LoginPage() {
 
     setIsLoading(true);
 
+    if (!navigator.onLine) {
+      const u = usernameInput.trim().toLowerCase();
+      const p = passwordInput.trim();
+      if (selRole === "kader" && u === "kader" && p === "kader123") {
+        login("kader", "kader");
+        return;
+      }
+      if (selRole === "ibu" && (u === "ibu" || u === "siti aminah") && p === "ibu123") {
+        login("ibu", "Siti Aminah");
+        return;
+      }
+      setErrorMsg("Perangkat Anda offline. Untuk demo offline, silakan gunakan akun default ('kader' / 'kader123' untuk Kader, atau 'ibu' / 'ibu123' untuk Ibu).");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const res = await verifyUserLogin(usernameInput, passwordInput, selRole);
       
