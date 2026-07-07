@@ -779,45 +779,69 @@ function getMockContent(id: string, title: string): string {
         <thead>
           <tr>
             <th>Bahan Makanan</th>
-            <th>Porsi Harian</th>
-            <th>Takaran per Porsi</th>
+            <th>12 Minggu Pertama</th>
+            <th>Keterangan per Porsi</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Nasi / Makanan Pokok</td>
-            <td>5 Porsi</td>
-            <td>100 gram nasi (3/4 gelas) atau 120 gram ubi jalar</td>
+            <td><strong>Nasi atau Makanan Pokok</strong></td>
+            <td>5 porsi</td>
+            <td>
+              <ul>
+                <li>100 g atau 3/4 gelas nasi</li>
+                <li>125 g atau 3 buah jagung sedang</li>
+                <li>210 g atau 2 kentang sedang</li>
+                <li>120 g atau 1/2 potong singkong</li>
+                <li>70 g atau 3 iris roti putih</li>
+                <li>200 g atau 2 gelas mie basah</li>
+              </ul>
+            </td>
           </tr>
           <tr>
-            <td>Protein Hewani (Ikan, Telur, Daging)</td>
-            <td>4 Porsi</td>
-            <td>50 gram ikan sedang atau 1 butir telur ayam</td>
+            <td><strong>Protein Hewani</strong><br/><small style="color: #6B7280;">Ikan, Telur, Ayam dll.</small></td>
+            <td>4 porsi</td>
+            <td>
+              <ul>
+                <li>50 g atau 1 potong sedang ikan</li>
+                <li>55 g atau 1 butir telur Ayam</li>
+              </ul>
+            </td>
           </tr>
           <tr>
-            <td>Protein Nabati (Tempe, Tahu)</td>
-            <td>4 Porsi</td>
-            <td>50 gram tempe (1 potong sedang) atau 100 gram tahu</td>
+            <td><strong>Protein Nabati</strong><br/><small style="color: #6B7280;">Tempe, Tahu, dll.</small></td>
+            <td>4 porsi</td>
+            <td>
+              <ul>
+                <li>50 g atau 1 potong sedang tempe</li>
+                <li>100 g atau 2 potong sedang tahu</li>
+              </ul>
+            </td>
           </tr>
           <tr>
-            <td>Sayuran Hijau / Berwarna</td>
-            <td>4 Porsi</td>
-            <td>100 gram sayur matang tanpa kuah (1 mangkok)</td>
+            <td><strong>Sayur-sayuran</strong></td>
+            <td>4 porsi</td>
+            <td>100 g atau 1 mangkuk sayur matang tanpa kuah</td>
           </tr>
           <tr>
-            <td>Buah-buahan segar</td>
-            <td>4 Porsi</td>
-            <td>100 gram buah (1 potong sedang pepaya / pisang)</td>
+            <td><strong>Buah-buahan</strong></td>
+            <td>4 porsi</td>
+            <td>
+              <ul>
+                <li>100 g atau 1 potong sedang pisang</li>
+                <li>100-190 g atau 1 potong besar pepaya</li>
+              </ul>
+            </td>
           </tr>
           <tr>
-            <td>Minyak / Lemak tambahan</td>
-            <td>5 Porsi</td>
-            <td>5 gram minyak kelapa atau mentega (1 sendok teh)</td>
+            <td><strong>Minyak/Lemak</strong></td>
+            <td>5 porsi</td>
+            <td>5 g atau 1 sendok teh, bersumber dari pengolahan makanan seperti menggoreng, menumis, santan, kemiri, mentega dan sumber lemak lainnya. Minyak/lemak termasuk santan yang digunakan dalam pengolahan, makanan digoreng, ditumis atau dimasak dengan santan.</td>
           </tr>
           <tr>
-            <td>Gula pasir / Pemanis</td>
-            <td>2 Porsi</td>
-            <td>10 gram gula pasir (1 sendok makan)</td>
+            <td><strong>Gula</strong></td>
+            <td>2 porsi</td>
+            <td>10 g atau 1 sendok makan bersumber dari kue-kue manis, minum teh manis dan lain-lainnya</td>
           </tr>
         </tbody>
       </table>
