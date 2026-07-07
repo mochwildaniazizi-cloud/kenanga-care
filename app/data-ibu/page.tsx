@@ -10,6 +10,7 @@ import {
 import { FaUserNurse, FaUserFriends, FaHeartbeat, FaUser, FaFileMedical } from "react-icons/fa";
 import { getMothersData, getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
 import { getTtdLogs, upsertTtdLog } from "@/app/actions/ttd";
+import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/weekly";
 import { useUserRole } from "@/context/UserRoleContext";
 import { FiRefreshCw } from "react-icons/fi";
 
@@ -124,7 +125,7 @@ export default function DataIbuPage() {
   const { role, username } = useUserRole();
   const [motherDetail, setMotherDetail] = useState<any>(null);
   const [isLoadingMother, setIsLoadingMother] = useState(true);
-  const [activeIbuSubTab, setActiveIbuSubTab] = useState<'ibu' | 'husband' | 'health' | 'ttd'>('ibu');
+  const [activeIbuSubTab, setActiveIbuSubTab] = useState<'ibu' | 'husband' | 'health' | 'ttd' | 'weekly'>('ibu');
   
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -134,6 +135,10 @@ export default function DataIbuPage() {
   const [ttdCompanion, setTtdCompanion] = useState("");
   const [ttdRelationship, setTtdRelationship] = useState("Suami");
   const [isSavingTtd, setIsSavingTtd] = useState(false);
+
+  // Weekly self monitoring states
+  const [weeklyLogs, setWeeklyLogs] = useState<any[]>([]);
+  const [weeklyTrimesterFilter, setWeeklyTrimesterFilter] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
     async function loadMotherDetail() {
@@ -216,6 +221,72 @@ export default function DataIbuPage() {
     }
     fetchTtdData();
   }, [motherDetail]);
+
+  useEffect(() => {
+    if (!motherDetail) return;
+    const motherId = motherDetail.mother_id;
+    const cacheKey = `offline_weekly_monitoring_${motherId}`;
+    
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        setWeeklyLogs(JSON.parse(cached));
+      } catch (e) {}
+    }
+
+    if (!navigator.onLine) return;
+
+    getWeeklyMonitorings(motherId).then((res) => {
+      if (res && res.success) {
+        setWeeklyLogs(res.list || []);
+        localStorage.setItem(cacheKey, JSON.stringify(res.list || []));
+      }
+    });
+  }, [motherDetail]);
+
+  const handleToggleWeekly = async (weekNumber: number, field: string) => {
+    if (!motherDetail) return;
+    const motherId = motherDetail.mother_id;
+    const cacheKey = `offline_weekly_monitoring_${motherId}`;
+
+    let updatedLogs = [...weeklyLogs];
+    const logIndex = updatedLogs.findIndex((l: any) => l.week_number === weekNumber);
+    let record: any = {};
+    if (logIndex >= 0) {
+      record = {
+        ...updatedLogs[logIndex],
+        [field]: !updatedLogs[logIndex][field]
+      };
+      updatedLogs[logIndex] = record;
+    } else {
+      record = {
+        week_number: weekNumber,
+        check_pregnancy: false,
+        check_class: false,
+        fever: false,
+        headache: false,
+        insomnia: false,
+        cough: false,
+        fetal_movement: false,
+        stomach_pain: false,
+        fluid_discharge: false,
+        urination_pain: false,
+        diarrhea: false,
+        [field]: true
+      };
+      updatedLogs.push(record);
+    }
+    setWeeklyLogs(updatedLogs);
+    localStorage.setItem(cacheKey, JSON.stringify(updatedLogs));
+
+    if (navigator.onLine) {
+      try {
+        await upsertWeeklyMonitoring(motherId, weekNumber, record);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
   const [mothersList, setMothersList] = useState<any[]>([]);
   const [historyList, setHistoryList] = useState<any[]>([]);
@@ -581,6 +652,13 @@ export default function DataIbuPage() {
                 >
                   <MdVaccines className="w-3.5 h-3.5" /> Checklist TTD
                 </button>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveIbuSubTab('weekly')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeIbuSubTab === 'weekly' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <MdCalendarMonth className="w-3.5 h-3.5" /> Pemantauan Mingguan
+                </button>
               </div>
 
               {/* Content Body */}
@@ -904,6 +982,197 @@ export default function DataIbuPage() {
                           <div className="w-3.5 h-3.5 rounded bg-base-bg/30 border border-base-border/25" />
                           <span>Belum Diminum</span>
                         </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {activeIbuSubTab === 'weekly' && (() => {
+                  const weeks = weeklyTrimesterFilter === 1
+                    ? [4, 5, 6, 7, 8, 9, 10, 11, 12]
+                    : weeklyTrimesterFilter === 2
+                    ? [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
+                    : [29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42];
+
+                  return (
+                    <div className="space-y-4 animate-in fade-in duration-200 text-xs">
+                      {/* Filter Sub-Tabs */}
+                      <div className="flex border-b text-[11px] font-bold text-base-text-secondary select-none">
+                        <button
+                          type="button"
+                          onClick={() => setWeeklyTrimesterFilter(1)}
+                          className={`flex-1 py-2.5 text-center border-b-2 transition cursor-pointer ${weeklyTrimesterFilter === 1 ? 'border-brand-primary text-brand-primary bg-brand-soft/5' : 'border-transparent hover:bg-base-bg/30'}`}
+                        >
+                          Trimester I (Mg 4-12)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWeeklyTrimesterFilter(2)}
+                          className={`flex-1 py-2.5 text-center border-b-2 transition cursor-pointer ${weeklyTrimesterFilter === 2 ? 'border-brand-primary text-brand-primary bg-brand-soft/5' : 'border-transparent hover:bg-base-bg/30'}`}
+                        >
+                          Trimester II (Mg 13-28)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWeeklyTrimesterFilter(3)}
+                          className={`flex-1 py-2.5 text-center border-b-2 transition cursor-pointer ${weeklyTrimesterFilter === 3 ? 'border-brand-primary text-brand-primary bg-brand-soft/5' : 'border-transparent hover:bg-base-bg/30'}`}
+                        >
+                          Trimester III (Mg 29-42)
+                        </button>
+                      </div>
+
+                      {/* Info Banner */}
+                      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                        <h4 className="font-bold text-xs text-brand-primary">
+                          Lembar Pemantauan Ibu Hamil (Buku KIA Halaman 10-13)
+                        </h4>
+                        <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                          Beri tanda centang (✓) pada kolom pelayanan kesehatan saat periksa/kelas ibu, serta centang kolom pemantauan mingguan jika Ibu merasakan kondisi/gejala tersebut selama minggu kehamilan Anda.
+                        </p>
+                      </div>
+
+                      {/* Horizontal Scrollable Table */}
+                      <div className="overflow-x-auto border border-base-border/20 rounded-xl shadow-sm">
+                        <table className="w-full text-left border-collapse min-w-[1000px]">
+                          <thead>
+                            <tr className="bg-base-bg/40 text-[10px] font-bold text-base-text-secondary uppercase tracking-wider border-b border-base-border/20">
+                              <th className="py-3 px-4 text-center sticky left-0 bg-base-white z-10 border-r border-base-border/20 shadow-[2px_0_5px_rgba(0,0,0,0.05)] w-24">Minggu Kehamilan</th>
+                              <th className="py-3 px-3 text-center border-r border-base-border/20" colSpan={2}>Pelayanan Kesehatan</th>
+                              <th className="py-3 px-3 text-center" colSpan={9}>Pemantauan Gejala / Kondisi</th>
+                            </tr>
+                            <tr className="bg-base-bg/25 text-[9px] font-bold text-base-text-secondary uppercase tracking-wider border-b border-base-border/20">
+                              <th className="py-2.5 px-4 text-center sticky left-0 bg-base-white z-10 border-r border-base-border/20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]"></th>
+                              <th className="py-2.5 px-2 text-center w-28 border-r">Periksa Hamil</th>
+                              <th className="py-2.5 px-2 text-center w-28 border-r border-base-border/20">Kelas Ibu Hamil</th>
+                              
+                              <th className="py-2.5 px-2 text-center w-24 border-r">Demam &gt;2 Hari</th>
+                              <th className="py-2.5 px-2 text-center w-24 border-r">Pusing Berat</th>
+                              <th className="py-2.5 px-2 text-center w-24 border-r">Cemas / Insomnia</th>
+                              <th className="py-2.5 px-2 text-center w-28 border-r">Batuk &gt;2Mg / Kontak TB</th>
+                              <th className="py-2.5 px-2 text-center w-28 border-r">Janin Kurang Gerak</th>
+                              <th className="py-2.5 px-2 text-center w-24 border-r">Nyeri Perut Hebat</th>
+                              <th className="py-2.5 px-2 text-center w-28 border-r">Cairan Berbau/Banyak</th>
+                              <th className="py-2.5 px-2 text-center w-28 border-r">Nyeri Kencing/Gatal</th>
+                              <th className="py-2.5 px-2 text-center">Diare Berulang</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-base-border/10 font-medium">
+                            {weeks.map((week) => {
+                              const record = weeklyLogs.find((l: any) => l.week_number === week) || {};
+                              const isFetalMovementDisabled = week < 24;
+
+                              return (
+                                <tr key={week} className="hover:bg-base-bg/15 transition-colors">
+                                  <td className="py-3 px-4 font-extrabold text-brand-primary text-center sticky left-0 bg-base-white z-10 border-r border-base-border/20 shadow-[2px_0_5px_rgba(0,0,0,0.05)]">
+                                    Minggu {week}
+                                  </td>
+                                  
+                                  <td className="py-3 px-2 text-center border-r">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.check_pregnancy}
+                                      onChange={() => handleToggleWeekly(week, "check_pregnancy")}
+                                      className="w-4 h-4 rounded text-brand-primary border-base-border/40 focus:ring-brand-primary/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r border-base-border/20">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.check_class}
+                                      onChange={() => handleToggleWeekly(week, "check_class")}
+                                      className="w-4 h-4 rounded text-brand-primary border-base-border/40 focus:ring-brand-primary/20 cursor-pointer"
+                                    />
+                                  </td>
+
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.fever}
+                                      onChange={() => handleToggleWeekly(week, "fever")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.headache}
+                                      onChange={() => handleToggleWeekly(week, "headache")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.insomnia}
+                                      onChange={() => handleToggleWeekly(week, "insomnia")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.cough}
+                                      onChange={() => handleToggleWeekly(week, "cough")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    {isFetalMovementDisabled ? (
+                                      <span className="text-[10px] text-base-text-secondary/40 font-semibold">-</span>
+                                    ) : (
+                                      <input
+                                        type="checkbox"
+                                        checked={!!record.fetal_movement}
+                                        onChange={() => handleToggleWeekly(week, "fetal_movement")}
+                                        className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                      />
+                                    )}
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.stomach_pain}
+                                      onChange={() => handleToggleWeekly(week, "stomach_pain")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.fluid_discharge}
+                                      onChange={() => handleToggleWeekly(week, "fluid_discharge")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center border-r bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.urination_pain}
+                                      onChange={() => handleToggleWeekly(week, "urination_pain")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="py-3 px-2 text-center bg-status-red-light/5">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!record.diarrhea}
+                                      onChange={() => handleToggleWeekly(week, "diarrhea")}
+                                      className="w-4 h-4 rounded text-status-red-solid border-base-border/40 focus:ring-status-red-solid/20 cursor-pointer"
+                                    />
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      {/* Warning Notice */}
+                      <div className="bg-status-red-light/10 border border-status-red-solid/15 rounded-xl p-3.5 flex items-start gap-2.5 text-status-red-solid text-[11px] leading-relaxed">
+                        <span className="text-sm">⚠️</span>
+                        <p className="font-medium text-xs">
+                          <strong>PENTING:</strong> Jika Ibu hamil mencentang salah satu gejala pada kolom <strong>Pemantauan Gejala / Kondisi</strong>, segeralah berkonsultasi ke bidan posyandu atau periksa ke Puskesmas/Rumah Sakit terdekat untuk penanganan medis dini.
+                        </p>
                       </div>
                     </div>
                   );

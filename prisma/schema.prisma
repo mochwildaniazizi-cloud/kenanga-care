@@ -27,6 +27,7 @@ model Mother {
   children             Child[]
   maternal_records     MaternalHealthRecord[]
   ttd_logs             TtdLog[]
+  weekly_monitorings   WeeklyMonitoring[]
 
   // Additional Identity fields from Buku KIA 2024
   jkn_number                 String?
@@ -200,4 +201,27 @@ model TtdLog {
 
   @@unique([mother_id, intake_date])
   @@map("ttd_logs")
+}
+
+model WeeklyMonitoring {
+  monitoring_id    String   @id @default(uuid())
+  mother_id        String
+  week_number      Int      // 4 to 42
+  check_pregnancy  Boolean  @default(false)
+  check_class      Boolean  @default(false)
+  fever            Boolean  @default(false)
+  headache         Boolean  @default(false)
+  insomnia         Boolean  @default(false)
+  cough            Boolean  @default(false)
+  fetal_movement   Boolean  @default(false)
+  stomach_pain     Boolean  @default(false)
+  fluid_discharge  Boolean  @default(false)
+  urination_pain   Boolean  @default(false)
+  diarrhea         Boolean  @default(false)
+  created_at       DateTime @default(now())
+
+  mother           Mother   @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
+
+  @@unique([mother_id, week_number])
+  @@map("weekly_monitoring")
 }
