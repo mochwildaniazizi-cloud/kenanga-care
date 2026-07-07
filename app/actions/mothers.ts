@@ -719,6 +719,18 @@ export async function updateUserAvatar(username: string, base64Avatar: string) {
   }
 }
 
+export async function getLoggedInMotherDetail(username: string) {
+  try {
+    if (!username) return null;
+    const loggedIn = await getLoggedInMotherData(username);
+    if (!loggedIn) return null;
+    return await getMotherDetail(loggedIn.mother_id);
+  } catch (err) {
+    console.error("Error in getLoggedInMotherDetail:", err);
+    return null;
+  }
+}
+
 
 
 

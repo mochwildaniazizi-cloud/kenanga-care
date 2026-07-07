@@ -384,8 +384,45 @@ export default function DataAnakPage() {
   if (role === "ibu") {
     if (isLoadingChildDetail) {
       return (
-        <div className="min-h-[50vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-pulse">
+          {/* Child Tabs Skeleton */}
+          <div className="flex bg-base-white p-1 rounded-2xl border border-base-border/30 max-w-xs shadow-sm h-12">
+            <div className="flex-1 bg-gray-100 rounded-xl m-1"></div>
+            <div className="flex-1 bg-gray-50 rounded-xl m-1"></div>
+          </div>
+
+          {/* Child Identity Card Skeleton */}
+          <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 h-28">
+            <div className="flex items-center gap-4 w-full">
+              <div className="w-16 h-16 rounded-full bg-gray-200 shrink-0"></div>
+              <div className="space-y-2 w-full max-w-sm">
+                <div className="h-6 w-48 bg-gray-200 rounded"></div>
+                <div className="h-4 w-64 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Grid Stats Bento Skeleton */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-base-white p-5 rounded-bento-lg border border-base-border/30 h-28 flex flex-col justify-between">
+                <div className="h-4 w-12 bg-gray-100 rounded"></div>
+                <div className="h-6 w-20 bg-gray-100 rounded"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Graphic and Table Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-base-white rounded-bento-lg p-6 border border-base-border/30 h-80">
+              <div className="h-5 w-48 bg-gray-100 rounded"></div>
+              <div className="h-full mt-4 bg-gray-50 rounded"></div>
+            </div>
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 h-80">
+              <div className="h-5 w-48 bg-gray-100 rounded"></div>
+              <div className="h-full mt-4 bg-gray-50 rounded"></div>
+            </div>
+          </div>
         </div>
       );
     }

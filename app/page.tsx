@@ -9,7 +9,7 @@ import { MdPregnantWoman, MdChildFriendly, MdCalendarMonth, MdOutlineScale, MdSp
 import { FaBaby, FaNotesMedical, FaBookOpen } from "react-icons/fa";
 import Link from "next/link";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
 import LandingPage from "@/components/LandingPage";
 import { getSchedules } from "@/app/actions/schedule";
 import PWAInstallBanner from "@/components/PWAInstallBanner";
@@ -106,9 +106,8 @@ export default function DashboardPage() {
         }
 
         if (role === "ibu") {
-          const loggedInMother = await getLoggedInMotherData(username);
-          if (loggedInMother) {
-            const detail = await getMotherDetail(loggedInMother.mother_id);
+          const detail = await getLoggedInMotherDetail(username);
+          if (detail) {
             setMotherDetail(detail);
             localStorage.setItem("mother_dashboard_detail", JSON.stringify(detail));
           }
@@ -172,11 +171,65 @@ export default function DashboardPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[500px]">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
-      </div>
-    );
+    if (role === "ibu") {
+      return (
+        <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-pulse">
+          {/* Welcome Jumbotron Skeleton */}
+          <div className="bg-gray-100 rounded-bento-lg p-6 md:p-8 border border-base-border/20 h-40">
+            <div className="h-4 w-24 bg-gray-200 rounded"></div>
+            <div className="h-8 w-64 bg-gray-200 rounded mt-4"></div>
+            <div className="h-4 w-96 bg-gray-200 rounded mt-2"></div>
+          </div>
+
+          {/* Schedule Banner Skeleton */}
+          <div className="bg-base-white border border-base-border/20 rounded-bento-lg p-5 flex items-center justify-between gap-4 h-24">
+            <div className="flex items-center gap-4 w-full">
+              <div className="w-12 h-12 rounded-xl bg-gray-200 shrink-0"></div>
+              <div className="space-y-2 w-full max-w-sm">
+                <div className="h-3 w-32 bg-gray-200 rounded"></div>
+                <div className="h-5 w-48 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stat Cards Grid Skeleton */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-base-white p-6 rounded-bento-lg border border-base-border/30 h-28 flex flex-col justify-between">
+                <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                <div className="h-6 w-20 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    } else {
+      // Kader Skeleton
+      return (
+        <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-pulse">
+          {/* Schedule Banner Skeleton */}
+          <div className="bg-base-white border border-base-border/20 rounded-bento-lg p-5 flex items-center justify-between gap-4 h-24">
+            <div className="flex items-center gap-4 w-full">
+              <div className="w-12 h-12 rounded-xl bg-gray-200 shrink-0"></div>
+              <div className="space-y-2 w-full max-w-sm">
+                <div className="h-3 w-32 bg-gray-200 rounded"></div>
+                <div className="h-5 w-48 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stat Cards Grid Skeleton */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-base-white p-6 rounded-bento-lg border border-base-border/30 h-28 flex flex-col justify-between">
+                <div className="h-4 w-12 bg-gray-200 rounded"></div>
+                <div className="h-6 w-20 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
   }
 
   // --- MOTHER DASHBOARD VIEW ---
