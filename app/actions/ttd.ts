@@ -1,13 +1,13 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export async function getTtdLogs(motherId: string, year: number, month: number) {
   try {
     const startDate = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
     const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
 
-    const logs = await prisma.ttdLog.findMany({
+    const logs = await (prisma as any).ttdLog.findMany({
       where: {
         mother_id: motherId,
         intake_date: {
@@ -20,7 +20,7 @@ export async function getTtdLogs(motherId: string, year: number, month: number) 
       },
     });
 
-    return logs.map(l => ({
+    return logs.map((l: any) => ({
       log_id: l.log_id,
       mother_id: l.mother_id,
       intake_date: l.intake_date.toISOString().split("T")[0],
@@ -44,7 +44,7 @@ export async function upsertTtdLog(
   try {
     const intakeDate = new Date(dateStr + "T00:00:00.000Z");
 
-    const existing = await prisma.ttdLog.findFirst({
+    const existing = await (prisma as any).ttdLog.findFirst({
       where: {
         mother_id: motherId,
         intake_date: intakeDate,
@@ -52,7 +52,7 @@ export async function upsertTtdLog(
     });
 
     if (existing) {
-      const updated = await prisma.ttdLog.update({
+      const updated = await (prisma as any).ttdLog.update({
         where: {
           log_id: existing.log_id,
         },
@@ -64,7 +64,7 @@ export async function upsertTtdLog(
       });
       return { success: true, log: updated };
     } else {
-      const created = await prisma.ttdLog.create({
+      const created = await (prisma as any).ttdLog.create({
         data: {
           mother_id: motherId,
           intake_date: intakeDate,
