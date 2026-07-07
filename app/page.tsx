@@ -5,7 +5,8 @@ import { getDashboardStats, getRecentChildActivity, getRecentMotherActivity } fr
 import ActivityTableCard from "@/components/ActivityTableCard";
 import { StatusType } from "@/components/StatusBadge";
 import { PiBabyFill } from "react-icons/pi";
-import { MdPregnantWoman, MdChildFriendly, MdCalendarMonth, MdOutlineScale, MdSpeed, MdFavorite, MdHelpOutline, MdScale, MdHeight, MdMonitorWeight } from "react-icons/md";
+import { getTtdLogs, upsertTtdLog } from "@/app/actions/ttd";
+import { MdPregnantWoman, MdChildFriendly, MdCalendarMonth, MdOutlineScale, MdSpeed, MdFavorite, MdHelpOutline, MdScale, MdHeight, MdMonitorWeight, MdVaccines, MdCheckCircle } from "react-icons/md";
 import { FaBaby, FaNotesMedical, FaBookOpen } from "react-icons/fa";
 import Link from "next/link";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -44,6 +45,9 @@ export default function DashboardPage() {
   // Mother dashboard state
   const [motherDetail, setMotherDetail] = useState<any>(null);
   const [nextSchedule, setNextSchedule] = useState<any>(null);
+  const [hasTakenTtdToday, setHasTakenTtdToday] = useState(false);
+  const [ttdCompanionName, setTtdCompanionName] = useState("");
+  const [ttdRelationshipName, setTtdRelationshipName] = useState("Suami");
 
   // Load cached data immediately on mount/role change to ensure 0ms load speed
   useEffect(() => {
@@ -156,6 +160,112 @@ export default function DashboardPage() {
     const date = new Date(dateString);
     const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
+  useEffect(() => {
+    if (role !== "ibu" || !motherDetail) return;
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const cacheKey = `offline_ttd_logs_${motherDetail.mother_id}_${currentYear}_${currentMonth}`;
+
+    // Read from cache first
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        const logs = parsed.logs || [];
+        const isTaken = logs.some((l: any) => l.intake_date === dateStr && l.taken);
+        setHasTakenTtdToday(isTaken);
+        setTtdCompanionName(parsed.companion || "");
+        setTtdRelationshipName(parsed.relationship || "Suami");
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Read from DB
+    if (navigator.onLine) {
+      getTtdLogs(motherDetail.mother_id, currentYear, currentMonth).then((res) => {
+        if (res && res.success) {
+          const logs = res.logs;
+          const isTaken = logs.some((l: any) => l.intake_date === dateStr && l.taken);
+          setHasTakenTtdToday(isTaken);
+          
+          const latestLog = logs.find((l: any) => l.companion);
+          const companion = latestLog?.companion || localStorage.getItem(`ttd_companion_${motherDetail.mother_id}`) || "";
+          const relationship = latestLog?.relationship || localStorage.getItem(`ttd_relationship_${motherDetail.mother_id}`) || "Suami";
+          
+          if (companion) setTtdCompanionName(companion);
+          if (relationship) setTtdRelationshipName(relationship);
+
+          localStorage.setItem(cacheKey, JSON.stringify({
+            logs,
+            companion,
+            relationship
+          }));
+        }
+      });
+    }
+  }, [role, motherDetail]);
+
+  const handleToggleTtdDashboard = async () => {
+    if (!motherDetail) return;
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const cacheKey = `offline_ttd_logs_${motherDetail.mother_id}_${currentYear}_${currentMonth}`;
+
+    const newTakenState = !hasTakenTtdToday;
+    setHasTakenTtdToday(newTakenState);
+
+    // Save to localStorage companion info
+    localStorage.setItem(`ttd_companion_${motherDetail.mother_id}`, ttdCompanionName);
+    localStorage.setItem(`ttd_relationship_${motherDetail.mother_id}`, ttdRelationshipName);
+
+    // Read cached logs to update
+    let logs = [];
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        logs = parsed.logs || [];
+      } catch (e) {}
+    }
+
+    const logIndex = logs.findIndex((l: any) => l.intake_date === dateStr);
+    if (logIndex >= 0) {
+      logs[logIndex] = {
+        ...logs[logIndex],
+        taken: newTakenState,
+        companion: ttdCompanionName,
+        relationship: ttdRelationshipName
+      };
+    } else {
+      logs.push({
+        intake_date: dateStr,
+        taken: newTakenState,
+        companion: ttdCompanionName,
+        relationship: ttdRelationshipName
+      });
+    }
+
+    localStorage.setItem(cacheKey, JSON.stringify({
+      logs,
+      companion: ttdCompanionName,
+      relationship: ttdRelationshipName
+    }));
+
+    if (navigator.onLine) {
+      try {
+        await upsertTtdLog(motherDetail.mother_id, dateStr, newTakenState, ttdCompanionName, ttdRelationshipName);
+      } catch (err) {
+        console.error(err);
+      }
+    }
   };
 
   if (!isInitialized) {
@@ -286,6 +396,47 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* TTD Daily Checklist Quick Action */}
+        <div className="bg-base-white border border-base-border/30 rounded-bento-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${hasTakenTtdToday ? "bg-status-green-light text-status-green-solid" : "bg-brand-soft text-brand-primary animate-pulse"}`}>
+              <MdVaccines className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold text-base-text-secondary uppercase tracking-wider block">
+                Pemantauan Tablet Tambah Darah (TTD)
+              </span>
+              <h4 className="font-extrabold text-sm text-base-text-primary mt-1">
+                {hasTakenTtdToday ? "Luar biasa! Ibu sudah minum TTD hari ini." : "Apakah Ibu sudah meminum TTD hari ini?"}
+              </h4>
+              <p className="text-xs text-base-text-secondary mt-0.5">
+                {hasTakenTtdToday 
+                  ? "Apresiasi untuk kedisiplinan Ibu demi kesehatan calon bayi." 
+                  : "Mencegah anemia & mendukung tumbuh kembang janin sejak dini."}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 justify-end">
+            <button
+              type="button"
+              onClick={handleToggleTtdDashboard}
+              className={`px-4.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer w-full sm:w-auto text-center border shadow-sm ${
+                hasTakenTtdToday
+                  ? "bg-status-green-light text-status-green-solid border-status-green-solid/35 hover:bg-status-green-solid hover:text-base-white"
+                  : "bg-brand-primary text-base-white border-brand-primary hover:bg-status-pink-dark"
+              }`}
+            >
+              {hasTakenTtdToday ? "✓ Sudah Diminum" : "Belum, Tandai Sudah Minum"}
+            </button>
+            <Link 
+              href="/data-ibu"
+              className="text-xs font-bold text-brand-primary hover:underline whitespace-nowrap px-2"
+            >
+              Lihat Kalender →
+            </Link>
+          </div>
+        </div>
 
         {/* --- MOTHER STAT CARDS --- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

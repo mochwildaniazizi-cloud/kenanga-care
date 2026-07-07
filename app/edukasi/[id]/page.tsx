@@ -854,43 +854,219 @@ function getMockContent(id: string, title: string): string {
       </ul>
     `;
   }
-
   if (id === "L5") {
     return `
-      <p>Ibu hamil trimester 1 wajib mengenali gejala abnormal pada tubuhnya agar dapat segera ditangani oleh dokter atau bidan sebelum membahayakan nyawa ibu dan janin.</p>
+      <p class="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Ibu hamil trimester pertama (usia kehamilan 1-12 minggu) wajib mengenali dan mewaspadai berbagai tanda bahaya, serta memahami tata cara perawatan sehari-hari dan larangan aktivitas fisik sesuai standar panduan Buku KIA 2024 Halaman 8 dan 9.
+      </p>
 
-      <div class="bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg">
-        <h3 class="text-red-800 font-bold text-sm">⚠️ Tanda Bahaya Kehamilan Trimester 1 (Segera ke Puskesmas/RS)</h3>
-        <ul class="list-disc pl-5 text-xs text-red-700 space-y-1 mt-2">
-          <li><strong>Demam Tinggi:</strong> Suhu tubuh ibu di atas 38°C dapat memicu keguguran atau cacat lahir janin.</li>
-          <li><strong>Nyeri Perut Hebat:</strong> Kram perut bagian bawah yang luar biasa bisa menjadi tanda kehamilan di luar kandungan (ektopik).</li>
-          <li><strong>Mual & Muntah Hebat:</strong> Mengalami muntah terus-menerus hingga tidak ada makanan/minuman yang masuk (Hiperemesis Gravidarum).</li>
-          <li><strong>Perdarahan Pervaginam:</strong> Keluar darah segar dari jalan lahir, baik flek maupun darah haid (ancaman keguguran).</li>
-          <li><strong>Nyeri Saat Kencing / Keputihan Gatal:</strong> Tanda infeksi saluran kemih atau infeksi jamur kelamin yang wajib segera diobati bidan.</li>
-        </ul>
+      <h2 class="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        Tanda Bahaya Pada Trimester 1 (Segera ke Puskesmas/Rumah Sakit)
+      </h2>
+      <p class="text-xs text-base-text-secondary mb-4 italic">* Segera bawa ibu hamil periksa ke dokter/bidan jika mengalami salah satu gejala di bawah ini:</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <!-- Demam Tinggi -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/25 rounded-2xl p-4 flex flex-col items-center text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-status-red-solid/10 text-status-red-solid flex items-center justify-center">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h4 class="font-extrabold text-xs text-base-text-primary">Demam Tinggi</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed">Suhu tubuh di atas 38°C bisa menandakan infeksi sistemik yang berbahaya bagi janin.</p>
+        </div>
+
+        <!-- Nyeri Perut Hebat -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/25 rounded-2xl p-4 flex flex-col items-center text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-status-red-solid/10 text-status-red-solid flex items-center justify-center">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          </div>
+          <h4 class="font-extrabold text-xs text-base-text-primary">Nyeri Perut Hebat</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed">Kram perut bawah yang sangat menusuk berisiko keguguran atau kehamilan ektopik.</p>
+        </div>
+
+        <!-- Mual & Muntah Hebat -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/25 rounded-2xl p-4 flex flex-col items-center text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-status-red-solid/10 text-status-red-solid flex items-center justify-center">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h4 class="font-extrabold text-xs text-base-text-primary">Mual & Muntah Berlebih</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed">Muntah terus menerus hingga tubuh lemas dan cairan terbuang (Hiperemesis Gravidarum).</p>
+        </div>
+
+        <!-- Perdarahan -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/25 rounded-2xl p-4 flex flex-col items-center text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-status-red-solid/10 text-status-red-solid flex items-center justify-center">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          </div>
+          <h4 class="font-extrabold text-xs text-base-text-primary">Perdarahan / Flek Darah</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed">Keluar flek atau darah merah segar dari jalan lahir, tanda ancaman keguguran.</p>
+        </div>
+
+        <!-- Sakit Saat Kencing / Keputihan Gatal -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/25 rounded-2xl p-4 flex flex-col items-center text-center space-y-3 sm:col-span-2 md:col-span-1">
+          <div class="w-12 h-12 rounded-full bg-status-red-solid/10 text-status-red-solid flex items-center justify-center">
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          </div>
+          <h4 class="font-extrabold text-xs text-base-text-primary">Keluhan Organ Intim</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed">Nyeri saat kencing, keputihan berlebih, gatal, atau berbau di daerah kewanitaan.</p>
+        </div>
       </div>
 
-      <h2>Perawatan Sehari-hari & Larangan Selama Kehamilan</h2>
-      <p>Terapkan pola hidup sehat berikut ini demi perkembangan bayi Anda:</p>
+      <h2 class="text-lg font-extrabold text-status-orange-solid border-b pb-2 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Masalah Lain Pada Kehamilan
+      </h2>
+      <p class="text-xs text-base-text-secondary mb-4 italic">* Laporkan segera kepada kader, bidan, atau dokter bila menemui kondisi berikut:</p>
       
-      <h3>Yang Harus Dilakukan:</h3>
-      <ol>
-        <li>Menjaga kebersihan diri dengan mandi teratur dan mencuci tangan pakai sabun di air mengalir sebelum makan.</li>
-        <li>Istirahat yang cukup: Tidur malam minimal 6-7 jam dan tidur siang selama 1-2 jam.</li>
-        <li>Merangsang pertumbuhan janin dengan sering mengelus perut dan mengajaknya berbicara sejak dini.</li>
-        <li>Hubungan suami istri diperbolehkan selama kondisi kehamilan sehat dan tidak ada riwayat pendarahan.</li>
-      </ol>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 mb-8">
+        <!-- Batuk Lama -->
+        <div class="bg-status-orange-light/10 border border-status-orange-solid/20 rounded-xl p-3 text-center flex flex-col items-center">
+          <svg class="w-6 h-6 text-status-orange-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span class="font-bold text-[11px] text-base-text-primary">Batuk Lama</span>
+          <span class="text-[10px] text-base-text-secondary mt-1">Batuk terus menerus lebih dari 2 minggu.</span>
+        </div>
+        <!-- Demam Menggigil -->
+        <div class="bg-status-orange-light/10 border border-status-orange-solid/20 rounded-xl p-3 text-center flex flex-col items-center">
+          <svg class="w-6 h-6 text-status-orange-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="font-bold text-[11px] text-base-text-primary">Demam Menggigil</span>
+          <span class="text-[10px] text-base-text-secondary mt-1">Gejala khas infeksi malaria (terutama daerah endemis).</span>
+        </div>
+        <!-- Diare Berulang -->
+        <div class="bg-status-orange-light/10 border border-status-orange-solid/20 rounded-xl p-3 text-center flex flex-col items-center">
+          <svg class="w-6 h-6 text-status-orange-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          <span class="font-bold text-[11px] text-base-text-primary">Diare Berulang</span>
+          <span class="text-[10px] text-base-text-secondary mt-1">Buang air besar cair berkali-kali, berisiko dehidrasi.</span>
+        </div>
+        <!-- Jantung Berdebar -->
+        <div class="bg-status-orange-light/10 border border-status-orange-solid/20 rounded-xl p-3 text-center flex flex-col items-center">
+          <svg class="w-6 h-6 text-status-orange-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+          <span class="font-bold text-[11px] text-base-text-primary">Jantung Berdebar</span>
+          <span class="text-[10px] text-base-text-secondary mt-1">Jantung terasa terpompa kencang / nyeri dada.</span>
+        </div>
+        <!-- Cemas & Sulit Tidur -->
+        <div class="bg-status-orange-light/10 border border-status-orange-solid/20 rounded-xl p-3 text-center flex flex-col items-center">
+          <svg class="w-6 h-6 text-status-orange-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+          <span class="font-bold text-[11px] text-base-text-primary">Cemas Berlebih</span>
+          <span class="text-[10px] text-base-text-secondary mt-1">Kecemasan psikologis tinggi & sulit tidur malam.</span>
+        </div>
+      </div>
 
-      <h3>Hal yang Tidak Boleh Dilakukan:</h3>
-      <ul>
-        <li>❌ Minum obat tanpa resep dokter atau bidan (risiko kecacatan janin).</li>
-        <li>❌ Merokok atau terpapar asap rokok (risiko bayi lahir dengan berat rendah/prematur).</li>
-        <li>❌ Mengonsumsi alkohol atau jamu tradisional tanpa pengawasan medis.</li>
-        <li>❌ Mengalami stres berlebihan dan tidur telentang lebih dari 10 menit pada trimester lanjut.</li>
-      </ul>
+      <h2 class="text-lg font-extrabold text-status-blue-solid border-b pb-2 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Perawatan Sehari-hari Ibu Hamil
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-xs font-semibold text-base-text-primary">
+        <div class="flex gap-3 bg-brand-soft/20 border border-brand-primary/10 p-4.5 rounded-2xl items-start">
+          <span class="w-6 h-6 rounded-full bg-brand-primary text-base-white flex items-center justify-center shrink-0 font-extrabold">1</span>
+          <div>
+            <h4 class="font-bold text-xs">Menjaga Kebersihan Diri</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-1 leading-relaxed">Mandi teratur, cuci tangan pakai sabun di air mengalir sebelum makan, serta ganti pakaian dan pakaian dalam secara teratur.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 bg-brand-soft/20 border border-brand-primary/10 p-4.5 rounded-2xl items-start">
+          <span class="w-6 h-6 rounded-full bg-brand-primary text-base-white flex items-center justify-center shrink-0 font-extrabold">2</span>
+          <div>
+            <h4 class="font-bold text-xs">Istirahat Cukup</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-1 leading-relaxed">Tidur malam minimal 6 - 7 jam dan tidur siang santai sekitar 1 - 2 jam demi mengurangi ketegangan fisik ibu.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 bg-brand-soft/20 border border-brand-primary/10 p-4.5 rounded-2xl items-start">
+          <span class="w-6 h-6 rounded-full bg-brand-primary text-base-white flex items-center justify-center shrink-0 font-extrabold">3</span>
+          <div>
+            <h4 class="font-bold text-xs">Stimulasi Perkembangan Bayi</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-1 leading-relaxed">Sering ajak janin berbicara, bersenandung, dan berikan sentuhan/usapan hangat pada perut ibu secara rutin.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 bg-brand-soft/20 border border-brand-primary/10 p-4.5 rounded-2xl items-start">
+          <span class="w-6 h-6 rounded-full bg-brand-primary text-base-white flex items-center justify-center shrink-0 font-extrabold">4</span>
+          <div>
+            <h4 class="font-bold text-xs">Hubungan Suami Istri</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-1 leading-relaxed">Boleh dilakukan selama kondisi kehamilan sehat, tidak ada riwayat keguguran berulang, flek darah, atau ketuban pecah dini.</p>
+          </div>
+        </div>
+      </div>
 
-      <h3>Aktivitas Fisik yang Dilarang:</h3>
-      <p>Hindari berjongkok terlalu lama, melompat, mengangkat beban berat, membungkuk tanpa pegangan, serta olahraga yang berisiko mengganggu keseimbangan tubuh.</p>
+      <h2 class="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Hal yang DILARANG Selama Kehamilan
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-8">
+        <!-- Minum Obat Tanpa Resep -->
+        <div class="bg-base-white border border-status-red-solid/20 rounded-xl p-3 text-center flex flex-col items-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-status-red-solid/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-8 h-8 text-status-red-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          <span class="font-extrabold text-[10px] text-base-text-primary leading-tight">Obat Tanpa Resep</span>
+          <p class="text-[9px] text-base-text-secondary mt-1 leading-tight">Bisa memicu cacat bawaan lahir.</p>
+        </div>
+        <!-- Kerja Berat -->
+        <div class="bg-base-white border border-status-red-solid/20 rounded-xl p-3 text-center flex flex-col items-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-status-red-solid/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-8 h-8 text-status-red-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          <span class="font-extrabold text-[10px] text-base-text-primary leading-tight">Kerja Berat / Lelah</span>
+          <p class="text-[9px] text-base-text-secondary mt-1 leading-tight">Memicu stres janin & kontraksi dini.</p>
+        </div>
+        <!-- Merokok -->
+        <div class="bg-base-white border border-status-red-solid/20 rounded-xl p-3 text-center flex flex-col items-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-status-red-solid/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-8 h-8 text-status-red-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          <span class="font-extrabold text-[10px] text-base-text-primary leading-tight">Merokok / Asap</span>
+          <p class="text-[9px] text-base-text-secondary mt-1 leading-tight">Berat bayi lahir rendah (BBLR).</p>
+        </div>
+        <!-- Alkohol & Jamu -->
+        <div class="bg-base-white border border-status-red-solid/20 rounded-xl p-3 text-center flex flex-col items-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-status-red-solid/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-8 h-8 text-status-red-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          <span class="font-extrabold text-[10px] text-base-text-primary leading-tight">Alkohol & Jamu</span>
+          <p class="text-[9px] text-base-text-secondary mt-1 leading-tight">Gangguan saraf janin & kerusakan hati.</p>
+        </div>
+        <!-- Stres Berlebihan -->
+        <div class="bg-base-white border border-status-red-solid/20 rounded-xl p-3 text-center flex flex-col items-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-status-red-solid/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-8 h-8 text-status-red-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          <span class="font-extrabold text-[10px] text-base-text-primary leading-tight">Stres Berlebihan</span>
+          <p class="text-[9px] text-base-text-secondary mt-1 leading-tight">Mengganggu suplai darah & nutrisi.</p>
+        </div>
+        <!-- Tidur Telentang >10m -->
+        <div class="bg-base-white border border-status-red-solid/20 rounded-xl p-3 text-center flex flex-col items-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-status-red-solid/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <svg class="w-8 h-8 text-status-red-solid mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          <span class="font-extrabold text-[10px] text-base-text-primary leading-tight">Tidur Telentang</span>
+          <p class="text-[9px] text-base-text-secondary mt-1 leading-tight">Trimester 2 & 3: risiko janin kurang oksigen.</p>
+        </div>
+      </div>
+
+      <h2 class="text-lg font-extrabold text-status-orange-solid border-b pb-2 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+        Aktivitas Fisik yang DILARANG Selama Hamil
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3.5 mb-6 text-xs text-center font-bold text-base-text-primary">
+        <div class="p-4 bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full border-2 border-status-red-solid flex items-center justify-center text-status-red-solid font-extrabold mb-3">🚷</div>
+          <h4>Jongkok Terlalu Lama</h4>
+        </div>
+        <div class="p-4 bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full border-2 border-status-red-solid flex items-center justify-center text-status-red-solid font-extrabold mb-3">🚷</div>
+          <h4>Melompat & Hentakan</h4>
+        </div>
+        <div class="p-4 bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full border-2 border-status-red-solid flex items-center justify-center text-status-red-solid font-extrabold mb-3">🚷</div>
+          <h4>Olahraga Keseimbangan</h4>
+        </div>
+        <div class="p-4 bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full border-2 border-status-red-solid flex items-center justify-center text-status-red-solid font-extrabold mb-3">🚷</div>
+          <h4>Membungkuk Tanpa Pegangan</h4>
+        </div>
+        <div class="p-4 bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl flex flex-col items-center">
+          <div class="w-10 h-10 rounded-full border-2 border-status-red-solid flex items-center justify-center text-status-red-solid font-extrabold mb-3">🚷</div>
+          <h4>Mengejan Sangat Kuat</h4>
+        </div>
+      </div>
+
+      <div class="bg-brand-soft/20 border border-brand-primary/10 p-4.5 rounded-2xl text-xs font-semibold text-brand-primary">
+        <h4 class="font-extrabold text-sm mb-1.5 flex items-center gap-1.5"><span class="text-base text-brand-primary">💡</span> Saran Latihan Fisik Trimester 1</h4>
+        <p class="text-base-text-secondary leading-relaxed font-medium">Ibu diperbolehkan (dan disarankan) melakukan latihan fisik ringan seperti pemanasan, peregangan lembut, senam panggul, pendinginan, serta jalan kaki santai untuk menjaga stamina kehamilan.</p>
+      </div>
     `;
   }
 
