@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import { UserRoleProvider } from "@/context/UserRoleContext";
 import SWRegister from "@/components/SWRegister";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,10 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* HEADER COMPONENT */}
             <Header />
             
-            {/* DYNAMIC CONTENT AREA (Halaman page.tsx akan muncul di sini) */}
-            <main className="flex-1 overflow-y-auto bg-surface p-4 sm:p-8 pt-4 pb-24 lg:pb-8">
+            {/* DYNAMIC CONTENT AREA WITH PULL TO REFRESH */}
+            <PullToRefresh>
               {children}
-            </main>
+            </PullToRefresh>
             
           </div>
 
