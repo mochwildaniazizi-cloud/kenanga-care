@@ -410,6 +410,14 @@ export default function DataIbuPage() {
     return (
       <div className="space-y-6 max-w-[1600px] mx-auto pb-28 lg:pb-10 animate-in fade-in duration-300">
         
+        {/* Offline Warning Banner */}
+        {!navigator.onLine && (
+          <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
+            <span className="text-sm">⚠️</span>
+            <span>Mode Offline: Menampilkan data cadangan lokal dari Beranda. Sambungkan ke internet untuk menyinkronkan data pemeriksaan terbaru.</span>
+          </div>
+        )}
+
         {/* Header Profil */}
         <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">

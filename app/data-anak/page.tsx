@@ -137,15 +137,40 @@ export default function DataAnakPage() {
       if (role !== "ibu") return;
       const cacheKey = `offline_mother_children_${username}`;
       const cached = localStorage.getItem(cacheKey);
+      let parsedChildren: any[] = [];
+      
       if (cached) {
         try {
-          const parsed = JSON.parse(cached);
-          setMotherChildren(parsed);
-          if (parsed.length > 0 && !selectedChildId) {
-            setSelectedChildId(parsed[0].child_id);
-          }
+          parsedChildren = JSON.parse(cached);
         } catch (e) {
           console.error("Failed to parse cached mother children:", e);
+        }
+      }
+
+      // Fallback to mother_dashboard_detail if cache is empty
+      if (parsedChildren.length === 0) {
+        const dashboardCached = localStorage.getItem("mother_dashboard_detail");
+        if (dashboardCached) {
+          try {
+            const parsed = JSON.parse(dashboardCached);
+            if (parsed.children && parsed.children.length > 0) {
+              parsedChildren = parsed.children.map((c: any) => ({
+                child_id: c.child_id,
+                child_name: c.name || c.child_name || "-",
+                gender: c.gender,
+                birth_date: c.birth_date,
+              }));
+            }
+          } catch (e) {
+            console.error("Failed to parse fallback dashboard details:", e);
+          }
+        }
+      }
+
+      if (parsedChildren.length > 0) {
+        setMotherChildren(parsedChildren);
+        if (!selectedChildId) {
+          setSelectedChildId(parsedChildren[0].child_id);
         }
       }
 
@@ -181,13 +206,56 @@ export default function DataAnakPage() {
       if (!selectedChildId) return;
       const cacheKey = `offline_child_detail_${selectedChildId}`;
       const cached = localStorage.getItem(cacheKey);
+      let foundDetail: any = null;
+
       if (cached) {
         try {
-          setSelectedChildDetail(JSON.parse(cached));
-          setIsLoadingChildDetail(false);
+          foundDetail = JSON.parse(cached);
         } catch (e) {
           console.error("Failed to parse cached child detail:", e);
         }
+      }
+
+      // Fallback to mother_dashboard_detail children list
+      if (!foundDetail) {
+        const dashboardCached = localStorage.getItem("mother_dashboard_detail");
+        if (dashboardCached) {
+          try {
+            const parsed = JSON.parse(dashboardCached);
+            const match = parsed.children.find((c: any) => c.child_id === selectedChildId);
+            if (match) {
+              foundDetail = {
+                child_id: match.child_id,
+                national_id: match.national_id || "-",
+                name: match.name || match.child_name,
+                birth_order: match.birth_order || "-",
+                birth_place: match.birth_place || "-",
+                dob: match.dob || match.birth_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(match.birth_date || match.dob)) : "-",
+                gender: match.gender,
+                avatarUrl: match.avatarUrl || null,
+                birth_weight: match.birth_weight || 0,
+                birth_length: match.birth_length || 0,
+                current_weight: match.current_weight || 0,
+                current_height: match.current_height || 0,
+                ageInMonths: parseInt(match.age) || 0,
+                blood_type: match.blood_type || "-",
+                special_conditions: [],
+                special_conditions_notes: "",
+                status: match.status || "Normal",
+                mother_name: parsed.mother_name || parsed.name || "-",
+                measurements: [],
+                isOfflineFallback: true,
+              };
+            }
+          } catch (e) {
+            console.error("Failed to parse child fallback from dashboard cached details:", e);
+          }
+        }
+      }
+
+      if (foundDetail) {
+        setSelectedChildDetail(foundDetail);
+        setIsLoadingChildDetail(false);
       }
 
       if (!navigator.onLine) {
@@ -533,6 +601,14 @@ export default function DataAnakPage() {
     return (
       <div className="space-y-6 max-w-[1600px] mx-auto pb-28 lg:pb-10 animate-in fade-in duration-300">
         
+        {/* Offline Fallback Warning Banner */}
+        {child.isOfflineFallback && (
+          <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
+            <span className="text-sm">⚠️</span>
+            <span>Mode Offline: Menampilkan data cadangan lokal dari Beranda. Sambungkan ke internet untuk melihat grafik & riwayat lengkap.</span>
+          </div>
+        )}
+
         {/* Child Selector Tabs (if multiple children) */}
         {motherChildren.length > 1 && (
           <div className="flex bg-base-white p-1 rounded-2xl border border-base-border/30 max-w-md shadow-sm">
