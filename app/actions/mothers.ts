@@ -94,7 +94,7 @@ export async function getMothersData() {
     const avatars = getCustomAvatars();
     const customMothersAvatars = avatars.mothers || {};
 
-    return mothers.map((mother, index) => {
+    return mothers.map((mother: any, index: number) => {
       const children = mother.children || [];
       const childrenCount = mother.number_of_children || children.length || 0;
       const status = determineMotherStatus(mother.ui_status, childrenCount, children, mother.estimated_due_date);
@@ -147,7 +147,7 @@ export async function getMaternalHistory() {
       },
     });
 
-    return records.map((record, index) => {
+    return records.map((record: any, index: number) => {
       const date = new Intl.DateTimeFormat('id-ID', { 
         day: '2-digit', month: 'long', year: 'numeric' 
       }).format(record.visit_date);
@@ -495,7 +495,7 @@ export async function getLoggedInMotherData(username: string) {
       mother_name: mother.mother_name,
       national_id: mother.national_id,
       avatarUrl: mother.avatarUrl,
-      children: mother.children.map(c => ({
+      children: mother.children.map((c: any) => ({
         child_id: c.child_id,
         child_name: c.child_name,
         gender: c.gender,
