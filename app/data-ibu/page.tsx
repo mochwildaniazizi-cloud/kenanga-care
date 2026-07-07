@@ -546,7 +546,7 @@ export default function DataIbuPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Left Column: Identitas & Kehamilan */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-12 space-y-6">
             
             {/* Card: TABBED BENTO CONTAINER */}
             <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden">
@@ -910,63 +910,6 @@ export default function DataIbuPage() {
               </div>
             </div>
           </div>
-
-            {/* Right Column: Daftar Anak Kandung */}
-          <div className="lg:col-span-6 space-y-6">
-            
-            {/* Card: Daftar Anak Kandung Terhubung */}
-            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 flex flex-col h-full justify-between">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
-                  <div className="flex items-center gap-2">
-                    <FaUserFriends className="w-5 h-5 text-brand-primary" />
-                    <h2 className="font-bold text-base-text-primary text-base">Anak Terdaftar Saya</h2>
-                  </div>
-                  <span className="text-[10px] font-bold bg-brand-soft text-brand-primary border border-brand-primary/20 px-2.5 py-1 rounded-full uppercase">
-                    {motherDetail.children.length} Balita
-                  </span>
-                </div>
-
-                {motherDetail.children.length === 0 ? (
-                  <div className="py-12 border border-dashed border-base-border/50 rounded-2xl text-center text-sm text-base-text-secondary">
-                    Belum ada data anak terdaftar yang terhubung.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {motherDetail.children.map((child: any, idx: number) => (
-                      <div key={idx} className="border border-base-border/30 rounded-xl p-4 bg-base-bg/5 hover:border-brand-primary/40 transition-all flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <p className="font-bold text-base-text-primary leading-tight">{child.name}</p>
-                            {child.gender === "M" ? (
-                              <MdMale className="w-4 h-4 text-status-blue-solid" />
-                            ) : (
-                              <MdFemale className="w-4 h-4 text-brand-primary" />
-                            )}
-                          </div>
-                          <p className="text-xs text-base-text-secondary mt-1">{child.age} &bull; {child.dob}</p>
-                        </div>
-                        <div className="mt-4 pt-3 border-t border-base-border/10 flex justify-end">
-                          <Link 
-                            href={`/data-anak/${child.child_id}`}
-                            className="text-xs font-bold text-brand-primary hover:underline transition cursor-pointer"
-                          >
-                            Lihat Detail Balita &rarr;
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              
-              <div className="text-xs text-base-text-secondary mt-4 leading-relaxed">
-                * Relasi data di atas berdasarkan pencocokan nomor induk data keluarga yang tersimpan di rekam medis posyandu.
-              </div>
-            </div>
-
-          </div>
-
         </div>
 
         {/* Maternal Examination History Table */}
