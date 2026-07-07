@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* 1. Brand */
+  --brand-primary: #EA2986;
+  --brand-soft: #FCE8F0;
+
+  /* 2. Base */
+  --base-text-primary: #1E1E1E;
+  --base-text-secondary: #6B7280;
+  --base-border: #BBBBBB;
+  --base-bg: #F8F6F7;
+  --base-white: #FFFFFF;
+
+  /* Custom component backing colors */
+  --card-bg: #FFFFFF;
+  --surface-bg: #F8F6F7;
+}
+
+.dark {
+  /* 1. Brand */
+  --brand-primary: #F472B6;
+  --brand-soft: #301925;
+
+  /* 2. Base */
+  --base-text-primary: #F3F4F6;
+  --base-text-secondary: #9CA3AF;
+  --base-border: #374151;
+  --base-bg: #090B10;
+  --base-white: #15171E;
+
+  /* Custom component backing colors */
+  --card-bg: #15171E;
+  --surface-bg: #090B10;
+}
+
+@theme {
+  /* 1. Brand */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-soft: var(--brand-soft);
+
+  /* 2. Base */
+  --color-base-text-primary: var(--base-text-primary);
+  --color-base-text-secondary: var(--base-text-secondary);
+  --color-base-border: var(--base-border);
+  --color-base-bg: var(--base-bg);
+  --color-base-white: var(--base-white);
+
+  /* Custom components mapping */
+  --color-card: var(--card-bg);
+  --color-surface: var(--surface-bg);
+
+  /* 3. Status */
+  --color-status-red-solid: #D92D20;
+  --color-status-orange-solid: #E87034;
+  --color-status-yellow-solid: #EBC115;
+  --color-status-green-solid: #1E9D5D;
+  --color-status-green-light: #E6F8ED;
+  --color-status-blue-solid: #4A85F6;
+  --color-status-blue-light: #ECF2FE;
+  --color-status-cerulean-solid: #026AA2;
+  --color-status-cerulean-light: #E0F2FE;
+  --color-status-purple-solid: #7A5AF8;
+  --color-status-pink-dark: #C60C66;
+
+  /* 4. Gender */
+  --color-gender-male-solid: #4A85F6;
+  --color-gender-male-bg: #ECF2FE;
+  --color-gender-female-solid: #E62E7B;
+  --color-gender-female-bg: #FCE8F0;
+
+  /* Radius */
+  --radius-bento-sm: 1rem;
+  --radius-bento-md: 1.5rem;
+  --radius-bento-lg: 2rem;
+}
+
+@layer base {
+  html {
+    font-size: 13.5px;
+  }
+  @media (min-width: 640px) {
+    html {
+      font-size: 14.5px;
+    }
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 15.2px;
+    }
+  }
+  @media (min-width: 1280px) {
+    html {
+      font-size: 16px;
+    }
+  }
+  @media (min-width: 1600px) {
+    html {
+      font-size: 16.5px;
+    }
+  }
+
+  body {
+    background-color: var(--color-base-bg);
+    color: var(--color-base-text-primary);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* Share Modal Custom Premium Animations */
+@keyframes share-modal-backdrop-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+    background-color: rgba(0, 0, 0, 0.45);
+  }
+}
+
+@keyframes share-modal-content-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(30px);
+  }
+  60% {
+    transform: scale(1.02) translateY(-4px);
+  }
+  85% {
+    transform: scale(0.99) translateY(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes link-badge-in {
+  0% {
+    transform: translate(-50%, -120%) scale(0.4) rotate(-20deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -40%) scale(1.12) rotate(10deg);
+    opacity: 1;
+  }
+  85% {
+    transform: translate(-50%, -55%) scale(0.96) rotate(-3deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up-staggered {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-share-backdrop {
+  animation: share-modal-backdrop-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-share-content {
+  animation: share-modal-content-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-link-badge {
+  animation: link-badge-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+.animate-stagger-1 {
+  animation: fade-in-up-staggered 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.animate-stagger-2 {
+  animation: fade-in-up-staggered 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+.animate-stagger-3 {
+  animation: fade-in-up-staggered 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+.animate-stagger-4 {
+  animation: fade-in-up-staggered 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+}
+
+/* Tactile Mobile & Button Interaction Feedback */
+button,
+.btn,
+.interactive-card,
+[role="button"],
+a {
+  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.12s ease;
+}
+
+button:active,
+.btn:active,
+.interactive-card:active,
+[role="button"]:active,
+a:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}

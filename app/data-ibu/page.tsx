@@ -940,6 +940,7 @@ export default function DataIbuPage() {
                 Selanjutnya &gt;
               </button>
             </div>
+            <p>{currentPage} dari {totalPages}</p>
           </div>
         )}
       </div>
@@ -1140,6 +1141,7 @@ export default function DataIbuPage() {
                 Selanjutnya &gt;
               </button>
             </div>
+            <p>{currentHistoryPage} dari {totalHistoryPages}</p>
           </div>
         )}
       </div>
