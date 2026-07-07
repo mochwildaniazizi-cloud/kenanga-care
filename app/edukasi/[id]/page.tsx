@@ -714,6 +714,163 @@ function getMockContent(id: string, title: string): string {
     `;
   }
 
+  if (id === "L3") {
+    return `
+      <p><strong>1000 Hari Pertama Kehidupan (1000 HPK)</strong> adalah masa paling penting dalam pertumbuhan dan perkembangan anak. Masa ini terdiri dari <strong>270 hari</strong> selama bayi berada dalam kandungan ibu, dan <strong>730 hari</strong> atau dua tahun pertama kehidupan anak setelah dilahirkan.</p>
+      
+      <blockquote>
+        "Masa 1000 HPK sangat penting karena anak akan mengalami pertumbuhan dan perkembangan organ tubuh penting (otak, jantung, hati, ginjal, paru-paru, dan tulang) secara sangat pesat yang berdampak pada kualitas kesehatannya di masa depan."
+      </blockquote>
+
+      <h2>Tahapan Perkembangan Otak Anak</h2>
+      <p>Kapasitas otak berkembang sangat cepat pada periode emas ini:</p>
+      <ul>
+        <li><strong>25% Saat Lahir:</strong> Otak mulai membentuk sambungan sel saraf awal.</li>
+        <li><strong>70% Di Usia 0 - 1 Tahun:</strong> Periode emas belajar sensorik, visual, dan motorik.</li>
+        <li><strong>85% Di Usia 1 - 3 Tahun:</strong> Puncak perkembangan kemampuan berbahasa dan kognitif berpikir anak.</li>
+      </ul>
+
+      <h2>Mengapa Nutrisi 1000 HPK Harus Optimal?</h2>
+      <p>Kekurangan asupan gizi pada masa ini dapat menyebabkan gangguan pertumbuhan fisik dan otak yang bersifat <strong>permanen (tidak dapat diperbaiki)</strong>, termasuk tubuh pendek atau stunting serta rendahnya kemampuan berpikir anak saat dewasa. Pencegahan harus dilakukan sejak masa calon pengantin, kehamilan, nifas, hingga anak berusia 2 tahun.</p>
+
+      <h2>Layanan Kesehatan Gratis Selama Kehamilan</h2>
+      <p>Gunakan fasilitas kesehatan (Puskesmas/Posyandu) untuk mendapatkan pemeriksaan gratis berikut:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Layanan Kesehatan Ibu</th>
+            <th>Layanan Kesehatan Bayi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pemeriksaan Kehamilan Bidan/Dokter</td>
+            <td>Pemeriksaan Kondisi & Denyut Jantung Bayi</td>
+          </tr>
+          <tr>
+            <td>Pemberian Tablet Tambah Darah (TTD)</td>
+            <td>Imunisasi Tetanus Toxoid (TT)</td>
+          </tr>
+          <tr>
+            <td>Pemeriksaan Status Gizi & LILA</td>
+            <td>Pemeriksaan USG Gratis (3 Kali)</td>
+          </tr>
+          <tr>
+            <td>Pemeriksaan Tekanan Darah & Laboratorium</td>
+            <td>Kelas Ibu Hamil & Konseling Menyusui</td>
+          </tr>
+        </tbody>
+      </table>
+    `;
+  }
+
+  if (id === "L4") {
+    return `
+      <p>Kehamilan trimester pertama (usia 1-3 bulan) adalah masa pembentukan organ vital janin. Pada bulan pertama janin baru sebesar <strong>biji beras</strong>, dan pada bulan ketiga telah berkembang sebesar <strong>jeruk nipis</strong> (panjang sekitar 9 cm, berat 28 gram). Ibu disarankan melakukan periksa kehamilan minimal 6 kali oleh bidan/dokter.</p>
+
+      <blockquote>
+        "Selama 9 bulan kehamilan, berat badan ibu hamil idealnya naik sebanyak 5 - 10 kg sesuai dengan status gizi ibu sebelum hamil."
+      </blockquote>
+
+      <h2>Panduan Porsi Makan & Minum Harian Trimester 1</h2>
+      <p>Porsi makanan harian harus padat gizi untuk mendukung pembentukan organ janin. Berikut adalah tabel porsi makan harian yang direkomendasikan:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Bahan Makanan</th>
+            <th>Porsi Harian</th>
+            <th>Takaran per Porsi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Nasi / Makanan Pokok</td>
+            <td>5 Porsi</td>
+            <td>100 gram nasi (3/4 gelas) atau 120 gram ubi jalar</td>
+          </tr>
+          <tr>
+            <td>Protein Hewani (Ikan, Telur, Daging)</td>
+            <td>4 Porsi</td>
+            <td>50 gram ikan sedang atau 1 butir telur ayam</td>
+          </tr>
+          <tr>
+            <td>Protein Nabati (Tempe, Tahu)</td>
+            <td>4 Porsi</td>
+            <td>50 gram tempe (1 potong sedang) atau 100 gram tahu</td>
+          </tr>
+          <tr>
+            <td>Sayuran Hijau / Berwarna</td>
+            <td>4 Porsi</td>
+            <td>100 gram sayur matang tanpa kuah (1 mangkok)</td>
+          </tr>
+          <tr>
+            <td>Buah-buahan segar</td>
+            <td>4 Porsi</td>
+            <td>100 gram buah (1 potong sedang pepaya / pisang)</td>
+          </tr>
+          <tr>
+            <td>Minyak / Lemak tambahan</td>
+            <td>5 Porsi</td>
+            <td>5 gram minyak kelapa atau mentega (1 sendok teh)</td>
+          </tr>
+          <tr>
+            <td>Gula pasir / Pemanis</td>
+            <td>2 Porsi</td>
+            <td>10 gram gula pasir (1 sendok makan)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Batasan Penting Konsumsi Harian</h2>
+      <ul>
+        <li><strong>Garam:</strong> Batasi konsumsi garam paling banyak <strong>1 sendok teh per hari</strong> guna mencegah hipertensi kehamilan (preeklamsia).</li>
+        <li><strong>Air Putih:</strong> Minum air putih minimal <strong>8 - 12 gelas per hari</strong> untuk mencegah dehidrasi dan menjaga volume air ketuban.</li>
+        <li><strong>Minuman Kafein:</strong> Batasi konsumsi kopi, teh, dan minuman bersoda. Hindari alkohol sama sekali.</li>
+      </ul>
+    `;
+  }
+
+  if (id === "L5") {
+    return `
+      <p>Ibu hamil trimester 1 wajib mengenali gejala abnormal pada tubuhnya agar dapat segera ditangani oleh dokter atau bidan sebelum membahayakan nyawa ibu dan janin.</p>
+
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg">
+        <h3 class="text-red-800 font-bold text-sm">⚠️ Tanda Bahaya Kehamilan Trimester 1 (Segera ke Puskesmas/RS)</h3>
+        <ul class="list-disc pl-5 text-xs text-red-700 space-y-1 mt-2">
+          <li><strong>Demam Tinggi:</strong> Suhu tubuh ibu di atas 38°C dapat memicu keguguran atau cacat lahir janin.</li>
+          <li><strong>Nyeri Perut Hebat:</strong> Kram perut bagian bawah yang luar biasa bisa menjadi tanda kehamilan di luar kandungan (ektopik).</li>
+          <li><strong>Mual & Muntah Hebat:</strong> Mengalami muntah terus-menerus hingga tidak ada makanan/minuman yang masuk (Hiperemesis Gravidarum).</li>
+          <li><strong>Perdarahan Pervaginam:</strong> Keluar darah segar dari jalan lahir, baik flek maupun darah haid (ancaman keguguran).</li>
+          <li><strong>Nyeri Saat Kencing / Keputihan Gatal:</strong> Tanda infeksi saluran kemih atau infeksi jamur kelamin yang wajib segera diobati bidan.</li>
+        </ul>
+      </div>
+
+      <h2>Perawatan Sehari-hari & Larangan Selama Kehamilan</h2>
+      <p>Terapkan pola hidup sehat berikut ini demi perkembangan bayi Anda:</p>
+      
+      <h3>Yang Harus Dilakukan:</h3>
+      <ol>
+        <li>Menjaga kebersihan diri dengan mandi teratur dan mencuci tangan pakai sabun di air mengalir sebelum makan.</li>
+        <li>Istirahat yang cukup: Tidur malam minimal 6-7 jam dan tidur siang selama 1-2 jam.</li>
+        <li>Merangsang pertumbuhan janin dengan sering mengelus perut dan mengajaknya berbicara sejak dini.</li>
+        <li>Hubungan suami istri diperbolehkan selama kondisi kehamilan sehat dan tidak ada riwayat pendarahan.</li>
+      </ol>
+
+      <h3>Hal yang Tidak Boleh Dilakukan:</h3>
+      <ul>
+        <li>❌ Minum obat tanpa resep dokter atau bidan (risiko kecacatan janin).</li>
+        <li>❌ Merokok atau terpapar asap rokok (risiko bayi lahir dengan berat rendah/prematur).</li>
+        <li>❌ Mengonsumsi alkohol atau jamu tradisional tanpa pengawasan medis.</li>
+        <li>❌ Mengalami stres berlebihan dan tidur telentang lebih dari 10 menit pada trimester lanjut.</li>
+      </ul>
+
+      <h3>Aktivitas Fisik yang Dilarang:</h3>
+      <p>Hindari berjongkok terlalu lama, melompat, mengangkat beban berat, membungkuk tanpa pegangan, serta olahraga yang berisiko mengganggu keseimbangan tubuh.</p>
+    `;
+  }
+
+
   // General fallback
   return `
     <p>Ini adalah isi artikel tentang <strong>${title}</strong>.</p>

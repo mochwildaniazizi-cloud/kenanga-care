@@ -5,10 +5,11 @@ import Link from "next/link";
 import { 
   MdSearch, MdFilterList, MdAdd, 
   MdOutlineError, MdPerson, MdCalendarMonth, MdPregnantWoman,
-  MdPhone, MdBloodtype, MdMale, MdFemale
+  MdPhone, MdBloodtype, MdMale, MdFemale, MdVaccines
 } from "react-icons/md";
 import { FaUserNurse, FaUserFriends, FaHeartbeat, FaUser, FaFileMedical } from "react-icons/fa";
 import { getMothersData, getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
+import { getTtdLogs, upsertTtdLog } from "@/app/actions/ttd";
 import { useUserRole } from "@/context/UserRoleContext";
 import { FiRefreshCw } from "react-icons/fi";
 
@@ -123,7 +124,16 @@ export default function DataIbuPage() {
   const { role, username } = useUserRole();
   const [motherDetail, setMotherDetail] = useState<any>(null);
   const [isLoadingMother, setIsLoadingMother] = useState(true);
-  const [activeIbuSubTab, setActiveIbuSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
+  const [activeIbuSubTab, setActiveIbuSubTab] = useState<'ibu' | 'husband' | 'health' | 'ttd'>('ibu');
+  
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+
+  const [ttdLogs, setTtdLogs] = useState<any[]>([]);
+  const [ttdCompanion, setTtdCompanion] = useState("");
+  const [ttdRelationship, setTtdRelationship] = useState("Suami");
+  const [isSavingTtd, setIsSavingTtd] = useState(false);
 
   useEffect(() => {
     async function loadMotherDetail() {
@@ -160,6 +170,51 @@ export default function DataIbuPage() {
       loadMotherDetail();
     }
   }, [role, username]);
+
+  useEffect(() => {
+    if (!motherDetail) return;
+    async function fetchTtdData() {
+      const motherId = motherDetail.mother_id;
+      const cacheKey = `offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`;
+      
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setTtdLogs(parsed.logs || []);
+          setTtdCompanion(parsed.companion || "");
+          setTtdRelationship(parsed.relationship || "Suami");
+        } catch (e) {
+          console.error("Failed to parse cached TTD data:", e);
+        }
+      }
+
+      if (!navigator.onLine) return;
+
+      try {
+        const logs = await getTtdLogs(motherId, currentYear, currentMonth);
+        if (logs) {
+          setTtdLogs(logs);
+          
+          const latestLog = logs.find(l => l.companion);
+          const companion = latestLog?.companion || localStorage.getItem(`ttd_companion_${motherId}`) || "";
+          const relationship = latestLog?.relationship || localStorage.getItem(`ttd_relationship_${motherId}`) || "Suami";
+          
+          if (companion) setTtdCompanion(companion);
+          if (relationship) setTtdRelationship(relationship);
+
+          localStorage.setItem(cacheKey, JSON.stringify({
+            logs,
+            companion,
+            relationship
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to load TTD logs", err);
+      }
+    }
+    fetchTtdData();
+  }, [motherDetail]);
 
   const [mothersList, setMothersList] = useState<any[]>([]);
   const [historyList, setHistoryList] = useState<any[]>([]);
@@ -207,6 +262,53 @@ export default function DataIbuPage() {
     } else {
       setHistorySortField(field);
       setHistorySortOrder("asc");
+    }
+  };
+
+  const handleToggleTtd = async (day: number) => {
+    if (!motherDetail) return;
+    const motherId = motherDetail.mother_id;
+    const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    const isCurrentlyTaken = ttdLogs.some(l => l.intake_date === dateStr && l.taken);
+    const newTakenState = !isCurrentlyTaken;
+
+    // Save companion to cache
+    localStorage.setItem(`ttd_companion_${motherId}`, ttdCompanion);
+    localStorage.setItem(`ttd_relationship_${motherId}`, ttdRelationship);
+
+    let updatedLogs = [...ttdLogs];
+    const logIndex = updatedLogs.findIndex(l => l.intake_date === dateStr);
+    if (logIndex >= 0) {
+      updatedLogs[logIndex] = {
+        ...updatedLogs[logIndex],
+        taken: newTakenState,
+        companion: ttdCompanion,
+        relationship: ttdRelationship
+      };
+    } else {
+      updatedLogs.push({
+        intake_date: dateStr,
+        taken: newTakenState,
+        companion: ttdCompanion,
+        relationship: ttdRelationship
+      });
+    }
+    setTtdLogs(updatedLogs);
+
+    const cacheKey = `offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`;
+    localStorage.setItem(cacheKey, JSON.stringify({
+      logs: updatedLogs,
+      companion: ttdCompanion,
+      relationship: ttdRelationship
+    }));
+
+    if (navigator.onLine) {
+      try {
+        await upsertTtdLog(motherId, dateStr, newTakenState, ttdCompanion, ttdRelationship);
+      } catch (err) {
+        console.error("Failed to upsert TTD log:", err);
+      }
     }
   };
 
@@ -471,6 +573,13 @@ export default function DataIbuPage() {
                 >
                   <FaFileMedical className="w-3.5 h-3.5" /> Riwayat &amp; Risiko
                 </button>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveIbuSubTab('ttd')}
+                  className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activeIbuSubTab === 'ttd' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <MdVaccines className="w-3.5 h-3.5" /> Checklist TTD
+                </button>
               </div>
 
               {/* Content Body */}
@@ -676,6 +785,130 @@ export default function DataIbuPage() {
                     </div>
                   </div>
                 )}
+
+                {/* TAB 4: CHECKLIST TTD */}
+                {activeIbuSubTab === 'ttd' && (() => {
+                  const totalDays = new Date(currentYear, currentMonth, 0).getDate();
+                  const daysArray = Array.from({ length: totalDays }, (_, i) => i + 1);
+                  const monthsIndonesian = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                  ];
+                  const monthName = monthsIndonesian[currentMonth - 1];
+
+                  return (
+                    <div className="space-y-5 animate-in fade-in duration-200 text-xs">
+                      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-2">
+                        <h4 className="font-bold text-sm text-brand-primary flex items-center gap-1.5">
+                          <MdVaccines className="w-4 h-4" /> Kartu Minum Tablet Tambah Darah (TTD/MMS)
+                        </h4>
+                        <p className="text-base-text-secondary text-[11px] leading-relaxed">
+                          Sesuai panduan Buku KIA 2024 Halaman 7. Ibu hamil wajib meminum paling sedikit 90 tablet tambah darah selama kehamilan untuk mencegah anemia dan mendukung perkembangan janin.
+                        </p>
+                      </div>
+
+                      {/* Input Pendamping & Hubungan */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-bg/20 p-4 rounded-xl border border-base-border/20">
+                        <div className="space-y-1.5">
+                          <label className="font-bold text-base-text-secondary">Nama Pendamping Minum TTD</label>
+                          <input 
+                            type="text" 
+                            placeholder="Nama suami, orang tua, atau kader..."
+                            value={ttdCompanion}
+                            onChange={(e) => {
+                              setTtdCompanion(e.target.value);
+                              if (motherDetail) {
+                                localStorage.setItem(`ttd_companion_${motherDetail.mother_id}`, e.target.value);
+                              }
+                            }}
+                            className="w-full bg-base-white border border-base-border/40 rounded-lg px-3 py-2 text-xs outline-none focus:border-brand-primary text-base-text-primary transition"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="font-bold text-base-text-secondary">Hubungan dengan Ibu</label>
+                          <select
+                            value={ttdRelationship}
+                            onChange={(e) => {
+                              setTtdRelationship(e.target.value);
+                              if (motherDetail) {
+                                localStorage.setItem(`ttd_relationship_${motherDetail.mother_id}`, e.target.value);
+                              }
+                            }}
+                            className="w-full bg-base-white border border-base-border/40 rounded-lg px-3 py-2 text-xs outline-none focus:border-brand-primary text-base-text-primary transition appearance-none cursor-pointer"
+                          >
+                            <option value="Suami">Suami</option>
+                            <option value="Orang Tua">Orang Tua / Ibu Kandung</option>
+                            <option value="Mertua">Mertua</option>
+                            <option value="Kader">Kader Posyandu</option>
+                            <option value="Lainnya">Lainnya</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Calendar Grid 1-31 */}
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-base-text-primary">
+                            Lembar Pantauan: <span className="text-brand-primary">{monthName} {currentYear}</span>
+                          </span>
+                          <span className="text-[10px] text-base-text-secondary italic">
+                            * Ketuk tanggal untuk menandai
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-2 text-center">
+                          {daysArray.map((day) => {
+                            const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const isTaken = ttdLogs.some(l => l.intake_date === dateStr && l.taken);
+                            const isToday = today.getDate() === day && today.getMonth() + 1 === currentMonth && today.getFullYear() === currentYear;
+
+                            return (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => handleToggleTtd(day)}
+                                className={`h-11 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer font-bold relative border ${
+                                  isTaken 
+                                    ? "bg-brand-primary text-base-white border-brand-primary shadow-sm hover:bg-status-pink-dark" 
+                                    : isToday
+                                    ? "bg-base-white text-brand-primary border-brand-primary border-2 shadow-sm"
+                                    : "bg-base-bg/30 text-base-text-secondary border-base-border/25 hover:border-brand-primary/40 hover:bg-base-bg/65"
+                                }`}
+                              >
+                                <span className="text-xs">{day}</span>
+                                {isTaken && (
+                                  <span className="text-[8px] mt-0.5 leading-none block font-medium uppercase text-pink-100">taken</span>
+                                )}
+                                {isToday && !isTaken && (
+                                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-status-orange-solid animate-pulse" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Legend */}
+                      <div className="flex items-center gap-4 text-[10px] text-base-text-secondary border-t pt-3">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3.5 h-3.5 rounded bg-brand-primary" />
+                          <span>Tablet Diminum</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3.5 h-3.5 rounded border border-brand-primary bg-base-white" />
+                          <span>Hari Ini</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3.5 h-3.5 rounded bg-base-bg/30 border border-base-border/25" />
+                          <span>Belum Diminum</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
 
               </div>
             </div>

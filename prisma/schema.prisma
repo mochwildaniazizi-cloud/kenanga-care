@@ -26,6 +26,7 @@ model Mother {
   updated_at           DateTime               @updatedAt
   children             Child[]
   maternal_records     MaternalHealthRecord[]
+  ttd_logs             TtdLog[]
 
   // Additional Identity fields from Buku KIA 2024
   jkn_number                 String?
@@ -184,4 +185,19 @@ model MaternalHealthRecord {
   schedule           Schedule? @relation(fields: [schedule_id], references: [schedule_id], onDelete: SetNull)
 
   @@map("maternal_health_records")
+}
+
+model TtdLog {
+  log_id       String   @id @default(uuid())
+  mother_id    String
+  intake_date  DateTime
+  taken        Boolean  @default(true)
+  companion    String?
+  relationship String?
+  created_at   DateTime @default(now())
+
+  mother       Mother   @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
+
+  @@unique([mother_id, intake_date])
+  @@map("ttd_logs")
 }
