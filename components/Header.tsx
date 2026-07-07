@@ -26,7 +26,7 @@ import { PiBabyFill } from "react-icons/pi";
 import { useUserRole } from "@/context/UserRoleContext";
 import { createChildMeasurement, createChild, updateChild } from "@/app/actions/children";
 import { createMaternalRecord, createMother, getLoggedInMotherData, updateMother } from "@/app/actions/mothers";
-import { getRealtimeNotifications, createSchedule } from "@/app/actions/schedule";
+import { getRealtimeNotifications } from "@/app/actions/schedule";
 
 const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
   "/": { label: "Beranda", icon: HomeIcon },
@@ -256,7 +256,6 @@ export default function Header() {
     const pendingCreateChildren = JSON.parse(localStorage.getItem("pending_create_children") || "[]");
     const pendingUpdateMothers = JSON.parse(localStorage.getItem("pending_update_mothers") || "[]");
     const pendingUpdateChildren = JSON.parse(localStorage.getItem("pending_update_children") || "[]");
-    const pendingSchedules = JSON.parse(localStorage.getItem("pending_create_schedules") || "[]");
 
     let syncedCount = 0;
 
@@ -356,22 +355,6 @@ export default function Header() {
       }
     }
 
-    // Sync new schedules
-    const failedSchedules = [];
-    for (const s of pendingSchedules) {
-      try {
-        const res = await createSchedule(s);
-        if (res.success) {
-          syncedCount++;
-        } else {
-          failedSchedules.push(s);
-        }
-      } catch (e) {
-        console.error("Failed to sync schedule offline record:", e);
-        failedSchedules.push(s);
-      }
-    }
-
     // Save failed queues back or remove if empty
     if (failedChildMeas.length > 0) {
       localStorage.setItem("pending_child_measurements", JSON.stringify(failedChildMeas));
@@ -395,12 +378,6 @@ export default function Header() {
       localStorage.setItem("pending_create_children", JSON.stringify(failedChildren));
     } else {
       localStorage.removeItem("pending_create_children");
-    }
-
-    if (failedSchedules.length > 0) {
-      localStorage.setItem("pending_create_schedules", JSON.stringify(failedSchedules));
-    } else {
-      localStorage.removeItem("pending_create_schedules");
     }
 
     if (failedUpdateMothers.length > 0) {

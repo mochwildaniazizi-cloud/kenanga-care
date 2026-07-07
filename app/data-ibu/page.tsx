@@ -239,24 +239,6 @@ export default function DataIbuPage() {
       localStorage.setItem("offline_mothers_list", JSON.stringify(mothers));
       localStorage.setItem("offline_mothers_history", JSON.stringify(history));
       localStorage.setItem("offline_mothers_metrics", JSON.stringify(fetchedMetrics));
-
-      // Proactive background caching of all mothers detailed records
-      if (mothers.length > 0) {
-        setTimeout(async () => {
-          for (const m of mothers) {
-            try {
-              if (navigator.onLine) {
-                const detail = await getMotherDetail(m.mother_id);
-                if (detail) {
-                  localStorage.setItem(`offline_mother_detail_${m.mother_id}`, JSON.stringify(detail));
-                }
-              }
-            } catch (err) {
-              console.error(`Background caching failed for mother ${m.mother_id}:`, err);
-            }
-          }
-        }, 1000);
-      }
     } catch (error: any) {
       console.error("Failed to load data:", error);
       if (forceRefresh) {

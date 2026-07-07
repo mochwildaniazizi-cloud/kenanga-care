@@ -12,7 +12,6 @@ import { useUserRole } from "@/context/UserRoleContext";
 import { getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
 import LandingPage from "@/components/LandingPage";
 import { getSchedules } from "@/app/actions/schedule";
-import { getChildDetail } from "@/app/actions/children";
 import PWAInstallBanner from "@/components/PWAInstallBanner";
 import { MdArrowForward } from "react-icons/md";
 
@@ -111,22 +110,6 @@ export default function DashboardPage() {
           if (detail) {
             setMotherDetail(detail);
             localStorage.setItem("mother_dashboard_detail", JSON.stringify(detail));
-            
-            // Background pre-caching for children details
-            if (detail.children && detail.children.length > 0) {
-              setTimeout(async () => {
-                for (const c of detail.children) {
-                  try {
-                    const childDetail = await getChildDetail(c.child_id);
-                    if (childDetail) {
-                      localStorage.setItem(`offline_child_detail_${c.child_id}`, JSON.stringify(childDetail));
-                    }
-                  } catch (e) {
-                    console.error("Failed to background cache child details:", e);
-                  }
-                }
-              }, 1000);
-            }
           }
         } else {
           const [stats, cAct, mAct] = await Promise.all([

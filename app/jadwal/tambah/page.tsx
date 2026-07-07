@@ -6,7 +6,6 @@ import { createSchedule } from "@/app/actions/schedule";
 import { useUserRole } from "@/context/UserRoleContext";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import { FiArrowLeft } from "react-icons/fi";
-import { showLocalNotification } from "@/utils/notifications";
 
 export default function TambahJadwalPage() {
   const router = useRouter();
@@ -14,7 +13,6 @@ export default function TambahJadwalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [isOfflineSaved, setIsOfflineSaved] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   const [formData, setFormData] = useState({
@@ -44,54 +42,19 @@ export default function TambahJadwalPage() {
       return;
     }
 
-    const scheduleData = {
-      schedule_date: formData.schedule_date,
-      start_time: formData.start_time,
-      end_time: formData.end_time,
-      service_focus: formData.service_focus,
-      changed_by: username || "Kader Siti"
-    };
-
-    if (!navigator.onLine) {
-      const pending = JSON.parse(localStorage.getItem("pending_create_schedules") || "[]");
-      pending.push(scheduleData);
-      localStorage.setItem("pending_create_schedules", JSON.stringify(pending));
-
-      // Optimistically update the cached schedules list
-      const cached = localStorage.getItem("offline_schedules_list");
-      if (cached) {
-        try {
-          const list = JSON.parse(cached);
-          list.push({
-            id: "offline-" + Date.now(),
-            date: new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(formData.schedule_date)),
-            rawDate: formData.schedule_date,
-            time: `${formData.start_time} - ${formData.end_time} WIB`,
-            focus: formData.service_focus,
-            status: "Terjadwal"
-          });
-          localStorage.setItem("offline_schedules_list", JSON.stringify(list));
-        } catch (e) {
-          console.error("Failed to optimistically update offline schedules list:", e);
-        }
-      }
-
-      setIsOfflineSaved(true);
-      showLocalNotification("Jadwal Disimpan Offline", {
-        body: `Jadwal Posyandu untuk tanggal ${formData.schedule_date} disimpan secara offline.`,
-      });
-      setShowSuccessModal(true);
-      return;
-    }
-
     setIsSubmitting(true);
     setErrorMsg("");
 
     try {
-      const res = await createSchedule(scheduleData);
+      const res = await createSchedule({
+        schedule_date: formData.schedule_date,
+        start_time: formData.start_time,
+        end_time: formData.end_time,
+        service_focus: formData.service_focus,
+        changed_by: username || "Kader Siti"
+      });
 
       if (res.success) {
-        setIsOfflineSaved(false);
         setShowSuccessModal(true);
       } else {
         setErrorMsg(res.error || "Gagal menyimpan jadwal.");
@@ -223,14 +186,9 @@ export default function TambahJadwalPage() {
               </svg>
             </div>
             <div className="space-y-1.5">
-              <h3 className="text-lg font-black text-base-text-primary">
-                {isOfflineSaved ? "Jadwal Disimpan Offline" : "Jadwal Berhasil Disimpan"}
-              </h3>
+              <h3 className="text-lg font-black text-base-text-primary">Jadwal Berhasil Disimpan</h3>
               <p className="text-xs text-base-text-secondary leading-relaxed">
-                {isOfflineSaved 
-                  ? "Koneksi offline. Jadwal Posyandu baru disimpan secara lokal dan akan otomatis disinkronisasikan ke database saat internet aktif."
-                  : "Jadwal Posyandu baru telah sukses ditambahkan dan disinkronisasikan ke database sistem."
-                }
+                Jadwal Posyandu baru telah sukses ditambahkan dan disinkronisasikan ke database sistem.
               </p>
             </div>
             <button

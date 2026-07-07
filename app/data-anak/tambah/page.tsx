@@ -63,37 +63,9 @@ export default function TambahAnakPage() {
       setIsSearching(true);
       setShowDropdown(true);
       searchTimeoutRef.current = setTimeout(async () => {
-        if (!navigator.onLine) {
-          const cached = localStorage.getItem("offline_mothers_list");
-          if (cached) {
-            try {
-              const list = JSON.parse(cached);
-              const term = motherSearchTerm.toLowerCase();
-              const filtered = list.filter((m: any) => 
-                (m.name && m.name.toLowerCase().includes(term)) ||
-                (m.national_id && m.national_id.toLowerCase().includes(term))
-              ).map((m: any) => ({
-                id: m.mother_id,
-                name: m.name || "Tanpa Nama",
-                nik: m.national_id || "-"
-              }));
-              setSearchResults(filtered);
-            } catch (e) {
-              console.error("Failed to parse cached mothers list for offline search:", e);
-            }
-          }
-          setIsSearching(false);
-          return;
-        }
-
-        try {
-          const results = await searchMothers(motherSearchTerm);
-          setSearchResults(results);
-        } catch (err) {
-          console.error("Failed to search mothers online:", err);
-        } finally {
-          setIsSearching(false);
-        }
+        const results = await searchMothers(motherSearchTerm);
+        setSearchResults(results);
+        setIsSearching(false);
       }, 500);
     } else {
       setSearchResults([]);
