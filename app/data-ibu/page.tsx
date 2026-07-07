@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   MdSearch, MdFilterList, MdAdd, 
   MdOutlineError, MdPerson, MdCalendarMonth, MdPregnantWoman,
-  MdPhone, MdBloodtype, MdMale, MdFemale, MdVaccines
+  MdPhone, MdBloodtype, MdMale, MdFemale, MdVaccines, MdEdit
 } from "react-icons/md";
 import { FaUserNurse, FaUserFriends, FaHeartbeat, FaUser, FaFileMedical } from "react-icons/fa";
 import { getMothersData, getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
@@ -135,6 +135,7 @@ export default function DataIbuPage() {
   const [ttdCompanion, setTtdCompanion] = useState("");
   const [ttdRelationship, setTtdRelationship] = useState("Suami");
   const [isSavingTtd, setIsSavingTtd] = useState(false);
+  const [isEditingCompanion, setIsEditingCompanion] = useState(false);
 
   // Weekly self monitoring states
   const [weeklyLogs, setWeeklyLogs] = useState<any[]>([]);
@@ -886,42 +887,71 @@ export default function DataIbuPage() {
                         </p>
                       </div>
 
-                      {/* Input Pendamping & Hubungan */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-base-bg/20 p-4 rounded-xl border border-base-border/20">
-                        <div className="space-y-1.5">
-                          <label className="font-bold text-base-text-secondary">Nama Pendamping Minum TTD</label>
-                          <input 
-                            type="text" 
-                            placeholder="Nama suami, orang tua, atau kader..."
-                            value={ttdCompanion}
-                            onChange={(e) => {
-                              setTtdCompanion(e.target.value);
-                              if (motherDetail) {
-                                localStorage.setItem(`ttd_companion_${motherDetail.mother_id}`, e.target.value);
-                              }
-                            }}
-                            className="w-full bg-base-white border border-base-border/40 rounded-lg px-3 py-2 text-xs outline-none focus:border-brand-primary text-base-text-primary transition"
-                          />
+                      <div className="bg-base-bg/20 p-4 rounded-xl border border-base-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Nama Pendamping Minum TTD</span>
+                            {isEditingCompanion ? (
+                              <input 
+                                type="text" 
+                                placeholder="Nama suami, orang tua, atau kader..."
+                                value={ttdCompanion}
+                                onChange={(e) => {
+                                  setTtdCompanion(e.target.value);
+                                  if (motherDetail) {
+                                    localStorage.setItem(`ttd_companion_${motherDetail.mother_id}`, e.target.value);
+                                  }
+                                }}
+                                className="w-full bg-base-white border border-base-border/40 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-brand-primary text-base-text-primary transition"
+                              />
+                            ) : (
+                              <p className="text-sm font-bold text-base-text-primary">{ttdCompanion || "Belum diatur"}</p>
+                            )}
+                          </div>
+
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Hubungan dengan Ibu</span>
+                            {isEditingCompanion ? (
+                              <select
+                                value={ttdRelationship}
+                                onChange={(e) => {
+                                  setTtdRelationship(e.target.value);
+                                  if (motherDetail) {
+                                    localStorage.setItem(`ttd_relationship_${motherDetail.mother_id}`, e.target.value);
+                                  }
+                                }}
+                                className="w-full bg-base-white border border-base-border/40 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-brand-primary text-base-text-primary transition appearance-none cursor-pointer"
+                              >
+                                <option value="Suami">Suami</option>
+                                <option value="Orang Tua">Orang Tua / Ibu Kandung</option>
+                                <option value="Mertua">Mertua</option>
+                                <option value="Kader">Kader Posyandu</option>
+                                <option value="Lainnya">Lainnya</option>
+                              </select>
+                            ) : (
+                              <p className="text-sm font-bold text-base-text-primary">{ttdRelationship || "Suami"}</p>
+                            )}
+                          </div>
                         </div>
 
-                        <div className="space-y-1.5">
-                          <label className="font-bold text-base-text-secondary">Hubungan dengan Ibu</label>
-                          <select
-                            value={ttdRelationship}
-                            onChange={(e) => {
-                              setTtdRelationship(e.target.value);
-                              if (motherDetail) {
-                                localStorage.setItem(`ttd_relationship_${motherDetail.mother_id}`, e.target.value);
-                              }
-                            }}
-                            className="w-full bg-base-white border border-base-border/40 rounded-lg px-3 py-2 text-xs outline-none focus:border-brand-primary text-base-text-primary transition appearance-none cursor-pointer"
-                          >
-                            <option value="Suami">Suami</option>
-                            <option value="Orang Tua">Orang Tua / Ibu Kandung</option>
-                            <option value="Mertua">Mertua</option>
-                            <option value="Kader">Kader Posyandu</option>
-                            <option value="Lainnya">Lainnya</option>
-                          </select>
+                        <div className="shrink-0 flex items-center self-end md:self-center">
+                          {isEditingCompanion ? (
+                            <button
+                              type="button"
+                              onClick={() => setIsEditingCompanion(false)}
+                              className="px-4 py-2 bg-brand-primary text-base-white hover:bg-status-pink-dark text-xs font-bold rounded-lg shadow-sm cursor-pointer transition"
+                            >
+                              Selesai
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setIsEditingCompanion(true)}
+                              className="px-3.5 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 text-xs font-bold rounded-lg cursor-pointer transition flex items-center gap-1.5"
+                            >
+                              <MdEdit className="w-3.5 h-3.5" /> Ubah Pendamping
+                            </button>
+                          )}
                         </div>
                       </div>
 
