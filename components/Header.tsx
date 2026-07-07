@@ -232,7 +232,7 @@ export default function Header() {
   ];
 
   const ibuNotifications = [
-    { category: "Jadwal Rutin", time: "1 jam yang lalu", message: "Halo Ibu, Posyandu Kenanga 1 akan mengadakan imunisasi balita besok pagi. Jangan lupa membawa KIA." },
+    { category: "Jadwal Rutin", time: "1 jam yang lalu", message: "Halo Ibu, Posyandu Kenanga 1 akan mengadakan imunisasi balita besok pagi. Silakan kunjungi posyandu sesuai jadwal." },
     { category: "Vitamin A Anak", time: "6 jam yang lalu", message: "Jadwal pembagian Vitamin A untuk Balita Anda (Bagas Pratama) sudah dibuka di Kader." },
     { category: "Status Gizi", time: "1 hari yang lalu", message: "Grafik tumbuh kembang Giselle Putri bulan ini terpantau Normal & Baik. Pertahankan!" }
   ];

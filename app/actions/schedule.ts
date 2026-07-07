@@ -261,10 +261,10 @@ export async function getRealtimeNotifications(role: "kader" | "ibu", username?:
 
       // Add general reminder
       notifications.push({
-        id: "alert-ibu-kia",
+        id: "alert-ibu-pwa",
         category: "Pemberitahuan PWA",
         time: "Baru saja",
-        message: `Halo Ibu ${motherName}, selalu bawa buku KIA (Kesehatan Ibu dan Anak) setiap berkunjung ke Posyandu Kenanga.`,
+        message: `Selamat datang di Kenanga Care, Ibu ${motherName}. Pantau tumbuh kembang anak secara digital di sini.`,
         timestamp: Date.now()
       });
 
