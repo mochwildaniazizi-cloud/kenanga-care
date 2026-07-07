@@ -285,7 +285,7 @@ export async function createMother(data: any) {
         husband_puskesmas_domicile: data.husband_puskesmas_domicile || null,
         husband_faskes_secondary: data.husband_faskes_secondary || null,
         husband_medical_record_number: data.husband_medical_record_number || null,
-      }
+      } as any
     });
     return { success: true, id: mother.mother_id };
   } catch (error: any) {
@@ -331,9 +331,10 @@ export async function getMotherDetail(motherId: string) {
     });
 
     if (!mother) return null;
+    const m = mother as any;
 
     const children = mother.children || [];
-    const childrenCount = mother.number_of_children || children.length || 0;
+    const childrenCount = m.number_of_children || children.length || 0;
     const status = determineMotherStatus(mother.ui_status, childrenCount, children, mother.estimated_due_date);
 
     const gestationalAge = calculateGestationalOrNifasAge(status, mother.estimated_due_date, children);
@@ -375,49 +376,49 @@ export async function getMotherDetail(motherId: string) {
           : null),
 
       // Buku KIA Additional Identity fields
-      jkn_number: mother.jkn_number || "-",
-      faskes_1: mother.faskes_1 || "-",
-      faskes_referral: mother.faskes_referral || "-",
-      birth_place: mother.birth_place || "-",
-      education: mother.education || "-",
-      occupation: mother.occupation || "-",
-      address: mother.address || "-",
-      other_financing: mother.other_financing || "-",
-      insurance_other: mother.insurance_other || "-",
-      insurance_number: mother.insurance_number || "-",
-      insurance_validity: mother.insurance_validity ? mother.insurance_validity.toISOString().split("T")[0] : "",
-      faskes_primary: mother.faskes_primary || "-",
-      puskesmas_domicile: mother.puskesmas_domicile || "-",
-      cohort_register_number: mother.cohort_register_number || "-",
-      faskes_secondary: mother.faskes_secondary || "-",
-      medical_record_number: mother.medical_record_number || "-",
+      jkn_number: m.jkn_number || "-",
+      faskes_1: m.faskes_1 || "-",
+      faskes_referral: m.faskes_referral || "-",
+      birth_place: m.birth_place || "-",
+      education: m.education || "-",
+      occupation: m.occupation || "-",
+      address: m.address || "-",
+      other_financing: m.other_financing || "-",
+      insurance_other: m.insurance_other || "-",
+      insurance_number: m.insurance_number || "-",
+      insurance_validity: m.insurance_validity ? m.insurance_validity.toISOString().split("T")[0] : "",
+      faskes_primary: m.faskes_primary || "-",
+      puskesmas_domicile: m.puskesmas_domicile || "-",
+      cohort_register_number: m.cohort_register_number || "-",
+      faskes_secondary: m.faskes_secondary || "-",
+      medical_record_number: m.medical_record_number || "-",
 
       // Riwayat Singkat Kesehatan Ibu
-      pregnancy_number: mother.pregnancy_number ?? 1,
-      children_born_alive: mother.children_born_alive ?? 0,
-      miscarriage_history: mother.miscarriage_history ?? 0,
-      disease_history: mother.disease_history || "-",
+      pregnancy_number: m.pregnancy_number ?? 1,
+      children_born_alive: m.children_born_alive ?? 0,
+      miscarriage_history: m.miscarriage_history ?? 0,
+      disease_history: m.disease_history || "-",
 
       // Husband Identity fields
-      husband_national_id: mother.husband_national_id || "-",
-      husband_jkn_number: mother.husband_jkn_number || "-",
-      husband_faskes_1: mother.husband_faskes_1 || "-",
-      husband_faskes_referral: mother.husband_faskes_referral || "-",
-      husband_birth_place: mother.husband_birth_place || "-",
-      husband_birth_date: mother.husband_birth_date ? mother.husband_birth_date.toISOString().split("T")[0] : "",
-      husband_education: mother.husband_education || "-",
-      husband_occupation: mother.husband_occupation || "-",
-      husband_address: mother.husband_address || "-",
-      husband_phone_number: mother.husband_phone_number || "-",
-      husband_blood_type: mother.husband_blood_type || "-",
-      husband_other_financing: mother.husband_other_financing || "-",
-      husband_insurance_other: mother.husband_insurance_other || "-",
-      husband_insurance_number: mother.husband_insurance_number || "-",
-      husband_insurance_validity: mother.husband_insurance_validity ? mother.husband_insurance_validity.toISOString().split("T")[0] : "",
-      husband_faskes_primary: mother.husband_faskes_primary || "-",
-      husband_puskesmas_domicile: mother.husband_puskesmas_domicile || "-",
-      husband_faskes_secondary: mother.husband_faskes_secondary || "-",
-      husband_medical_record_number: mother.husband_medical_record_number || "-",
+      husband_national_id: m.husband_national_id || "-",
+      husband_jkn_number: m.husband_jkn_number || "-",
+      husband_faskes_1: m.husband_faskes_1 || "-",
+      husband_faskes_referral: m.husband_faskes_referral || "-",
+      husband_birth_place: m.husband_birth_place || "-",
+      husband_birth_date: m.husband_birth_date ? m.husband_birth_date.toISOString().split("T")[0] : "",
+      husband_education: m.husband_education || "-",
+      husband_occupation: m.husband_occupation || "-",
+      husband_address: m.husband_address || "-",
+      husband_phone_number: m.husband_phone_number || "-",
+      husband_blood_type: m.husband_blood_type || "-",
+      husband_other_financing: m.husband_other_financing || "-",
+      husband_insurance_other: m.husband_insurance_other || "-",
+      husband_insurance_number: m.husband_insurance_number || "-",
+      husband_insurance_validity: m.husband_insurance_validity ? m.husband_insurance_validity.toISOString().split("T")[0] : "",
+      husband_faskes_primary: m.husband_faskes_primary || "-",
+      husband_puskesmas_domicile: m.husband_puskesmas_domicile || "-",
+      husband_faskes_secondary: m.husband_faskes_secondary || "-",
+      husband_medical_record_number: m.husband_medical_record_number || "-",
 
       children: mother.children.map((c: any) => {
         const birthDate = c.birth_date ? new Date(c.birth_date) : null;
@@ -545,7 +546,7 @@ export async function updateMother(motherId: string, data: any) {
         husband_puskesmas_domicile: data.husband_puskesmas_domicile !== undefined ? data.husband_puskesmas_domicile : undefined,
         husband_faskes_secondary: data.husband_faskes_secondary !== undefined ? data.husband_faskes_secondary : undefined,
         husband_medical_record_number: data.husband_medical_record_number !== undefined ? data.husband_medical_record_number : undefined,
-      }
+      } as any
     });
 
     if (data.avatarUrl !== undefined) {

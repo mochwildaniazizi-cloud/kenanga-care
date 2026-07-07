@@ -196,7 +196,7 @@ export default function DataIbuPage() {
         if (logs) {
           setTtdLogs(logs);
           
-          const latestLog = logs.find(l => l.companion);
+          const latestLog = logs.find((l: any) => l.companion);
           const companion = latestLog?.companion || localStorage.getItem(`ttd_companion_${motherId}`) || "";
           const relationship = latestLog?.relationship || localStorage.getItem(`ttd_relationship_${motherId}`) || "Suami";
           
@@ -860,7 +860,7 @@ export default function DataIbuPage() {
                         <div className="grid grid-cols-7 gap-2 text-center">
                           {daysArray.map((day) => {
                             const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                            const isTaken = ttdLogs.some(l => l.intake_date === dateStr && l.taken);
+                            const isTaken = ttdLogs.some((l: any) => l.intake_date === dateStr && l.taken);
                             const isToday = today.getDate() === day && today.getMonth() + 1 === currentMonth && today.getFullYear() === currentYear;
 
                             return (
@@ -909,13 +909,9 @@ export default function DataIbuPage() {
                 })()}
               </div>
             </div>
-
-              </div>
-            </div>
-
           </div>
 
-          {/* Right Column: Daftar Anak Kandung */}
+            {/* Right Column: Daftar Anak Kandung */}
           <div className="lg:col-span-6 space-y-6">
             
             {/* Card: Daftar Anak Kandung Terhubung */}
