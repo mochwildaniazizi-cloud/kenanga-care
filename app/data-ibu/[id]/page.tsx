@@ -21,7 +21,8 @@ export default function MotherDetailPage() {
   const { role } = useUserRole();
   const [mother, setMother] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSubTab, setActiveSubTab] = useState<'ibu' | 'husband' | 'health' | 'ttd' | 'weekly'>('ibu');
+  const [activeSubTab, setActiveSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
+  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly'>('ttd');
 
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -892,20 +893,6 @@ export default function MotherDetailPage() {
               >
                 <FaFileMedical className="w-3.5 h-3.5" /> Riwayat &amp; Risiko
               </button>
-              <button 
-                type="button" 
-                onClick={() => setActiveSubTab('ttd')}
-                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'ttd' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
-              >
-                <MdVaccines className="w-3.5 h-3.5" /> Checklist TTD
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setActiveSubTab('weekly')}
-                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'weekly' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
-              >
-                <MdCalendarMonth className="w-3.5 h-3.5" /> Pemantauan Mingguan
-              </button>
             </div>
 
             {/* Content Body */}
@@ -1308,9 +1295,34 @@ export default function MotherDetailPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
 
+          {/* Card 2: PEMANTAUAN MANDIRI (TTD & MINGGUAN) */}
+          <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden mt-6">
+            {/* Tabs Selector for Card 2 */}
+            <div className="flex border-b text-xs font-bold text-base-text-secondary select-none">
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('ttd')}
+                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'ttd' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdVaccines className="w-3.5 h-3.5" /> Checklist TTD / MMS
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('weekly')}
+                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'weekly' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdCalendarMonth className="w-3.5 h-3.5" /> Pemantauan Mingguan
+              </button>
+            </div>
+
+            {/* Content Body for Card 2 */}
+            <div className="p-6">
+              
               {/* TAB 4: CHECKLIST TTD */}
-              {activeSubTab === 'ttd' && (() => {
+              {activePemantauanTab === 'ttd' && (() => {
                 const totalDays = new Date(currentYear, currentMonth, 0).getDate();
                 const daysArray = Array.from({ length: totalDays }, (_, i) => i + 1);
                 const monthsIndonesian = [
@@ -1462,7 +1474,7 @@ export default function MotherDetailPage() {
               })()}
 
               {/* TAB 5: PEMANTAUAN MINGGUAN */}
-              {activeSubTab === 'weekly' && (() => {
+              {activePemantauanTab === 'weekly' && (() => {
                 const weeks = weeklyTrimesterFilter === 1
                   ? [4, 5, 6, 7, 8, 9, 10, 11, 12]
                   : weeklyTrimesterFilter === 2
@@ -1814,7 +1826,7 @@ export default function MotherDetailPage() {
               
               {/* The Image inside */}
               <img 
-                src={cropImageSrc} 
+                src={cropImageSrc || undefined} 
                 alt="Raw Preview" 
                 draggable={false}
                 style={{
