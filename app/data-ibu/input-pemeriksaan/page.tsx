@@ -80,8 +80,25 @@ export default function InputPemeriksaanIbuPage() {
   // Fetch mothers list on mount
   useEffect(() => {
     async function fetchData() {
-      const data = await getMothersData();
-      setMothersData(data as Mother[]);
+      // Try local storage cache fallback first
+      const cached = localStorage.getItem("offline_mothers_list");
+      if (cached) {
+        try {
+          setMothersData(JSON.parse(cached) as Mother[]);
+        } catch (e) {
+          console.error("Failed to parse cached mothers list for input dropdown:", e);
+        }
+      }
+
+      if (!navigator.onLine) return;
+
+      try {
+        const data = await getMothersData();
+        setMothersData(data as Mother[]);
+        localStorage.setItem("offline_mothers_list", JSON.stringify(data));
+      } catch (err) {
+        console.error("Failed to fetch mothers data:", err);
+      }
     }
     fetchData();
   }, []);

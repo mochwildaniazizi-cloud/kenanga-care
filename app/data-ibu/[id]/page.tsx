@@ -384,6 +384,14 @@ export default function MotherDetailPage() {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-28 lg:pb-10 animate-in fade-in duration-300">
       
+      {/* Offline Warning Banner */}
+      {!navigator.onLine && (
+        <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
+          <span className="text-sm">⚠️</span>
+          <span>Mode Offline: Menampilkan rekam medis lokal dari memori peramban. Anda tetap bisa mengubah profil ibu secara offline.</span>
+        </div>
+      )}
+
       {/* Header & Back Button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/20 pb-4">
         <div className="flex items-center gap-4">

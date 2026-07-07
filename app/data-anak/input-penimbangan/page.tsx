@@ -59,8 +59,25 @@ export default function InputPenimbanganPage() {
   // Fetch children on mount
   useEffect(() => {
     async function fetchData() {
-      const data = await getChildrenData();
-      setChildrenData(data as Child[]);
+      // Try local storage cache fallback first
+      const cached = localStorage.getItem("offline_children_list");
+      if (cached) {
+        try {
+          setChildrenData(JSON.parse(cached) as Child[]);
+        } catch (e) {
+          console.error("Failed to parse cached children list for input dropdown:", e);
+        }
+      }
+
+      if (!navigator.onLine) return;
+
+      try {
+        const data = await getChildrenData();
+        setChildrenData(data as Child[]);
+        localStorage.setItem("offline_children_list", JSON.stringify(data));
+      } catch (err) {
+        console.error("Failed to fetch children data:", err);
+      }
     }
     fetchData();
   }, []);
