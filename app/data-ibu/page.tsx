@@ -192,8 +192,9 @@ export default function DataIbuPage() {
       if (!navigator.onLine) return;
 
       try {
-        const logs = await getTtdLogs(motherId, currentYear, currentMonth);
-        if (logs) {
+        const res = await getTtdLogs(motherId, currentYear, currentMonth);
+        if (res && res.success) {
+          const logs = res.logs;
           setTtdLogs(logs);
           
           const latestLog = logs.find((l: any) => l.companion);

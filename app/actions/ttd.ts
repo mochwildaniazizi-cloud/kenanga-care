@@ -20,7 +20,7 @@ export async function getTtdLogs(motherId: string, year: number, month: number) 
       },
     });
 
-    return logs.map((l: any) => ({
+    const mapped = logs.map((l: any) => ({
       log_id: l.log_id,
       mother_id: l.mother_id,
       intake_date: l.intake_date.toISOString().split("T")[0],
@@ -28,9 +28,11 @@ export async function getTtdLogs(motherId: string, year: number, month: number) 
       companion: l.companion || "",
       relationship: l.relationship || "",
     }));
-  } catch (error) {
+
+    return { success: true, logs: mapped };
+  } catch (error: any) {
     console.error("Failed to get TTD logs:", error);
-    return [];
+    return { success: false, error: error.message, logs: [] };
   }
 }
 
