@@ -274,6 +274,24 @@ export async function createChild(data: any) {
         blood_type: (data.blood_type && data.blood_type !== "-") ? data.blood_type : null,
         special_conditions: data.special_conditions ? JSON.stringify(data.special_conditions) : "[]",
         special_conditions_notes: data.special_conditions_notes || null,
+
+        // Additional Identity fields from Buku KIA 2024
+        jkn_number: data.jkn_number || null,
+        faskes_1: data.faskes_1 || null,
+        faskes_referral: data.faskes_referral || null,
+        birth_certificate_number: data.birth_certificate_number || null,
+        other_financing: data.other_financing || null,
+        insurance_other: data.insurance_other || null,
+        insurance_number: data.insurance_number || null,
+        insurance_validity: data.insurance_validity ? new Date(data.insurance_validity) : null,
+        faskes_primary: data.faskes_primary || null,
+        puskesmas_domicile: data.puskesmas_domicile || null,
+        cohort_register_number_baby: data.cohort_register_number_baby || null,
+        cohort_register_number_toddler: data.cohort_register_number_toddler || null,
+        faskes_secondary: data.faskes_secondary || null,
+        medical_record_number: data.medical_record_number || null,
+        address: data.address || null,
+        phone_number: data.phone_number || null,
       }
     });
 
@@ -363,6 +381,24 @@ export async function getChildDetail(childId: string) {
         : "Normal",
       mother_id: child.mother?.mother_id,
       mother_name: child.mother?.mother_name || "-",
+
+      // Additional Identity fields from Buku KIA 2024
+      jkn_number: child.jkn_number || "-",
+      faskes_1: child.faskes_1 || "-",
+      faskes_referral: child.faskes_referral || "-",
+      birth_certificate_number: child.birth_certificate_number || "-",
+      other_financing: child.other_financing || "-",
+      insurance_other: child.insurance_other || "-",
+      insurance_number: child.insurance_number || "-",
+      insurance_validity: child.insurance_validity ? child.insurance_validity.toISOString().split("T")[0] : "",
+      faskes_primary: child.faskes_primary || "-",
+      puskesmas_domicile: child.puskesmas_domicile || "-",
+      cohort_register_number_baby: child.cohort_register_number_baby || "-",
+      cohort_register_number_toddler: child.cohort_register_number_toddler || "-",
+      faskes_secondary: child.faskes_secondary || "-",
+      medical_record_number: child.medical_record_number || "-",
+      address: child.address || "-",
+      phone_number: child.phone_number || "-",
       measurements: child.measurements.map((m: any) => ({
         measurement_id: m.measurement_id,
         date: formatDateIndonesian(m.visit_date),
@@ -402,6 +438,24 @@ export async function updateChild(childId: string, data: any) {
         blood_type: (data.blood_type && data.blood_type !== "-") ? data.blood_type : null,
         special_conditions: data.special_conditions ? JSON.stringify(data.special_conditions) : "[]",
         special_conditions_notes: data.special_conditions_notes || null,
+
+        // Additional Identity fields from Buku KIA 2024
+        jkn_number: data.jkn_number !== undefined ? data.jkn_number : undefined,
+        faskes_1: data.faskes_1 !== undefined ? data.faskes_1 : undefined,
+        faskes_referral: data.faskes_referral !== undefined ? data.faskes_referral : undefined,
+        birth_certificate_number: data.birth_certificate_number !== undefined ? data.birth_certificate_number : undefined,
+        other_financing: data.other_financing !== undefined ? data.other_financing : undefined,
+        insurance_other: data.insurance_other !== undefined ? data.insurance_other : undefined,
+        insurance_number: data.insurance_number !== undefined ? data.insurance_number : undefined,
+        insurance_validity: data.insurance_validity ? new Date(data.insurance_validity) : (data.insurance_validity === null ? null : undefined),
+        faskes_primary: data.faskes_primary !== undefined ? data.faskes_primary : undefined,
+        puskesmas_domicile: data.puskesmas_domicile !== undefined ? data.puskesmas_domicile : undefined,
+        cohort_register_number_baby: data.cohort_register_number_baby !== undefined ? data.cohort_register_number_baby : undefined,
+        cohort_register_number_toddler: data.cohort_register_number_toddler !== undefined ? data.cohort_register_number_toddler : undefined,
+        faskes_secondary: data.faskes_secondary !== undefined ? data.faskes_secondary : undefined,
+        medical_record_number: data.medical_record_number !== undefined ? data.medical_record_number : undefined,
+        address: data.address !== undefined ? data.address : undefined,
+        phone_number: data.phone_number !== undefined ? data.phone_number : undefined,
       }
     });
 

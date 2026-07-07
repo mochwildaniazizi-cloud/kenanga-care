@@ -9,7 +9,8 @@ import {
 } from "react-icons/md";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import ArticleCard from "@/components/ArticleCard";
-import { mockArticles, CategoryType } from "./data";
+import { mockArticles } from "./data";
+import type { CategoryType } from "./data";
 import { useUserRole } from "@/context/UserRoleContext";
 
 type TabType = CategoryType | "Semua" | "Tersimpan";

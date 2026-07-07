@@ -8,9 +8,9 @@ import { getMotherDetail, updateMother } from "@/app/actions/mothers";
 import { 
   MdArrowBack, MdPerson, MdCalendarToday, MdPhone, 
   MdPregnantWoman, MdBloodtype, MdOutlineError, MdFemale, MdMale,
-  MdEdit, MdSave, MdClose, MdCheckCircleOutline, MdCameraAlt
+  MdEdit, MdSave, MdClose, MdCheckCircleOutline, MdCameraAlt, MdHome, MdInfo
 } from "react-icons/md";
-import { FaUserFriends, FaHeartbeat } from "react-icons/fa";
+import { FaUserFriends, FaHeartbeat, FaUser, FaUserFriends as FaUserCouple, FaFileMedical } from "react-icons/fa";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 export default function MotherDetailPage() {
@@ -18,6 +18,7 @@ export default function MotherDetailPage() {
   const { role } = useUserRole();
   const [mother, setMother] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeSubTab, setActiveSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
 
   // Editing States
   const [isEditing, setIsEditing] = useState(false);
@@ -74,10 +75,7 @@ export default function MotherDetailPage() {
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
     const touch = e.touches[0];
-    setCropOffset({
-      x: touch.clientX - dragStart.x,
-      y: touch.clientY - dragStart.y
-    });
+    setDragStart({ x: touch.clientX - cropOffset.x, y: touch.clientY - cropOffset.y });
   };
 
   const handleCropSave = () => {
@@ -110,6 +108,7 @@ export default function MotherDetailPage() {
       setCropImageSrc(null);
     };
   };
+
   const [editForm, setEditForm] = useState<any>({
     national_id: "",
     mother_name: "",
@@ -120,7 +119,53 @@ export default function MotherDetailPage() {
     estimated_due_date: "",
     risk_status: "Normal",
     ui_status: "Ibu Hamil",
-    number_of_children: 0
+    number_of_children: 0,
+    avatarUrl: "",
+
+    // Additional Mother Identity fields from Buku KIA 2024
+    jkn_number: "",
+    faskes_1: "",
+    faskes_referral: "",
+    birth_place: "",
+    education: "",
+    occupation: "",
+    address: "",
+    other_financing: "",
+    insurance_other: "",
+    insurance_number: "",
+    insurance_validity: "",
+    faskes_primary: "",
+    puskesmas_domicile: "",
+    cohort_register_number: "",
+    faskes_secondary: "",
+    medical_record_number: "",
+
+    // Riwayat Singkat Kesehatan Ibu
+    pregnancy_number: "1",
+    children_born_alive: "0",
+    miscarriage_history: "0",
+    disease_history: "",
+
+    // Husband fields
+    husband_national_id: "",
+    husband_jkn_number: "",
+    husband_faskes_1: "",
+    husband_faskes_referral: "",
+    husband_birth_place: "",
+    husband_birth_date: "",
+    husband_education: "",
+    husband_occupation: "",
+    husband_address: "",
+    husband_phone_number: "",
+    husband_blood_type: "-",
+    husband_other_financing: "",
+    husband_insurance_other: "",
+    husband_insurance_number: "",
+    husband_insurance_validity: "",
+    husband_faskes_primary: "",
+    husband_puskesmas_domicile: "",
+    husband_faskes_secondary: "",
+    husband_medical_record_number: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -129,8 +174,6 @@ export default function MotherDetailPage() {
     async function fetchDetail() {
       if (!id) return;
       setError(null);
-
-      // Decode URL-encoded id (e.g., spaces encoded as %20)
       const decodedId = decodeURIComponent(id as string);
 
       // Attempt load full cached detail
@@ -156,7 +199,8 @@ export default function MotherDetailPage() {
               husband_name: "-",
               number_of_children: 0,
               measurements: [],
-              children: []
+              children: [],
+              maternal_records: []
             });
             setIsLoading(false);
           }
@@ -198,7 +242,52 @@ export default function MotherDetailPage() {
       risk_status: mother.condition || "Normal",
       ui_status: mother.status || "Ibu Hamil",
       number_of_children: mother.number_of_children || 0,
-      avatarUrl: mother.avatarUrl || ""
+      avatarUrl: mother.avatarUrl || "",
+
+      // Buku KIA Mother fields
+      jkn_number: mother.jkn_number === "-" ? "" : mother.jkn_number,
+      faskes_1: mother.faskes_1 === "-" ? "" : mother.faskes_1,
+      faskes_referral: mother.faskes_referral === "-" ? "" : mother.faskes_referral,
+      birth_place: mother.birth_place === "-" ? "" : mother.birth_place,
+      education: mother.education === "-" ? "" : mother.education,
+      occupation: mother.occupation === "-" ? "" : mother.occupation,
+      address: mother.address === "-" ? "" : mother.address,
+      other_financing: mother.other_financing === "-" ? "" : mother.other_financing,
+      insurance_other: mother.insurance_other === "-" ? "" : mother.insurance_other,
+      insurance_number: mother.insurance_number === "-" ? "" : mother.insurance_number,
+      insurance_validity: mother.insurance_validity || "",
+      faskes_primary: mother.faskes_primary === "-" ? "" : mother.faskes_primary,
+      puskesmas_domicile: mother.puskesmas_domicile === "-" ? "" : mother.puskesmas_domicile,
+      cohort_register_number: mother.cohort_register_number === "-" ? "" : mother.cohort_register_number,
+      faskes_secondary: mother.faskes_secondary === "-" ? "" : mother.faskes_secondary,
+      medical_record_number: mother.medical_record_number === "-" ? "" : mother.medical_record_number,
+
+      // Riwayat Singkat Kesehatan Ibu
+      pregnancy_number: mother.pregnancy_number || 1,
+      children_born_alive: mother.children_born_alive || 0,
+      miscarriage_history: mother.miscarriage_history || 0,
+      disease_history: mother.disease_history === "-" ? "" : mother.disease_history,
+
+      // Husband Identity fields
+      husband_national_id: mother.husband_national_id === "-" ? "" : mother.husband_national_id,
+      husband_jkn_number: mother.husband_jkn_number === "-" ? "" : mother.husband_jkn_number,
+      husband_faskes_1: mother.husband_faskes_1 === "-" ? "" : mother.husband_faskes_1,
+      husband_faskes_referral: mother.husband_faskes_referral === "-" ? "" : mother.husband_faskes_referral,
+      husband_birth_place: mother.husband_birth_place === "-" ? "" : mother.husband_birth_place,
+      husband_birth_date: mother.husband_birth_date || "",
+      husband_education: mother.husband_education === "-" ? "" : mother.husband_education,
+      husband_occupation: mother.husband_occupation === "-" ? "" : mother.husband_occupation,
+      husband_address: mother.husband_address === "-" ? "" : mother.husband_address,
+      husband_phone_number: mother.husband_phone_number === "-" ? "" : mother.husband_phone_number,
+      husband_blood_type: mother.husband_blood_type === "-" ? "" : mother.husband_blood_type,
+      husband_other_financing: mother.husband_other_financing === "-" ? "" : mother.husband_other_financing,
+      husband_insurance_other: mother.husband_insurance_other === "-" ? "" : mother.husband_insurance_other,
+      husband_insurance_number: mother.husband_insurance_number === "-" ? "" : mother.husband_insurance_number,
+      husband_insurance_validity: mother.husband_insurance_validity || "",
+      husband_faskes_primary: mother.husband_faskes_primary === "-" ? "" : mother.husband_faskes_primary,
+      husband_puskesmas_domicile: mother.husband_puskesmas_domicile === "-" ? "" : mother.husband_puskesmas_domicile,
+      husband_faskes_secondary: mother.husband_faskes_secondary === "-" ? "" : mother.husband_faskes_secondary,
+      husband_medical_record_number: mother.husband_medical_record_number === "-" ? "" : mother.husband_medical_record_number,
     });
     setIsEditing(true);
   };
@@ -209,13 +298,53 @@ export default function MotherDetailPage() {
       editForm.mother_name !== (mother.name || "") ||
       editForm.national_id !== (mother.national_id || "") ||
       editForm.birth_date !== (mother.dobRaw || "") ||
+      editForm.jkn_number !== (mother.jkn_number === "-" ? "" : mother.jkn_number) ||
+      editForm.faskes_1 !== (mother.faskes_1 === "-" ? "" : mother.faskes_1) ||
+      editForm.faskes_referral !== (mother.faskes_referral === "-" ? "" : mother.faskes_referral) ||
+      editForm.birth_place !== (mother.birth_place === "-" ? "" : mother.birth_place) ||
+      editForm.education !== (mother.education === "-" ? "" : mother.education) ||
+      editForm.occupation !== (mother.occupation === "-" ? "" : mother.occupation) ||
+      editForm.address !== (mother.address === "-" ? "" : mother.address) ||
+      editForm.other_financing !== (mother.other_financing === "-" ? "" : mother.other_financing) ||
+      editForm.insurance_other !== (mother.insurance_other === "-" ? "" : mother.insurance_other) ||
+      editForm.insurance_number !== (mother.insurance_number === "-" ? "" : mother.insurance_number) ||
+      editForm.insurance_validity !== (mother.insurance_validity || "") ||
+      editForm.faskes_primary !== (mother.faskes_primary === "-" ? "" : mother.faskes_primary) ||
+      editForm.puskesmas_domicile !== (mother.puskesmas_domicile === "-" ? "" : mother.puskesmas_domicile) ||
+      editForm.cohort_register_number !== (mother.cohort_register_number === "-" ? "" : mother.cohort_register_number) ||
+      editForm.faskes_secondary !== (mother.faskes_secondary === "-" ? "" : mother.faskes_secondary) ||
+      editForm.medical_record_number !== (mother.medical_record_number === "-" ? "" : mother.medical_record_number) ||
+      editForm.pregnancy_number !== (mother.pregnancy_number || 1) ||
+      editForm.children_born_alive !== (mother.children_born_alive || 0) ||
+      editForm.miscarriage_history !== (mother.miscarriage_history || 0) ||
+      editForm.disease_history !== (mother.disease_history === "-" ? "" : mother.disease_history) ||
       editForm.husband_name !== (mother.husband_name === "-" ? "" : mother.husband_name) ||
+      editForm.husband_national_id !== (mother.husband_national_id === "-" ? "" : mother.husband_national_id) ||
+      editForm.husband_jkn_number !== (mother.husband_jkn_number === "-" ? "" : mother.husband_jkn_number) ||
+      editForm.husband_faskes_1 !== (mother.husband_faskes_1 === "-" ? "" : mother.husband_faskes_1) ||
+      editForm.husband_faskes_referral !== (mother.husband_faskes_referral === "-" ? "" : mother.husband_faskes_referral) ||
+      editForm.husband_birth_place !== (mother.husband_birth_place === "-" ? "" : mother.husband_birth_place) ||
+      editForm.husband_birth_date !== (mother.husband_birth_date || "") ||
+      editForm.husband_education !== (mother.husband_education === "-" ? "" : mother.husband_education) ||
+      editForm.husband_occupation !== (mother.husband_occupation === "-" ? "" : mother.husband_occupation) ||
+      editForm.husband_address !== (mother.husband_address === "-" ? "" : mother.husband_address) ||
+      editForm.husband_phone_number !== (mother.husband_phone_number === "-" ? "" : mother.husband_phone_number) ||
+      editForm.husband_blood_type !== (mother.husband_blood_type === "-" ? "" : mother.husband_blood_type) ||
+      editForm.husband_other_financing !== (mother.husband_other_financing === "-" ? "" : mother.husband_other_financing) ||
+      editForm.husband_insurance_other !== (mother.husband_insurance_other === "-" ? "" : mother.husband_insurance_other) ||
+      editForm.husband_insurance_number !== (mother.husband_insurance_number === "-" ? "" : mother.husband_insurance_number) ||
+      editForm.husband_insurance_validity !== (mother.husband_insurance_validity || "") ||
+      editForm.husband_faskes_primary !== (mother.husband_faskes_primary === "-" ? "" : mother.husband_faskes_primary) ||
+      editForm.husband_puskesmas_domicile !== (mother.husband_puskesmas_domicile === "-" ? "" : mother.husband_puskesmas_domicile) ||
+      editForm.husband_faskes_secondary !== (mother.husband_faskes_secondary === "-" ? "" : mother.husband_faskes_secondary) ||
+      editForm.husband_medical_record_number !== (mother.husband_medical_record_number === "-" ? "" : mother.husband_medical_record_number) ||
       editForm.phone_number !== (mother.phone_number === "-" ? "" : mother.phone_number) ||
       editForm.blood_type !== (mother.blood_type === "-" ? "" : mother.blood_type) ||
       editForm.estimated_due_date !== (mother.estimated_due_date && mother.estimated_due_date !== "-" ? mother.estimated_due_date : "") ||
       editForm.risk_status !== (mother.condition || "Normal") ||
       editForm.ui_status !== (mother.status || "Ibu Hamil") ||
-      editForm.number_of_children !== (mother.number_of_children || 0)
+      editForm.number_of_children !== (mother.number_of_children || 0) ||
+      editForm.avatarUrl !== (mother.avatarUrl || "")
     );
   };
 
@@ -227,7 +356,7 @@ export default function MotherDetailPage() {
     setIsEditing(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditForm((prev: any) => ({ ...prev, [name]: value }));
   };
@@ -241,24 +370,68 @@ export default function MotherDetailPage() {
 
     const decodedId = decodeURIComponent(id as string);
 
+    const updatedMother = {
+      ...mother,
+      national_id: editForm.national_id,
+      name: editForm.mother_name,
+      dobRaw: editForm.birth_date,
+      dob: editForm.birth_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.birth_date)) : "-",
+      age: getAgeInYears(editForm.birth_date) + " Tahun",
+      husband_name: editForm.husband_name || "-",
+      phone_number: editForm.phone_number || "-",
+      blood_type: editForm.blood_type || "-",
+      estimated_due_date: editForm.estimated_due_date || "-",
+      hpl: editForm.estimated_due_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.estimated_due_date)) : "-",
+      condition: editForm.risk_status,
+      status: editForm.ui_status,
+      number_of_children: editForm.number_of_children ? parseInt(editForm.number_of_children.toString()) : 0,
+      avatarUrl: editForm.avatarUrl,
+
+      // Additional Buku KIA 2024 fields
+      jkn_number: editForm.jkn_number || "-",
+      faskes_1: editForm.faskes_1 || "-",
+      faskes_referral: editForm.faskes_referral || "-",
+      birth_place: editForm.birth_place || "-",
+      education: editForm.education || "-",
+      occupation: editForm.occupation || "-",
+      address: editForm.address || "-",
+      other_financing: editForm.other_financing || "-",
+      insurance_other: editForm.insurance_other || "-",
+      insurance_number: editForm.insurance_number || "-",
+      insurance_validity: editForm.insurance_validity || "",
+      faskes_primary: editForm.faskes_primary || "-",
+      puskesmas_domicile: editForm.puskesmas_domicile || "-",
+      cohort_register_number: editForm.cohort_register_number || "-",
+      faskes_secondary: editForm.faskes_secondary || "-",
+      medical_record_number: editForm.medical_record_number || "-",
+
+      pregnancy_number: editForm.pregnancy_number ? parseInt(editForm.pregnancy_number.toString()) : 1,
+      children_born_alive: editForm.children_born_alive ? parseInt(editForm.children_born_alive.toString()) : 0,
+      miscarriage_history: editForm.miscarriage_history ? parseInt(editForm.miscarriage_history.toString()) : 0,
+      disease_history: editForm.disease_history || "-",
+
+      husband_national_id: editForm.husband_national_id || "-",
+      husband_jkn_number: editForm.husband_jkn_number || "-",
+      husband_faskes_1: editForm.husband_faskes_1 || "-",
+      husband_faskes_referral: editForm.husband_faskes_referral || "-",
+      husband_birth_place: editForm.husband_birth_place || "-",
+      husband_birth_date: editForm.husband_birth_date || "",
+      husband_education: editForm.husband_education || "-",
+      husband_occupation: editForm.husband_occupation || "-",
+      husband_address: editForm.husband_address || "-",
+      husband_phone_number: editForm.husband_phone_number || "-",
+      husband_blood_type: editForm.husband_blood_type || "-",
+      husband_other_financing: editForm.husband_other_financing || "-",
+      husband_insurance_other: editForm.husband_insurance_other || "-",
+      husband_insurance_number: editForm.husband_insurance_number || "-",
+      husband_insurance_validity: editForm.husband_insurance_validity || "",
+      husband_faskes_primary: editForm.husband_faskes_primary || "-",
+      husband_puskesmas_domicile: editForm.husband_puskesmas_domicile || "-",
+      husband_faskes_secondary: editForm.husband_faskes_secondary || "-",
+      husband_medical_record_number: editForm.husband_medical_record_number || "-",
+    };
+
     if (!navigator.onLine) {
-      const updatedMother = {
-        ...mother,
-        national_id: editForm.national_id,
-        name: editForm.mother_name,
-        dobRaw: editForm.birth_date,
-        dob: editForm.birth_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.birth_date)) : "-",
-        age: getAgeInYears(editForm.birth_date) + " Tahun",
-        husband_name: editForm.husband_name || "-",
-        phone_number: editForm.phone_number || "-",
-        blood_type: editForm.blood_type || "-",
-        estimated_due_date: editForm.estimated_due_date || "-",
-        hpl: editForm.estimated_due_date ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(editForm.estimated_due_date)) : "-",
-        condition: editForm.risk_status,
-        status: editForm.ui_status,
-        number_of_children: editForm.number_of_children ? parseInt(editForm.number_of_children.toString()) : 0,
-        avatarUrl: editForm.avatarUrl
-      };
       setMother(updatedMother);
       localStorage.setItem("offline_mother_detail_" + decodedId, JSON.stringify(updatedMother));
 
@@ -299,6 +472,7 @@ export default function MotherDetailPage() {
       if (res.success) {
         const data = await getMotherDetail(decodedId);
         setMother(data);
+        localStorage.setItem("offline_mother_detail_" + decodedId, JSON.stringify(data));
         setIsEditing(false);
         setShowSuccessModal(true);
       } else {
@@ -410,7 +584,7 @@ export default function MotherDetailPage() {
               title="Klik untuk ubah foto profil"
             >
               {editForm.avatarUrl ? (
-                <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover animate-in fade-in" />
               ) : (
                 <MdPerson className="w-9 h-9" />
               )}
@@ -517,192 +691,452 @@ export default function MotherDetailPage() {
       {/* Bento Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left Column: Identitas & Kehamilan (Col span 6) */}
-        <div className="lg:col-span-6 space-y-6">
+        {/* Left Column: Identitas & Kehamilan (Col span 7) */}
+        <div className="lg:col-span-7 space-y-6">
           
-          {/* Card: Identitas Ibu */}
-          <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
-              <MdPerson className="w-5 h-5 text-brand-primary" />
-              <h2 className="font-bold text-base-text-primary text-base">Identitas Ibu</h2>
+          {/* Card: TABBED BENTO CONTAINER */}
+          <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden">
+            {/* Tabs Selector */}
+            <div className="flex border-b text-xs font-bold text-base-text-secondary select-none">
+              <button 
+                type="button" 
+                onClick={() => setActiveSubTab('ibu')}
+                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'ibu' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <FaUser className="w-3.5 h-3.5" /> Identitas Ibu
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActiveSubTab('husband')}
+                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'husband' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <FaUserCouple className="w-3.5 h-3.5" /> Suami / Keluarga
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActiveSubTab('health')}
+                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'health' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <FaFileMedical className="w-3.5 h-3.5" /> Riwayat &amp; Risiko
+              </button>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4 text-xs font-medium">
-              <div className="space-y-1">
-                <span className="text-base-text-secondary block">Tanggal Lahir</span>
-                {isEditing ? (
-                  <div className="relative overflow-visible z-50">
-                    <CustomDatePicker 
-                      value={editForm.birth_date}
-                      onChange={(val) => setEditForm((prev: any) => ({ ...prev, birth_date: val }))}
-                      label="Select birth date"
-                      outputFormat="iso"
-                    />
+
+            {/* Content Body */}
+            <div className="p-6">
+              
+              {/* TAB 1: IDENTITAS IBU */}
+              {activeSubTab === 'ibu' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">No. JKN / BPJS</span>
+                    {isEditing ? (
+                      <input type="text" name="jkn_number" value={editForm.jkn_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.jkn_number || "-"}</p>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary">{mother.dob}</p>
-                )}
-              </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Tempat Lahir</span>
+                    {isEditing ? (
+                      <input type="text" name="birth_place" value={editForm.birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.birth_place || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Tanggal Lahir</span>
+                    {isEditing ? (
+                      <div className="relative overflow-visible z-50">
+                        <CustomDatePicker value={editForm.birth_date} onChange={(val) => setEditForm((prev: any) => ({ ...prev, birth_date: val }))} outputFormat="iso" />
+                      </div>
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.dob}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Golongan Darah</span>
+                    {isEditing ? (
+                      <select name="blood_type" value={editForm.blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white cursor-pointer">
+                        <option value="">Golongan Darah</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                        <option value="Tidak Tahu">Tidak Tahu</option>
+                      </select>
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                        <MdBloodtype className="w-4 h-4 text-status-red-solid" /> {mother.blood_type}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Pendidikan</span>
+                    {isEditing ? (
+                      <input type="text" name="education" value={editForm.education} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.education || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Pekerjaan</span>
+                    {isEditing ? (
+                      <input type="text" name="occupation" value={editForm.occupation} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.occupation || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">No. Telepon / WA</span>
+                    {isEditing ? (
+                      <input type="text" name="phone_number" value={editForm.phone_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
+                        <MdPhone className="w-3.5 h-3.5 text-base-text-secondary" /> {mother.phone_number}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Faskes Tingkat 1</span>
+                    {isEditing ? (
+                      <input type="text" name="faskes_1" value={editForm.faskes_1} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.faskes_1 || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Faskes Rujukan</span>
+                    {isEditing ? (
+                      <input type="text" name="faskes_referral" value={editForm.faskes_referral} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.faskes_referral || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Puskesmas Domisili</span>
+                    {isEditing ? (
+                      <input type="text" name="puskesmas_domicile" value={editForm.puskesmas_domicile} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.puskesmas_domicile || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">No. Reg Kohort Ibu</span>
+                    {isEditing ? (
+                      <input type="text" name="cohort_register_number" value={editForm.cohort_register_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.cohort_register_number || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">No. Catatan Medik RS</span>
+                    {isEditing ? (
+                      <input type="text" name="medical_record_number" value={editForm.medical_record_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.medical_record_number || "-"}</p>
+                    )}
+                  </div>
+                  <div className="sm:col-span-2 space-y-1">
+                    <span className="text-base-text-secondary block">Alamat Rumah</span>
+                    {isEditing ? (
+                      <textarea name="address" value={editForm.address} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs resize-none" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.address || "-"}</p>
+                    )}
+                  </div>
 
-              <div className="space-y-1">
-                <span className="text-base-text-secondary block">Usia Saat Ini</span>
-                <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{displayAge ? `${displayAge} Tahun` : "-"}</p>
-              </div>
+                  <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Pembiayaan Lain</span>
+                      {isEditing ? (
+                        <input type="text" name="other_financing" value={editForm.other_financing} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.other_financing || "-"}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Asuransi Lain</span>
+                      {isEditing ? (
+                        <input type="text" name="insurance_other" value={editForm.insurance_other} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.insurance_other || "-"}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Nomor Asuransi</span>
+                      {isEditing ? (
+                        <input type="text" name="insurance_number" value={editForm.insurance_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.insurance_number || "-"}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi</span>
+                      {isEditing ? (
+                        <input type="date" name="insurance_validity" value={editForm.insurance_validity} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs text-base-text-primary" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.insurance_validity || "-"}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-              <div className="space-y-1">
-                <span className="text-base-text-secondary block">Nama Suami</span>
-                {isEditing ? (
-                  <input 
-                    type="text" 
-                    name="husband_name"
-                    value={editForm.husband_name}
-                    onChange={handleInputChange}
-                    className="w-full px-2.5 py-1.5 border border-base-border/50 rounded-lg focus:outline-none focus:border-brand-primary text-xs"
-                    placeholder="Nama Suami"
-                  />
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary">{mother.husband_name}</p>
-                )}
-              </div>
+              {/* TAB 2: IDENTITAS SUAMI */}
+              {activeSubTab === 'husband' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Nama Lengkap Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_name" value={editForm.husband_name} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_name || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">NIK Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_national_id" maxLength={16} value={editForm.husband_national_id} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_national_id || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">No. JKN / BPJS Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_jkn_number" value={editForm.husband_jkn_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_jkn_number || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Tempat Lahir Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_birth_place" value={editForm.husband_birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_birth_place || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Tanggal Lahir Suami</span>
+                    {isEditing ? (
+                      <input type="date" name="husband_birth_date" value={editForm.husband_birth_date} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs text-base-text-primary" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_birth_date || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Golongan Darah Suami</span>
+                    {isEditing ? (
+                      <select name="husband_blood_type" value={editForm.husband_blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white cursor-pointer">
+                        <option value="">Golongan Darah</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                        <option value="Tidak Tahu">Tidak Tahu</option>
+                      </select>
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_blood_type || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Pendidikan Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_education" value={editForm.husband_education} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_education || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Pekerjaan Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_occupation" value={editForm.husband_occupation} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_occupation || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Nomor Telepon Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_phone_number" value={editForm.husband_phone_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_phone_number || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Faskes Tingkat 1 Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_faskes_1" value={editForm.husband_faskes_1} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_faskes_1 || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Faskes Rujukan Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_faskes_referral" value={editForm.husband_faskes_referral} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_faskes_referral || "-"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">No. Catatan Medik RS Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_medical_record_number" value={editForm.husband_medical_record_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_medical_record_number || "-"}</p>
+                    )}
+                  </div>
+                  <div className="sm:col-span-2 space-y-1">
+                    <span className="text-base-text-secondary block">Alamat Rumah Suami</span>
+                    {isEditing ? (
+                      <input type="text" name="husband_address" value={editForm.husband_address} onChange={handleInputChange} placeholder="Kosongkan jika sama dengan alamat ibu..." className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.husband_address || "-"}</p>
+                    )}
+                  </div>
+                  
+                  <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Pembiayaan Lain Suami</span>
+                      {isEditing ? (
+                        <input type="text" name="husband_other_financing" value={editForm.husband_other_financing} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.husband_other_financing || "-"}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Asuransi Lain Suami</span>
+                      {isEditing ? (
+                        <input type="text" name="husband_insurance_other" value={editForm.husband_insurance_other} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.husband_insurance_other || "-"}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Nomor Asuransi Suami</span>
+                      {isEditing ? (
+                        <input type="text" name="husband_insurance_number" value={editForm.husband_insurance_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.husband_insurance_number || "-"}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi Suami</span>
+                      {isEditing ? (
+                        <input type="date" name="husband_insurance_validity" value={editForm.husband_insurance_validity} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs text-base-text-primary" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{mother.husband_insurance_validity || "-"}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-              <div className="space-y-1">
-                <span className="text-base-text-secondary block">No. Telepon / WA</span>
-                {isEditing ? (
-                  <input 
-                    type="text" 
-                    name="phone_number"
-                    value={editForm.phone_number}
-                    onChange={handleInputChange}
-                    className="w-full px-2.5 py-1.5 border border-base-border/50 rounded-lg focus:outline-none focus:border-brand-primary text-xs"
-                    placeholder="No. Telepon"
-                  />
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
-                    <MdPhone className="w-3.5 h-3.5 text-base-text-secondary" /> {mother.phone_number}
-                  </p>
-                )}
-              </div>
+              {/* TAB 3: RIWAYAT KESEHATAN IBU */}
+              {activeSubTab === 'health' && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Kehamilan Ke-</span>
+                    {isEditing ? (
+                      <input type="number" name="pregnancy_number" min="1" value={editForm.pregnancy_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{mother.pregnancy_number ?? "1"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Jumlah Anak Lahir Hidup</span>
+                    {isEditing ? (
+                      <input type="number" name="children_born_alive" min="0" value={editForm.children_born_alive} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{mother.children_born_alive ?? "0"}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Riwayat Keguguran</span>
+                    {isEditing ? (
+                      <input type="number" name="miscarriage_history" min="0" value={editForm.miscarriage_history} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{mother.miscarriage_history ?? "0"} kali</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Jumlah Anak Hidup Posyandu</span>
+                    {isEditing ? (
+                      <input type="number" name="number_of_children" min="0" value={editForm.number_of_children} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{mother.number_of_children} anak</p>
+                    )}
+                  </div>
+                  <div className="sm:col-span-2 space-y-1">
+                    <span className="text-base-text-secondary block">Riwayat Penyakit Ibu</span>
+                    {isEditing ? (
+                      <textarea name="disease_history" value={editForm.disease_history} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs resize-none" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary italic">{mother.disease_history || "-"}</p>
+                    )}
+                  </div>
 
-              <div className="space-y-1">
-                <span className="text-base-text-secondary block">Golongan Darah</span>
-                {isEditing ? (
-                  <select 
-                    name="blood_type"
-                    value={editForm.blood_type}
-                    onChange={handleInputChange}
-                    className="w-full px-2.5 py-1.5 border border-base-border/50 rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white cursor-pointer"
-                  >
-                    <option value="">Pilih Golongan Darah</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="AB">AB</option>
-                    <option value="O">O</option>
-                  </select>
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
-                    <MdBloodtype className="w-4 h-4 text-status-red-solid" /> {mother.blood_type}
-                  </p>
-                )}
-              </div>
+                  <div className="sm:col-span-2 border-t pt-3 mt-1 grid grid-cols-3 gap-4">
+                    <div className="bg-base-bg/30 p-2.5 rounded-xl text-center">
+                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Status Ibu</span>
+                      {isEditing ? (
+                        <select name="ui_status" value={editForm.ui_status} onChange={handleInputChange} className="mt-1 w-full bg-base-white border text-center text-xs p-1 rounded cursor-pointer">
+                          <option value="Calon Ibu">Calon Ibu</option>
+                          <option value="Ibu Hamil">Ibu Hamil</option>
+                          <option value="Ibu Nifas">Ibu Nifas</option>
+                          <option value="Ibu Balita">Ibu Balita</option>
+                        </select>
+                      ) : (
+                        <p className="text-xs font-bold text-base-text-primary mt-1">{mother.status}</p>
+                      )}
+                    </div>
+                    <div className="bg-base-bg/30 p-2.5 rounded-xl text-center">
+                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Kondisi Risiko</span>
+                      {isEditing ? (
+                        <select name="risk_status" value={editForm.risk_status} onChange={handleInputChange} className="mt-1 w-full bg-base-white border text-center text-xs p-1 rounded cursor-pointer">
+                          <option value="Normal">Normal</option>
+                          <option value="KEK">KEK</option>
+                          <option value="Risiko Tinggi">Risiko Tinggi</option>
+                        </select>
+                      ) : (
+                        <span className={`inline-block mt-1 px-2 py-0.5 border text-[10px] font-bold rounded-full ${getConditionColor(displayCondition)}`}>
+                          {displayCondition}
+                        </span>
+                      )}
+                    </div>
+                    <div className="bg-base-bg/30 p-2.5 rounded-xl text-center">
+                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block">HPL / Bersalin</span>
+                      {isEditing ? (
+                        editForm.ui_status === "Ibu Hamil" ? (
+                          <input type="date" name="estimated_due_date" value={editForm.estimated_due_date} onChange={handleInputChange} className="mt-1 w-full bg-base-white border text-center text-xs p-0.5 rounded" />
+                        ) : (
+                          <p className="text-xs text-base-text-secondary mt-1.5">Hanya Ibu Hamil</p>
+                        )
+                      ) : (
+                        <p className="text-xs font-bold text-base-text-primary mt-1 whitespace-nowrap overflow-hidden text-ellipsis">{mother.hpl}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-              <div className="space-y-1">
-                <span className="text-base-text-secondary block">Jumlah Anak</span>
-                {isEditing ? (
-                  <input 
-                    type="number" 
-                    name="number_of_children"
-                    value={editForm.number_of_children}
-                    onChange={handleInputChange}
-                    className="w-full px-2.5 py-1.5 border border-base-border/50 rounded-lg focus:outline-none focus:border-brand-primary text-xs"
-                    min="0"
-                  />
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary">{mother.number_of_children} anak</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Card: Status Kehamilan / Nifas */}
-          <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-            <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
-              <MdPregnantWoman className="w-5 h-5 text-brand-primary" />
-              <h2 className="font-bold text-base-text-primary text-base">Status Kehamilan & Persalinan</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
-                <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Status Ibu</span>
-                {isEditing ? (
-                  <select 
-                    name="ui_status"
-                    value={editForm.ui_status}
-                    onChange={handleInputChange}
-                    className="mt-1 px-1.5 py-1 border border-base-border/50 rounded text-xs bg-base-white cursor-pointer w-full text-center"
-                  >
-                    <option value="Calon Ibu">Calon Ibu</option>
-                    <option value="Ibu Hamil">Ibu Hamil</option>
-                    <option value="Ibu Nifas">Ibu Nifas</option>
-                    <option value="Ibu Balita">Ibu Balita</option>
-                  </select>
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary mt-1">{mother.status}</p>
-                )}
-              </div>
-
-              <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
-                <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Kondisi Risiko</span>
-                {isEditing ? (
-                  <select 
-                    name="risk_status"
-                    value={editForm.risk_status}
-                    onChange={handleInputChange}
-                    className="mt-1 px-1.5 py-1 border border-base-border/50 rounded text-xs bg-base-white cursor-pointer w-full text-center"
-                  >
-                    <option value="Normal">Normal</option>
-                    <option value="KEK">KEK</option>
-                    <option value="Risiko Tinggi">Risiko Tinggi</option>
-                  </select>
-                ) : (
-                  <span className={`inline-block mt-1.5 px-2.5 py-0.5 border text-[10px] font-bold rounded-full ${getConditionColor(displayCondition)}`}>
-                    {displayCondition}
-                  </span>
-                )}
-              </div>
-
-              <div className="bg-base-bg/30 p-3.5 rounded-xl text-center">
-                <span className="text-[10px] font-bold text-base-text-secondary uppercase block">HPL / Bersalin</span>
-                {isEditing ? (
-                  editForm.ui_status === "Ibu Hamil" ? (
-                    <input 
-                      type="date" 
-                      name="estimated_due_date"
-                      value={editForm.estimated_due_date}
-                      onChange={handleInputChange}
-                      className="mt-1 px-1.5 py-1 border border-base-border/50 rounded text-xs bg-base-white cursor-pointer w-full text-center"
-                    />
-                  ) : (
-                    <p className="text-xs text-base-text-secondary mt-2">Hanya Ibu Hamil</p>
-                  )
-                ) : (
-                  <p className="text-sm font-bold text-base-text-primary mt-1 whitespace-nowrap overflow-hidden text-ellipsis">{mother.hpl}</p>
-                )}
-              </div>
             </div>
           </div>
 
         </div>
 
-        {/* Right Column: Daftar Anak Kandung (Col span 6) */}
-        <div className="lg:col-span-6 space-y-6">
+        {/* Right Column: Daftar Anak Kandung (Col span 5) */}
+        <div className="lg:col-span-5 space-y-6">
           
           {/* Card: Daftar Anak Kandung Terhubung */}
           <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 flex flex-col h-full justify-between">
             <div className="space-y-4">
               <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <FaUserFriends className="w-5 h-5 text-brand-primary" />
-                  <h2 className="font-bold text-base-text-primary text-base">Anak Terdaftar dari Ibu Ini</h2>
+                  <FaUserCouple className="w-5 h-5 text-brand-primary" />
+                  <h2 className="font-bold text-base-text-primary text-base">Balita Saya</h2>
                 </div>
                 <span className="text-[10px] font-bold bg-brand-soft text-brand-primary border border-brand-primary/20 px-2.5 py-1 rounded-full uppercase">
                   {mother.children.length} Balita
@@ -711,7 +1145,7 @@ export default function MotherDetailPage() {
 
               {mother.children.length === 0 ? (
                 <div className="py-12 border border-dashed border-base-border/50 rounded-2xl text-center text-sm text-base-text-secondary">
-                  Belum ada data anak terdaftar yang terhubung dengan NIK Ibu ini.
+                  Belum ada data anak terdaftar yang terhubung dengan rekam medis Ibu ini.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -742,8 +1176,8 @@ export default function MotherDetailPage() {
               )}
             </div>
             
-            <div className="text-xs text-base-text-secondary mt-4 leading-relaxed">
-              * Relasi data di atas berdasarkan pencocokan nomor induk data keluarga yang tersimpan di rekam medis posyandu.
+            <div className="text-xs text-base-text-secondary mt-4 leading-relaxed italic">
+              * Anak terdaftar di atas terhubung otomatis melalui data Posyandu.
             </div>
           </div>
 
@@ -823,6 +1257,7 @@ export default function MotherDetailPage() {
           </div>
         </div>
       )}
+
       {/* Crop Image Modal */}
       {cropImageSrc && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">

@@ -240,6 +240,51 @@ export async function createMother(data: any) {
         risk_status: data.risk_status || "Normal",
         ui_status: data.ui_status || "Ibu Hamil",
         number_of_children: data.number_of_children ? parseInt(data.number_of_children) : 0,
+
+        // Additional Identity fields from Buku KIA 2024
+        jkn_number: data.jkn_number || null,
+        faskes_1: data.faskes_1 || null,
+        faskes_referral: data.faskes_referral || null,
+        birth_place: data.birth_place || null,
+        education: data.education || null,
+        occupation: data.occupation || null,
+        address: data.address || null,
+        other_financing: data.other_financing || null,
+        insurance_other: data.insurance_other || null,
+        insurance_number: data.insurance_number || null,
+        insurance_validity: data.insurance_validity ? new Date(data.insurance_validity) : null,
+        faskes_primary: data.faskes_primary || null,
+        puskesmas_domicile: data.puskesmas_domicile || null,
+        cohort_register_number: data.cohort_register_number || null,
+        faskes_secondary: data.faskes_secondary || null,
+        medical_record_number: data.medical_record_number || null,
+
+        // Riwayat Singkat Kesehatan Ibu (Brief Health History)
+        pregnancy_number: data.pregnancy_number ? parseInt(data.pregnancy_number.toString()) : 1,
+        children_born_alive: data.children_born_alive ? parseInt(data.children_born_alive.toString()) : 0,
+        miscarriage_history: data.miscarriage_history ? parseInt(data.miscarriage_history.toString()) : 0,
+        disease_history: data.disease_history || null,
+
+        // Husband Identity fields
+        husband_national_id: data.husband_national_id || null,
+        husband_jkn_number: data.husband_jkn_number || null,
+        husband_faskes_1: data.husband_faskes_1 || null,
+        husband_faskes_referral: data.husband_faskes_referral || null,
+        husband_birth_place: data.husband_birth_place || null,
+        husband_birth_date: data.husband_birth_date ? new Date(data.husband_birth_date) : null,
+        husband_education: data.husband_education || null,
+        husband_occupation: data.husband_occupation || null,
+        husband_address: data.husband_address || null,
+        husband_phone_number: data.husband_phone_number || null,
+        husband_blood_type: data.husband_blood_type || null,
+        husband_other_financing: data.husband_other_financing || null,
+        husband_insurance_other: data.husband_insurance_other || null,
+        husband_insurance_number: data.husband_insurance_number || null,
+        husband_insurance_validity: data.husband_insurance_validity ? new Date(data.husband_insurance_validity) : null,
+        husband_faskes_primary: data.husband_faskes_primary || null,
+        husband_puskesmas_domicile: data.husband_puskesmas_domicile || null,
+        husband_faskes_secondary: data.husband_faskes_secondary || null,
+        husband_medical_record_number: data.husband_medical_record_number || null,
       }
     });
     return { success: true, id: mother.mother_id };
@@ -328,6 +373,52 @@ export async function getMotherDetail(motherId: string) {
           : mother.mother_name.includes("Fitriani")
           ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop"
           : null),
+
+      // Buku KIA Additional Identity fields
+      jkn_number: mother.jkn_number || "-",
+      faskes_1: mother.faskes_1 || "-",
+      faskes_referral: mother.faskes_referral || "-",
+      birth_place: mother.birth_place || "-",
+      education: mother.education || "-",
+      occupation: mother.occupation || "-",
+      address: mother.address || "-",
+      other_financing: mother.other_financing || "-",
+      insurance_other: mother.insurance_other || "-",
+      insurance_number: mother.insurance_number || "-",
+      insurance_validity: mother.insurance_validity ? mother.insurance_validity.toISOString().split("T")[0] : "",
+      faskes_primary: mother.faskes_primary || "-",
+      puskesmas_domicile: mother.puskesmas_domicile || "-",
+      cohort_register_number: mother.cohort_register_number || "-",
+      faskes_secondary: mother.faskes_secondary || "-",
+      medical_record_number: mother.medical_record_number || "-",
+
+      // Riwayat Singkat Kesehatan Ibu
+      pregnancy_number: mother.pregnancy_number ?? 1,
+      children_born_alive: mother.children_born_alive ?? 0,
+      miscarriage_history: mother.miscarriage_history ?? 0,
+      disease_history: mother.disease_history || "-",
+
+      // Husband Identity fields
+      husband_national_id: mother.husband_national_id || "-",
+      husband_jkn_number: mother.husband_jkn_number || "-",
+      husband_faskes_1: mother.husband_faskes_1 || "-",
+      husband_faskes_referral: mother.husband_faskes_referral || "-",
+      husband_birth_place: mother.husband_birth_place || "-",
+      husband_birth_date: mother.husband_birth_date ? mother.husband_birth_date.toISOString().split("T")[0] : "",
+      husband_education: mother.husband_education || "-",
+      husband_occupation: mother.husband_occupation || "-",
+      husband_address: mother.husband_address || "-",
+      husband_phone_number: mother.husband_phone_number || "-",
+      husband_blood_type: mother.husband_blood_type || "-",
+      husband_other_financing: mother.husband_other_financing || "-",
+      husband_insurance_other: mother.husband_insurance_other || "-",
+      husband_insurance_number: mother.husband_insurance_number || "-",
+      husband_insurance_validity: mother.husband_insurance_validity ? mother.husband_insurance_validity.toISOString().split("T")[0] : "",
+      husband_faskes_primary: mother.husband_faskes_primary || "-",
+      husband_puskesmas_domicile: mother.husband_puskesmas_domicile || "-",
+      husband_faskes_secondary: mother.husband_faskes_secondary || "-",
+      husband_medical_record_number: mother.husband_medical_record_number || "-",
+
       children: mother.children.map((c: any) => {
         const birthDate = c.birth_date ? new Date(c.birth_date) : null;
         let ageStr = "-";
@@ -409,6 +500,51 @@ export async function updateMother(motherId: string, data: any) {
         ui_status: data.ui_status || "Ibu Hamil",
         number_of_children: data.number_of_children ? parseInt(data.number_of_children.toString()) : 0,
         avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : undefined,
+
+        // Additional Identity fields from Buku KIA 2024
+        jkn_number: data.jkn_number !== undefined ? data.jkn_number : undefined,
+        faskes_1: data.faskes_1 !== undefined ? data.faskes_1 : undefined,
+        faskes_referral: data.faskes_referral !== undefined ? data.faskes_referral : undefined,
+        birth_place: data.birth_place !== undefined ? data.birth_place : undefined,
+        education: data.education !== undefined ? data.education : undefined,
+        occupation: data.occupation !== undefined ? data.occupation : undefined,
+        address: data.address !== undefined ? data.address : undefined,
+        other_financing: data.other_financing !== undefined ? data.other_financing : undefined,
+        insurance_other: data.insurance_other !== undefined ? data.insurance_other : undefined,
+        insurance_number: data.insurance_number !== undefined ? data.insurance_number : undefined,
+        insurance_validity: data.insurance_validity ? new Date(data.insurance_validity) : (data.insurance_validity === null ? null : undefined),
+        faskes_primary: data.faskes_primary !== undefined ? data.faskes_primary : undefined,
+        puskesmas_domicile: data.puskesmas_domicile !== undefined ? data.puskesmas_domicile : undefined,
+        cohort_register_number: data.cohort_register_number !== undefined ? data.cohort_register_number : undefined,
+        faskes_secondary: data.faskes_secondary !== undefined ? data.faskes_secondary : undefined,
+        medical_record_number: data.medical_record_number !== undefined ? data.medical_record_number : undefined,
+
+        // Riwayat Singkat Kesehatan Ibu (Brief Health History)
+        pregnancy_number: data.pregnancy_number !== undefined ? (data.pregnancy_number ? parseInt(data.pregnancy_number.toString()) : 1) : undefined,
+        children_born_alive: data.children_born_alive !== undefined ? (data.children_born_alive ? parseInt(data.children_born_alive.toString()) : 0) : undefined,
+        miscarriage_history: data.miscarriage_history !== undefined ? (data.miscarriage_history ? parseInt(data.miscarriage_history.toString()) : 0) : undefined,
+        disease_history: data.disease_history !== undefined ? data.disease_history : undefined,
+
+        // Husband Identity fields
+        husband_national_id: data.husband_national_id !== undefined ? data.husband_national_id : undefined,
+        husband_jkn_number: data.husband_jkn_number !== undefined ? data.husband_jkn_number : undefined,
+        husband_faskes_1: data.husband_faskes_1 !== undefined ? data.husband_faskes_1 : undefined,
+        husband_faskes_referral: data.husband_faskes_referral !== undefined ? data.husband_faskes_referral : undefined,
+        husband_birth_place: data.husband_birth_place !== undefined ? data.husband_birth_place : undefined,
+        husband_birth_date: data.husband_birth_date ? new Date(data.husband_birth_date) : (data.husband_birth_date === null ? null : undefined),
+        husband_education: data.husband_education !== undefined ? data.husband_education : undefined,
+        husband_occupation: data.husband_occupation !== undefined ? data.husband_occupation : undefined,
+        husband_address: data.husband_address !== undefined ? data.husband_address : undefined,
+        husband_phone_number: data.husband_phone_number !== undefined ? data.husband_phone_number : undefined,
+        husband_blood_type: data.husband_blood_type !== undefined ? data.husband_blood_type : undefined,
+        husband_other_financing: data.husband_other_financing !== undefined ? data.husband_other_financing : undefined,
+        husband_insurance_other: data.husband_insurance_other !== undefined ? data.husband_insurance_other : undefined,
+        husband_insurance_number: data.husband_insurance_number !== undefined ? data.husband_insurance_number : undefined,
+        husband_insurance_validity: data.husband_insurance_validity ? new Date(data.husband_insurance_validity) : (data.husband_insurance_validity === null ? null : undefined),
+        husband_faskes_primary: data.husband_faskes_primary !== undefined ? data.husband_faskes_primary : undefined,
+        husband_puskesmas_domicile: data.husband_puskesmas_domicile !== undefined ? data.husband_puskesmas_domicile : undefined,
+        husband_faskes_secondary: data.husband_faskes_secondary !== undefined ? data.husband_faskes_secondary : undefined,
+        husband_medical_record_number: data.husband_medical_record_number !== undefined ? data.husband_medical_record_number : undefined,
       }
     });
 

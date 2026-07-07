@@ -27,8 +27,54 @@ model Mother {
   children             Child[]
   maternal_records     MaternalHealthRecord[]
 
+  // Additional Identity fields from Buku KIA 2024
+  jkn_number                 String?
+  faskes_1                   String?
+  faskes_referral            String?
+  birth_place                String?
+  education                  String?
+  occupation                 String?
+  address                    String?
+  other_financing            String?
+  insurance_other            String?
+  insurance_number           String?
+  insurance_validity         DateTime?
+  faskes_primary             String?
+  puskesmas_domicile         String?
+  cohort_register_number     String?
+  faskes_secondary           String?
+  medical_record_number      String?
+
+  // Riwayat Singkat Kesehatan Ibu (Brief Health History)
+  pregnancy_number           Int?                   @default(1)
+  children_born_alive        Int?                   @default(0)
+  miscarriage_history        Int?                   @default(0)
+  disease_history            String?
+
+  // Husband Identity fields
+  husband_national_id        String?
+  husband_jkn_number         String?
+  husband_faskes_1           String?
+  husband_faskes_referral    String?
+  husband_birth_place        String?
+  husband_birth_date         DateTime?
+  husband_education          String?
+  husband_occupation         String?
+  husband_address            String?
+  husband_phone_number       String?
+  husband_blood_type         String?
+  husband_other_financing    String?
+  husband_insurance_other    String?
+  husband_insurance_number   String?
+  husband_insurance_validity DateTime?
+  husband_faskes_primary     String?
+  husband_puskesmas_domicile String?
+  husband_faskes_secondary   String?
+  husband_medical_record_number String?
+
   @@map("mothers")
 }
+
 
 model Child {
   child_id                 String             @id @default(uuid())
@@ -50,6 +96,24 @@ model Child {
   updated_at               DateTime           @updatedAt
   mother                   Mother             @relation(fields: [mother_id], references: [mother_id], onDelete: Cascade)
   measurements             ChildMeasurement[]
+
+  // Additional Identity fields from Buku KIA 2024
+  jkn_number                 String?
+  faskes_1                   String?
+  faskes_referral            String?
+  birth_certificate_number   String?
+  other_financing            String?
+  insurance_other            String?
+  insurance_number           String?
+  insurance_validity         DateTime?
+  faskes_primary             String?
+  puskesmas_domicile         String?
+  cohort_register_number_baby String?
+  cohort_register_number_toddler String?
+  faskes_secondary           String?
+  medical_record_number      String?
+  address                    String?
+  phone_number               String?
 
   @@map("children")
 }

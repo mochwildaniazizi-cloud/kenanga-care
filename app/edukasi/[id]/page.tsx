@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiArrowLeft, FiClock, FiTag, FiBookOpen, FiTrash, FiCopy, FiCheck, FiX } from "react-icons/fi";
 import { MdPlayCircleOutline, MdBookmark, MdBookmarkBorder, MdShare } from "react-icons/md";
-import { mockArticles, Article } from "../data";
+import { mockArticles } from "../data";
+import type { Article } from "../data";
 import { useUserRole } from "@/context/UserRoleContext";
 
 // Extends Article interface to allow custom content field
