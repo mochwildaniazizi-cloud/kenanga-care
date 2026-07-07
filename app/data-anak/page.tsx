@@ -135,11 +135,33 @@ export default function DataAnakPage() {
   useEffect(() => {
     async function loadMotherChildren() {
       if (role !== "ibu") return;
+      const cacheKey = `offline_mother_children_${username}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setMotherChildren(parsed);
+          if (parsed.length > 0 && !selectedChildId) {
+            setSelectedChildId(parsed[0].child_id);
+          }
+        } catch (e) {
+          console.error("Failed to parse cached mother children:", e);
+        }
+      }
+
+      if (!navigator.onLine) {
+        setIsLoadingChildDetail(false);
+        return;
+      }
+
       try {
         const loggedInMother = await getLoggedInMotherData(username);
         if (loggedInMother && loggedInMother.children.length > 0) {
           setMotherChildren(loggedInMother.children);
-          setSelectedChildId(loggedInMother.children[0].child_id);
+          localStorage.setItem(cacheKey, JSON.stringify(loggedInMother.children));
+          if (!selectedChildId) {
+            setSelectedChildId(loggedInMother.children[0].child_id);
+          }
         } else {
           setIsLoadingChildDetail(false);
         }
@@ -157,10 +179,28 @@ export default function DataAnakPage() {
   useEffect(() => {
     async function loadChildDetail() {
       if (!selectedChildId) return;
+      const cacheKey = `offline_child_detail_${selectedChildId}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          setSelectedChildDetail(JSON.parse(cached));
+          setIsLoadingChildDetail(false);
+        } catch (e) {
+          console.error("Failed to parse cached child detail:", e);
+        }
+      }
+
+      if (!navigator.onLine) {
+        return;
+      }
+
       try {
         setIsLoadingChildDetail(true);
         const detail = await getChildDetail(selectedChildId);
-        setSelectedChildDetail(detail);
+        if (detail) {
+          setSelectedChildDetail(detail);
+          localStorage.setItem(cacheKey, JSON.stringify(detail));
+        }
       } catch (err) {
         console.error("Failed to load child detail:", err);
       } finally {

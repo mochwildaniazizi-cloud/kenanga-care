@@ -8,7 +8,7 @@ import {
   MdPhone, MdBloodtype, MdMale, MdFemale
 } from "react-icons/md";
 import { FaUserNurse, FaUserFriends, FaHeartbeat } from "react-icons/fa";
-import { getMothersData, getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail } from "@/app/actions/mothers";
+import { getMothersData, getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
 import { useUserRole } from "@/context/UserRoleContext";
 import { FiRefreshCw } from "react-icons/fi";
 
@@ -127,12 +127,27 @@ export default function DataIbuPage() {
   useEffect(() => {
     async function loadMotherDetail() {
       if (role !== "ibu") return;
+      const cacheKey = `offline_mother_detail_${username}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          setMotherDetail(JSON.parse(cached));
+          setIsLoadingMother(false);
+        } catch (e) {
+          console.error("Failed to parse cached mother detail:", e);
+        }
+      }
+
+      if (!navigator.onLine) {
+        return;
+      }
+
       try {
         setIsLoadingMother(true);
-        const loggedInMother = await getLoggedInMotherData(username);
-        if (loggedInMother) {
-          const detail = await getMotherDetail(loggedInMother.mother_id);
+        const detail = await getLoggedInMotherDetail(username);
+        if (detail) {
           setMotherDetail(detail);
+          localStorage.setItem(cacheKey, JSON.stringify(detail));
         }
       } catch (err) {
         console.error("Failed to load mother detail:", err);
