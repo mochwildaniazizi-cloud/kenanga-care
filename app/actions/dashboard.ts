@@ -93,14 +93,20 @@ export async function getDashboardStats() {
       riskMothers,
       problematicNutrition,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching dashboard stats:", error);
+    try {
+      const fs = require("fs");
+      fs.writeFileSync("c:\\Code\\kenanga-care\\dashboard_error.log", error.stack || error.message || String(error));
+    } catch (e) {}
     return {
       totalChildren: 0,
       totalMothers: 0,
       totalKunjungan: 0,
       riskMothers: 0,
       problematicNutrition: 0,
+      mothersHamil: 0,
+      errorMsg: error.message || String(error)
     };
   }
 }

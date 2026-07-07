@@ -118,13 +118,22 @@ export default function DashboardPage() {
             getRecentChildActivity(),
             getRecentMotherActivity(),
           ]);
-          setKaderStats(stats);
-          setChildActivity(cAct);
-          setMotherActivity(mAct);
 
-          localStorage.setItem("kader_dashboard_stats", JSON.stringify(stats));
-          localStorage.setItem("kader_dashboard_child_activity", JSON.stringify(cAct));
-          localStorage.setItem("kader_dashboard_mother_activity", JSON.stringify(mAct));
+          if (stats && !stats.errorMsg) {
+            setKaderStats(stats);
+            localStorage.setItem("kader_dashboard_stats", JSON.stringify(stats));
+          } else if (stats) {
+            setKaderStats((prev: any) => ({ ...(prev || {}), errorMsg: stats.errorMsg }));
+          }
+
+          if (cAct && cAct.length > 0) {
+            setChildActivity(cAct);
+            localStorage.setItem("kader_dashboard_child_activity", JSON.stringify(cAct));
+          }
+          if (mAct && mAct.length > 0) {
+            setMotherActivity(mAct);
+            localStorage.setItem("kader_dashboard_mother_activity", JSON.stringify(mAct));
+          }
         }
       } catch (err) {
         console.error("Error loading dashboard data:", err);
@@ -448,6 +457,12 @@ export default function DashboardPage() {
             <span>Kelola Jadwal</span>
             <MdArrowForward className="w-4 h-4" />
           </Link>
+        </div>
+      )}
+
+      {kaderStats?.errorMsg && (
+        <div className="bg-status-red-light border border-status-red-solid/25 rounded-xl p-4 text-xs font-semibold text-status-red-solid">
+          Error loading database stats: {kaderStats.errorMsg}
         </div>
       )}
 
