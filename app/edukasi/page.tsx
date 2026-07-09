@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   MdDashboard, MdVaccines, MdPregnantWoman, 
   MdChildCare, MdOutlineLocalDining, MdOutlineExtension,
-  MdAdd, MdBookmark, MdSearch, MdMenuBook
+  MdAdd, MdBookmark, MdSearch, MdMenuBook, MdFavorite
 } from "react-icons/md";
 import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import ArticleCard from "@/components/ArticleCard";
@@ -105,6 +105,11 @@ export default function EdukasiPage() {
       id: "Tumbuh Kembang", label: "Tumbuh Kembang", icon: MdOutlineExtension, 
       colorStyle: "border-status-cerulean-solid text-status-cerulean-solid", 
       activeStyle: "bg-status-cerulean-solid text-base-white border-status-cerulean-solid" 
+    },
+    { 
+      id: "Ibu Menyusui", label: "Ibu Menyusui", icon: MdFavorite, 
+      colorStyle: "border-status-pink-solid text-status-pink-solid", 
+      activeStyle: "bg-status-pink-solid text-base-white border-status-pink-solid" 
     },
     { 
       id: "Tersimpan", label: "Tersimpan", icon: MdBookmark, 

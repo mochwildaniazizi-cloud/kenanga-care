@@ -16,6 +16,7 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
       case "Imunisasi": return "bg-status-orange-solid text-base-white";
       case "Ibu Hamil": return "bg-status-blue-solid text-base-white";
       case "Ibu Nifas": return "bg-status-purple-solid text-base-white";
+      case "Ibu Menyusui": return "bg-pink-500 text-base-white";
       case "Tumbuh Kembang": return "bg-[#0277BD] text-base-white";
       default: return "bg-gray-200 text-gray-800";
     }

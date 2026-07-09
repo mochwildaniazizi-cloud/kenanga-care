@@ -1,4 +1,4 @@
-export type CategoryType = "Gizi & MPASI" | "Imunisasi" | "Ibu Hamil" | "Ibu Nifas" | "Tumbuh Kembang";
+export type CategoryType = "Gizi & MPASI" | "Imunisasi" | "Ibu Hamil" | "Ibu Nifas" | "Ibu Menyusui" | "Tumbuh Kembang";
 
 export interface Article {
   id: string;
@@ -131,7 +131,7 @@ export const mockArticles: Article[] = [
   {
     id: "L14",
     title: "Panduan Sukses Menyusui: Posisi, Pelekatan, & Cara Menyimpan ASI",
-    categories: ["Ibu Hamil", "Gizi & MPASI"],
+    categories: ["Ibu Menyusui", "Gizi & MPASI"],
     type: "Artikel",
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=600&auto=format&fit=crop",
@@ -140,7 +140,7 @@ export const mockArticles: Article[] = [
   {
     id: "L15",
     title: "Tanda Bahaya Bayi Baru Lahir (0-28 Hari) & Ukuran Lambung Bayi",
-    categories: ["Balita 0-2 Tahun"],
+    categories: ["Tumbuh Kembang"],
     type: "Artikel",
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
@@ -149,7 +149,7 @@ export const mockArticles: Article[] = [
   {
     id: "L16",
     title: "Perawatan Bayi Baru Lahir: Tali Pusat, Perawatan Kanguru, & Deteksi Warna Tinja (Atresia Bilier)",
-    categories: ["Balita 0-2 Tahun"],
+    categories: ["Tumbuh Kembang"],
     type: "Artikel",
     duration: "9 Menit",
     imageUrl: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?q=80&w=600&auto=format&fit=crop",
@@ -158,7 +158,7 @@ export const mockArticles: Article[] = [
   {
     id: "L17",
     title: "Tanda Bahaya Balita 29 Hari - 5 Tahun & Panduan Pengukuran Lingkar Lengan Atas (LiLA)",
-    categories: ["Balita 0-2 Tahun"],
+    categories: ["Tumbuh Kembang"],
     type: "Artikel",
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
