@@ -202,5 +202,15 @@ export const mockArticles: Article[] = [
     imageUrl: "https://images.unsplash.com/photo-1491013516836-7db643ee125a?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false,
     isNativeKIA: true
+  },
+  {
+    id: "L20",
+    title: "Panduan Lengkap MPASI Gizi Seimbang & Resep Praktis Bayi Usia 6 - 12 Bulan",
+    categories: ["Gizi & MPASI", "Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "10 Menit",
+    imageUrl: "/cover-article/L20.jpg", // Jangan lupa siapkan file gambar di folder public/cover-article
+    isLanjutkanMembaca: false,
+    isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten ini
   }
 ];

@@ -421,6 +421,8 @@ export default function ArticleDetailPage() {
               <L18ArticleContent />
             ) : id === "L19" ? (
               <L19ArticleContent />
+            ) : id === "L20" ? (
+              <L20ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2549,6 +2551,149 @@ function L19ArticleContent() {
       {/* Catatan / Peringatan Evaluasi */}
       <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/20 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed shadow-xs">
         ⚠️ Jika bayi BELUM bisa melakukan salah satu hal di atas, segera bawa ke Bidan/Puskesmas untuk evaluasi tumbuh kembang lebih lanjut.
+      </div>
+    </div>
+  );
+}
+
+function L20ArticleContent() {
+  return (
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Pengantar */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
+        Di usia 6-12 bulan, bayi berkembang semakin pesat secara fisik dan mental. Kebutuhan gizi bayi tidak lagi dapat dipenuhi hanya oleh ASI, sehingga membutuhkan pemenuhan gizi lengkap yang kaya protein hewani untuk mencegah stunting dan mendukung anak tumbuh cerdas.
+      </p>
+
+      {/* Banner Bahaya Stunting */}
+      <div className="p-4 bg-status-orange-light/20 border border-status-orange-solid/25 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed shadow-xs flex items-center gap-2">
+        <span>⚠️</span>
+        <p>
+          <strong>Awas Bahaya Stunting!</strong> Kekurangan gizi pada fase ini dapat menyebabkan gagal pertumbuhan fisik dan performa otak anak menjadi kurang cerdas saat dewasa.
+        </p>
+      </div>
+
+      {/* Bagian 1: Karakteristik 4 Syarat Utama MPASI */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🥣 4 Syarat Utama Pemenuhan MPASI (Usia 6 - 24 Bulan)
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs leading-relaxed">
+          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
+            <h4 className="font-bold text-brand-primary mb-1">1. Tepat Waktu</h4>
+            <p className="text-base-text-secondary font-medium">MPASI diberikan saat ASI saja sudah tidak dapat memenuhi kebutuhan gizi bayi. Diberikan mulai tepat usia 6 bulan.</p>
+          </div>
+          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
+            <h4 className="font-bold text-brand-primary mb-1">2. Cukup (Adekuat)</h4>
+            <p className="text-base-text-secondary font-medium">MPASI mempertimbangkan jumlah, frekuensi, konsistensi/tekstur, dan variasi makanan yang mengandung karbohidrat, protein hewani (prioritas), protein nabati, dan lemak tambahan.</p>
+          </div>
+          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
+            <h4 className="font-bold text-brand-primary mb-1">3. Aman</h4>
+            <p className="text-base-text-secondary font-medium">Memperhatikan kebersihan bahan makanan, peralatan memasak, serta wajib mencuci tangan bersih sebelum menyiapkan makanan anak.</p>
+          </div>
+          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
+            <h4 className="font-bold text-brand-primary mb-1">4. Diberikan dengan Cara Benar</h4>
+            <p className="text-base-text-secondary font-medium">Diberikan secara teratur (pagi, siang, sore, selingan), lama makan maksimal 30 menit, ciptakan lingkungan netral (tanpa TV/gadget), dan ajari anak makan mandiri.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Bagian 2: 8 Kelompok Bahan Makanan Utama MPASI */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🥦 8 Kelompok Bahan Makanan Utama MPASI
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          {[
+            { id: "1", title: "Air Susu Ibu (ASI)", icon: "🤱" },
+            { id: "2", title: "Makanan Pokok (Beras, Jagung, Ubi)", icon: "🌾" },
+            { id: "3", title: "Kacang-kacangan (Tempe, Tahu)", icon: "🫘" },
+            { id: "4", title: "Susu Hewani & Turunannya", icon: "🥛" },
+            { id: "5", title: "Daging-dagingan (Ikan, Daging, Ayam)", icon: "🐟" },
+            { id: "6", title: "Telur", icon: "🥚" },
+            { id: "7", title: "Buah & Sayur Kaya Vit A", icon: "🥕" },
+            { id: "8", title: "Buah & Sayuran Lainnya", icon: "🥑" },
+          ].map((item) => (
+            <div key={item.id} className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-3 shadow-xs">
+              <span className="text-2xl block mb-1">{item.icon}</span>
+              <span className="text-[10px] bg-status-purple-solid text-white px-1.5 py-0.5 rounded-full font-extrabold block w-fit mx-auto mb-1">{item.id}</span>
+              <h5 className="font-bold text-[11px] text-base-text-primary leading-tight">{item.title}</h5>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bagian 3: Pembagian Tekstur dan Porsi Usia Berkala */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          📊 Panduan Tekstur dan Porsi Makan Berkala
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          {/* 6-8 Bulan */}
+          <div className="border border-base-border/30 rounded-2xl p-4 bg-base-white shadow-xs">
+            <span className="text-[10px] uppercase bg-status-green-solid text-white px-2 py-0.5 rounded-full font-bold">6 - 8 Bulan</span>
+            <h4 className="font-bold text-base-text-primary mt-2 mb-1">Tekstur: DISARING</h4>
+            <p className="text-base-text-secondary mb-3 font-medium">Makanan dilumatkan dan disaring halus. Konsistensi kental (tidak mudah jatuh dari sendok).</p>
+            <div className="text-[11px] font-semibold text-status-green-solid border-t pt-2">
+              ⏱️ 2-3 kali makanan utama + 1-2 kali selingan.<br/>
+              🍚 Porsi: Mulai 2-3 sendok makan hingga 1/2 mangkuk (125 ml).
+            </div>
+          </div>
+          {/* 9-11 Bulan */}
+          <div className="border border-base-border/30 rounded-2xl p-4 bg-base-white shadow-xs">
+            <span className="text-[10px] uppercase bg-status-blue-solid text-white px-2 py-0.5 rounded-full font-bold">9 - 11 Bulan</span>
+            <h4 className="font-bold text-base-text-primary mt-2 mb-1">Tekstur: DICINCANG</h4>
+            <p className="text-base-text-secondary mb-3 font-medium">Makanan dicincang halus, cincang kasar, atau makanan siap genggang (finger food).</p>
+            <div className="text-[11px] font-semibold text-status-blue-solid border-t pt-2">
+              ⏱️ 3-4 kali makanan utama + 1-2 kali selingan.<br/>
+              🍚 Porsi: 1/2 hingga 3/4 mangkuk ukuran 250 ml.
+            </div>
+          </div>
+          {/* 12-23 Bulan */}
+          <div className="border border-base-border/30 rounded-2xl p-4 bg-base-white shadow-xs">
+            <span className="text-[10px] uppercase bg-status-purple-solid text-white px-2 py-0.5 rounded-full font-bold">12 - 23 Bulan</span>
+            <h4 className="font-bold text-base-text-primary mt-2 mb-1">Tekstur: MASAK BIASA</h4>
+            <p className="text-base-text-secondary mb-3 font-medium">Makanan keluarga yang dihaluskan seperlunya atau dipotong kecil jika dirasa perlu.</p>
+            <div className="text-[11px] font-semibold text-status-purple-solid border-t pt-2">
+              ⏱️ 3-4 kali makanan utama + 1-2 kali selingan.<br/>
+              🍚 Porsi: 3/4 hingga 1 mangkuk penuh ukuran 250 ml.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bagian 4: Menu dan Resep Resmi Kemenkes */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🍳 Menu Masak &amp; Resep Resmi MPASI KIA (Untuk 3 Porsi)
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+          {/* Resep 6-8 Bulan */}
+          <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 shadow-xs">
+            <h4 className="font-bold text-brand-primary text-sm mb-2">🥣 Bubur Sup Daging Kacang Merah (6-8 Bulan)</h4>
+            <div className="space-y-1 text-base-text-secondary font-medium mb-3">
+              <p><strong>Bahan:</strong> 50g nasi, 30g daging ayam cincang, 25g telur ayam, 10g kacang merah, 10g wortel, 10g tomat, bumbu halus (bawang merah &amp; putih), 300ml kaldu ayam, 5g minyak.</p>
+            </div>
+            <ol className="list-decimal pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium border-t border-brand-primary/10 pt-2">
+              <li>Didihkan air kaldu ayam, masukkan kacang merah dan daging sampai empuk.</li>
+              <li>Tumis bumbu halus sampai harum, masukkan ke dalam air kaldu masakan.</li>
+              <li>Masukkan nasi, buncis, wortel. Tambahkan kocokan telur, aduk rata hingga matang.</li>
+              <li>Haluskan bubur disaring dengan saringan kawat hingga mencapai tekstur lumat kental.</li>
+            </ol>
+          </div>
+          {/* Resep 9-12 Bulan */}
+          <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 shadow-xs">
+            <h4 className="font-bold text-brand-primary text-sm mb-2">🍛 Nasi Tim Ikan Kembung Telur Puyuh (9-12 Bulan)</h4>
+            <div className="space-y-1 text-base-text-secondary font-medium mb-3">
+              <p><strong>Bahan:</strong> 75g nasi, 30g ikan kembung (ambil dagingnya), 30g telur puyuh, 15g wortel, 10g tomat, bumbu halus, 75ml kaldu ayam, 7.5g minyak kelapa, buah semangka (selingan).</p>
+            </div>
+            <ol className="list-decimal pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium border-t border-brand-primary/10 pt-2">
+              <li>Masukkan nasi, daging ikan kembung, telur puyuh, dan minyak kelapa ke dalam mangkok tim.</li>
+              <li>Tambahkan air kaldu ayam secukupnya.</li>
+              <li>Masukkan parutan wortel dan tomat, tim hingga matang sempurna.</li>
+              <li>Angkat dan sajikan hangat bersama potongan buah semangka secara terpisah.</li>
+            </ol>
+          </div>
+        </div>
       </div>
     </div>
   );
