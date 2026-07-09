@@ -24,7 +24,17 @@ export default function ChildDetailPage() {
   const [activeSubTab, setActiveSubTab] = useState<'biodata' | 'health_service' | 'newborn_monitoring'>('biodata');
   const [newbornMonitoring, setNewbornMonitoring] = useState<any>({
     pemeriksaan: [false, false, false, false],
-    dangerSigns: new Array(12).fill(false)
+    dangerSigns: new Array(12).fill(false),
+    harianList: new Array(28).fill(null).map((_, i) => ({
+      day: i + 1,
+      symptoms: new Array(12).fill(false),
+      notes: ""
+    })),
+    kelasBalita: new Array(15).fill(null).map((_, i) => ({
+      no: i + 1,
+      date: "",
+      notes: ""
+    }))
   });
 
   // Editing States
@@ -269,7 +279,22 @@ export default function ChildDetailPage() {
       const cachedNewborn = localStorage.getItem(`newborn_monitoring_${decodedId}`);
       if (cachedNewborn) {
         try {
-          setNewbornMonitoring(JSON.parse(cachedNewborn));
+          const parsed = JSON.parse(cachedNewborn);
+          if (!parsed.harianList) {
+            parsed.harianList = new Array(28).fill(null).map((_, i) => ({
+              day: i + 1,
+              symptoms: new Array(12).fill(false),
+              notes: ""
+            }));
+          }
+          if (!parsed.kelasBalita) {
+            parsed.kelasBalita = new Array(15).fill(null).map((_, i) => ({
+              no: i + 1,
+              date: "",
+              notes: ""
+            }));
+          }
+          setNewbornMonitoring(parsed);
         } catch (e) {}
       }
     }
@@ -1072,6 +1097,187 @@ export default function ChildDetailPage() {
                         ))}
                       </div>
                     </div>
+
+                    {/* III. Lembar Pemantauan Harian 0-28 Hari */}
+                    {(() => {
+                      const harianSymptoms = [
+                        "Sesak napas / dada tertarik ke dalam",
+                        "Lemah / menangis merintih",
+                        "Kulit biru di sekitar mulut / ujung jari",
+                        "Hisapan lemah / muntah cairan hijau",
+                        "Kejang (mata mendelik / tangisan melengking)",
+                        "Suhu panas (>37.5°C) atau dingin (<36.5°C)",
+                        "BAB berdarah atau diare encer",
+                        "Kencing sedikit / warna pekat/kecoklatan",
+                        "Tali pusat merah / berdarah / berbau",
+                        "Mata merah / bernanah",
+                        "Kulit berbintil air / bernanah",
+                        "Belum mendapat imunisasi HB0 / Vit K1"
+                      ];
+
+                      const weeks = [
+                        { label: "Minggu 1", days: [1,2,3,4,5,6,7] },
+                        { label: "Minggu 2", days: [8,9,10,11,12,13,14] },
+                        { label: "Minggu 3", days: [15,16,17,18,19,20,21] },
+                        { label: "Minggu 4", days: [22,23,24,25,26,27,28] }
+                      ];
+
+                      const handleToggleSymptom = (dayIdx: number, symIdx: number) => {
+                        const nextHarian = newbornMonitoring.harianList.map((d: any, i: number) => {
+                          if (i !== dayIdx) return d;
+                          const nextSymptoms = [...d.symptoms];
+                          nextSymptoms[symIdx] = !nextSymptoms[symIdx];
+                          return { ...d, symptoms: nextSymptoms };
+                        });
+                        const nextM = { ...newbornMonitoring, harianList: nextHarian };
+                        setNewbornMonitoring(nextM);
+                        if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                      };
+
+                      const getDayStatus = (dayEntry: any) => {
+                        if (!dayEntry?.symptoms) return null;
+                        const count = dayEntry.symptoms.filter(Boolean).length;
+                        return count;
+                      };
+
+                      return (
+                        <div className="space-y-2.5">
+                          <h5 className="font-bold text-xs text-brand-primary">III. Lembar Pemantauan Harian (Hari 1-28)</h5>
+                          <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
+                            Centang gejala yang muncul setiap hari. Jika ada tanda, segera hubungi bidan atau puskesmas. (Buku KIA Hal 42-45)
+                          </p>
+
+                          {/* Week selector */}
+                          <div className="flex gap-1.5 flex-wrap">
+                            {weeks.map((wk, wi) => {
+                              const weekDayEntries = wk.days.map(d => newbornMonitoring.harianList?.[d - 1]);
+                              const weekHasAlert = weekDayEntries.some((d: any) => d?.symptoms?.some(Boolean));
+                              return (
+                                <button
+                                  key={wi}
+                                  type="button"
+                                  onClick={() => {
+                                    const nextM = { ...newbornMonitoring, _weekSel: wi };
+                                    setNewbornMonitoring(nextM);
+                                    if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                                  }}
+                                  className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-bold transition border ${(newbornMonitoring._weekSel ?? 0) === wi ? 'bg-brand-primary text-white border-brand-primary' : 'bg-base-white border-base-border/30 text-base-text-secondary hover:border-brand-primary/30'}`}
+                                >
+                                  {wk.label}
+                                  {weekHasAlert && <span className="w-1.5 h-1.5 rounded-full bg-status-red-solid inline-block animate-pulse" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Days in selected week */}
+                          <div className="grid grid-cols-1 gap-2">
+                            {weeks[newbornMonitoring._weekSel ?? 0]?.days.map((dayNum: number) => {
+                              const dayIdx = dayNum - 1;
+                              const dayEntry = newbornMonitoring.harianList?.[dayIdx];
+                              const symCount = getDayStatus(dayEntry);
+                              const hasAlert = symCount > 0;
+                              return (
+                                <details key={dayNum} className="group border border-base-border/20 rounded-xl overflow-hidden bg-base-white">
+                                  <summary className="flex items-center justify-between p-3 cursor-pointer select-none list-none">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-extrabold shrink-0 ${hasAlert ? 'bg-status-red-solid text-white' : 'bg-brand-soft/20 text-brand-primary'}`}>{dayNum}</span>
+                                      <span className="font-bold text-[10px] text-base-text-primary">Hari ke-{dayNum}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                      {hasAlert ? (
+                                        <span className="text-[8px] font-bold text-status-red-solid bg-status-red-light/30 border border-status-red-solid/20 px-1.5 py-0.5 rounded-full animate-pulse">{symCount} Gejala</span>
+                                      ) : (
+                                        <span className="text-[8px] font-bold text-status-green-solid bg-status-green-light/30 border border-status-green-solid/20 px-1.5 py-0.5 rounded-full">Sehat ✓</span>
+                                      )}
+                                      <span className="text-base-text-secondary text-[10px] group-open:rotate-180 transition-transform duration-200">▼</span>
+                                    </div>
+                                  </summary>
+                                  <div className="px-3 pb-3 grid grid-cols-1 gap-1.5 border-t border-base-border/10 pt-2.5">
+                                    {harianSymptoms.map((sym, si) => (
+                                      <label key={si} className="flex items-center gap-2 cursor-pointer hover:bg-base-bg/30 px-1.5 py-1 rounded-lg transition">
+                                        <input
+                                          type="checkbox"
+                                          checked={!!dayEntry?.symptoms?.[si]}
+                                          onChange={() => handleToggleSymptom(dayIdx, si)}
+                                          className="w-3.5 h-3.5 rounded text-status-red-solid cursor-pointer focus:ring-status-red-solid/30 shrink-0"
+                                        />
+                                        <span className={`text-[10px] font-medium select-none ${dayEntry?.symptoms?.[si] ? 'text-status-red-solid font-bold' : 'text-base-text-secondary'}`}>{sym}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                </details>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* IV. Absensi Kelas Ibu Balita */}
+                    {(() => {
+                      const handleEditKelas = (idx: number, field: string, val: string) => {
+                        const nextKelas = newbornMonitoring.kelasBalita.map((k: any, i: number) =>
+                          i === idx ? { ...k, [field]: val } : k
+                        );
+                        const nextM = { ...newbornMonitoring, kelasBalita: nextKelas };
+                        setNewbornMonitoring(nextM);
+                        if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                      };
+
+                      const filledCount = newbornMonitoring.kelasBalita?.filter((k: any) => !!k.date).length ?? 0;
+
+                      return (
+                        <div className="space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-bold text-xs text-brand-primary">IV. Absensi Kelas Ibu Balita</h5>
+                            <span className="text-[9px] font-bold text-brand-primary bg-brand-soft/20 px-2 py-0.5 rounded-full">{filledCount} / 15 Hadir</span>
+                          </div>
+                          <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
+                            Catat kehadiran kelas ibu balita. (Buku KIA Hal 50)
+                          </p>
+                          {/* Progress bar */}
+                          <div className="w-full h-1.5 bg-base-bg/50 rounded-full overflow-hidden">
+                            <div className="h-full bg-brand-primary rounded-full transition-all duration-300" style={{ width: `${(filledCount / 15) * 100}%` }} />
+                          </div>
+                          <div className="overflow-x-auto rounded-xl border border-base-border/20">
+                            <table className="w-full text-[10px] border-collapse">
+                              <thead>
+                                <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
+                                  <th className="p-2 text-center w-8">No</th>
+                                  <th className="p-2 text-left">Tanggal</th>
+                                  <th className="p-2 text-left">Catatan Materi / Fasilitator</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {newbornMonitoring.kelasBalita?.map((row: any, idx: number) => (
+                                  <tr key={idx} className="border-b border-base-border/5 hover:bg-base-bg/20 transition">
+                                    <td className="p-2 text-center font-bold text-base-text-secondary">{row.no}</td>
+                                    <td className="p-2">
+                                      <input
+                                        type="date"
+                                        value={row.date || ""}
+                                        onChange={e => handleEditKelas(idx, 'date', e.target.value)}
+                                        className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
+                                      />
+                                    </td>
+                                    <td className="p-2">
+                                      <input
+                                        type="text"
+                                        value={row.notes || ""}
+                                        onChange={e => handleEditKelas(idx, 'notes', e.target.value)}
+                                        placeholder="Catatan..."
+                                        className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
+                                      />
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                   </div>
                 );

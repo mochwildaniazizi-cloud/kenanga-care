@@ -408,6 +408,10 @@ export default function ArticleDetailPage() {
               <L14ArticleContent />
             ) : id === "L15" ? (
               <L15ArticleContent />
+            ) : id === "L16" ? (
+              <L16ArticleContent />
+            ) : id === "L17" ? (
+              <L17ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2754,6 +2758,203 @@ function L15ArticleContent() {
 
       <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 text-xs text-status-red-solid leading-relaxed font-bold">
         ⚠️ PENTING: Jika menemukan salah satu tanda bahaya di atas pada bayi Anda, segeralah bawa bayi ke Bidan, Puskesmas, atau Rumah Sakit terdekat untuk pertolongan medis segera.
+      </div>
+    </div>
+  );
+}
+
+function L16ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Perawatan bayi baru lahir usia 0-28 hari membutuhkan ketelitian ekstra dari orang tua. Beberapa aspek kritis meliputi menjaga kehangatan tubuh bayi, perawatan tali pusat agar tidak terinfeksi, serta pemantauan warna tinja guna mendeteksi penyakit serius seperti Atresia Bilier.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🌡️ Cara Menjaga Bayi Tetap Hangat
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 space-y-3">
+          <h4 className="font-bold text-brand-primary flex items-center gap-1.5">
+            🧼 Mandi & Pakaian:
+          </h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li>Mandikan bayi menggunakan air hangat minimal <strong>6 jam setelah lahir</strong> agar suhu tubuh stabil.</li>
+            <li>Sebelum tali pusat terlepas, cukup bersihkan badan bayi dengan dilap air hangat. Jangan direndam.</li>
+            <li>Setelah tali pusat lepas, bayi dapat dimandikan dengan cara terendam di bak mandi khusus.</li>
+            <li>Beri pakaian bersih, selimuti dengan baik, dan pakaikan topi, kaos kaki, serta kaos tangan jika cuaca dingin.</li>
+            <li>Segera ganti pakaian dan popok yang basah agar tubuh tidak kedinginan.</li>
+          </ul>
+        </div>
+        
+        <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 space-y-3">
+          <h4 className="font-bold text-brand-primary flex items-center gap-1.5">
+            🦘 Perawatan Metode Kanguru (PMK):
+          </h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed">
+            Metode ini sangat disarankan untuk bayi dengan <strong>Berat Lahir Rendah (BBLR) &lt; 2500 gram</strong> atau lahir prematur:
+          </p>
+          <ul className="list-disc pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium">
+            <li>Posisikan bayi di dada ibu/ayah dalam kondisi tegak tanpa pakaian (hanya memakai popok & topi), bersentuhan kulit ke kulit secara langsung (*skin-to-skin contact*).</li>
+            <li>Selimuti bayi bersama ibu/ayah dengan kain panjang hangat. Suhu tubuh orang tua akan menghangatkan tubuh bayi secara konstan dan merangsang produksi ASI.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🔗 Perawatan Tali Pusat yang Benar
+      </h2>
+      <div className="p-5 bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl text-xs leading-relaxed mb-6 space-y-3">
+        <p className="text-base-text-primary font-bold">Langkah Perawatan Tali Pusat Sehat (Buku KIA Hal 46):</p>
+        <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+          <li><strong>Wajib Cuci Tangan:</strong> Selalu cuci tangan menggunakan air bersih mengalir dan sabun sebelum serta sesudah merawat tali pusat bayi.</li>
+          <li><strong>Rawat Terbuka & Kering:</strong> Biarkan tali pusat terbuka dan kering. Jangan dibungkus dengan kain kasa terlalu rapat.</li>
+          <li><strong>Tanpa Tambahan Apapun:</strong> Jangan berikan alkohol, betadine, bedak, minyak, atau ramuan dedaunan tradisional pada tali pusat karena berisiko memicu infeksi berat.</li>
+          <li><strong>Cara Membersihkan:</strong> Jika tali pusat kotor atau basah terkena air kencing/tinja, cuci dengan air hangat bersih dan sabun bayi secara lembut, kemudian segera keringkan dengan kasa steril atau handuk bersih hingga benar-benar kering.</li>
+        </ul>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        💩 Deteksi Dini Warna Tinja Bayi (Deteksi Atresia Bilier)
+      </h2>
+      <p className="text-xs text-base-text-secondary leading-relaxed mb-4">
+        Atresia Bilier adalah penyakit sumbatan saluran empedu hati yang fatal jika terlambat dideteksi. Ibu wajib mengamati warna tinja (kotoran) bayi setiap hari hingga usia 4 bulan.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 text-xs leading-relaxed">
+        <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 space-y-3">
+          <h4 className="font-extrabold text-status-red-solid flex items-center gap-1.5">
+            🚨 WARNA TINJA TIDAK NORMAL (BAHAYA!):
+          </h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed">
+            Tinja berwarna <strong>Putih Keabu-abuan, Dempul, Kuning Sangat Pucat</strong> (Nomor 1, 2, atau 3 pada kartu warna tinja Buku KIA).
+          </p>
+          <div className="p-3 bg-base-white border border-status-red-solid/25 rounded-xl font-bold text-status-red-solid text-[10px]">
+            ⚠️ SEGERA bawa bayi ke dokter spesialis anak atau rumah sakit terdekat apabila tinja bayi berwarna pucat!
+          </div>
+        </div>
+        
+        <div className="bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl p-5 space-y-3">
+          <h4 className="font-extrabold text-status-green-solid flex items-center gap-1.5">
+            ✅ WARNA TINJA NORMAL (SEHAT):
+          </h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed">
+            Tinja berwarna <strong>Kuning Emas, Kuning Tua, atau Hijau Kekuningan</strong> (Warna cerah menandakan empedu mengalir dengan lancar ke usus pencernaan).
+          </p>
+          <p className="text-[10px] text-base-text-secondary leading-normal font-semibold">
+            *Catat secara berkala warna tinja bayi Anda saat berusia 2 minggu, 1 bulan, dan 2-4 bulan untuk pemantauan optimal.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L17ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Fase balita usia 29 hari hingga 5 tahun merupakan masa keemasan sekaligus membutuhkan kepekaan tinggi dari orang tua terhadap tanda bahaya penyakit akut. Selain mendeteksi tanda bahaya, status gizi balita juga perlu dipantau secara mandiri menggunakan pita Lingkar Lengan Atas (LiLA).
+      </p>
+
+      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-4 flex items-center gap-1.5">
+        🚨 Tanda Bahaya Balita (29 Hari - 5 Tahun)
+      </h2>
+      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed font-semibold">
+        Segera periksakan balita Anda ke dokter, bidan, atau puskesmas terdekat jika mendapati gejala berikut:
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🤒</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam / Panas Tinggi</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh panas tinggi tidak kunjung turun setelah diberi penurun panas.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🤮</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">2. Muntah Terus-Menerus</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Balita memuntahkan semua isi lambung, tidak sanggup menelan cairan apa pun.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">💧</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">3. Diare Akut</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Buang air besar cair berkali-kali disertai lemas atau tanda dehidrasi.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">⚡</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">4. Kejang</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kejang demam maupun kejang tanpa demam (badan kaku/kelojotan).</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">👂</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">5. Bengkak di Belakang Telinga</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Pembengkakan disertai rasa nyeri di tulang belakang daun telinga (Mastoiditis).</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🩸</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">6. Perdarahan</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Mimisan hebat, bintik-bintik merah darah di kulit, atau buang air besar berdarah.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">👃</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">7. Sesak Napas</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Tarikan dinding dada bagian bawah ke dalam yang sangat jelas saat bernapas.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🔵</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">8. Tampak Biru (Sianosis)</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Mulut, lidah, atau ujung jari tampak kebiruan akibat kekurangan oksigen.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🚰</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">9. Tidak Bisa Minum</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Sangat lemah sehingga menolak atau tidak sanggup minum cairan/ASI sama sekali.</p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        📏 Pengukuran Lingkar Lengan Atas (LiLA) Balita
+      </h2>
+      <p className="text-xs text-base-text-secondary leading-relaxed mb-4">
+        Pengukuran LiLA dilakukan pada balita usia <strong>6 - 59 bulan</strong> menggunakan pita LiLA tiga warna untuk deteksi dini stunting, gizi kurang, dan gizi buruk:
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-xs leading-relaxed text-center font-bold">
+        <div className="bg-status-red-light/20 border border-status-red-solid/25 text-status-red-solid rounded-2xl p-4 flex flex-col justify-center items-center">
+          <span className="text-[10px] uppercase bg-status-red-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">MERAH</span>
+          <span className="text-sm font-extrabold block">&lt; 11.5 cm</span>
+          <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-1 block">
+            <strong>Gizi Buruk (Sangat Kurus)</strong>. Segera rujuk balita ke Puskesmas/Rumah Sakit untuk penanganan medis darurat.
+          </span>
+        </div>
+        
+        <div className="bg-status-orange-light/20 border border-status-orange-solid/25 text-status-orange-solid rounded-2xl p-4 flex flex-col justify-center items-center">
+          <span className="text-[10px] uppercase bg-status-orange-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">KUNING</span>
+          <span className="text-sm font-extrabold block">11.5 - 12.4 cm</span>
+          <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-1 block">
+            <strong>Gizi Kurang (Kurus)</strong>. Perlu asupan makanan tambahan (PMT) serta pemantauan intensif di Posyandu.
+          </span>
+        </div>
+        
+        <div className="bg-status-green-light/20 border border-status-green-solid/25 text-status-green-solid rounded-2xl p-4 flex flex-col justify-center items-center">
+          <span className="text-[10px] uppercase bg-status-green-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">HIJAU</span>
+          <span className="text-sm font-extrabold block">&gt;= 12.4 cm</span>
+          <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-1 block">
+            <strong>Gizi Baik (Normal)</strong>. Pertahankan asupan gizi seimbang serta pola asuh yang penuh kasih sayang.
+          </span>
+        </div>
+      </div>
+
+      <div className="p-5 bg-base-white border border-base-border/20 rounded-2xl text-xs leading-relaxed space-y-2">
+        <p className="font-extrabold text-base-text-primary">Langkah Pengukuran LiLA yang Tepat:</p>
+        <ol className="list-decimal pl-4 space-y-1 text-base-text-secondary font-medium">
+          <li>Pengukuran dilakukan pada lengan kiri anak (atau lengan kanan jika anak kidal).</li>
+          <li>Tekuk lengan anak membentuk sudut 90 derajat.</li>
+          <li>Ukur jarak antara pangkal bahu dan siku lengan atas, tentukan titik tengahnya.</li>
+          <li>Luruskan kembali lengan anak dan gantung secara santai di samping tubuh.</li>
+          <li>Lingkarkan pita LiLA tepat di titik tengah lengan yang telah ditentukan tadi secara pas (tidak terlalu ketat dan tidak terlalu longgar).</li>
+          <li>Baca angka hasil pengukuran serta warna pita yang ditunjukkan oleh panah indikator pita LiLA.</li>
+        </ol>
       </div>
     </div>
   );

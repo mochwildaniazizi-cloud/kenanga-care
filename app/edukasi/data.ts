@@ -145,5 +145,23 @@ export const mockArticles: Article[] = [
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
+  },
+  {
+    id: "L16",
+    title: "Perawatan Bayi Baru Lahir: Tali Pusat, Perawatan Kanguru, & Deteksi Warna Tinja (Atresia Bilier)",
+    categories: ["Balita 0-2 Tahun"],
+    type: "Artikel",
+    duration: "9 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L17",
+    title: "Tanda Bahaya Balita 29 Hari - 5 Tahun & Panduan Pengukuran Lingkar Lengan Atas (LiLA)",
+    categories: ["Balita 0-2 Tahun"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
   }
 ];
