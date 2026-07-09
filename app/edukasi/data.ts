@@ -1,3 +1,4 @@
+// data.ts
 export type CategoryType = "Gizi & MPASI" | "Imunisasi" | "Ibu Hamil" | "Ibu Nifas" | "Ibu Menyusui" | "Tumbuh Kembang";
 
 export interface Article {
@@ -8,6 +9,7 @@ export interface Article {
   duration: string;
   imageUrl: string;
   isLanjutkanMembaca?: boolean;
+  isNativeKIA?: boolean; // <--- Tambahkan properti flag baru ini
 }
 
 export const mockArticles: Article[] = [
@@ -18,7 +20,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "5 Menit",
     imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: true
+    isLanjutkanMembaca: true,
+    isNativeKIA: true // <--- Set TRUE untuk semua artikel bawaan KIA
   },
   {
     id: "L2",
@@ -27,7 +30,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "6 Menit",
     imageUrl: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: true
+    isLanjutkanMembaca: true,
+    isNativeKIA: true
   },
   {
     id: "L3",
@@ -36,7 +40,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "4 Menit",
     imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: true
+    isLanjutkanMembaca: true,
+    isNativeKIA: true
   },
   {
     id: "L4",
@@ -45,7 +50,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "5 Menit",
     imageUrl: "https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L5",
@@ -53,8 +59,9 @@ export const mockArticles: Article[] = [
     categories: ["Ibu Hamil"],
     type: "Artikel",
     duration: "5 Menit",
-    imageUrl: "https://images.unsplash.com/photos/person-holding-belly-photo-NIZeg731LxM?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    imageUrl: "/cover-article/L5.jpg",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L6",
@@ -63,7 +70,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "6 Menit",
     imageUrl: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L7",
@@ -72,7 +80,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "6 Menit",
     imageUrl: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L8",
@@ -81,7 +90,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "5 Menit",
     imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L9",
@@ -90,7 +100,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L10",
@@ -99,7 +110,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L11",
@@ -108,7 +120,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L12",
@@ -117,7 +130,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "6 Menit",
     imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L13",
@@ -125,8 +139,9 @@ export const mockArticles: Article[] = [
     categories: ["Ibu Hamil"],
     type: "Artikel",
     duration: "6 Menit",
-    imageUrl: "https://images.unsplash.com/photo-1536640719371-2e25f8dd9a98?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    imageUrl: "/cover-article/L13.jpg",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L14",
@@ -135,7 +150,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L15",
@@ -144,7 +160,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L16",
@@ -153,7 +170,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "9 Menit",
     imageUrl: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L17",
@@ -162,7 +180,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L18",
@@ -171,7 +190,8 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   },
   {
     id: "L19",
@@ -180,6 +200,7 @@ export const mockArticles: Article[] = [
     type: "Artikel",
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1491013516836-7db643ee125a?q=80&w=600&auto=format&fit=crop",
-    isLanjutkanMembaca: false
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   }
 ];

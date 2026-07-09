@@ -266,7 +266,7 @@ export default function ArticleDetailPage() {
         </Link>
 
         <div className="flex items-center gap-2">
-          {role !== "ibu" && (
+          {role !== "ibu" && !article.isNativeKIA && (
             <Link
               href={`/edukasi/tambah?edit=${article.id}`}
               className="px-4 py-2 bg-brand-primary/10 hover:bg-brand-primary text-brand-primary hover:text-base-white text-xs font-bold rounded-xl transition duration-150 flex items-center"
@@ -276,7 +276,8 @@ export default function ArticleDetailPage() {
             </Link>
           )}
 
-          {role !== "ibu" && (
+          {/* Tambahkan && !article.isNativeKIA di bawah ini */}
+          {role !== "ibu" && !article.isNativeKIA && (
             <button
               onClick={handleDelete}
               className="px-4 py-2 bg-red-50 hover:bg-red-600 border border-red-200 text-red-500 hover:text-base-white text-xs font-bold rounded-xl transition duration-150 flex items-center cursor-pointer"
