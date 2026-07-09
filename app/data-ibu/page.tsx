@@ -128,7 +128,8 @@ export default function DataIbuPage() {
   const [motherDetail, setMotherDetail] = useState<any>(null);
   const [isLoadingMother, setIsLoadingMother] = useState(true);
   const [activeIbuSubTab, setActiveIbuSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
-  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process' | 'postpartum' | 'kb'>('ttd');
+  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process' | 'postpartum' | 'kb' | 'breastfeeding'>('ttd');
+  const [breastfeedingAnswers, setBreastfeedingAnswers] = useState<boolean[]>(new Array(12).fill(false));
   
   const [attendance, setAttendance] = useState([
     { date: "", note: "" },
@@ -210,6 +211,13 @@ export default function DataIbuPage() {
     const cachedKbConsent = localStorage.getItem(`kb_consent_${motherId}`);
     if (cachedKbConsent) {
       setKbConsent(cachedKbConsent === 'true');
+    }
+
+    const cachedBreastfeeding = localStorage.getItem(`breastfeeding_monitoring_${motherId}`);
+    if (cachedBreastfeeding) {
+      try {
+        setBreastfeedingAnswers(JSON.parse(cachedBreastfeeding));
+      } catch (e) {}
     }
   }, [motherDetail]);
   const today = new Date();
@@ -991,6 +999,13 @@ export default function DataIbuPage() {
                   className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'kb' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
                 >
                   <MdFamilyRestroom className="w-3.5 h-3.5" /> KB Pasca Salin
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setActivePemantauanTab('breastfeeding')}
+                  className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'breastfeeding' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                >
+                  <MdPregnantWoman className="w-3.5 h-3.5" /> Menyusui & Nutrisi
                 </button>
               </div>
 
@@ -1791,6 +1806,73 @@ export default function DataIbuPage() {
                               </div>
                             </div>
                           )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {activePemantauanTab === 'breastfeeding' && (() => {
+                    const handleToggleBreastfeeding = (idx: number) => {
+                      const next = [...breastfeedingAnswers];
+                      next[idx] = !next[idx];
+                      setBreastfeedingAnswers(next);
+                      if (motherDetail) {
+                        localStorage.setItem(`breastfeeding_monitoring_${motherDetail.mother_id}`, JSON.stringify(next));
+                      }
+                    };
+
+                    const items = [
+                      { title: "1. Posisi Lurus & Dekat", desc: "Kepala dan badan bayi membentuk garis lurus, badan bayi dekat menempel tubuh ibu." },
+                      { title: "2. Mulut Terbuka Lebar", desc: "Mulut bayi terbuka lebar saat menyusu untuk pelekatan maksimal." },
+                      { title: "3. Dagu Menempel Payudara", desc: "Dagu bayi menempel erat pada payudara ibu saat menyusu." },
+                      { title: "4. Areola Atas Terlihat Lebih Banyak", desc: "Bagian areola payudara di atas terlihat lebih banyak dibanding areola bawah." },
+                      { title: "5. Bibir Bawah Dower / Flanged", desc: "Bibir bawah bayi memutar keluar secara sempurna." },
+                      { title: "6. Menyusu 8-12 Kali Sehari", desc: "Menyusui sesering mungkin minimal 8 hingga 12 kali dalam 24 jam." },
+                      { title: "7. Makanan Pokok (6 Porsi)", desc: "Mengonsumsi nasi atau makanan pokok sebanyak 6 porsi sehari." },
+                      { title: "8. Protein Hewani (4 Porsi)", desc: "Mengonsumsi lauk pauk protein hewani seperti ikan, telur, daging sebanyak 4 porsi sehari." },
+                      { title: "9. Protein Nabati (4 Porsi)", desc: "Mengonsumsi tempe atau tahu sebanyak 4 porsi sehari." },
+                      { title: "10. Sayur-sayuran (4 Porsi)", desc: "Mengonsumsi sayur matang sebanyak 4 mangkuk sehari." },
+                      { title: "11. Buah-buahan (4 Porsi)", desc: "Mengonsumsi buah-buahan seperti pisang, pepaya, apel sebanyak 4 porsi sehari." },
+                      { title: "12. Air Putih (14 Gelas/Hari)", desc: "Memenuhi hidrasi harian dengan minum 14 gelas air putih sehari." }
+                    ];
+
+                    const checkedCount = breastfeedingAnswers.filter(Boolean).length;
+                    const pct = Math.round(checkedCount * (100 / 12));
+
+                    return (
+                      <div className="space-y-4 animate-in fade-in duration-200">
+                        <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                          <h4 className="font-bold text-xs text-brand-primary">
+                            Lembar Pemantauan Menyusui & Nutrisi Ibu (Diisi Ibu)
+                          </h4>
+                          <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                            Memastikan posisi pelekatan menyusui yang benar dan pemenuhan porsi makan harian ibu menyusui sesuai Buku KIA halaman 35-37.
+                          </p>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-[20px] p-4 shadow-sm bg-base-white">
+                          <div className="w-full bg-base-border/40 h-2 rounded-full mb-2 overflow-hidden">
+                            <div className="bg-brand-primary h-full transition-all duration-300" style={{ width: `${pct}%` }}></div>
+                          </div>
+                          <p className="text-[11px] font-bold text-brand-primary">Selesai: {pct}% ({checkedCount} dari 12)</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {items.map((item, idx) => (
+                            <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+                              <input 
+                                type="checkbox" 
+                                checked={!!breastfeedingAnswers[idx]} 
+                                onChange={() => handleToggleBreastfeeding(idx)} 
+                                className="w-4 h-4 rounded text-brand-primary mt-0.5 cursor-pointer focus:ring-brand-primary/30" 
+                              />
+                              <div className="text-[10px] leading-relaxed select-none">
+                                <span className="font-bold text-base-text-primary block">{item.title}</span>
+                                <span className="text-base-text-secondary">{item.desc}</span>
+                              </div>
+                            </label>
+                          ))}
                         </div>
                       </div>
                     );

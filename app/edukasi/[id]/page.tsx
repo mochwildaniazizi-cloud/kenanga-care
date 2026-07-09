@@ -404,6 +404,10 @@ export default function ArticleDetailPage() {
               <L12ArticleContent />
             ) : id === "L13" ? (
               <L13ArticleContent />
+            ) : id === "L14" ? (
+              <L14ArticleContent />
+            ) : id === "L15" ? (
+              <L15ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2542,6 +2546,214 @@ function L13ArticleContent() {
             <li><strong>Kondom:</strong> Metode penghalang yang aman digunakan kapan saja pasca nifas.</li>
           </ul>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function L14ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Menyusui secara eksklusif selama 6 bulan pertama kehidupan bayi memberikan fondasi gizi terbaik serta melatih kekebalan tubuh bayi secara alami. Ibu menyusui membutuhkan pemahaman tentang posisi, pelekatan yang benar, dan metode memerah/menyimpan ASI.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        ✨ Manfaat Menyusui Langsung bagi Ibu
+      </h2>
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 text-xs leading-relaxed mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+          <li><strong>Mencegah Kanker:</strong> Menyusui mengurangi risiko kanker payudara dan ovarium pada ibu.</li>
+          <li><strong>Pemulihan Uterus:</strong> Merangsang pelepasan hormon oksitosin untuk membantu rahim kembali ke ukuran semula dan mengurangi perdarahan.</li>
+        </ul>
+        <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+          <li><strong>KB Alami:</strong> Menyusui eksklusif bekerja sebagai Metode Amenore Laktasi (MAL) pencegah kehamilan alami.</li>
+          <li><strong>Penurunan Berat Badan:</strong> Menyusui membakar kalori ekstra untuk mempercepat penurunan berat badan pasca melahirkan.</li>
+        </ul>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        👶 Posisi & Pelekatan Menyusui yang Benar
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div className="bg-base-white border border-base-border/25 rounded-2xl p-5">
+          <h4 className="font-bold text-brand-primary mb-2">1. Posisi Menyusui yang Benar</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li>Kepala dan badan bayi membentuk garis lurus yang lurus.</li>
+            <li>Wajah bayi menghadap payudara, hidung berhadapan dengan puting susu.</li>
+            <li>Badan bayi dekat dan menempel erat ke tubuh ibu.</li>
+            <li>Ibu menggendong/mendekap seluruh badan bayi secara mantap.</li>
+          </ul>
+        </div>
+        <div className="bg-base-white border border-base-border/25 rounded-2xl p-5">
+          <h4 className="font-bold text-brand-primary mb-2">2. Pelekatan Menyusui yang Benar</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li>Bayi dekat dengan payudara dengan mulut terbuka lebar.</li>
+            <li>Dagu bayi menyentuh payudara ibu.</li>
+            <li>Bagian areola payudara di atas terlihat lebih banyak dibanding areola bawah.</li>
+            <li>Bibir bawah bayi memutar keluar (dower / flanged).</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🌡️ Suhu & Durasi Penyimpanan ASI Perah (ASIP)
+      </h2>
+      <div className="overflow-x-auto border border-base-border/20 rounded-2xl shadow-sm bg-base-white text-xs mb-6">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-base-bg/30 text-base-text-primary font-bold border-b border-base-border/10">
+              <th className="p-3">Tempat Penyimpanan</th>
+              <th className="p-3">Suhu</th>
+              <th className="p-3">Lama Penyimpanan</th>
+            </tr>
+          </thead>
+          <tbody className="text-base-text-secondary font-medium">
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">Cooler Bag (Dengan Ice Pack)</td>
+              <td className="p-3">15°C</td>
+              <td className="p-3 font-bold text-status-orange-solid">24 Jam</td>
+            </tr>
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">Dalam Ruangan (ASIP Segar)</td>
+              <td className="p-3">27°C s.d. 32°C / 25°C</td>
+              <td className="p-3 font-bold text-status-orange-solid">4 Jam / 6-8 Jam</td>
+            </tr>
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">Kulkas Bawah / Chiller</td>
+              <td className="p-3">4°C</td>
+              <td className="p-3 font-bold text-brand-primary">2 - 3 Hari (48-72 jam)</td>
+            </tr>
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">Freezer Kulkas 1 Pintu</td>
+              <td className="p-3">-15°C s.d. 0°C</td>
+              <td className="p-3 font-bold text-brand-primary">2 Minggu</td>
+            </tr>
+            <tr>
+              <td className="p-3 font-bold text-base-text-primary">Freezer Kulkas 2 Pintu / Deep Freezer</td>
+              <td className="p-3">-20°C s.d. -18°C</td>
+              <td className="p-3 font-bold text-status-green-solid">3 - 6 Bulan</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🥗 Porsi Makan & Minum Ibu Menyusui (Kebutuhan Sehari)
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 text-xs leading-relaxed font-semibold">
+        <div className="p-5 bg-brand-soft/10 border border-brand-primary/15 rounded-2xl space-y-2.5 text-base-text-primary">
+          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍚 Nasi / Makanan Pokok:</span> <span className="font-extrabold text-brand-primary">6 Porsi Sehari</span></p>
+          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍗 Protein Hewani (Ikan, Daging, Telur):</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
+          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🥛 Protein Nabati (Tempe, Tahu):</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
+          <p className="flex justify-between"><span>🥦 Sayur-sayuran:</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
+        </div>
+        <div className="p-5 bg-brand-soft/10 border border-brand-primary/15 rounded-2xl space-y-2.5 text-base-text-primary">
+          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍎 Buah-buahan:</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
+          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🧈 Minyak / Lemak:</span> <span className="font-extrabold text-brand-primary">6 Porsi Sehari</span></p>
+          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍬 Gula:</span> <span className="font-extrabold text-brand-primary">2 Porsi Sehari</span></p>
+          <p className="flex justify-between text-status-green-solid font-bold"><span>💧 Air Putih:</span> <span>14 Gelas/Hari (0-6 bln) / 12 Gelas/Hari (7-12 bln)</span></p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L15ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Bayi baru lahir (neonatus) usia 0 hingga 28 hari berada dalam fase rentan terhadap infeksi dan penyesuaian organ fisik. Orang tua wajib memantau tanda-tanda bahaya neonatus dan memahami pertumbuhan kapasitas lambung bayi.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🍒 Ukuran Lambung Bayi Baru Lahir (0 - 6 Bulan)
+      </h2>
+      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
+        Mengapa bayi menyusu sangat sering? Lambung bayi baru lahir sangat kecil dan bertumbuh bertahap:
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-1">🔴</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Hari Ke-1</h4>
+          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Seukuran Kelereng</span>
+          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 5-7 ml. Bayi hanya membutuhkan sedikit cairan kolostrum.</p>
+        </div>
+        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-1">🟡</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Hari Ke-3</h4>
+          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Bola Pingpong</span>
+          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 22-27 ml. Bayi menyusu lebih sering (10-12 kali).</p>
+        </div>
+        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-1">🥚</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Minggu Ke-1</h4>
+          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Telur Ayam</span>
+          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 45-60 ml. Bayi mulai menyusu dengan pola teratur.</p>
+        </div>
+        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-1">🦆</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Bulan Ke-1</h4>
+          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Telur Bebek</span>
+          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 80-150 ml. Bayi sanggup menyusu lebih banyak sekali minum.</p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
+        🚨 Tanda Bahaya Pada Bayi Baru Lahir (0 - 28 Hari)
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🤒</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam / Panas Tinggi</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh bayi &gt;37.5°C menandakan adanya infeksi akut.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🥶</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">2. Badan Dingin (Hipotermia)</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh &lt;36°C, tubuh bayi teraba dingin, berisiko fatal jika dibiarkan.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">💤</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">3. Bayi Lemah / Merintih</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Bayi lunglai, sulit dibangunkan untuk menyusu, atau bernapas merintih terus.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">👃</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">4. Sesak Napas</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Napas bayi cepat (&gt;60 kali/menit) atau tampak tarikan dinding dada ke dalam.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🔗</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">5. Tali Pusat Merah/Bau</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Pangkal tali pusat kemerahan meluas ke perut, basah, berbau busuk/bernanah.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🤮</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">6. Muntah &amp; Diare</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Bayi memuntahkan semua isi lambung, menolak menyusu, disertai diare cair berulang.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">⚡</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">7. Kejang-Kejang</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Bayi mengalami kejang kaku, kelojotan, atau mata mendelik ke atas.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🟡</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">8. Kulit &amp; Mata Kuning</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kuning muncul pada hari pertama (&lt;24 jam) atau kuning meluas hingga kaki.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">💩</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">9. Tinja Berwarna Pucat</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kotoran bayi berwarna putih keabu-abuan/pucat (indikasi sumbatan empedu).</p>
+        </div>
+      </div>
+
+      <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 text-xs text-status-red-solid leading-relaxed font-bold">
+        ⚠️ PENTING: Jika menemukan salah satu tanda bahaya di atas pada bayi Anda, segeralah bawa bayi ke Bidan, Puskesmas, atau Rumah Sakit terdekat untuk pertolongan medis segera.
       </div>
     </div>
   );

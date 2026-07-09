@@ -127,5 +127,23 @@ export const mockArticles: Article[] = [
     duration: "6 Menit",
     imageUrl: "https://images.unsplash.com/photo-1536640719371-2e25f8dd9a98?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
+  },
+  {
+    id: "L14",
+    title: "Panduan Sukses Menyusui: Posisi, Pelekatan, & Cara Menyimpan ASI",
+    categories: ["Ibu Hamil", "Gizi & MPASI"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1596464716127-f2a82984de30?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L15",
+    title: "Tanda Bahaya Bayi Baru Lahir (0-28 Hari) & Ukuran Lambung Bayi",
+    categories: ["Balita 0-2 Tahun"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
   }
 ];

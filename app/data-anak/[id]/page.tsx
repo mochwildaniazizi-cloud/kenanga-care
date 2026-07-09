@@ -21,7 +21,11 @@ export default function ChildDetailPage() {
   const { role } = useUserRole();
   const [child, setChild] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSubTab, setActiveSubTab] = useState<'biodata' | 'health_service'>('biodata');
+  const [activeSubTab, setActiveSubTab] = useState<'biodata' | 'health_service' | 'newborn_monitoring'>('biodata');
+  const [newbornMonitoring, setNewbornMonitoring] = useState<any>({
+    pemeriksaan: [false, false, false, false],
+    dangerSigns: new Array(12).fill(false)
+  });
 
   // Editing States
   const [isEditing, setIsEditing] = useState(false);
@@ -259,6 +263,16 @@ export default function ChildDetailPage() {
       }
     }
     fetchDetail();
+
+    if (id) {
+      const decodedId = decodeURIComponent(id as string);
+      const cachedNewborn = localStorage.getItem(`newborn_monitoring_${decodedId}`);
+      if (cachedNewborn) {
+        try {
+          setNewbornMonitoring(JSON.parse(cachedNewborn));
+        } catch (e) {}
+      }
+    }
   }, [id]);
 
   const handleStartEdit = () => {
@@ -729,6 +743,13 @@ export default function ChildDetailPage() {
               >
                 <FaFileMedical className="w-3.5 h-3.5" /> Layanan Kesehatan
               </button>
+              <button 
+                type="button" 
+                onClick={() => setActiveSubTab('newborn_monitoring')}
+                className={`flex-1 py-3 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'newborn_monitoring' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdChildCare className="w-3.5 h-3.5" /> Pemantauan Neonatus
+              </button>
             </div>
 
             {/* Content Body */}
@@ -940,6 +961,121 @@ export default function ChildDetailPage() {
                 </div>
               )}
 
+              {/* TAB 3: NEWBORN MONITORING (0-28 HARI) */}
+              {activeSubTab === 'newborn_monitoring' && (() => {
+                const handleTogglePemeriksaan = (idx: number) => {
+                  const nextP = [...newbornMonitoring.pemeriksaan];
+                  nextP[idx] = !nextP[idx];
+                  const nextMonitoring = { ...newbornMonitoring, pemeriksaan: nextP };
+                  setNewbornMonitoring(nextMonitoring);
+                  if (child) {
+                    localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextMonitoring));
+                  }
+                };
+
+                const handleToggleDanger = (idx: number) => {
+                  const nextD = [...newbornMonitoring.dangerSigns];
+                  nextD[idx] = !nextD[idx];
+                  const nextMonitoring = { ...newbornMonitoring, dangerSigns: nextD };
+                  setNewbornMonitoring(nextMonitoring);
+                  if (child) {
+                    localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextMonitoring));
+                  }
+                };
+
+                const pItems = [
+                  { label: "1. Pemeriksaan Neonatus 1 (KN1)", desc: "Umur 6-48 jam setelah lahir." },
+                  { label: "2. Pemeriksaan Neonatus 2 (KN2)", desc: "Umur 3-7 hari setelah lahir." },
+                  { label: "3. Pemeriksaan Neonatus 3 (KN3)", desc: "Umur 8-28 hari setelah lahir." },
+                  { label: "4. Salep Mata, Vit K1, & Imunisasi HB0", desc: "Umur 0-5 jam setelah lahir." }
+                ];
+
+                const dangerItems = [
+                  { title: "Demam / Panas Tinggi", desc: "Suhu tubuh bayi >37.5°C.", emoji: "🤒" },
+                  { title: "Badan Dingin", desc: "Suhu tubuh <36°C (Hipotermia).", emoji: "🥶" },
+                  { title: "Kejang-Kejang", desc: "Kejang kaku atau kelojotan.", emoji: "⚡" },
+                  { title: "Lemah / Tidak Aktif", desc: "Bayi lunglai dan sulit dibangunkan.", emoji: "💤" },
+                  { title: "Napas Cepat / Sesak Napas", desc: "Napas cepat (>60 x/menit).", emoji: "👃" },
+                  { title: "Merintih / Merintih Terus", desc: "Bernapas mengeluarkan suara merintih.", emoji: "🔊" },
+                  { title: "Tidak Mau Menyusu", desc: "Menolak menyusu sama sekali.", emoji: "🍼" },
+                  { title: "Tali Pusat Kemerahan / Bau", desc: "Meluas ke kulit perut, basah/berbau.", emoji: "🔗" },
+                  { title: "Kulit & Mata Kuning", desc: "Kuning muncul pada hari pertama/meluas.", emoji: "🟡" },
+                  { title: "Muntah-Muntah", desc: "Memuntahkan semua yang diminum.", emoji: "🤮" },
+                  { title: "Diare", desc: "Buang air besar cair berkali-kali.", emoji: "💩" },
+                  { title: "Tinja Berwarna Pucat", desc: "Tinja berwarna putih keabu-abuan.", emoji: "⚪" }
+                ];
+
+                const hasDanger = newbornMonitoring.dangerSigns.some(Boolean);
+
+                return (
+                  <div className="space-y-5 text-xs animate-in fade-in duration-200">
+                    
+                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                      <h4 className="font-bold text-xs text-brand-primary">
+                        Pemantauan Bayi Baru Lahir (Neonatus 0-28 Hari)
+                      </h4>
+                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                        Pantau pelayanan kesehatan dan kenali tanda bahaya bayi baru lahir secara mandiri (Buku KIA Hal 40-41).
+                      </p>
+                    </div>
+
+                    {/* I. Pemeriksaan Kesehatan */}
+                    <div className="space-y-2.5">
+                      <h5 className="font-bold text-xs text-brand-primary">I. Kunjungan Pemeriksaan Kesehatan</h5>
+                      <div className="grid grid-cols-1 gap-2">
+                        {pItems.map((item, idx) => (
+                          <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/20 rounded-xl cursor-pointer hover:border-brand-primary/20 transition">
+                            <input 
+                              type="checkbox" 
+                              checked={!!newbornMonitoring.pemeriksaan[idx]} 
+                              onChange={() => handleTogglePemeriksaan(idx)} 
+                              className="w-4 h-4 rounded text-brand-primary mt-0.5 cursor-pointer focus:ring-brand-primary/30" 
+                            />
+                            <div className="text-[10px] leading-relaxed select-none">
+                              <span className="font-bold text-base-text-primary block">{item.label}</span>
+                              <span className="text-base-text-secondary">{item.desc}</span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* II. Tanda Bahaya */}
+                    <div className="space-y-2.5">
+                      <h5 className="font-bold text-xs text-status-red-solid flex items-center gap-1">
+                        II. Deteksi Dini Tanda Bahaya 
+                        {hasDanger && (
+                          <span className="text-[8px] font-bold text-status-red-solid bg-status-red-light/35 border border-status-red-solid/25 px-2 py-0.5 rounded-full uppercase animate-pulse shrink-0">Bahaya</span>
+                        )}
+                      </h5>
+
+                      {hasDanger && (
+                        <div className="p-3 bg-status-red-light/10 border border-status-red-solid/20 rounded-xl text-[10px] text-status-red-solid font-bold leading-relaxed animate-in slide-in-from-top-2 duration-200">
+                          ⚠️ PERINGATAN: Gejala bahaya neonatus terdeteksi! Segera hubungi faskes/dokter anak untuk pemeriksaan lebih lanjut.
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {dangerItems.map((item, idx) => (
+                          <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/20 rounded-xl cursor-pointer hover:border-status-red-solid/20 transition">
+                            <input 
+                              type="checkbox" 
+                              checked={!!newbornMonitoring.dangerSigns[idx]} 
+                              onChange={() => handleToggleDanger(idx)} 
+                              className="w-4 h-4 rounded text-status-red-solid mt-0.5 cursor-pointer focus:ring-status-red-solid/30" 
+                            />
+                            <div className="text-[10px] leading-relaxed select-none">
+                              <span className="font-bold text-base-text-primary flex items-center gap-1">{item.emoji} {item.title}</span>
+                              <span className="text-base-text-secondary block mt-0.5">{item.desc}</span>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                );
+              })()}
             </div>
           </div>
 
