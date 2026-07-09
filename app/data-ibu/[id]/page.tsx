@@ -1527,9 +1527,9 @@ export default function MotherDetailPage() {
                         <span>Belum Diminum</span>
                       </div>
                     </div>
-                  </div>
-                );
-              })()}
+                    </div>
+                  );
+                })()}
 
               {/* TAB 5: PEMANTAUAN MINGGUAN */}
               {activePemantauanTab === 'weekly' && (() => {
