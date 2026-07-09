@@ -1198,21 +1198,21 @@ function L7ArticleContent() {
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}
       <p className="text-sm text-base-text-secondary leading-relaxed">
-        Trimester kedua (4-6 bulan) adalah masa ketika organ tubuh janin berkembang semakin matang dan ibu mulai merasakan gerakan pertamanya. Di masa ini, pemenuhan porsi gizi seimbang harian meningkat secara bertahap.
+        Memasuki Usia Kehamilan 4-6 Bulan (Trimester 2), organ tubuh janin berkembang semakin matang dan Ibu mulai dapat merasakan gerakan pertamanya. Fase ini adalah saat yang tepat bagi Ibu dan keluarga untuk mulai merencanakan persiapan persalinan dengan matang harian.
       </p>
 
-      {/* Grid Perbandingan Ukuran Janin */}
+      {/* Grid Estimasi Ukuran Janin Berkala */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {[
           {
             icon: "🍎",
             title: "Bulan Ke-4 (13-16 Minggu)",
-            desc: "Ukuran janin sebesar Apel. Berat sekitar 100 gram, organ-organ tubuh mulai berfungsi aktif."
+            desc: "Ukuran janin sebesar Apel. Panjang tubuh janin mulai berkembang dari sekitar 12.5 cm."
           },
           {
             icon: "🌽",
             title: "Bulan Ke-6 (21-24 Minggu)",
-            desc: "Ukuran janin sebesar Jagung. Berat sekitar 600 gram, kulit berkembang keriput halus."
+            desc: "Ukuran janin sebesar Jagung. Panjang mencapai 34 cm dengan berat badan kisaran 1000 gram."
           }
         ].map((item, idx) => (
           <div key={idx} className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-4 shadow-xs">
@@ -1225,6 +1225,108 @@ function L7ArticleContent() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Grid Dinamika Ibu, Bayi, dan Edukasi */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+        {/* Yang Dialami Ibu */}
+        <div className="bg-base-white border border-base-border/25 rounded-2xl p-5 shadow-xs">
+          <h4 className="font-bold text-brand-primary mb-2.5 flex items-center gap-1.5">
+            🤰 Yang Akan Dialami Ibu:
+          </h4>
+          <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+            <li>Gejala mual/muntah yang dirasakan pada awal kehamilan mulai berkurang secara bertahap.</li>
+            <li>Kenaikan berat badan ideal berkisar <strong className="text-base-text-primary">4 - 8 kg</strong> (sesuai status gizi pra-hamil).</li>
+            <li>Mulai merasakan tendangan atau pergerakan aktif janin harian pada usia kehamilan 5 bulan.</li>
+          </ul>
+        </div>
+
+        {/* Yang Harus Dilakukan */}
+        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5 shadow-xs">
+          <h4 className="font-bold text-status-green-solid mb-2.5 flex items-center gap-1.5">
+            ✅ Yang Harus Dilakukan Ibu:
+          </h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li>Periksa kehamilan ke dokter atau bidan minimal 2 kali pada trimester ini.</li>
+            <li>Pantau secara aktif gerakan janin harian dalam kandungan.</li>
+            <li>Makan porsi kecil tapi sering (3 kali makan utama + 1-2 kali kudapan sehat).</li>
+            <li>Minum rutin Paket <strong className="text-status-green-solid">Tablet Tambah Darah (TTD)</strong> harian.</li>
+            <li>Diskusikan awal rencana proses persalinan bersama tenaga kesehatan.</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Bagian Utama: Tabel Porsi Makan & Minum Trimester 2 */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-brand-primary border-b pb-2 flex items-center gap-2">
+          🍽️ Porsi Makan & Minum Ibu Hamil (Kebutuhan Sehari Usia 12-40 Minggu)
+        </h2>
+        
+        <div className="overflow-x-auto border border-base-border/20 rounded-xl bg-base-white shadow-sm">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-base-bg text-base-text-primary border-b font-bold">
+                <th className="py-3 px-4 w-1/3">Bahan Makanan</th>
+                <th className="py-3 px-4 text-center w-28">Takaran Harian</th>
+                <th className="py-3 px-4">Keterangan Porsi Pilihan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                {
+                  name: "Nasi / Makanan Pokok",
+                  portion: "6 Porsi",
+                  desc: ["100 g atau 3/4 gelas nasi", "125 g atau 3 buah jagung sedang", "210 g atau 2 kentang sedang", "120 g atau 1/2 potong singkong", "70 g atau 3 iris roti putih", "200 g atau 2 gelas mie basah"]
+                },
+                {
+                  name: "Protein Hewani",
+                  sub: "Ikan, Telur, Ayam, dll.",
+                  portion: "4 Porsi",
+                  desc: ["50 g atau 1 potong sedang ikan", "55 g atau 1 butir telur ayam"]
+                },
+                {
+                  name: "Protein Nabati",
+                  sub: "Tempe, Tahu, dll.",
+                  portion: "4 Porsi",
+                  desc: ["50 g atau 1 potong sedang tempe", "100 g atau 2 potong sedang tahu"]
+                },
+              ].map((row, idx) => (
+                <tr key={idx} className="border-b hover:bg-base-bg/30 transition-colors">
+                  <td className="py-3 px-4 border-r border-base-border/10 font-bold text-base-text-primary">
+                    {row.name}
+                    {row.sub && <small className="text-base-text-secondary block font-normal mt-0.5">({row.sub})</small>}
+                  </td>
+                  <td className="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">{row.portion}</td>
+                  <td className="py-3 px-4 text-base-text-secondary font-medium">
+                    <ul className="list-disc pl-4 grid grid-cols-1 sm:grid-cols-2 gap-1">
+                      {row.desc.map((li, lIdx) => <li key={lIdx}>{li}</li>)}
+                    </ul>
+                  </td>
+                </tr>
+              ))}
+              {[
+                { name: "Sayur-sayuran", portion: "4 Porsi", desc: "100 g atau 1 mangkuk sayur matang tanpa kuah." },
+                { name: "Buah-buahan", portion: "4 Porsi", desc: "100 g (1 potong sedang) pisang, ATAU 100-190 g (1 potong besar) pepaya." },
+                { name: "Minyak / Lemak", portion: "5 Porsi", desc: "5 g atau 1 sendok teh. Bersumber dari pengolahan makanan seperti menggoreng, menumis, santan, mentega, atau kemiri." },
+                { name: "Gula", portion: "2 Porsi", desc: "10 g atau 1 sendok makan. Bersumber dari kue-kue manis, teh manis harian, dsb." }
+              ].map((row, idx) => (
+                <tr key={idx} className="border-b last:border-0 hover:bg-base-bg/30 transition-colors">
+                  <td className="py-3 px-4 border-r border-base-border/10 font-bold text-base-text-primary">{row.name}</td>
+                  <td className="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">{row.portion}</td>
+                  <td className="py-3 px-4 text-base-text-secondary font-medium leading-relaxed">{row.desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Baris Intisari Batasan Konsumsi */}
+      <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed shadow-xs flex items-center gap-2">
+        <span>⚠️</span>
+        <p>
+          Batasi konsumsi garam paling banyak <strong className="text-base-text-primary">1 sendok teh/hari</strong> dan pastikan minum air putih minimal <strong className="text-base-text-primary">8 - 12 gelas per hari</strong>.
+        </p>
       </div>
     </div>
   );
@@ -1813,26 +1915,26 @@ function L14ArticleContent() {
           {/* Posisi */}
           <div className="bg-base-white border border-base-border/25 rounded-2xl p-5 shadow-xs">
             <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1.5">
-              1. Posisi Menyusui yang Benar[cite: 2]
+              1. Posisi Menyusui yang Benar
             </h4>
             <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
-              <li>Kepala dan badan bayi membentuk garis lurus yang lurus[cite: 2].</li>
-              <li>Wajah bayi menghadap payudara, hidung berhadapan dengan puting susu[cite: 2].</li>
-              <li>Badan bayi dekat dan menempel erat ke tubuh ibu[cite: 2].</li>
-              <li>Ibu menggendong/mendekap seluruh badan bayi secara mantap[cite: 2].</li>
+              <li>Kepala dan badan bayi membentuk garis lurus yang lurus.</li>
+              <li>Wajah bayi menghadap payudara, hidung berhadapan dengan puting susu.</li>
+              <li>Badan bayi dekat dan menempel erat ke tubuh ibu.</li>
+              <li>Ibu menggendong/mendekap seluruh badan bayi secara mantap.</li>
             </ul>
           </div>
 
           {/* Pelekatan */}
           <div className="bg-base-white border border-base-border/25 rounded-2xl p-5 shadow-xs">
             <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1.5">
-              2. Pelekatan Menyusui yang Benar[cite: 2]
+              2. Pelekatan Menyusui yang Benar
             </h4>
             <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
-              <li>Bayi dekat dengan payudara dengan mulut terbuka lebar[cite: 2].</li>
-              <li>Dagu bayi menyentuh payudara ibu[cite: 2].</li>
-              <li>Bagian areola payudara di atas terlihat lebih banyak dibanding areola bawah[cite: 2].</li>
-              <li>Bibir bawah bayi memutar keluar (dower / flanged)[cite: 2].</li>
+              <li>Bayi dekat dengan payudara dengan mulut terbuka lebar.</li>
+              <li>Dagu bayi menyentuh payudara ibu.</li>
+              <li>Bagian areola payudara di atas terlihat lebih banyak dibanding areola bawah.</li>
+              <li>Bibir bawah bayi memutar keluar (dower / flanged).</li>
             </ul>
           </div>
         </div>
