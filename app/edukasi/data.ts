@@ -55,5 +55,41 @@ export const mockArticles: Article[] = [
     duration: "5 Menit",
     imageUrl: "https://images.unsplash.com/photo-1584515901187-548c00a5a16a?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
+  },
+  {
+    id: "L6",
+    title: "Kesehatan Jiwa Ibu Hamil & Kelas Ibu Hamil (Trimester 1)",
+    categories: ["Ibu Hamil"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L7",
+    title: "Usia Kehamilan 4-6 Bulan: Perkembangan & Porsi Makan Trimester 2",
+    categories: ["Ibu Hamil", "Gizi & MPASI"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L8",
+    title: "9 Tanda Bahaya Kehamilan Trimester 2 yang Wajib Diwaspadai",
+    categories: ["Ibu Hamil"],
+    type: "Artikel",
+    duration: "5 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L9",
+    title: "Panduan Trimester 3: Perkembangan Bayi & Checklist Persiapan Melahirkan",
+    categories: ["Ibu Hamil"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
   }
 ];

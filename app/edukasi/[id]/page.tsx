@@ -1070,6 +1070,522 @@ function getMockContent(id: string, title: string): string {
     `;
   }
 
+  if (id === "L6") {
+    return `
+      <p class="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Kehamilan bukan hanya tentang kesehatan fisik, melainkan juga kesehatan mental. Di Trimester 1, perubahan hormon yang drastis seringkali mempengaruhi emosi ibu. Selain itu, partisipasi dalam Kelas Ibu Hamil sangat penting sebagai sarana edukasi kelompok demi kelancaran persalinan.
+      </p>
+
+      <h2 class="text-lg font-extrabold text-brand-primary border-b pb-2 mb-4 flex items-center gap-2">
+        🧠 Kesehatan Jiwa Ibu Hamil
+      </h2>
+      <p class="text-xs text-base-text-secondary mb-4 leading-relaxed">
+        Selama kehamilan Ibu dapat mengalami berbagai gejolak emosi seperti mudah sedih, mudah marah, stres, cemas, dan depresi. Hal ini akan mempengaruhi kesehatan fisik dan emosi ibu hamil, serta perkembangan bayi dalam kandungannya.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-4.5">
+          <h4 class="font-bold text-xs text-status-purple-solid mb-2">Kenali Gejala Gangguan Jiwa:</h4>
+          <ul class="list-disc pl-4 space-y-1.5 text-xs text-base-text-secondary font-medium">
+            <li>Ketegangan mental berupa kecemasan dan rasa khawatir yang berlebihan.</li>
+            <li>Ketegangan fisik seperti gelisah, gemetar, tidak dapat rileks, dan sakit kepala.</li>
+            <li>Berdebar-debar, berkeringat dingin, sesak napas, kepala terasa ringan, serta keluhan tidak nyaman di ulu hati.</li>
+            <li>Merasa lelah berkepanjangan tapi sulit untuk tidur.</li>
+            <li>Mudah tersinggung dan marah.</li>
+            <li>Mengalami perubahan hubungan dengan suami atau keluarga.</li>
+          </ul>
+        </div>
+
+        <div class="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-4.5">
+          <h4 class="font-bold text-xs text-status-green-solid mb-2">YANG HARUS DILAKUKAN:</h4>
+          <p class="text-xs text-base-text-secondary leading-relaxed mb-3">
+            Ibu tidak bisa menjalani kehamilan sendiri dan membutuhkan dukungan penuh dari suami dan keluarga. Jaga kesehatan jiwa ibu selama kehamilan dengan:
+          </p>
+          <ul class="list-disc pl-4 space-y-1.5 text-xs text-base-text-secondary font-medium">
+            <li>Tidur dan istirahat yang cukup.</li>
+            <li>Makan makanan bergizi seimbang.</li>
+            <li>Pergi ke Puskesmas atau fasilitas pelayanan kesehatan untuk melakukan pemeriksaan masalah kesehatan jiwa bila keluhan terus berlanjut.</li>
+            <li>Suami atau keluarga mendampingi serta memberi perhatian dan bantuan yang dibutuhkan ibu.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Interactive Widget: Self Screening -->
+      <div class="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-5 mb-8 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-lg">📋</span>
+          <h4 class="font-extrabold text-sm text-brand-primary">Skrining Mandiri Kesehatan Jiwa Ibu Hamil</h4>
+        </div>
+        <p class="text-xs text-base-text-secondary mb-4 leading-relaxed">
+          Deteksi dini suasana perasaan (mood) Ibu secara mandiri untuk mencegah kecemasan atau depresi antenatal.
+        </p>
+
+        <div class="space-y-2.5 text-xs font-semibold text-base-text-primary">
+          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" id="screening_1" class="mt-0.5 rounded text-brand-primary w-4 h-4" onclick="window.checkScreening()" />
+            <span>Merasa cemas, tegang, atau gelisah berlebih dalam 2 minggu terakhir.</span>
+          </label>
+          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" id="screening_2" class="mt-0.5 rounded text-brand-primary w-4 h-4" onclick="window.checkScreening()" />
+            <span>Kehilangan minat atau kesenangan dalam melakukan aktivitas sehari-hari.</span>
+          </label>
+          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" id="screening_3" class="mt-0.5 rounded text-brand-primary w-4 h-4" onclick="window.checkScreening()" />
+            <span>Merasa murung, sedih, putus asa, atau merasa tidak berharga.</span>
+          </label>
+          <label class="flex items-start gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" id="screening_4" class="mt-0.5 rounded text-brand-primary w-4 h-4" onclick="window.checkScreening()" />
+            <span>Mengalami gangguan tidur (insomnia atau tidur berlebihan) akibat pikiran cemas.</span>
+          </label>
+        </div>
+
+        <div id="screening-result" class="hidden mt-4 p-3.5 bg-brand-soft/20 border border-brand-primary/25 rounded-xl text-xs leading-relaxed font-semibold text-brand-primary">
+          <strong>Hasil Skrining:</strong> <span class="font-normal text-base-text-secondary" id="screening-advice"></span>
+        </div>
+
+        <button onclick="window.submitScreening()" class="mt-4 w-full py-2.5 bg-brand-primary text-base-white font-bold rounded-xl text-xs hover:bg-status-pink-dark transition shadow-md shadow-brand-primary/10 cursor-pointer">
+          Cek Hasil Skrining Mandiri
+        </button>
+
+        <img src="x" onerror="this.style.display='none'; window.checkScreening = function(){}; window.submitScreening = function(){
+          const c1 = document.getElementById('screening_1').checked;
+          const c2 = document.getElementById('screening_2').checked;
+          const c3 = document.getElementById('screening_3').checked;
+          const c4 = document.getElementById('screening_4').checked;
+          const count = (c1?1:0) + (c2?1:0) + (c3?1:0) + (c4?1:0);
+          const resBox = document.getElementById('screening-result');
+          const adviceText = document.getElementById('screening-advice');
+          resBox.classList.remove('hidden');
+          if (count === 0) {
+            adviceText.innerHTML = 'Kondisi emosi Ibu tampak sehat dan stabil! Tetap pertahankan pikiran positif dan nikmati masa kehamilan.';
+          } else if (count <= 2) {
+            adviceText.innerHTML = 'Ibu mengalami tingkat stres/kecemasan ringan. Cobalah bicarakan dengan suami/keluarga, perbanyak istirahat, dan lakukan latihan napas dalam.';
+          } else {
+            adviceText.innerHTML = 'Ibu mengalami gejala stres/depresi sedang hingga berat. Segera konsultasikan dengan bidan, dokter di Puskesmas, atau psikolog untuk pendampingan emosional.';
+          }
+        }" />
+      </div>
+
+      <h2 class="text-lg font-extrabold text-brand-primary border-b pb-2 mb-4 flex items-center gap-2">
+        👩‍🏫 Ikuti Kelas Ibu Hamil
+      </h2>
+      <p class="text-xs text-base-text-secondary leading-relaxed mb-4">
+        Dengan mengikuti Kelas Ibu Hamil, Ibu bisa mempersiapkan fisik dan mental untuk kelancaran proses melahirkan. Selain itu juga mendapatkan dukungan dari ibu-ibu lain, serta memperoleh informasi tentang kehamilan, proses melahirkan, perawatan masa nifas, perawatan bayi baru lahir, kebutuhan dan pemenuhan gizi, serta pelayanan kesehatan yang diterima.
+      </p>
+      
+      <div class="bg-status-yellow-light/20 border border-status-yellow-solid/25 rounded-2xl p-4.5 mb-6 text-xs font-semibold text-base-text-primary">
+        📌 Untuk jadwal dan tempat pelaksanaan Kelas Ibu Hamil tanyakan pada petugas kesehatan. Minta suami/keluarga mendampingi mengikuti kelas paling sedikit 1 kali.
+      </div>
+
+      <h3 class="font-bold text-xs text-base-text-primary mb-3">Absensi Kehadiran Kelas Ibu Hamil (Diisi Mandiri):</h3>
+      <div class="overflow-x-auto border border-base-border/20 rounded-xl shadow-sm">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-base-bg text-base-text-primary border-b font-bold">
+              <th class="py-2.5 px-4 text-center w-12">No.</th>
+              <th class="py-2.5 px-4 w-40">Tanggal Kelas</th>
+              <th class="py-2.5 px-4">Materi / Nama & Paraf Kader</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="py-2 px-4 text-center font-bold">1</td>
+              <td class="py-2 px-4"><input type="date" class="border rounded px-1.5 py-0.5 text-xs w-full bg-base-white" /></td>
+              <td class="py-2 px-4"><input type="text" placeholder="Materi Trimester 1 / Nama Kader" class="border rounded px-1.5 py-0.5 text-xs w-full bg-base-white" /></td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-2 px-4 text-center font-bold">2</td>
+              <td class="py-2 px-4"><input type="date" class="border rounded px-1.5 py-0.5 text-xs w-full bg-base-white" /></td>
+              <td class="py-2 px-4"><input type="text" placeholder="Materi Trimester 2 / Nama Bidan" class="border rounded px-1.5 py-0.5 text-xs w-full bg-base-white" /></td>
+            </tr>
+            <tr>
+              <td class="py-2 px-4 text-center font-bold">3</td>
+              <td class="py-2 px-4"><input type="date" class="border rounded px-1.5 py-0.5 text-xs w-full bg-base-white" /></td>
+              <td class="py-2 px-4"><input type="text" placeholder="Materi Trimester 3 / Persiapan Lahir" class="border rounded px-1.5 py-0.5 text-xs w-full bg-base-white" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  if (id === "L7") {
+    return `
+      <p class="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Trimester kedua (usia kehamilan 4-6 bulan atau minggu ke-13 hingga 28) adalah masa ketika organ tubuh janin berkembang semakin matang dan ibu mulai merasakan gerakan pertamanya. Di masa ini, pemenuhan porsi gizi seimbang harian meningkat secara bertahap.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-3">
+          <span class="text-3xl">🍎</span>
+          <div class="text-xs">
+            <h4 class="font-bold text-base-text-primary">Bulan Ke-4 (13-16 Minggu)</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-0.5">Ukuran janin sebesar <strong>Apel</strong>. Berat sekitar 100 gram, organ-organ tubuh mulai berfungsi.</p>
+          </div>
+        </div>
+        <div class="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-3">
+          <span class="text-3xl">🌽</span>
+          <div class="text-xs">
+            <h4 class="font-bold text-base-text-primary">Bulan Ke-6 (21-24 Minggu)</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-0.5">Ukuran janin sebesar <strong>Jagung</strong>. Berat sekitar 600 gram, kulit berkembang keriput halus.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div class="bg-[#F8FAF8] border border-[#CBDCCB] rounded-2xl p-4.5">
+          <h4 class="font-bold text-status-green-solid mb-2 flex items-center gap-1">👶 Yang Dialami Bayi:</h4>
+          <p class="text-base-text-secondary font-medium">Fungsi organ dan tubuh bayi berkembang, dimana bayi tumbuh mulai dari panjang 12.5 cm atau kira-kira sebesar apel sampai 34 cm dan berat sekitar 1000 gram atau kira-kira sebesar jagung di akhir bulan ke-6.</p>
+        </div>
+        <div class="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-4.5">
+          <h4 class="font-bold text-status-blue-solid mb-2 flex items-center gap-1">👩 Yang Dialami Ibu:</h4>
+          <p class="text-base-text-secondary font-medium">Gejala mual muntah (morning sickness) pada awal kehamilan mulai berkurang. Kenaikan berat badan bertambah sesuai status gizi sebelum hamil. Ibu juga mulai merasakan gerakan bayi seperti menendang, pada usia kehamilan 5 bulan.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 text-xs leading-relaxed">
+        <div class="bg-status-orange-light/10 border border-status-orange-solid/15 rounded-2xl p-4.5">
+          <h4 class="font-bold text-status-orange-solid mb-2 flex items-center gap-1">✅ Yang Harus Dilakukan:</h4>
+          <ul class="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+            <li>Periksa kehamilan ke dokter atau bidan paling sedikit dua kali di trimester ini.</li>
+            <li>Pantau gerak janin secara mandiri.</li>
+            <li>Makan dengan porsi lebih kecil tapi sering, porsi ditambah dengan kudapan bergizi (lihat tabel porsi).</li>
+            <li>Minum Tablet Tambah Darah (TTD) atau multivitamin setiap hari selama kehamilan.</li>
+            <li>Kenali dan cek tanda bahaya kehamilan. Bila ada, segera pergi ke fasilitas kesehatan terdekat.</li>
+            <li>Mulai merencanakan proses melahirkan atau kelahiran melalui diskusi dengan tenaga kesehatan.</li>
+          </ul>
+        </div>
+        <div class="bg-status-purple-light/10 border border-status-purple-solid/15 rounded-2xl p-4.5">
+          <h4 class="font-bold text-status-purple-solid mb-2 flex items-center gap-1">💡 Mengapa Harus Dilakukan?</h4>
+          <ul class="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+            <li>Untuk memastikan ibu tetap sehat dan pertumbuhan bayi sesuai tahapannya.</li>
+            <li>Agar ibu dan keluarga sudah memiliki perencanaan proses melahirkan/kelahiran sejak jauh hari demi keselamatan ibu dan bayi baru lahir.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🍽️ Porsi Makan Ibu Hamil Trimester 2 (12-40 Minggu)
+      </h2>
+      <p class="text-xs text-base-text-secondary mb-4">
+        Kebutuhan kalori ibu hamil meningkat pada trimester 2 dan 3 untuk pertumbuhan plasenta dan janin. Berikut takaran porsi makan per hari sesuai Buku KIA 2024:
+      </p>
+
+      <div class="overflow-x-auto border border-base-border/20 rounded-xl shadow-sm mb-6">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-base-bg text-base-text-primary border-b font-bold">
+              <th class="py-2.5 px-4">Bahan Makanan</th>
+              <th class="py-2.5 px-4 text-center w-32">Porsi / Hari</th>
+              <th class="py-2.5 px-4">Keterangan Takaran Porsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="py-3 px-4 font-bold">Nasi atau Makanan Pokok</td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">6 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">
+                1 porsi = 100 g (3/4 gelas) nasi, ATAU 125 g (3 buah) jagung sedang, ATAU 210 g (2 buah) kentang sedang, ATAU 120 g (1/2 potong) singkong, ATAU 70 g (3 iris) roti putih.
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3 px-4 font-bold">Protein Hewani <small class="text-base-text-secondary block">(Ikan, Telur, Daging)</small></td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">4 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">
+                1 porsi = 50 g (1 potong sedang) ikan, ATAU 55 g (1 butir) telur ayam, ATAU 50 g (1 potong sedang) daging ayam/sapi.
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3 px-4 font-bold">Protein Nabati <small class="text-base-text-secondary block">(Tempe, Tahu)</small></td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">4 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">
+                1 porsi = 50 g (1 potong sedang) tempe, ATAU 100 g (2 potong sedang) tahu.
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3 px-4 font-bold">Sayur-sayuran</td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">4 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">1 porsi = 100 g sayur segar (1 mangkuk sayur matang tanpa kuah).</td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3 px-4 font-bold">Buah-buahan</td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">4 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">
+                1 porsi = 100 g (1 potong sedang) pisang, ATAU 100-190 g (1 potong besar) pepaya.
+              </td>
+            </tr>
+            <tr class="border-b">
+              <td class="py-3 px-4 font-bold">Minyak/Lemak</td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">5 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">
+                1 porsi = 5 g (1 sendok teh) minyak goreng/mentega. Termasuk santan/minyak yang digunakan dalam menumis dan menggoreng.
+              </td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold">Gula</td>
+              <td class="py-3 px-4 text-center font-extrabold text-brand-primary bg-brand-soft/10">2 Porsi</td>
+              <td class="py-3 px-4 text-base-text-secondary">1 porsi = 10 g (1 sendok makan) gula pasir / pemanis makanan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bg-status-orange-light/10 border border-status-orange-solid/25 rounded-2xl p-4.5 text-xs font-semibold text-status-orange-solid">
+        ⚠️ Batasi konsumsi garam paling banyak 1 sendok teh/hari dan minum air putih 8 - 12 gelas per hari.
+      </div>
+    `;
+  }
+
+  if (id === "L8") {
+    return `
+      <p class="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Mengenali tanda bahaya kehamilan trimester 2 sangat penting demi keselamatan Ibu dan janin. Jika Ibu mengalami salah satu dari gejala-gejala berikut, segera bawa ke bidan, dokter, Puskesmas, atau Rumah Sakit terdekat tanpa menunda.
+      </p>
+
+      <h2 class="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
+        🚨 9 Tanda Bahaya Kehamilan Trimester 2
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <!-- 1 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🤒</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">1. Demam Tinggi</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh panas tinggi, menandakan adanya infeksi sistemik yang berisiko bagi keselamatan janin.</p>
+        </div>
+        <!-- 2 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🤮</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">2. Muntah Darah</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Muntah parah atau bercampur darah segar yang menyebabkan ibu lemas dan tidak bisa makan sama sekali.</p>
+        </div>
+        <!-- 3 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🫁</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">3. Sesak Napas & Berdebar</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Napas tersengal pendek disertai jantung berdenyut sangat kencang dan dada terasa nyeri tertekan.</p>
+        </div>
+        <!-- 4 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🤰</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">4. Nyeri Perut Hebat</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kram atau nyeri perut bagian bawah yang menusuk tajam, berisiko aborsi spontan atau kontraksi dini.</p>
+        </div>
+        <!-- 5 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">👁️</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">5. Pandangan Kabur</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Penglihatan berkunang-kunang atau mendadak buram, merupakan salah satu indikasi preeklampsia.</p>
+        </div>
+        <!-- 6 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🩸</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">6. Perdarahan Pervaginam</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Keluar darah segar maupun flek kecokelatan dari jalan lahir. Tanda solusio plasenta atau plasenta previa.</p>
+        </div>
+        <!-- 7 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">💦</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">7. Air Ketuban Pecah/Bau</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Keluar cairan merembes sangat banyak dari jalan lahir atau berbau tidak sedap/busuk.</p>
+        </div>
+        <!-- 8 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🤯</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">8. Pusing / Sakit Kepala Berat</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Sakit kepala berdenyut hebat yang tidak kunjung reda walau sudah beristirahat.</p>
+        </div>
+        <!-- 9 -->
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span class="text-3xl mb-2">🚽</span>
+          <h4 class="font-extrabold text-xs text-base-text-primary">9. Sakit Saat Kencing / Gatal</h4>
+          <p class="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Nyeri saat buang air kecil, keluar keputihan pekat berwarna kehijauan, gatal, atau berbau di organ intim.</p>
+        </div>
+      </div>
+
+      <div class="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start">
+        <span class="text-lg">🚨</span>
+        <div>
+          <h4 class="font-extrabold text-sm mb-1">TINDAKAN DARURAT:</h4>
+          <p class="font-medium leading-relaxed">Jika Ibu hamil merasakan minimal 1 tanda bahaya di atas, segera bawa ke bidan desa, Puskesmas, atau langsung ke Instalasi Gawat Darurat (IGD) Rumah Sakit terdekat untuk pertolongan medis segera!</p>
+        </div>
+      </div>
+    `;
+  }
+
+  if (id === "L9") {
+    return `
+      <p class="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Trimester ketiga (usia kehamilan 7-9 bulan atau minggu ke-29 hingga 40) adalah garis akhir menuju persalinan. Pada periode penting ini, ibu dan keluarga harus mematangkan perencanaan persiapan melahirkan demi kelancaran persalinan.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-3">
+          <span class="text-3xl">🍉</span>
+          <div class="text-xs">
+            <h4 class="font-bold text-base-text-primary">Perkembangan Janin Trimester 3</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-0.5">Ukuran janin bertambah dari sebesar <strong>Pepaya</strong> pada bulan ke-7 menjadi sebesar <strong>Semangka</strong> pada bulan ke-9 sebelum lahir.</p>
+          </div>
+        </div>
+        <div class="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-3">
+          <span class="text-3xl">🤝</span>
+          <div class="text-xs">
+            <h4 class="font-bold text-base-text-primary">Dukungan Keluarga & Suami</h4>
+            <p class="text-[11px] text-base-text-secondary font-medium mt-0.5">Suami, keluarga, dan kader bersama-sama membantu ibu menyiapkan kesiapan donor darah, kendaraan darurat, dan stiker P4K.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Widget: Checklist Persiapan Melahirkan -->
+      <div class="bg-brand-soft/10 border border-brand-primary/20 rounded-[24px] p-6 mb-8 shadow-sm">
+        <div class="flex items-center gap-2.5 mb-2">
+          <span class="text-xl">🎒</span>
+          <h4 class="font-extrabold text-sm text-brand-primary">Checklist Mandiri Persiapan Melahirkan (Diisi Ibu)</h4>
+        </div>
+        <p class="text-xs text-base-text-secondary mb-5 leading-relaxed">
+          Centang persiapan yang sudah selesai. Data akan tersimpan otomatis di perangkat Anda.
+        </p>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-base-border/40 h-2.5 rounded-full mb-2.5 overflow-hidden">
+          <div id="prep-progress" class="bg-brand-primary h-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <p class="text-xs font-bold text-brand-primary mb-5" id="prep-progress-text">Persiapan selesai: 0% (0 dari 10)</p>
+
+        <div class="space-y-3">
+          <!-- 1 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_1" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">1. Tanggal Perkiraan Persalinan (HPL)</span>
+              <span class="text-base-text-secondary">Sudah menanyakan tanggal perkiraan lahir ke bidan/dokter.</span>
+            </div>
+          </label>
+          <!-- 2 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_2" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">2. Pendamping Melahirkan</span>
+              <span class="text-base-text-secondary">Meminta suami atau keluarga mendampingi saat periksa dan melahirkan.</span>
+            </div>
+          </label>
+          <!-- 3 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_3" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">3. Tabungan / Dana Cadangan</span>
+              <span class="text-base-text-secondary">Mempersiapkan dana cadangan untuk biaya persalinan dan keperluan tak terduga.</span>
+            </div>
+          </label>
+          <!-- 4 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_4" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">4. Kartu JKN / BPJS Kesehatan</span>
+              <span class="text-base-text-secondary">Mempersiapkan kartu BPJS atau mendaftar jika belum memilikinya.</span>
+            </div>
+          </label>
+          <!-- 5 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_5" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">5. Tempat Melahirkan</span>
+              <span class="text-base-text-secondary">Sudah menyepakati tempat bersalin (Puskesmas, RS, atau Klinik Bersalin).</span>
+            </div>
+          </label>
+          <!-- 6 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_6" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">6. KTP, KK & Dokumen Lahir</span>
+              <span class="text-base-text-secondary">Menyiapkan berkas KTP, Kartu Keluarga, dan Buku KIA untuk syarat administrasi bayi.</span>
+            </div>
+          </label>
+          <!-- 7 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_7" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">7. Calon Pendonor Darah Siaga</span>
+              <span class="text-base-text-secondary">Menyiapkan lebih dari 1 orang yang bergolongan darah sama dan bersedia mendonor.</span>
+            </div>
+          </label>
+          <!-- 8 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_8" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">8. Kendaraan Siaga</span>
+              <span class="text-base-text-secondary">Menyepakati kendaraan darurat dengan keluarga atau tetangga untuk transportasi.</span>
+            </div>
+          </label>
+          <!-- 9 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_9" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">9. Stiker P4K Terpasang</span>
+              <span class="text-base-text-secondary">Sudah menempelkan stiker Program Perencanaan Persalinan dan Pencegahan Komplikasi (P4K) di depan rumah.</span>
+            </div>
+          </label>
+          <!-- 10 -->
+          <label class="flex items-start gap-3 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+            <input type="checkbox" id="prep_10" class="w-4 h-4 rounded text-brand-primary mt-0.5" onclick="window.updatePrepCheck()" />
+            <div class="text-[11px] leading-relaxed">
+              <span class="font-bold text-base-text-primary block">10. Rencana KB Pasca Salin</span>
+              <span class="text-base-text-secondary">Sudah merencanakan metode Keluarga Berencana (KB) pasca bersalin.</span>
+            </div>
+          </label>
+        </div>
+
+        <img src="x" onerror="this.style.display='none'; 
+          window.updatePrepCheck = function() {
+            let checked = 0;
+            for(let i=1; i<=10; i++) {
+              const chk = document.getElementById('prep_'+i);
+              if(chk && chk.checked) {
+                checked++;
+                localStorage.setItem('birth_prep_'+i, 'true');
+              } else {
+                localStorage.setItem('birth_prep_'+i, 'false');
+              }
+            }
+            const pct = checked * 10;
+            const progress = document.getElementById('prep-progress');
+            const text = document.getElementById('prep-progress-text');
+            if(progress) progress.style.width = pct + '%';
+            if(text) text.textContent = 'Persiapan selesai: ' + pct + '% (' + checked + ' dari 10)';
+          };
+          // Initialize state
+          for(let i=1; i<=10; i++) {
+            const chk = document.getElementById('prep_'+i);
+            if(chk) chk.checked = localStorage.getItem('birth_prep_'+i) === 'true';
+          }
+          window.updatePrepCheck();
+        " />
+      </div>
+
+      <h2 class="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🔍 Mitos vs Fakta Kehamilan Trimester 3
+      </h2>
+      
+      <div class="space-y-4 mb-6">
+        <div class="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-status-red-solid uppercase mb-1">
+            ❌ Mitos
+          </div>
+          <p class="text-xs text-base-text-primary font-bold">\"Minyak kelapa atau makanan pedas dapat mempercepat dan melicinkan persalinan.\"</p>
+        </div>
+        <div class="bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl p-4">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-status-green-solid uppercase mb-1">
+            ✅ Fakta
+          </div>
+          <p class="text-xs text-base-text-secondary font-semibold leading-relaxed">
+            Mitos ini tidak terbukti secara ilmiah ya, Bu. Mengonsumsi minyak kelapa secara berlebihan justru dapat mengganggu pencernaan ibu (memicu diare), dan makanan pedas berisiko memicu sakit maag/diare. Yang terpenting di akhir trimester ketiga adalah menjaga porsi makan gizi seimbang, istirahat cukup, menjaga hidrasi tubuh, dan senam hamil ringan guna melatih kelenturan panggul.
+          </p>
+        </div>
+      </div>
+    `;
+  }
+
+
 
   // General fallback
   return `
