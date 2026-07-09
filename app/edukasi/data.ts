@@ -53,7 +53,7 @@ export const mockArticles: Article[] = [
     categories: ["Ibu Hamil"],
     type: "Artikel",
     duration: "5 Menit",
-    imageUrl: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?q=80&w=600&auto=format&fit=crop",
+    imageUrl: "https://images.unsplash.com/photos/person-holding-belly-photo-NIZeg731LxM?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
   },
   {
