@@ -1719,8 +1719,8 @@ export default function MotherDetailPage() {
                         <strong>PENTING:</strong> Jika Ibu hamil mencentang salah satu gejala pada kolom <strong>Pemantauan Gejala / Kondisi</strong>, segeralah berkonsultasi ke bidan posyandu atau periksa ke Puskesmas/Rumah Sakit terdekat untuk penanganan medis dini.
                       </p>
                     </div>
-                  </div>
-              })()}
+                  );
+                })()}
 
               {activePemantauanTab === 'attendance' && (() => {
                 const formatDate = (isoStr: string) => {
