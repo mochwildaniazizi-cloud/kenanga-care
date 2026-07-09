@@ -1795,11 +1795,8 @@ export default function DataIbuPage() {
                       </div>
                     );
                   })()}
-                </div>
               </div>
             </div>
-          </div>
-        </div>
 
         {/* Maternal Examination History Table */}
         <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
