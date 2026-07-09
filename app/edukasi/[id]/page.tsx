@@ -1084,7 +1084,6 @@ function L5ArticleContent() {
 }
 
 function L6ArticleContent() {
-  // Komponen L6 tetap menggunakan state-mu yang sudah stabil...
   const [isEditing, setIsEditing] = useState(false);
   const [attendance, setAttendance] = useState([
     { date: "", note: "" },
@@ -1196,25 +1195,36 @@ function L6ArticleContent() {
 
 function L7ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
-        Trimester kedua (4-6 bulan) adalah masa ketika organ tubuh janin berkembang semakin matang dan ibu mulai merasakan gerakan pertamanya.
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
+        Trimester kedua (4-6 bulan) adalah masa ketika organ tubuh janin berkembang semakin matang dan ibu mulai merasakan gerakan pertamanya. Di masa ini, pemenuhan porsi gizi seimbang harian meningkat secara bertahap.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-3xl">🍎</span>
-          <div className="text-xs">
-            <h4 className="font-bold text-base-text-primary">Bulan Ke-4 (13-16 Minggu)</h4>
-            <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Ukuran janin sebesar <strong>Apel</strong>. Berat sekitar 100 gram, organ mulai berfungsi.</p>
+
+      {/* Grid Perbandingan Ukuran Janin */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {[
+          {
+            icon: "🍎",
+            title: "Bulan Ke-4 (13-16 Minggu)",
+            desc: "Ukuran janin sebesar Apel. Berat sekitar 100 gram, organ-organ tubuh mulai berfungsi aktif."
+          },
+          {
+            icon: "🌽",
+            title: "Bulan Ke-6 (21-24 Minggu)",
+            desc: "Ukuran janin sebesar Jagung. Berat sekitar 600 gram, kulit berkembang keriput halus."
+          }
+        ].map((item, idx) => (
+          <div key={idx} className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-4 shadow-xs">
+            <span className="text-3xl shrink-0">{item.icon}</span>
+            <div className="text-xs">
+              <h4 className="font-bold text-base-text-primary">{item.title}</h4>
+              <p className="text-[11px] text-base-text-secondary font-medium mt-1 leading-relaxed">
+                {item.desc}
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 flex items-center gap-3">
-          <span className="text-3xl">🌽</span>
-          <div className="text-xs">
-            <h4 className="font-bold text-base-text-primary">Bulan Ke-6 (21-24 Minggu)</h4>
-            <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Ukuran janin sebesar <strong>Jagung</strong>. Berat sekitar 600 gram, kulit berkembang halus.</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -1222,26 +1232,35 @@ function L7ArticleContent() {
 
 function L8ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
-        Mengenali tanda bahaya kehamilan trimester 2 sangat penting demi keselamatan Ibu dan janin. Jika Ibu mengalami gejala berikut, segera ke Puskesmas.
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
+        Mengenali tanda bahaya kehamilan trimester 2 sangat penting demi keselamatan Ibu dan janin. Jika Ibu mengalami salah satu dari gejala di bawah ini, segera ke Puskesmas atau Rumah Sakit terdekat tanpa menunda.
       </p>
-      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">🚨 9 Tanda Bahaya Kehamilan Trimester 2</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤒</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam Tinggi</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium">Suhu tubuh panas tinggi menandakan infeksi sistemik sistem tubuh.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤮</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">2. Muntah Darah</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium">Muntah parah berisiko hilangnya nutrisi esensial harian ibu hamil.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🫁</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">3. Sesak Napas</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium">Napas pendek tersengal disertai nyeri dada atau jantung berdebar kencang.</p>
+
+      {/* Bagian Judul Indikator */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 flex items-center gap-2">
+          🚨 9 Tanda Bahaya Kehamilan Trimester 2
+        </h2>
+        
+        {/* Grid Cards Menu Tanda Bahaya */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { icon: "🤒", num: "1", title: "Demam Tinggi", desc: "Suhu tubuh panas tinggi menandakan infeksi sistemik pada sistem tubuh ibu hamil." },
+            { icon: "🤮", num: "2", title: "Muntah Darah", desc: "Muntah parah atau bercampur darah segar berisiko hilangnya nutrisi esensial harian harian ibu." },
+            { icon: "🫁", num: "3", title: "Sesak Napas", desc: "Napas pendek tersengal disertai nyeri dada mendadak atau kondisi jantung berdebar kencang." },
+          ].map((item, idx) => (
+            <div key={idx} className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center space-y-2 shadow-xs hover:border-status-red-solid/40 transition-colors">
+              <span className="text-3xl mb-1">{item.icon}</span>
+              <h4 className="font-extrabold text-xs text-base-text-primary">
+                {item.num}. {item.title}
+              </h4>
+              <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -1250,9 +1269,12 @@ function L8ArticleContent() {
 
 function L9ArticleContent() {
   const [prepList, setPrepList] = useState<boolean[]>(new Array(10).fill(false));
+
   useEffect(() => {
     const list = [];
-    for(let i=1; i<=10; i++) { list.push(localStorage.getItem('birth_prep_'+i) === 'true'); }
+    for (let i = 1; i <= 10; i++) {
+      list.push(localStorage.getItem('birth_prep_' + i) === 'true');
+    }
     setPrepList(list);
   }, []);
 
@@ -1277,22 +1299,63 @@ function L9ArticleContent() {
   ];
 
   const count = prepList.filter(Boolean).length;
+  const percentage = count * 10;
+
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed">Trimester ketiga (7-9 bulan) adalah persiapan akhir menyambut garis finish lahirnya janin.</p>
-      <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-[24px] p-6 mb-8">
-        <h4 className="font-extrabold text-sm text-brand-primary mb-2">🎒 Checklist Mandiri Persiapan Lahiran</h4>
-        <div className="w-full bg-base-border/40 h-2 rounded-full mb-3 overflow-hidden">
-          <div className="bg-brand-primary h-full" style={{ width: `${count * 10}%` }}></div>
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
+        Trimester ketiga (7-9 bulan) adalah persiapan akhir menyambut garis finish lahirnya janin. Pada periode penting ini, ibu dan keluarga harus mematangkan perencanaan persiapan melahirkan demi kelancaran persalinan.
+      </p>
+
+      {/* Kontainer Utama Checklist */}
+      <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-[24px] p-6 mb-8 shadow-sm">
+        <div className="flex items-center gap-2.5 mb-3">
+          <span className="text-xl">🎒</span>
+          <h4 className="font-extrabold text-sm text-brand-primary">Checklist Mandiri Persiapan Lahiran</h4>
         </div>
-        <p className="text-xs font-bold text-brand-primary mb-4">Selesai: {count * 10}% ({count} dari 10)</p>
+
+        {/* Progress Bar Indikator */}
+        <div className="w-full bg-base-border/40 h-2.5 rounded-full mb-2 overflow-hidden">
+          <div 
+            className="bg-brand-primary h-full transition-all duration-300 ease-out" 
+            style={{ width: `${percentage}%` }}
+          ></div>
+        </div>
+        
+        <p className="text-xs font-bold text-brand-primary mb-5">
+          Persiapan selesai: {percentage}% ({count} dari 10)
+        </p>
+
+        {/* Daftar Item Checklist */}
         <div className="space-y-3">
           {items.map((item, idx) => (
-            <label key={idx} className="flex items-start gap-3 p-3 bg-base-white border rounded-xl cursor-pointer">
-              <input type="checkbox" checked={prepList[idx]} onChange={() => handleToggle(idx)} className="mt-0.5" />
-              <div className="text-[11px] leading-relaxed">
-                <span className="font-bold text-base-text-primary block">{item.title}</span>
-                <span className="text-base-text-secondary">{item.desc}</span>
+            <label 
+              key={idx} 
+              className={`flex items-start gap-3 p-3 bg-base-white border rounded-xl text-xs cursor-pointer transition-all select-none
+                ${prepList[idx] ? 'border-brand-primary bg-brand-soft/5' : 'border-base-border/20 hover:border-base-border/40'}`}
+            >
+              {/* Checkbox Input */}
+              <div className="flex items-center h-5 mt-0.5 shrink-0">
+                <input 
+                  type="checkbox" 
+                  checked={prepList[idx]} 
+                  onChange={() => handleToggle(idx)} 
+                  className="w-4 h-4 text-brand-primary bg-base-white border-base-border rounded focus:ring-brand-primary/30 accent-brand-primary cursor-pointer" 
+                />
+              </div>
+
+              {/* Konten Judul dan Deskripsi */}
+              <div className="text-[11px] leading-relaxed mt-0.5">
+                <span 
+                  className={`font-bold block transition-colors
+                    ${prepList[idx] ? 'text-brand-primary font-semibold' : 'text-base-text-primary'}`}
+                >
+                  {item.title}
+                </span>
+                <span className="text-base-text-secondary font-medium">
+                  {item.desc}
+                </span>
               </div>
             </label>
           ))}
@@ -1304,84 +1367,111 @@ function L9ArticleContent() {
 
 function L10ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Memasuki trimester ketiga (usia kehamilan 29-40 minggu), persiapan melahirkan harus mulai dimatangkan. Ibu dan keluarga wajib mengenali tanda bahaya pada trimester ini agar dapat segera mencari pertolongan medis darurat demi keselamatan ibu dan janin.
       </p>
 
-      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
-        🚨 Tanda Bahaya Kehamilan Trimester 3
-      </h2>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2.5">👶</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">1. Gerakan Bayi Berkurang</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Gerakan bayi tidak ada atau kurang dari 10 kali dalam kurun waktu 12 jam.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2.5">💦</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">2. Ketuban Pecah Dini</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Air ketuban pecah atau merembes keluar dari jalan lahir namun belum ada rasa kram/mulas (kontraksi).</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2.5">🤰</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">3. Nyeri Perut Hebat</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Nyeri perut bagian bawah yang sangat hebat dan menusuk di antara jeda kontraksi.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center sm:col-span-2 md:col-span-1">
-          <span className="text-3xl mb-2.5">🩸</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">4. Perdarahan Hebat</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Keluar darah segar dalam jumlah banyak dari jalan lahir, berisiko solusio plasenta.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center sm:col-span-2 md:col-span-2">
-          <span className="text-3xl mb-2.5">🤯</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">5. Sakit Kepala Berat / Pandangan Buram</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Pusing atau sakit kepala berdenyut sangat berat disertai mata berkunang-kunang. Tanda utama preeklampsia.</p>
+      {/* Bagian 1: Tanda Bahaya Trimester 3 */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 flex items-center gap-2">
+          🚨 Tanda Bahaya Kehamilan Trimester 3
+        </h2>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { icon: "👶", title: "Gerakan Bayi Berkurang", desc: "Gerakan bayi tidak ada atau kurang dari 10 kali dalam kurun waktu 12 jam." },
+            { icon: "💦", title: "Ketuban Pecah Dini", desc: "Air ketuban pecah atau merembes keluar dari jalan lahir namun belum ada rasa kram/mulas (kontraksi)." },
+            { icon: "🤰", title: "Nyeri Perut Hebat", desc: "Nyeri perut bagian bawah yang sangat hebat dan menusuk di antara jeda kontraksi." },
+            { icon: "🩸", title: "Perdarahan Hebat", desc: "Keluar darah segar dalam jumlah banyak dari jalan lahir, berisiko solusio plasenta." },
+            { icon: "🤯", title: "Sakit Kepala / Pandangan Buram", desc: "Pusing atau sakit kepala berdenyut sangat berat disertai mata berkunang-kunang. Tanda utama preeklampsia." }
+          ].map((item, idx) => (
+            <div 
+              key={idx} 
+              className={`bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center space-y-2 shadow-xs hover:border-status-red-solid/40 transition-colors
+                ${idx === 3 ? 'sm:col-span-2 md:col-span-1' : ''}
+                ${idx === 4 ? 'sm:col-span-2 md:col-span-2' : ''}`}
+            >
+              <span className="text-3xl mb-1">{item.icon}</span>
+              <h4 className="font-extrabold text-xs text-base-text-primary">
+                {idx + 1}. {item.title}
+              </h4>
+              <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start mb-8">
+      {/* Banner Tindakan Segera */}
+      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start">
         <span className="text-lg">🚨</span>
         <div>
           <h4 className="font-extrabold text-sm mb-1">TINDAKAN SEGERA:</h4>
-          <p className="font-medium leading-relaxed">Jika Ibu hamil merasakan minimal salah satu tanda bahaya di atas, segera bawa ke Puskesmas atau Rumah Sakit terdekat untuk pertolongan medis darurat!</p>
+          <p className="font-medium leading-relaxed">
+            Jika Ibu hamil merasakan minimal salah satu tanda bahaya di atas, segera bawa ke Puskesmas atau Rumah Sakit terdekat untuk pertolongan medis darurat!
+          </p>
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🤰 Sambut Kehadiran Sang Buah Hati (Melahirkan)
-      </h2>
-      <p className="text-xs text-base-text-secondary mb-5 leading-relaxed">
-        Persalinan adalah momen yang dinanti-nanti setelah perjuangan 9 bulan. Berikut panduan penting saat menyambut persalinan:
-      </p>
+      {/* Bagian 2: Menyambut Kelahiran */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🤰 Sambut Kehadiran Sang Buah Hati (Melahirkan)
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Persalinan adalah momen yang dinanti-nanti setelah perjuangan 9 bulan. Berikut panduan penting saat menyambut persalinan:
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
-        <div className="bg-brand-soft/20 border border-brand-primary/15 rounded-2xl p-5">
-          <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1">🏥 Tempat Melahirkan Terbaik:</h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed mb-3">
-            Proses melahirkan harus dilakukan di fasilitas pelayanan kesehatan resmi (<strong>Puskesmas, Rumah Sakit, atau Klinik Bersalin</strong>) agar jika terjadi penyulit atau keadaan darurat dapat segera ditangani secara tepat oleh nakes.
-          </p>
-          <h4 className="font-bold text-brand-primary mb-1 flex items-center gap-1">👩‍👦 Yang Dialami:</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mt-1">
-            <li>Melahirkan umumnya terjadi pada usia kehamilan 38 - 40 minggu.</li>
-            <li>Ditandai dengan pembukaan jalan lahir, rasa mulas teratur yang intensitasnya semakin sering dan lama, serta keluar lendir bercampur sedikit darah.</li>
-          </ul>
-        </div>
-        
-        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5">
-          <h4 className="font-bold text-status-green-solid mb-2 flex items-center gap-1">✅ Yang Harus Dilakukan:</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mb-3">
-            <li>Segera pergi ke fasilitas kesehatan bila merasakan mulas teratur atau ketuban pecah.</li>
-            <li>Siapkan pendamping melahirkan (suami atau keluarga dekat) serta perlengkapan administrasi/bayi.</li>
-            <li>Rawat gabung ibu dan bayi dalam satu ruangan jika kondisi keduanya dalam keadaan sehat.</li>
-          </ul>
-          <h4 className="font-bold text-status-green-solid mb-1 flex items-center gap-1">💡 Mengapa Harus Dilakukan?</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mt-1">
-            <li>Mempercepat penanganan komplikasi persalinan.</li>
-            <li>Memulai Inisiasi Menyusu Dini (IMD) dalam 1 jam pertama.</li>
-            <li>Menjamin pemantauan kesehatan ibu dan bayi selama 24 jam awal pasca salin.</li>
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+          {/* Kolom Tempat & Yang Dialami */}
+          <div className="bg-brand-soft/20 border border-brand-primary/15 rounded-2xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1.5">
+                🏥 Tempat Melahirkan Terbaik
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mb-4">
+                Proses melahirkan harus dilakukan di fasilitas pelayanan kesehatan resmi (<strong>Puskesmas, Rumah Sakit, atau Klinik Bersalin</strong>) agar jika terjadi penyulit atau keadaan darurat dapat segera ditangani secara tepat oleh nakes.
+              </p>
+            </div>
+            
+            <div className="border-t border-brand-primary/10 pt-3">
+              <h4 className="font-bold text-brand-primary mb-1 flex items-center gap-1.5">
+                👩‍👦 Yang Dialami Ibu
+              </h4>
+              <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mt-1">
+                <li>Melahirkan umumnya terjadi pada usia kehamilan 38 - 40 minggu.</li>
+                <li>Ditandai dengan pembukaan jalan lahir, rasa mulas teratur yang intensitasnya semakin sering dan lama, serta keluar lendir bercampur sedikit darah.</li>
+              </ul>
+            </div>
+          </div>
+          
+          {/* Kolom Yang Harus Dilakukan & Alasan */}
+          <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <h4 className="font-bold text-status-green-solid mb-2 flex items-center gap-1.5">
+                ✅ Yang Harus Dilakukan
+              </h4>
+              <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mb-4">
+                <li>Segera pergi ke fasilitas kesehatan bila merasakan mulas teratur atau ketuban pecah.</li>
+                <li>Siapkan pendamping melahirkan (suami atau keluarga dekat) serta perlengkapan administrasi/bayi.</li>
+                <li>Rawat gabung ibu dan bayi dalam satu ruangan jika kondisi keduanya dalam keadaan sehat.</li>
+              </ul>
+            </div>
+
+            <div className="border-t border-status-green-solid/10 pt-3">
+              <h4 className="font-bold text-status-green-solid mb-1 flex items-center gap-1.5">
+                💡 Mengapa Harus Dilakukan?
+              </h4>
+              <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mt-1">
+                <li>Mempercepat penanganan komplikasi persalinan jika ada.</li>
+                <li>Memulai Inisiasi Menyusu Dini (IMD) dalam 1 jam pertama.</li>
+                <li>Menjamin pemantauan kesehatan ibu dan bayi selama 24 jam awal pasca salin.</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1390,88 +1480,102 @@ function L10ArticleContent() {
 
 function L11ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Proses persalinan yang lancar memerlukan deteksi dini atas tanda-tanda persalinan normal maupun tanda bahaya. Setelah bayi lahir, langkah pertama yang sangat dianjurkan oleh Kemenkes adalah pelaksanaan Inisiasi Menyusu Dini (IMD) demi kesehatan optimal bayi.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
-        <div className="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-4.5">
-          <h4 className="font-bold text-status-blue-solid mb-2 flex items-center gap-1.5">⚡ Tanda Awal Proses Melahirkan:</h4>
+      {/* Grid Tanda Awal & Mengurangi Rasa Sakit */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+        <div className="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-4.5 shadow-xs">
+          <h4 className="font-bold text-status-blue-solid mb-2 flex items-center gap-1.5">
+            ⚡ Tanda Awal Proses Melahirkan:
+          </h4>
           <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
             <li>Keluar lendir bercampur darah segar dari jalan lahir.</li>
             <li>Merembes atau keluar cairan ketuban jernih dari jalan lahir.</li>
             <li>Perut mulas-mulas yang teratur, timbulnya semakin sering, kram semakin kuat, dan berlangsung semakin lama.</li>
           </ul>
         </div>
-        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-4.5">
-          <h4 className="font-bold text-status-purple-solid mb-2 flex items-center gap-1.5">🌬️ Mengurangi Rasa Sakit Bersalin:</h4>
+        
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-4.5 shadow-xs">
+          <h4 className="font-bold text-status-purple-solid mb-2 flex items-center gap-1.5">
+            🌬️ Mengurangi Rasa Sakit Bersalin:
+          </h4>
           <p className="text-base-text-secondary font-medium leading-relaxed">
             Untuk mengurangi rasa sakit ketika bersalin secara mandiri, Ibu dianjurkan untuk menarik napas panjang melalui hidung secara perlahan dan keluarkan melalui mulut saat kontraksi/mulas datang. Minta suami/pendamping memijat punggung bawah secara perlahan.
           </p>
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
-        🚨 Tanda Bahaya Pada Proses Melahirkan
-      </h2>
+      {/* Bagian Tanda Bahaya */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 flex items-center gap-2">
+          🚨 Tanda Bahaya Pada Proses Melahirkan
+        </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">💦</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">1. Ketuban Hijau & Bau</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Air ketuban pecah berwarna keruh kehijauan dan berbau tidak sedap/busuk.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">😫</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">2. Ibu Gelisah / Nyeri Hebat</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu tampak sangat gelisah atau mengalami kesakitan yang luar biasa ekstrem.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🧠</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">3. Ibu Mengalami Kejang</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu mengalami kejang-kejang (gejala eklampsia pasca bersalin yang berbahaya).</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🥵</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">4. Ibu Tidak Kuat Mengejan</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu merasa kelelahan hebat dan tidak memiliki tenaga lagi untuk mengejan.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🩸</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">5. Perdarahan Lewat Jalan Lahir</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Keluar darah segar mengalir sangat banyak dari jalan lahir sebelum bayi lahir.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">👶</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">6. Tali Pusat/Tangan Keluar</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Tali pusat bayi, tangan, atau kaki bayi keluar mendahului kepala bayi.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { icon: "💦", title: "Ketuban Hijau & Bau", desc: "Air ketuban pcah berwarna keruh kehijauan dan berbau tidak sedap/busuk." },
+            { icon: "😫", title: "Ibu Gelisah / Nyeri Hebat", desc: "Ibu tampak sangat gelisah atau mengalami kesakitan yang luar biasa ekstrem." },
+            { icon: "🧠", title: "Ibu Mengalami Kejang", desc: "Ibu mengalami kejang-kejang (gejala eklampsia pasca bersalin yang berbahaya)." },
+            { icon: "🥵", title: "Ibu Tidak Kuat Mengejan", desc: "Ibu merasa kelelahan hebat dan tidak memiliki tenaga lagi untuk mengejan." },
+            { icon: "🩸", title: "Perdarahan Jalan Lahir", desc: "Keluar darah segar mengalir sangat banyak dari jalan lahir sebelum bayi lahir." },
+            { icon: "👶", title: "Tali Pusat/Tangan Keluar", desc: "Tali pusat bayi, tangan, atau kaki bayi keluar mendahului kepala bayi." }
+          ].map((item, idx) => (
+            <div key={idx} className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center space-y-2 shadow-xs hover:border-status-red-solid/40 transition-colors">
+              <span className="text-3xl mb-1">{item.icon}</span>
+              <h4 className="font-extrabold text-xs text-base-text-primary">
+                {idx + 1}. {item.title}
+              </h4>
+              <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start mb-8">
+      {/* Banner Rujuk Darurat */}
+      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start">
         <span className="text-lg">🚨</span>
         <div>
           <h4 className="font-extrabold text-sm mb-1">RUJUK DARURAT:</h4>
-          <p className="font-medium leading-relaxed">Jika mengalami minimal salah satu tanda bahaya pada proses melahirkan di atas, petugas kesehatan harus segera merujuk Ibu ke Rumah Sakit terdekat!</p>
+          <p className="font-medium leading-relaxed">
+            Jika mengalami minimal salah satu tanda bahaya pada proses melahirkan di atas, petugas kesehatan harus segera merujuk Ibu ke Rumah Sakit terdekat!
+          </p>
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🍼 Inisiasi Menyusu Dini (IMD)
-      </h2>
-      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
-        Inisiasi Menyusu Dini (IMD) adalah proses meletakkan bayi secara tengkurap di dada ibu segera setelah lahir, sehingga kulit bayi melekat pada kulit ibu selama minimal 1 jam untuk mencari puting susu secara alami.
-      </p>
+      {/* Bagian IMD */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🍼 Inisiasi Menyusu Dini (IMD)
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Inisiasi Menyusu Dini (IMD) adalah proses meletakkan bayi secara tengkurap di dada ibu segera setelah lahir, sehingga kulit bayi melekat pada kulit ibu selama minimal 1 jam untuk mencari puting susu secara alami.
+        </p>
 
-      <div className="bg-brand-soft/20 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed mb-6">
-        <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1">✨ Manfaat IMD bagi Ibu & Bayi:</h4>
-        <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
-          <li><strong>Kehangatan Alami:</strong> Sentuhan kulit ke kulit menjaga suhu tubuh bayi tetap hangat dan stabil secara alami.</li>
-          <li><strong>Meningkatkan Kekebalan:</strong> Bayi mendapatkan cairan <strong>Kolostrum</strong> (ASI pertama berwarna kekuningan) yang kaya antibodi untuk melindunginya dari infeksi.</li>
-          <li><strong>Ikatan Kasih Sayang (Bonding):</strong> Membangun ikatan emosional yang kuat antara Ibu dan bayi sejak detik pertama lahir.</li>
-          <li><strong>Merangsang Kontraksi Rahim:</strong> Isapan bayi merangsang pelepasan hormon oksitosin yang membantu rahim ibu berkontraksi sehingga meminimalisir risiko perdarahan pasca salin.</li>
-        </ul>
+        <div className="bg-brand-soft/20 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed shadow-xs">
+          <h4 className="font-bold text-brand-primary mb-3 flex items-center gap-1.5">
+            ✨ Manfaat IMD bagi Ibu & Bayi:
+          </h4>
+          <ul className="list-disc pl-4 space-y-2.5 text-base-text-secondary font-medium">
+            <li>
+              <strong className="text-base-text-primary">Kehangatan Alami:</strong> Sentuhan kulit ke kulit menjaga suhu tubuh bayi tetap hangat dan stabil secara alami.
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Meningkatkan Kekebalan:</strong> Bayi mendapatkan cairan <strong className="text-brand-primary">Kolostrum</strong> (ASI pertama berwarna kekuningan) yang kaya antibodi untuk melindunginya dari infeksi.
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Ikatan Kasih Sayang (Bonding):</strong> Membangun ikatan emosional yang kuat antara Ibu dan bayi sejak detik pertama lahir.
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Merangsang Kontraksi Rahim:</strong> Isapan bayi merangsang pelepasan hormon oksitosin yang membantu rahim ibu berkontraksi sehingga meminimalisir risiko perdarahan pasca salin.
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -1479,105 +1583,77 @@ function L11ArticleContent() {
 
 function L12ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
-        Masa nifas (setelah melahirkan hingga 42 hari) adalah masa pemulihan penting bagi organ reproduksi dan kondisi emosional Ibu. Selama masa pemulihan ini, Ibu diwajibkan memeriksakan kesehatan minimal 4 kali dan mengenali tanda bahaya nifas.
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
+        Masa nifas (setelah melahirkan hingga 42 hari) adalah masa pemulihan penting bagi organ reproduksi dan kondisi emosional Ibu. Selama masa pemulihan ini, Ibu diwajibkan memeriksakan kesehatan minimal 4 kali guna memantau proses involusi uteri dan mencegah komplikasi pasca salin.
       </p>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-         JADWAL PEMERIKSAAN NIFAS (MINIMAL 4 KALI)
-      </h2>
-      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
-        Sesuai standar Buku KIA 2024, Ibu dan bayi harus mendapatkan pemeriksaan pasca melahirkan minimal 4 kali:
-      </p>
+      {/* Bagian Jadwal Pemeriksaan */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-brand-primary border-b pb-2 flex items-center gap-2">
+          📅 Jadwal Pemeriksaan Nifas (Minimal 4 Kali)
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Pastikan Ibu mendapatkan pelayanan kesehatan masa nifas (KF) secara lengkap dari tenaga kesehatan pada lini waktu berikut:
+        </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
-          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Pertama</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">6 Jam - 2 Hari</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Pemeriksaan perdarahan awal, pemulihan rahim, dan inisiasi ASI eksklusif.</p>
-        </div>
-        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
-          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Kedua</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">3 - 7 Hari</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Pemantauan kesehatan bayi, tali pusat, dan kecukupan ASI bagi bayi.</p>
-        </div>
-        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
-          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Ketiga</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">8 - 28 Hari</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Evaluasi pemulihan luka jalan lahir, infeksi pasca salin, dan gizi nifas.</p>
-        </div>
-        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
-          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Keempat</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">29 - 42 Hari</h4>
-          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Pemeriksaan akhir masa pemulihan nifas, konseling kontrasepsi (KB) pasca salin.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold text-base-text-primary">
+          {[
+            { kf: "KF 1", time: "6 Jam - 2 Hari", desc: "Pemeriksaan perdarahan awal, pengecekan kontraksi rahim, dan pemantauan suhu tubuh ibu." },
+            { kf: "KF 2", time: "3 - 7 Hari pasca salin", desc: "Memastikan rahim mengecil dengan baik, evaluasi cairan lochia, dan konseling ASI eksklusif." },
+            { kf: "KF 3", time: "8 - 28 Hari pasca salin", desc: "Pemeriksaan kondisi fisik umum ibu, penyembuhan luka jalan lahir, dan pemantauan tumbuh kembang awal bayi." },
+            { kf: "KF 4", time: "29 - 42 Hari pasca salin", desc: "Evaluasi akhir pemulihan organ reproduksi harian serta perencanaan program Keluarga Berencana (KB) pasca salin." },
+          ].map((item, idx) => (
+            <div key={idx} className="flex gap-3 bg-brand-soft/20 border border-brand-primary/10 p-4.5 rounded-2xl items-start shadow-xs">
+              <span className="w-12 h-6 rounded-full bg-brand-primary text-base-white flex items-center justify-center shrink-0 font-black text-[10px] uppercase tracking-wider">
+                {item.kf}
+              </span>
+              <div>
+                <h4 className="font-extrabold text-xs text-brand-primary">{item.time}</h4>
+                <p className="text-[11px] text-base-text-secondary font-medium mt-1 leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
-        🚨 Tanda Bahaya Pada Ibu Nifas (Masa Pemulihan)
-      </h2>
+      {/* Bagian Tanda Bahaya Masa Nifas */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 flex items-center gap-2">
+          🚨 Tanda Bahaya Pada Masa Nifas
+        </h2>
+        <p className="text-xs text-base-text-secondary italic">* Segera bawa Ibu nifas ke fasilitas kesehatan bila mengalami salah satu gejala di bawah ini:</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤒</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam Tinggi &gt;2 Hari</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh panas tinggi menandakan adanya infeksi jalan lahir atau rahim.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">😭</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">2. Depresi / Sedih Mendalam</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu terlihat sangat sedih, murung, cemas berlebih, atau menangis terus tanpa sebab.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🥀</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">3. Cairan Nifas Berbau</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Cairan lokia (darah nifas) yang keluar berbau busuk atau sangat tidak sedap.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤕</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">4. Pusing Berat & Bengkak</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Sakit kepala hebat, pandangan mata kabur, nyeri ulu hati, kaki/wajah bengkak, atau kejang.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🍒</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">5. Payudara Bengkak & Merah</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Payudara bengkak mengeras, kulit memerah, terasa sangat panas dan nyeri (mastitis).</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🩸</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">6. Perdarahan Jalan Lahir</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Keluar darah nifas segar mengalir deras, tanda sisa plasenta tertinggal di rahim.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { icon: "🩸", title: "Perdarahan Hebat", desc: "Perdarahan lewat jalan lahir yang keluar secara tiba-tiba dalam jumlah banyak." },
+            { icon: "🐟", title: "Lochia Berbau Busuk", desc: "Cairan vagina (lochia) berbau busuk, menyengat, atau disertai nyeri perut bawah." },
+            { icon: "🤒", title: "Demam Tinggi", desc: "Suhu tubuh meningkat drastis di atas 38°C, mengindikasikan adanya infeksi masa nifas." },
+            { icon: "🤯", title: "Sakit Kepala / Kejang", desc: "Sakit kepala hebat berulang, pandangan kabur mendadak, atau mengalami kejang fisik." },
+            { icon: "🦵", title: "Bengkak di Tangan/Wajah", desc: "Pembengkakan di tangan, wajah, atau kaki yang disertai dengan nyeri tekan hebat." },
+            { icon: "🍈", title: "Payudara Bengkak & Merah", desc: "Payudara membengkak, terasa keras, memerah, nyeri, atau mengeluarkan nanah." }
+          ].map((item, idx) => (
+            <div key={idx} className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center space-y-2 shadow-xs hover:border-status-red-solid/40 transition-colors">
+              <span className="text-3xl mb-1">{item.icon}</span>
+              <h4 className="font-extrabold text-xs text-base-text-primary">
+                {idx + 1}. {item.title}
+              </h4>
+              <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🚫 Hal-hal yang Dilarang Selama Masa Pemulihan
-      </h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-xs leading-relaxed font-semibold">
-        <div className="p-4.5 bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl space-y-3 text-status-red-solid">
-          <p className="flex items-start gap-2">
-            <span>❌</span>
-            <span>Membuang ASI pertama yang berwarna kekuningan (Kolostrum). ASI pertama sangat penting untuk imun bayi.</span>
-          </p>
-          <p className="flex items-start gap-2">
-            <span>❌</span>
-            <span>Membersihkan puting/payudara dengan alkohol, obat merah, atau sabun wangi karena residunya bisa tertelan bayi.</span>
-          </p>
-          <p className="flex items-start gap-2">
-            <span>❌</span>
-            <span>Mengikat perut (stagen) terlalu kencang karena mengganggu aliran darah dan pernapasan.</span>
-          </p>
-        </div>
-        <div className="p-4.5 bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl space-y-3 text-status-red-solid">
-          <p className="flex items-start gap-2">
-            <span>❌</span>
-            <span>Melakukan senam/latihan fisik dengan posisi telungkup sebelum rahim pulih sempurna.</span>
-          </p>
-          <p className="flex items-start gap-2">
-            <span>❌</span>
-            <span>Menempelkan ramuan daun-daunan pada jalan lahir/kemaluan karena berisiko memicu infeksi bakteri akut.</span>
+      {/* Banner Rujuk Darurat */}
+      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start">
+        <span className="text-lg">🚨</span>
+        <div>
+          <h4 className="font-extrabold text-sm mb-1">TINDAKAN DARURAT:</h4>
+          <p className="font-medium leading-relaxed">
+            Jika Ibu nifas mengalami salah satu tanda bahaya di atas, suami atau keluarga wajib segera membawa Ibu ke Bidan, Puskesmas, atau IGD Rumah Sakit terdekat demi mencegah komplikasi fatal!
           </p>
         </div>
       </div>
@@ -1587,62 +1663,106 @@ function L12ArticleContent() {
 
 function L13ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Setelah melahirkan, perubahan hormon yang drastis dan pola tidur yang terganggu berisiko memicu gangguan kesehatan jiwa pada ibu. Selain itu, perencanaan Keluarga Berencana (KB) pasca salin penting disepakati bersama suami untuk menata kehamilan yang sehat di masa depan.
       </p>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🧠 Mengenal Depresi Setelah Melahirkan (Nifas)
-      </h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
-        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-5">
-          <h4 className="font-bold text-status-purple-solid mb-1.5 flex items-center gap-1">🌸 Baby Blues Syndrome:</h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed mb-3">
-            Terjadi segera setelah melahirkan dan biasanya mereda dalam <strong>2 minggu</strong>. Gejala meliputi: mood tidak stabil, merasa sedih, murung secara tiba-tiba, cemas, sensitif, mudah tersinggung, dan sulit tidur.
-          </p>
-          <h4 className="font-bold text-status-purple-solid mb-1 flex items-center gap-1">Pencegahan & Dukungan:</h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
-            Dibutuhkan perhatian penuh dan pembagian tugas mengasuh bayi dari <strong>suami dan keluarga</strong> agar Ibu memiliki waktu istirahat yang cukup.
-          </p>
-        </div>
+      {/* Bagian 1: Depresi Setelah Melahirkan */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🧠 Mengenal Depresi Setelah Melahirkan (Nifas)
+        </h2>
         
-        <div className="bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl p-5">
-          <h4 className="font-bold text-status-red-solid mb-1.5 flex items-center gap-1">🚨 Depresi Pasca Melahirkan (Postpartum Depression):</h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed mb-3">
-            Kondisi klinis yang lebih parah, terjadi dalam 2 minggu hingga beberapa bulan setelah bersalin. Gejala: sedih mendalam terus menerus, merasa tidak berguna, sulit konsentrasi, menjauh dari bayi, cemas ekstrem, hingga hilangnya minat beraktivitas.
-          </p>
-          <h4 className="font-bold text-status-red-solid mb-1 flex items-center gap-1">Penanganan Medis:</h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
-            Jika gejala berlangsung lebih dari 2 minggu, segera lakukan konseling ke psikolog, dokter, atau bidan posyandu untuk penanganan konseling profesional.
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+          {/* Baby Blues */}
+          <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <h4 className="font-bold text-status-purple-solid mb-1.5 flex items-center gap-1.5">
+                🌸 Baby Blues Syndrome
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mb-4">
+                Terjadi segera setelah melahirkan dan biasanya mereda dalam <strong className="text-base-text-primary">2 minggu</strong>. Gejala meliputi: mood tidak stabil, merasa sedih, murung secara tiba-tiba, cemas, sensitif, mudah tersinggung, dan sulit tidur.
+              </p>
+            </div>
+            <div className="border-t border-status-purple-solid/10 pt-3">
+              <h4 className="font-bold text-status-purple-solid mb-1 flex items-center gap-1.5">
+                Pencegahan & Dukungan:
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
+                Dibutuhkan perhatian penuh dan pembagian tugas mengasuh bayi dari <strong>suami dan keluarga</strong> agar Ibu memiliki waktu istirahat yang cukup.
+              </p>
+            </div>
+          </div>
+          
+          {/* Postpartum Depression */}
+          <div className="bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl p-5 flex flex-col justify-between shadow-xs">
+            <div>
+              <h4 className="font-bold text-status-red-solid mb-1.5 flex items-center gap-1.5">
+                🚨 Depresi Pasca Melahirkan (Postpartum Depression)
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mb-4">
+                Kondisi klinis yang lebih parah, terjadi dalam 2 minggu hingga beberapa bulan setelah bersalin. Gejala: sedih mendalam terus menerus, merasa tidak berguna, sulit konsentrasi, menjauh dari bayi, cemas ekstrem, hingga hilangnya minat beraktivitas.
+              </p>
+            </div>
+            <div className="border-t border-status-red-solid/10 pt-3">
+              <h4 className="font-bold text-status-red-solid mb-1 flex items-center gap-1.5">
+                Penanganan Medis:
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
+                Jika gejala berlangsung lebih dari 2 minggu, segera lakukan konseling ke psikolog, dokter, atau bidan posyandu untuk penanganan konseling profesional.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        👪 Keluarga Berencana (KB) Pasca Salin
-      </h2>
-      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
-        Menjarangkan kehamilan minimal 2 tahun membantu tubuh ibu pulih optimal dan memberikan waktu menyusui terbaik bagi anak. Berikut pilihan metode kontrasepsi resmi:
-      </p>
+      {/* Bagian 2: Keluarga Berencana (KB) Pasca Salin */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          👪 Keluarga Berencana (KB) Pasca Salin
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Menjarangkan kehamilan minimal 2 tahun membantu tubuh ibu pulih optimal dan memberikan waktu menyusui terbaik bagi anak. Berikut pilihan metode kontrasepsi resmi:
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
-        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5">
-          <h4 className="font-bold text-status-green-solid mb-2 flex items-center gap-1">🔄 KB Jangka Panjang (MKJP):</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-            <li><strong>IUD / Spiral / AKDR:</strong> Alat kontrasepsi dalam rahim yang efektif mencegah kehamilan hingga 10 tahun. Sangat aman bagi ibu menyusui.</li>
-            <li><strong>Implan / Susuk:</strong> Alat kontrasepsi di bawah kulit lengan atas yang efektif hingga 3 tahun.</li>
-            <li><strong>MOW / MOP:</strong> Metode kontrasepsi mantap (sterilisasi) untuk pasangan yang sudah cukup anak.</li>
-          </ul>
-        </div>
-        <div className="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-5">
-          <h4 className="font-bold text-status-blue-solid mb-2 flex items-center gap-1">⏳ Non Jangka Panjang:</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-            <li><strong>Suntik KB 3 Bulan:</strong> Hormon progestin saja yang tidak menghambat produksi ASI. Disuntik berkala setiap 12 minggu.</li>
-            <li><strong>Pil KB Progestin (Minipil):</strong> Pil hormon harian khusus ibu menyusui agar tidak mengganggu kualitas ASI.</li>
-            <li><strong>Kondom:</strong> Metode penghalang yang aman digunakan kapan saja pasca nifas.</li>
-          </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+          {/* Jangka Panjang */}
+          <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5 shadow-xs">
+            <h4 className="font-bold text-status-green-solid mb-3 flex items-center gap-1.5">
+              🔄 KB Jangka Panjang (MKJP)
+            </h4>
+            <ul className="list-disc pl-4 space-y-2.5 text-base-text-secondary font-medium">
+              <li>
+                <strong className="text-base-text-primary">IUD / Spiral / AKDR:</strong> Alat kontrasepsi dalam rahim yang efektif mencegah kehamilan hingga 10 tahun. Sangat aman bagi ibu menyusui.
+              </li>
+              <li>
+                <strong className="text-base-text-primary">Implan / Susuk:</strong> Alat kontrasepsi di bawah kulit lengan atas yang efektif menahan kehamilan hingga 3 tahun.
+              </li>
+              <li>
+                <strong className="text-base-text-primary">MOW / MOP:</strong> Metode kontrasepsi mantap (sterilisasi) permanen untuk pasangan yang sudah cukup anak.
+              </li>
+            </ul>
+          </div>
+          
+          {/* Non Jangka Panjang */}
+          <div className="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-5 shadow-xs">
+            <h4 className="font-bold text-status-blue-solid mb-3 flex items-center gap-1.5">
+              ⏳ Non Jangka Panjang
+            </h4>
+            <ul className="list-disc pl-4 space-y-2.5 text-base-text-secondary font-medium">
+              <li>
+                <strong className="text-base-text-primary">Suntik KB 3 Bulan:</strong> Mengandung hormon progestin saja sehingga aman dan tidak menghambat produksi kuantitas ASI harian. Disuntik berkala setiap 12 minggu.
+              </li>
+              <li>
+                <strong className="text-base-text-primary">Pil KB Progestin (Minipil):</strong> Pil hormon harian khusus ibu menyusui agar tidak mengganggu kualitas ASI.
+              </li>
+              <li>
+                <strong className="text-base-text-primary">Kondom:</strong> Metode kontrasepsi penghalang yang aman digunakan kapan saja pasca masa nifas selesai.
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -1651,106 +1771,146 @@ function L13ArticleContent() {
 
 function L14ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
-        Menyusui secara eksklusif selama 6 bulan pertama kehidupan bayi memberikan fondasi gizi terbaik serta melatih kekebalan tubuh bayi secara alami. Ibu menyusui membutuhkan pemahaman tentang posisi, pelekatan yang benar, dan metode memerah/menyimpan ASI.
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
+        Menyusui secara eksklusif selama 6 bulan pertama kehidupan bayi memberikan fondasi gizi terbaik serta melatih kekebalan tubuh bayi secara alami[cite: 2]. Ibu menyusui membutuhkan pemahaman tentang posisi, pelekatan yang benar, dan metode memerah/menyimpan ASI[cite: 2].
       </p>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        ✨ Manfaat Menyusui Langsung bagi Ibu
-      </h2>
-      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 text-xs leading-relaxed mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
-          <li><strong>Mencegah Kanker:</strong> Menyusui mengurangi risiko kanker payudara dan ovarium pada ibu.</li>
-          <li><strong>Pemulihan Uterus:</strong> Merangsang pelepasan hormon oksitosin untuk membantu rahim kembali ke ukuran semula dan mengurangi perdarahan.</li>
-        </ul>
-        <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
-          <li><strong>KB Alami:</strong> Menyusui eksklusif bekerja sebagai Metode Amenore Laktasi (MAL) pencegah kehamilan alami.</li>
-          <li><strong>Penurunan Berat Badan:</strong> Menyusui membakar kalori ekstra untuk mempercepat penurunan berat badan pasca melahirkan.</li>
-        </ul>
-      </div>
-
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        👶 Posisi & Pelekatan Menyusui yang Benar
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
-        <div className="bg-base-white border border-base-border/25 rounded-2xl p-5">
-          <h4 className="font-bold text-brand-primary mb-2">1. Posisi Menyusui yang Benar</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-            <li>Kepala dan badan bayi membentuk garis lurus yang lurus.</li>
-            <li>Wajah bayi menghadap payudara, hidung berhadapan dengan puting susu.</li>
-            <li>Badan bayi dekat dan menempel erat ke tubuh ibu.</li>
-            <li>Ibu menggendong/mendekap seluruh badan bayi secara mantap.</li>
+      {/* Bagian 1: Manfaat Menyusui */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          ✨ Manfaat Menyusui Langsung bagi Ibu
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 text-xs leading-relaxed shadow-xs">
+          <ul className="list-disc pl-4 space-y-2.5 text-base-text-secondary font-medium">
+            <li>
+              <strong className="text-base-text-primary">Mencegah Kanker:</strong> Menyusui mengurangi risiko kanker payudara dan ovarium pada ibu[cite: 2].
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Pemulihan Uterus:</strong> Merangsang pelepasan hormon oksitosin untuk membantu rahim kembali ke ukuran semula dan mengurangi perdarahan[cite: 2].
+            </li>
           </ul>
-        </div>
-        <div className="bg-base-white border border-base-border/25 rounded-2xl p-5">
-          <h4 className="font-bold text-brand-primary mb-2">2. Pelekatan Menyusui yang Benar</h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-            <li>Bayi dekat dengan payudara dengan mulut terbuka lebar.</li>
-            <li>Dagu bayi menyentuh payudara ibu.</li>
-            <li>Bagian areola payudara di atas terlihat lebih banyak dibanding areola bawah.</li>
-            <li>Bibir bawah bayi memutar keluar (dower / flanged).</li>
+          <ul className="list-disc pl-4 space-y-2.5 text-base-text-secondary font-medium">
+            <li>
+              <strong className="text-base-text-primary">KB Alami:</strong> Menyusui eksklusif bekerja sebagai Metode Amenore Laktasi (MAL) pencegah kehamilan alami[cite: 2].
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Penurunan Berat Badan:</strong> Menyusui membakar kalori ekstra untuk mempercepat penurunan berat badan pasca melahirkan[cite: 2].
+            </li>
           </ul>
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🌡️ Suhu & Durasi Penyimpanan ASI Perah (ASIP)
-      </h2>
-      <div className="overflow-x-auto border border-base-border/20 rounded-2xl shadow-sm bg-base-white text-xs mb-6">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-base-bg/30 text-base-text-primary font-bold border-b border-base-border/10">
-              <th className="p-3">Tempat Penyimpanan</th>
-              <th className="p-3">Suhu</th>
-              <th className="p-3">Lama Penyimpanan</th>
-            </tr>
-          </thead>
-          <tbody className="text-base-text-secondary font-medium">
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">Cooler Bag (Dengan Ice Pack)</td>
-              <td className="p-3">15°C</td>
-              <td className="p-3 font-bold text-status-orange-solid">24 Jam</td>
-            </tr>
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">Dalam Ruangan (ASIP Segar)</td>
-              <td className="p-3">27°C s.d. 32°C / 25°C</td>
-              <td className="p-3 font-bold text-status-orange-solid">4 Jam / 6-8 Jam</td>
-            </tr>
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">Kulkas Bawah / Chiller</td>
-              <td className="p-3">4°C</td>
-              <td className="p-3 font-bold text-brand-primary">2 - 3 Hari (48-72 jam)</td>
-            </tr>
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">Freezer Kulkas 1 Pintu</td>
-              <td className="p-3">-15°C s.d. 0°C</td>
-              <td className="p-3 font-bold text-brand-primary">2 Minggu</td>
-            </tr>
-            <tr>
-              <td className="p-3 font-bold text-base-text-primary">Freezer Kulkas 2 Pintu / Deep Freezer</td>
-              <td className="p-3">-20°C s.d. -18°C</td>
-              <td className="p-3 font-bold text-status-green-solid">3 - 6 Bulan</td>
-            </tr>
-          </tbody>
-        </table>
+      {/* Bagian 2: Posisi & Pelekatan */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          👶 Posisi & Pelekatan Menyusui yang Benar
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+          {/* Posisi */}
+          <div className="bg-base-white border border-base-border/25 rounded-2xl p-5 shadow-xs">
+            <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1.5">
+              1. Posisi Menyusui yang Benar[cite: 2]
+            </h4>
+            <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+              <li>Kepala dan badan bayi membentuk garis lurus yang lurus[cite: 2].</li>
+              <li>Wajah bayi menghadap payudara, hidung berhadapan dengan puting susu[cite: 2].</li>
+              <li>Badan bayi dekat dan menempel erat ke tubuh ibu[cite: 2].</li>
+              <li>Ibu menggendong/mendekap seluruh badan bayi secara mantap[cite: 2].</li>
+            </ul>
+          </div>
+
+          {/* Pelekatan */}
+          <div className="bg-base-white border border-base-border/25 rounded-2xl p-5 shadow-xs">
+            <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1.5">
+              2. Pelekatan Menyusui yang Benar[cite: 2]
+            </h4>
+            <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+              <li>Bayi dekat dengan payudara dengan mulut terbuka lebar[cite: 2].</li>
+              <li>Dagu bayi menyentuh payudara ibu[cite: 2].</li>
+              <li>Bagian areola payudara di atas terlihat lebih banyak dibanding areola bawah[cite: 2].</li>
+              <li>Bibir bawah bayi memutar keluar (dower / flanged)[cite: 2].</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🥗 Porsi Makan & Minum Ibu Menyusui (Kebutuhan Sehari)
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 text-xs leading-relaxed font-semibold">
-        <div className="p-5 bg-brand-soft/10 border border-brand-primary/15 rounded-2xl space-y-2.5 text-base-text-primary">
-          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍚 Nasi / Makanan Pokok:</span> <span className="font-extrabold text-brand-primary">6 Porsi Sehari</span></p>
-          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍗 Protein Hewani (Ikan, Daging, Telur):</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
-          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🥛 Protein Nabati (Tempe, Tahu):</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
-          <p className="flex justify-between"><span>🥦 Sayur-sayuran:</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
+      {/* Bagian 3: Manajemen Tabel ASIP */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🌡️ Suhu & Durasi Penyimpanan ASI Perah (ASIP)
+        </h2>
+        
+        <div className="overflow-x-auto border border-base-border/20 rounded-2xl shadow-sm bg-base-white text-xs">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-base-bg/30 text-base-text-primary font-bold border-b border-base-border/10">
+                <th className="p-3">Tempat Penyimpanan</th>
+                <th className="p-3">Suhu</th>
+                <th className="p-3">Lama Penyimpanan</th>
+              </tr>
+            </thead>
+            <tbody className="text-base-text-secondary font-medium">
+              {[
+                { place: "Cooler Bag (Dengan Ice Pack)", temp: "15°C", duration: "24 Jam", color: "text-status-orange-solid" },
+                { place: "Dalam Ruangan (ASIP Segar)", temp: "27°C s.d. 32°C / 25°C", duration: "4 Jam / 6-8 Jam", color: "text-status-orange-solid" },
+                { place: "Kulkas Bawah / Chiller", temp: "4°C", duration: "2 - 3 Hari (48-72 jam)", color: "text-brand-primary" },
+                { place: "Freezer Kulkas 1 Pintu", temp: "-15°C s.d. 0°C", duration: "2 Minggu", color: "text-brand-primary" },
+                { place: "Freezer Kulkas 2 Pintu / Deep Freezer", temp: "-20°C s.d. -18°C", duration: "3 - 6 Bulan", color: "text-status-green-solid" },
+              ].map((row, idx) => (
+                <tr key={idx} className="border-b border-base-border/5 last:border-0 hover:bg-base-bg/30 transition-colors">
+                  <td className="p-3 font-bold text-base-text-primary">{row.place}</td>
+                  <td className="p-3 font-semibold">{row.temp}</td>
+                  <td className={`p-3 font-bold ${row.color}`}>{row.duration}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div className="p-5 bg-brand-soft/10 border border-brand-primary/15 rounded-2xl space-y-2.5 text-base-text-primary">
-          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍎 Buah-buahan:</span> <span className="font-extrabold text-brand-primary">4 Porsi Sehari</span></p>
-          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🧈 Minyak / Lemak:</span> <span className="font-extrabold text-brand-primary">6 Porsi Sehari</span></p>
-          <p className="flex justify-between border-b pb-2 border-base-border/10"><span>🍬 Gula:</span> <span className="font-extrabold text-brand-primary">2 Porsi Sehari</span></p>
-          <p className="flex justify-between text-status-green-solid font-bold"><span>💧 Air Putih:</span> <span>14 Gelas/Hari (0-6 bln) / 12 Gelas/Hari (7-12 bln)</span></p>
+      </div>
+
+      {/* Bagian 4: Kebutuhan Porsi Makan */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🥗 Porsi Makan & Minum Ibu Menyusui (Kebutuhan Sehari)
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-semibold">
+          {/* Makro Pokok */}
+          <div className="p-5 bg-brand-soft/10 border border-brand-primary/15 rounded-2xl space-y-3 text-base-text-primary shadow-xs">
+            {[
+              { label: "🍚 Nasi / Makanan Pokok", portion: "6 Porsi Sehari" },
+              { label: "🍗 Protein Hewani (Ikan, Daging, Telur)", portion: "4 Porsi Sehari" },
+              { label: "🥛 Protein Nabati (Tempe, Tahu)", portion: "4 Porsi Sehari" },
+              { label: "🥦 Sayur-sayuran", portion: "4 Porsi Sehari" }
+            ].map((item, idx) => (
+              <div key={idx} className="flex justify-between border-b border-base-border/10 pb-2 last:border-0 last:pb-0">
+                <span className="font-medium text-base-text-secondary">{item.label}</span>
+                <span className="font-extrabold text-brand-primary">{item.portion}</span>
+              </div>
+            ))}
+          </div>
+          
+          {/* Mikro & Hidrasi */}
+          <div className="p-5 bg-brand-soft/10 border border-brand-primary/15 rounded-2xl space-y-3 text-base-text-primary shadow-xs">
+            {[
+              { label: "🍎 Buah-buahan", portion: "4 Porsi Sehari" },
+              { label: "¼ Minyak / Lemak", portion: "6 Porsi Sehari" },
+              { label: "🍬 Gula", portion: "2 Porsi Sehari" }
+            ].map((item, idx) => (
+              <div key={idx} className="flex justify-between border-b border-base-border/10 pb-2 last:border-0 last:pb-0">
+                <span className="font-medium text-base-text-secondary">{item.label}</span>
+                <span className="font-extrabold text-brand-primary">{item.portion}</span>
+              </div>
+            ))}
+            <div className="flex justify-between text-status-green-solid font-bold pt-0.5">
+              <span>💧 Air Putih:</span>
+              <span className="text-right text-[11px]">14 Gelas/Hari (0-6 bln) <br/> 12 Gelas/Hari (7-12 bln)</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1759,99 +1919,79 @@ function L14ArticleContent() {
 
 function L15ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Bayi baru lahir (neonatus) usia 0 hingga 28 hari berada dalam fase rentan terhadap infeksi dan penyesuaian organ fisik. Orang tua wajib memantau tanda-tanda bahaya neonatus dan memahami pertumbuhan kapasitas lambung bayi.
       </p>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🍒 Ukuran Lambung Bayi Baru Lahir (0 - 6 Bulan)
-      </h2>
-      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
-        Mengapa bayi menyusu sangat sering? Lambung bayi baru lahir sangat kecil dan bertumbuh bertahap:
-      </p>
+      {/* Bagian 1: Ukuran Lambung Bayi */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🍒 Ukuran Lambung Bayi Baru Lahir (0 - 6 Bulan)
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Mengapa bayi menyusu sangat sering? Lambung bayi baru lahir sangat kecil dan bertumbuh bertahap:
+        </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-1">🔴</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Hari Ke-1</h4>
-          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Seukuran Kelereng</span>
-          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 5-7 ml. Bayi hanya membutuhkan sedikit cairan kolostrum.</p>
-        </div>
-        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-1">🟡</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Hari Ke-3</h4>
-          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Bola Pingpong</span>
-          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 22-27 ml. Bayi menyusu lebih sering (10-12 kali).</p>
-        </div>
-        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-1">🥚</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Minggu Ke-1</h4>
-          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Telur Ayam</span>
-          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 45-60 ml. Bayi mulai menyusu dengan pola teratur.</p>
-        </div>
-        <div className="bg-[#FFFDF6] border border-status-orange-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-1">🦆</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">Bulan Ke-1</h4>
-          <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1">Telur Bebek</span>
-          <p className="text-[11px] text-base-text-secondary mt-2 font-medium leading-relaxed">Kapasitas lambung: 80-150 ml. Bayi sanggup menyusu lebih banyak sekali minum.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "🔴 Hari Ke-1", title: "Seukuran Kelereng", bg: "bg-[#FFFDF6] border-status-orange-solid/20", cap: "5 - 7 ml", desc: "Bayi hanya membutuhkan sedikit cairan kolostrum." },
+            { label: "🟡 Hari Ke-3", title: "Bola Pingpong", bg: "bg-[#FFFDF6] border-status-orange-solid/20", cap: "22 - 27 ml", desc: "Bayi menyusu lebih sering (10 - 12 kali)." },
+            { label: "🥚 Minggu Ke-1", title: "Telur Ayam", bg: "bg-[#FFFDF6] border-status-orange-solid/20", cap: "45 - 60 ml", desc: "Bayi mulai menyusu dengan pola teratur." },
+            { label: "🦆 Bulan Ke-1", title: "Telur Bebek", bg: "bg-[#FFFDF6] border-status-orange-solid/20", cap: "80 - 150 ml", desc: "Bayi sanggup menyusu lebih banyak sekali minum." }
+          ].map((box, idx) => (
+            <div key={idx} className={`border rounded-2xl p-4 text-center flex flex-col items-center shadow-xs ${box.bg}`}>
+              <span className="font-extrabold text-xs text-base-text-primary">{box.label}</span>
+              <span className="text-[10px] text-status-orange-solid bg-status-orange-light/40 px-2 py-0.5 rounded-full font-bold uppercase mt-1.5 mb-2">
+                {box.title}
+              </span>
+              <div className="text-xs font-bold text-brand-primary mb-1">Kapasitas: {box.cap}</div>
+              <p className="text-[11px] text-base-text-secondary font-medium leading-relaxed">
+                {box.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
-        🚨 Tanda Bahaya Pada Bayi Baru Lahir (0 - 28 Hari)
-      </h2>
+      {/* Bagian 2: Tanda Bahaya Neonatus */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 flex items-center gap-2">
+          🚨 Tanda Bahaya Pada Bayi Baru Lahir (0 - 28 Hari)
+        </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤒</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam / Panas Tinggi</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh bayi &gt;37.5°C menandakan adanya infeksi akut.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🥶</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">2. Badan Dingin (Hipotermia)</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh &lt;36°C, tubuh bayi teraba dingin, berisiko fatal jika dibiarkan.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">💤</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">3. Bayi Lemah / Merintih</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Bayi lunglai, sulit dibangunkan untuk menyusu, atau bernapas merintih terus.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">👃</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">4. Sesak Napas</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Napas bayi cepat (&gt;60 kali/menit) atau tampak tarikan dinding dada ke dalam.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🔗</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">5. Tali Pusat Merah/Bau</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Pangkal tali pusat kemerahan meluas ke perut, basah, berbau busuk/bernanah.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤮</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">6. Muntah &amp; Diare</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Bayi memuntahkan semua isi lambung, menolak menyusu, disertai diare cair berulang.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">⚡</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">7. Kejang-Kejang</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Bayi mengalami kejang kaku, kelojotan, atau mata mendelik ke atas.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🟡</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">8. Kulit &amp; Mata Kuning</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kuning muncul pada hari pertama (&lt;24 jam) atau kuning meluas hingga kaki.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">💩</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">9. Tinja Berwarna Pucat</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kotoran bayi berwarna putih keabu-abuan/pucat (indikasi sumbatan empedu).</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { icon: "🤒", title: "Demam / Panas Tinggi", desc: "Suhu tubuh bayi >37.5°C menandakan adanya infeksi akut harian." },
+            { icon: "🥶", title: "Badan Dingin (Hipotermia)", desc: "Suhu tubuh <36°C, tubuh bayi teraba dingin, berisiko fatal jika dibiarkan." },
+            { icon: "💤", title: "Bayi Lemah / Merintih", desc: "Bayi lunglai, sulit dibangunkan untuk menyusu, atau bernapas merintih terus." },
+            { icon: "👃", title: "Sesak Napas", desc: "Napas bayi cepat (>60 kali/menit) atau tampak tarikan jelas dinding dada ke dalam." },
+            { icon: "🔗", title: "Tali Pusat Merah/Bau", desc: "Pangkal tali pusat kemerahan meluas ke perut, basah, berbau busuk atau bernanah." },
+            { icon: "🤮", title: "Muntah & Diare", desc: "Bayi memuntahkan semua isi lambung, menolak menyusu, disertai diare cair berulang." },
+            { icon: "⚡", title: "Kejang-Kejang", desc: "Bayi mengalami kejang kaku, gerakan kelojotan ekstrem, atau mata mendelik ke atas." },
+            { icon: "🟡", title: "Kulit & Mata Kuning", desc: "Kuning muncul pada hari pertama (<24 jam) atau warna kuning meluas hingga kaki." },
+            { icon: "💩", title: "Tinja Berwarna Pucat", desc: "Kotoran bayi berwarna putih keabu-abuan atau pucat (indikasi sumbatan empedu)." }
+          ].map((item, idx) => (
+            <div key={idx} className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center space-y-2 shadow-xs hover:border-status-red-solid/40 transition-colors">
+              <span className="text-3xl mb-1">{item.icon}</span>
+              <h4 className="font-extrabold text-xs text-base-text-primary">
+                {idx + 1}. {item.title}
+              </h4>
+              <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 text-xs text-status-red-solid leading-relaxed font-bold">
-        ⚠️ PENTING: Jika menemukan salah satu tanda bahaya di atas pada bayi Anda, segeralah bawa bayi ke Bidan, Puskesmas, atau Rumah Sakit terdekat untuk pertolongan medis segera.
+      {/* Banner Peringatan Penting */}
+      <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 text-xs text-status-red-solid leading-relaxed font-bold shadow-xs flex gap-3 items-start">
+        <span className="text-lg">⚠️</span>
+        <p className="font-semibold text-status-red-solid mt-0.5">
+          <strong>PENTING:</strong> Jika menemukan salah satu tanda bahaya di atas pada bayi Anda, segeralah bawa bayi ke Bidan, Puskesmas, atau Rumah Sakit terdekat untuk pertolongan medis segera.
+        </p>
       </div>
     </div>
   );
@@ -1859,85 +1999,115 @@ function L15ArticleContent() {
 
 function L16ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Perawatan bayi baru lahir usia 0-28 hari membutuhkan ketelitian ekstra dari orang tua. Beberapa aspek kritis meliputi menjaga kehangatan tubuh bayi, perawatan tali pusat agar tidak terinfeksi, serta pemantauan warna tinja guna mendeteksi penyakit serius seperti Atresia Bilier.
       </p>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🌡️ Cara Menjaga Bayi Tetap Hangat
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
-        <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 space-y-3">
-          <h4 className="font-bold text-brand-primary flex items-center gap-1.5">
-            🧼 Mandi & Pakaian:
-          </h4>
-          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-            <li>Mandikan bayi menggunakan air hangat minimal <strong>6 jam setelah lahir</strong> agar suhu tubuh stabil.</li>
-            <li>Sebelum tali pusat terlepas, cukup bersihkan badan bayi dengan dilap air hangat. Jangan direndam.</li>
-            <li>Setelah tali pusat lepas, bayi dapat dimandikan dengan cara terendam di bak mandi khusus.</li>
-            <li>Beri pakaian bersih, selimuti dengan baik, dan pakaikan topi, kaos kaki, serta kaos tangan jika cuaca dingin.</li>
-            <li>Segera ganti pakaian dan popok yang basah agar tubuh tidak kedinginan.</li>
-          </ul>
-        </div>
+      {/* Bagian 1: Menjaga Bayi Tetap Hangat */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🌡️ Cara Menjaga Bayi Tetap Hangat
+        </h2>
         
-        <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 space-y-3">
-          <h4 className="font-bold text-brand-primary flex items-center gap-1.5">
-            🦘 Perawatan Metode Kanguru (PMK):
-          </h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed">
-            Metode ini sangat disarankan untuk bayi dengan <strong>Berat Lahir Rendah (BBLR) &lt; 2500 gram</strong> atau lahir prematur:
-          </p>
-          <ul className="list-disc pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium">
-            <li>Posisikan bayi di dada ibu/ayah dalam kondisi tegak tanpa pakaian (hanya memakai popok & topi), bersentuhan kulit ke kulit secara langsung (*skin-to-skin contact*).</li>
-            <li>Selimuti bayi bersama ibu/ayah dengan kain panjang hangat. Suhu tubuh orang tua akan menghangatkan tubuh bayi secara konstan dan merangsang produksi ASI.</li>
-          </ul>
-        </div>
-      </div>
-
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🔗 Perawatan Tali Pusat yang Benar
-      </h2>
-      <div className="p-5 bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl text-xs leading-relaxed mb-6 space-y-3">
-        <p className="text-base-text-primary font-bold">Langkah Perawatan Tali Pusat Sehat (Buku KIA Hal 46):</p>
-        <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-          <li><strong>Wajib Cuci Tangan:</strong> Selalu cuci tangan menggunakan air bersih mengalir dan sabun sebelum serta sesudah merawat tali pusat bayi.</li>
-          <li><strong>Rawat Terbuka & Kering:</strong> Biarkan tali pusat terbuka dan kering. Jangan dibungkus dengan kain kasa terlalu rapat.</li>
-          <li><strong>Tanpa Tambahan Apapun:</strong> Jangan berikan alkohol, betadine, bedak, minyak, atau ramuan dedaunan tradisional pada tali pusat karena berisiko memicu infeksi berat.</li>
-          <li><strong>Cara Membersihkan:</strong> Jika tali pusat kotor atau basah terkena air kencing/tinja, cuci dengan air hangat bersih dan sabun bayi secara lembut, kemudian segera keringkan dengan kasa steril atau handuk bersih hingga benar-benar kering.</li>
-        </ul>
-      </div>
-
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        💩 Deteksi Dini Warna Tinja Bayi (Deteksi Atresia Bilier)
-      </h2>
-      <p className="text-xs text-base-text-secondary leading-relaxed mb-4">
-        Atresia Bilier adalah penyakit sumbatan saluran empedu hati yang fatal jika terlambat dideteksi. Ibu wajib mengamati warna tinja (kotoran) bayi setiap hari hingga usia 4 bulan.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4 text-xs leading-relaxed">
-        <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 space-y-3">
-          <h4 className="font-extrabold text-status-red-solid flex items-center gap-1.5">
-            🚨 WARNA TINJA TIDAK NORMAL (BAHAYA!):
-          </h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed">
-            Tinja berwarna <strong>Putih Keabu-abuan, Dempul, Kuning Sangat Pucat</strong> (Nomor 1, 2, atau 3 pada kartu warna tinja Buku KIA).
-          </p>
-          <div className="p-3 bg-base-white border border-status-red-solid/25 rounded-xl font-bold text-status-red-solid text-[10px]">
-            ⚠️ SEGERA bawa bayi ke dokter spesialis anak atau rumah sakit terdekat apabila tinja bayi berwarna pucat!
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+          {/* Mandi & Pakaian */}
+          <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 space-y-3 shadow-xs">
+            <h4 className="font-bold text-brand-primary flex items-center gap-1.5">
+              🧼 Mandi & Pakaian:
+            </h4>
+            <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+              <li>Mandikan bayi menggunakan air hangat minimal <strong className="text-base-text-primary">6 jam setelah lahir</strong> agar suhu tubuh stabil.</li>
+              <li>Sebelum tali pusat terlepas, cukup bersihkan badan bayi dengan dilap air hangat. Jangan direndam.</li>
+              <li>Setelah tali pusat lepas, bayi dapat dimandikan dengan cara terendam di bak mandi khusus.</li>
+              <li>Beri pakaian bersih, selimuti dengan baik, dan pakaikan topi, kaos kaki, serta kaos tangan jika cuaca dingin.</li>
+              <li>Segera ganti pakaian dan popok yang basah agar tubuh tidak kedinginan.</li>
+            </ul>
+          </div>
+          
+          {/* Perawatan Metode Kanguru */}
+          <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 space-y-3 shadow-xs flex flex-col justify-between">
+            <div>
+              <h4 className="font-bold text-brand-primary flex items-center gap-1.5">
+                🦘 Perawatan Metode Kanguru (PMK):
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mb-2">
+                Metote ini sangat disarankan untuk bayi dengan <strong>Berat Lahir Rendah (BBLR) &lt; 2500 gram</strong> atau lahir prematur:
+              </p>
+            </div>
+            <ul className="list-disc pl-4 space-y-2 text-[11px] text-base-text-secondary font-medium border-t border-brand-primary/10 pt-3">
+              <li>Posisikan bayi di dada ibu/ayah dalam kondisi tegak tanpa pakaian (hanya memakai popok & topi), bersentuhan kulit ke kulit secara langsung (<em>skin-to-skin contact</em>).</li>
+              <li>Selimuti bayi bersama ibu/ayah dengan kain panjang hangat. Suhu tubuh orang tua akan menghangatkan tubuh bayi secara konstan dan merangsang produksi ASI.</li>
+            </ul>
           </div>
         </div>
+      </div>
+
+      {/* Bagian 2: Perawatan Tali Pusat */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🔗 Perawatan Tali Pusat yang Benar
+        </h2>
         
-        <div className="bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl p-5 space-y-3">
-          <h4 className="font-extrabold text-status-green-solid flex items-center gap-1.5">
-            ✅ WARNA TINJA NORMAL (SEHAT):
-          </h4>
-          <p className="text-base-text-secondary font-medium leading-relaxed">
-            Tinja berwarna <strong>Kuning Emas, Kuning Tua, atau Hijau Kekuningan</strong> (Warna cerah menandakan empedu mengalir dengan lancar ke usus pencernaan).
-          </p>
-          <p className="text-[10px] text-base-text-secondary leading-normal font-semibold">
-            *Catat secara berkala warna tinja bayi Anda saat berusia 2 minggu, 1 bulan, dan 2-4 bulan untuk pemantauan optimal.
-          </p>
+        <div className="p-5 bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl text-xs leading-relaxed shadow-xs space-y-3">
+          <p className="text-base-text-primary font-bold">Langkah Perawatan Tali Pusat Sehat (Buku KIA Hal 46):</p>
+          <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+            <li>
+              <strong className="text-status-green-solid">Wajib Cuci Tangan:</strong> Selalu cuci tangan menggunakan air bersih mengalir dan sabun sebelum serta sesudah merawat tali pusat bayi.
+            </li>
+            <li>
+              <strong className="text-status-green-solid">Rawat Terbuka & Kering:</strong> Biarkan tali pusat terbuka dan kering. Jangan dibungkus dengan kain kasa terlalu rapat.
+            </li>
+            <li>
+              <strong className="text-status-green-solid">Tanpa Tambahan Apapun:</strong> Jangan berikan alkohol, betadine, bedak, minyak, atau ramuan dedaunan tradisional pada tali pusat karena berisiko memicu infeksi berat.
+            </li>
+            <li>
+              <strong className="text-status-green-solid">Cara Membersihkan:</strong> Jika tali pusat kotor atau basah terkena air kencing/tinja, cuci dengan air hangat bersih dan sabun bayi secara lembut, kemudian segera keringkan dengan kasa steril atau handuk bersih hingga benar-benar kering.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Bagian 3: Deteksi Dini Warna Tinja */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          💩 Deteksi Dini Warna Tinja Bayi (Deteksi Atresia Bilier)
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Atresia Bilier adalah penyakit sumbatan saluran empedu hati yang fatal jika terlambat dideteksi. Ibu wajib mengamati warna tinja (kotoran) bayi setiap hari hingga usia 4 bulan.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs leading-relaxed">
+          {/* Tidak Normal */}
+          <div className="bg-status-red-light/10 border border-status-red-solid/20 rounded-2xl p-5 space-y-3 shadow-xs flex flex-col justify-between">
+            <div>
+              <h4 className="font-extrabold text-status-red-solid flex items-center gap-1.5">
+                🚨 WARNA TINJA TIDAK NORMAL (BAHAYA!):
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
+                Tinja berwarna <strong className="text-status-red-solid">Putih Keabu-abuan, Dempul, atau Kuning Sangat Pucat</strong> (Nomor 1, 2, atau 3 pada kartu warna tinja Buku KIA).
+              </p>
+            </div>
+            <div className="p-3 bg-base-white border border-status-red-solid/25 rounded-xl font-bold text-status-red-solid text-[10px] mt-2">
+              ⚠️ SEGERA bawa bayi ke dokter spesialis anak atau rumah sakit terdekat apabila tinja bayi berwarna pucat!
+            </div>
+          </div>
+          
+          {/* Normal */}
+          <div className="bg-status-green-light/20 border border-status-green-solid/20 rounded-2xl p-5 space-y-3 shadow-xs flex flex-col justify-between">
+            <div>
+              <h4 className="font-extrabold text-status-green-solid flex items-center gap-1.5">
+                ✅ WARNA TINJA NORMAL (SEHAT):
+              </h4>
+              <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
+                Tinja berwarna <strong className="text-status-green-solid">Kuning Emas, Kuning Tua, atau Hijau Kekuningan</strong> (Warna cerah menandakan empedu mengalir dengan lancar ke usus pencernaan).
+              </p>
+            </div>
+            <p className="text-[10px] text-base-text-secondary leading-normal font-semibold border-t border-status-green-solid/10 pt-2">
+              *Catat secara berkala warna tinja bayi Anda saat berusia 2 minggu, 1 bulan, dan 2-4 bulan untuk pemantauan optimal.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -1946,108 +2116,104 @@ function L16ArticleContent() {
 
 function L17ArticleContent() {
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Fase balita usia 29 hari hingga 5 tahun merupakan masa keemasan sekaligus membutuhkan kepekaan tinggi dari orang tua terhadap tanda bahaya penyakit akut. Selain mendeteksi tanda bahaya, status gizi balita juga perlu dipantau secara mandiri menggunakan pita Lingkar Lengan Atas (LiLA).
       </p>
 
-      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-4 flex items-center gap-1.5">
-        🚨 Tanda Bahaya Balita (29 Hari - 5 Tahun)
-      </h2>
-      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed font-semibold">
-        Segera periksakan balita Anda ke dokter, bidan, atau puskesmas terdekat jika mendapati gejala berikut:
-      </p>
+      {/* Bagian 1: Tanda Bahaya Balita */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 flex items-center gap-2">
+          🚨 Tanda Bahaya Balita (29 Hari - 5 Tahun)
+        </h2>
+        <p className="text-xs text-base-text-secondary font-semibold leading-relaxed">
+          Segera periksakan balita Anda ke dokter, bidan, atau puskesmas terdekat jika mendapati gejala berikut:
+        </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤒</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam / Panas Tinggi</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh panas tinggi tidak kunjung turun setelah diberi penurun panas.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🤮</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">2. Muntah Terus-Menerus</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Balita memuntahkan semua isi lambung, tidak sanggup menelan cairan apa pun.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">💧</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">3. Diare Akut</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Buang air besar cair berkali-kali disertai lemas atau tanda dehidrasi.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">⚡</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">4. Kejang</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Kejang demam maupun kejang tanpa demam (badan kaku/kelojotan).</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">👂</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">5. Bengkak di Belakang Telinga</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Pembengkakan disertai rasa nyeri di tulang belakang daun telinga (Mastoiditis).</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🩸</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">6. Perdarahan</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Mimisan hebat, bintik-bintik merah darah di kulit, atau buang air besar berdarah.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">👃</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">7. Sesak Napas</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Tarikan dinding dada bagian bawah ke dalam yang sangat jelas saat bernapas.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🔵</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">8. Tampak Biru (Sianosis)</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Mulut, lidah, atau ujung jari tampak kebiruan akibat kekurangan oksigen.</p>
-        </div>
-        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
-          <span className="text-3xl mb-2">🚰</span>
-          <h4 className="font-extrabold text-xs text-base-text-primary">9. Tidak Bisa Minum</h4>
-          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Sangat lemah sehingga menolak atau tidak sanggup minum cairan/ASI sama sekali.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { icon: "🤒", title: "Demam / Panas Tinggi", desc: "Suhu tubuh panas tinggi tidak kunjung turun setelah diberi obat penurun panas secara berkala." },
+            { icon: "🤮", title: "Muntah Terus-Menerus", desc: "Balita memuntahkan semua isi lambung, tidak sanggup menelan cairan atau nutrisi apa pun." },
+            { icon: "💧", title: "Diare Akut", desc: "Buang air besar cair berkali-kali disertai kondisi fisik lemas atau tanda dehidrasi nyata." },
+            { icon: "⚡", title: "Kejang", desc: "Kejang demam maupun kejang tanpa demam (kondisi badan kaku atau kelojotan)." },
+            { icon: "👂", title: "Bengkak Belakang Telinga", desc: "Pembengkakan disertai rasa nyeri di tulang belakang daun telinga (Mastoiditis)." },
+            { icon: "🩸", title: "Perdarahan Spontan", desc: "Mimisan hebat, muncul bintik-bintik merah darah di kulit, atau buang air besar berdarah." },
+            { icon: "👃", title: "Sesak Napas", desc: "Tarikan dinding dada bagian bawah ke dalam yang sangat jelas terlihat saat anak bernapas." },
+            { icon: "🔵", title: "Tampak Biru (Sianosis)", desc: "Area mulut, lidah, atau ujung jari tampak kebiruan akibat kekurangan suplai oksigen harian." },
+            { icon: "🚰", title: "Tidak Bisa Minum", desc: "Kondisi sangat lemah sehingga menolak atau tidak sanggup meminum cairan/ASI sama sekali." }
+          ].map((item, idx) => (
+            <div key={idx} className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center space-y-2 shadow-xs hover:border-status-red-solid/40 transition-colors">
+              <span className="text-3xl mb-1">{item.icon}</span>
+              <h4 className="font-extrabold text-xs text-base-text-primary">
+                {idx + 1}. {item.title}
+              </h4>
+              <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        📏 Pengukuran Lingkar Lengan Atas (LiLA) Balita
-      </h2>
-      <p className="text-xs text-base-text-secondary leading-relaxed mb-4">
-        Pengukuran LiLA dilakukan pada balita usia <strong>6 - 59 bulan</strong> menggunakan pita LiLA tiga warna untuk deteksi dini stunting, gizi kurang, dan gizi buruk:
-      </p>
+      {/* Bagian 2: Pengukuran LiLA */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          📏 Pengukuran Lingkar Lengan Atas (LiLA) Balita
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Pengukuran LiLA dilakukan pada balita usia <strong>6 - 59 bulan</strong> menggunakan pita LiLA tiga warna untuk deteksi dini stunting, gizi kurang, dan gizi buruk harian:
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-xs leading-relaxed text-center font-bold">
-        <div className="bg-status-red-light/20 border border-status-red-solid/25 text-status-red-solid rounded-2xl p-4 flex flex-col justify-center items-center">
-          <span className="text-[10px] uppercase bg-status-red-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">MERAH</span>
-          <span className="text-sm font-extrabold block">&lt; 11.5 cm</span>
-          <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-1 block">
-            <strong>Gizi Buruk (Sangat Kurus)</strong>. Segera rujuk balita ke Puskesmas/Rumah Sakit untuk penanganan medis darurat.
-          </span>
-        </div>
-        
-        <div className="bg-status-orange-light/20 border border-status-orange-solid/25 text-status-orange-solid rounded-2xl p-4 flex flex-col justify-center items-center">
-          <span className="text-[10px] uppercase bg-status-orange-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">KUNING</span>
-          <span className="text-sm font-extrabold block">11.5 - 12.4 cm</span>
-          <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-1 block">
-            <strong>Gizi Kurang (Kurus)</strong>. Perlu asupan makanan tambahan (PMT) serta pemantauan intensif di Posyandu.
-          </span>
-        </div>
-        
-        <div className="bg-status-green-light/20 border border-status-green-solid/25 text-status-green-solid rounded-2xl p-4 flex flex-col justify-center items-center">
-          <span className="text-[10px] uppercase bg-status-green-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">HIJAU</span>
-          <span className="text-sm font-extrabold block">&gt;= 12.4 cm</span>
-          <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-1 block">
-            <strong>Gizi Baik (Normal)</strong>. Pertahankan asupan gizi seimbang serta pola asuh yang penuh kasih sayang.
-          </span>
+        {/* Grid Interpretasi Warna LiLA */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs leading-relaxed text-center font-bold">
+          {/* Merah */}
+          <div className="bg-status-red-light/20 border border-status-red-solid/25 text-status-red-solid rounded-2xl p-4.5 flex flex-col justify-between items-center shadow-xs">
+            <span className="text-[10px] uppercase bg-status-red-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">
+              MERAH
+            </span>
+            <span className="text-base font-black block text-status-red-solid">&lt; 11.5 cm</span>
+            <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-2 block">
+              <strong>Gizi Buruk (Sangat Kurus)</strong>. Segera rujuk balita ke Puskesmas/Rumah Sakit untuk penanganan medis darurat.
+            </span>
+          </div>
+          
+          {/* Kuning */}
+          <div className="bg-status-orange-light/20 border border-status-orange-solid/25 text-status-orange-solid rounded-2xl p-4.5 flex flex-col justify-between items-center shadow-xs">
+            <span className="text-[10px] uppercase bg-status-orange-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">
+              KUNING
+            </span>
+            <span className="text-base font-black block text-status-orange-solid">11.5 - 12.4 cm</span>
+            <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-2 block">
+              <strong>Gizi Kurang (Kurus)</strong>. Perlu asupan makanan tambahan (PMT) serta pemantauan intensif berkala di Posyandu.
+            </span>
+          </div>
+          
+          {/* Hijau */}
+          <div className="bg-status-green-light/20 border border-status-green-solid/25 text-status-green-solid rounded-2xl p-4.5 flex flex-col justify-between items-center shadow-xs">
+            <span className="text-[10px] uppercase bg-status-green-solid text-white px-2.5 py-0.5 rounded-full font-extrabold mb-2">
+              HIJAU
+            </span>
+            <span className="text-base font-black block text-status-green-solid">&gt;= 12.4 cm</span>
+            <span className="text-[11px] text-base-text-secondary font-medium leading-normal mt-2 block">
+              <strong>Gizi Baik (Normal)</strong>. Pertahankan asupan gizi seimbang harian serta pola asuh yang penuh kasih sayang.
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="p-5 bg-base-white border border-base-border/20 rounded-2xl text-xs leading-relaxed space-y-2">
-        <p className="font-extrabold text-base-text-primary">Langkah Pengukuran LiLA yang Tepat:</p>
-        <ol className="list-decimal pl-4 space-y-1 text-base-text-secondary font-medium">
-          <li>Pengukuran dilakukan pada lengan kiri anak (atau lengan kanan jika anak kidal).</li>
-          <li>Tekuk lengan anak membentuk sudut 90 derajat.</li>
-          <li>Ukur jarak antara pangkal bahu dan siku lengan atas, tentukan titik tengahnya.</li>
-          <li>Luruskan kembali lengan anak dan gantung secara santai di samping tubuh.</li>
+      {/* Bagian 3: Langkah Pengukuran */}
+      <div className="p-5 bg-base-white border border-base-border/25 rounded-2xl text-xs leading-relaxed space-y-3 shadow-xs">
+        <p className="font-extrabold text-base-text-primary flex items-center gap-1.5">
+          💡 Langkah Pengukuran LiLA yang Tepat:
+        </p>
+        <ol className="list-decimal pl-4 space-y-2 text-base-text-secondary font-medium">
+          <li>Pengukuran dilakukan pada lengan kiri anak (atau lengan kanan jika anak kidal nyata).</li>
+          <li>Tekuk lengan atas anak membentuk sudut siku sempurna 90 derajat.</li>
+          <li>Ukur jarak antara pangkal bahu dan siku lengan atas, tentukan titik tengahnya secara presisi.</li>
+          <li>Luruskan kembali lengan anak dan gantung secara santai/rileks di samping tubuh.</li>
           <li>Lingkarkan pita LiLA tepat di titik tengah lengan yang telah ditentukan tadi secara pas (tidak terlalu ketat dan tidak terlalu longgar).</li>
-          <li>Baca angka hasil pengukuran serta warna pita yang ditunjukkan oleh panah indikator pita LiLA.</li>
+          <li>Baca angka hasil pengukuran serta warna pita yang ditunjukkan oleh panah indikator pita LiLA kader.</li>
         </ol>
       </div>
     </div>
@@ -2055,105 +2221,158 @@ function L17ArticleContent() {
 }
 
 function L18ArticleContent() {
+  const [milestones, setMilestones] = useState<MilestoneItem[]>([
+    { id: 1, text: "Bayi bisa mengangkat kepala mandiri hingga 45 derajat?", checked: false },
+    { id: 2, text: "Bayi menggunakan kepala dan lengan ke depan saat diletakkan tengkurap?", checked: false },
+    { id: 3, text: "Bayi bisa melihat dan menoleh ke arah wajah Anda?", checked: false },
+    { id: 4, text: "Bayi bisa melepas genggaman atau meraih dan menggenggam benda kecil?", checked: false },
+    { id: 5, text: "Bayi suka tertawa keras?", checked: false },
+    { id: 6, text: "Bayi bereaksi terhadap suara keras (terkejut atau menoleh)?", checked: false },
+    { id: 7, text: "Bayi membalas tersenyum ketika diajak bicara atau tersenyum padanya?", checked: false },
+    { id: 8, text: "Bayi menyerap perhatian Anda dengan penglihatan, pendengaran, dan sentuhan?", checked: false }
+  ]);
+
+  const handleCheckboxChange = (id: number) => {
+    setMilestones(prev =>
+      prev.map(item => (item.id === id ? { ...item, checked: !item.checked } : item))
+    );
+  };
+
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Paragraf Pembuka */}
+      <p className="text-sm text-base-text-secondary leading-relaxed">
         Memasuki usia 29 hari hingga 3 bulan, bayi mulai menunjukkan respons sosial dan berkembang pesat secara motorik. Kunjungan posyandu setiap bulan, stimulasi bermain yang tepat, dan imunisasi tepat waktu adalah kunci tumbuh kembang optimal di fase ini.
       </p>
 
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🏥 Pelayanan Kesehatan Rutin
-      </h2>
-      <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed mb-4 space-y-2">
-        <p className="font-bold text-brand-primary">Bawa bayi ke Posyandu/Puskesmas setiap bulan untuk:</p>
-        <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
-          <li><strong>Pemantauan pertumbuhan dan perkembangan</strong> (berat badan, panjang badan, lingkar kepala).</li>
-          <li><strong>Kelas Ibu Balita</strong> — dihadiri ibu/ayah/keluarga untuk mendapat informasi penting seputar perawatan bayi.</li>
-          <li><strong>Imunisasi</strong> sesuai jadwal (lihat halaman 124–125 Buku KIA).</li>
-        </ul>
-      </div>
-
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        💉 Jadwal Imunisasi Usia 29 Hari – 3 Bulan
-      </h2>
-      <div className="overflow-x-auto rounded-2xl border border-base-border/20 mb-6">
-        <table className="w-full text-xs border-collapse">
-          <thead>
-            <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
-              <th className="p-3 text-left">Vaksin</th>
-              <th className="p-3 text-left">Tujuan</th>
-            </tr>
-          </thead>
-          <tbody className="text-base-text-secondary font-medium">
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">BCG</td>
-              <td className="p-3">Mencegah penyakit TBC.</td>
-            </tr>
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">Polio</td>
-              <td className="p-3">Mencegah polio, penyakit yang menyebabkan kelumpuhan kaki pada badann dll. ditularkan.</td>
-            </tr>
-            <tr className="border-b border-base-border/5">
-              <td className="p-3 font-bold text-base-text-primary">DPT-HB-Hib 1 & 2</td>
-              <td className="p-3">Mencegah penyakit difteri, pertusis, tetanus, hepatitis B, dan radang otak meningitis. (Diberikan 1x bulan, maksimal 3x) dosis ke-1, dan ke-2 pernah diberikan di hari setelah batas imunisasi pertama.</td>
-            </tr>
-            <tr>
-              <td className="p-3 font-bold text-base-text-primary">IPV (Rotavirus)</td>
-              <td className="p-3">Mencegah infeksi virus yang menyebabkan diare berat dan dehidrasi.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
-        🎈 Stimulasi Tumbuh Kembang (29 Hari – 3 Bulan)
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-xs leading-relaxed">
-        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-4 space-y-2">
-          <h4 className="font-bold text-status-green-solid">💞 Stimulasi Emosi & Kasih Sayang:</h4>
-          <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
-            <li>Peluk, cium, dan ayun bayi dengan lembut dan penuh kasih sayang.</li>
-            <li>Senyum, tatap mata, dan ajak bicara bayi sesering mungkin.</li>
-            <li>Bayi menyerap lingkungannya melalui <strong>penglihatan, pendengaran, dan sentuhan</strong>.</li>
-          </ul>
-        </div>
-        <div className="bg-status-blue-light/20 border border-status-blue-solid/15 rounded-2xl p-4 space-y-2">
-          <h4 className="font-bold text-status-blue-solid">🧸 Stimulasi Motorik & Sensorik:</h4>
-          <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
-            <li>Tunjukkan benda berwarna cerah dan terang untuk melatih penglihatan.</li>
-            <li>Perdengarkan berbagai suara dan nyanyian lembut.</li>
-            <li>Bantu bayi <strong>meraih, meraba, dan memegang mainan</strong>.</li>
-            <li>Latih bayi <strong>mengangkat kepala</strong> dengan posisi tengkurap (tummy time).</li>
-            <li>Gulingkan bayi perlahan ke kanan dan kiri untuk melatih otot badan.</li>
+      {/* Bagian 1: Pelayanan Kesehatan Rutin */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🏥 Pelayanan Kesehatan Rutin
+        </h2>
+        <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed space-y-2.5 shadow-xs">
+          <p className="font-bold text-brand-primary">Bawa bayi ke Posyandu/Puskesmas setiap bulan untuk:</p>
+          <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+            <li>
+              <strong className="text-base-text-primary">Pemantauan pertumbuhan dan perkembangan:</strong> Pengukuran berkala berat badan, panjang badan, serta lingkar kepala anak.
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Kelas Ibu Balita:</strong> Dihadiri oleh orang tua/keluarga untuk mendapatkan informasi bimbingan seputar perawatan harian bayi.
+            </li>
+            <li>
+              <strong className="text-base-text-primary">Imunisasi Wajib:</strong> Pemberian vaksin pelindung sesuai jadwal panduan resmi Buku KIA.
+            </li>
           </ul>
         </div>
       </div>
 
-      <h2 className="text-lg font-extrabold text-status-orange-solid border-b pb-2 mb-4 flex items-center gap-1.5">
-        ✅ Penanda Perkembangan Bayi Usia 29 Hari – 3 Bulan
-      </h2>
-      <p className="text-xs text-base-text-secondary leading-relaxed mb-4 font-semibold">
-        Beri tanda ✓ jika bayi SUDAH bisa melakukan hal berikut. Jika ada yang belum, segera konsultasikan ke Bidan atau Puskesmas. (Buku KIA Hal 53)
-      </p>
-      <div className="space-y-2 mb-4">
-        {[
-          "Bayi bisa mengangkat kepala mandiri hingga 45 derajat?",
-          "Bayi menggunakan kepala dan lengan ke depan saat diletakkan tengkurap?",
-          "Bayi bisa melihat dan menoleh ke arah wajah Anda?",
-          "Bayi bisa melepas genggaman atau meraih dan menggenggam benda kecil?",
-          "Bayi suka tertawa keras?",
-          "Bayi bereaksi terhadap suara keras (terkejut atau menoleh)?",
-          "Bayi membalas tersenyum ketika diajak bicara atau tersenyum padanya?",
-          "Bayi menyerap perhatian Anda dengan penglihatan, pendengaran, dan sentuhan?"
-        ].map((item, i) => (
-          <div key={i} className="flex items-start gap-3 p-3 bg-base-white border border-base-border/20 rounded-xl text-xs">
-            <span className="w-6 h-6 shrink-0 rounded-full bg-status-orange-light/40 text-status-orange-solid font-extrabold flex items-center justify-center text-[10px] mt-0.5">{i + 1}</span>
-            <span className="text-base-text-secondary font-medium leading-relaxed">{item}</span>
+      {/* Bagian 2: Jadwal Imunisasi */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          💉 Jadwal Imunisasi Usia 29 Hari – 3 Bulan
+        </h2>
+        
+        <div className="overflow-x-auto rounded-xl border border-base-border/20 shadow-sm bg-base-white">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
+                <th className="p-3 text-left w-1/3">Vaksin</th>
+                <th className="p-3 text-left">Tujuan Perlindungan Medis</th>
+              </tr>
+            </thead>
+            <tbody className="text-base-text-secondary font-medium">
+              {[
+                { name: "BCG", desc: "Mencegah penularan penyakit infeksi tuberkulosis (TBC) paru parah." },
+                { name: "Polio Drops (Tetes)", desc: "Mencegah infeksi virus polio yang berisiko menyebabkan kelumpuhan saraf kaki permanen." },
+                { name: "DPT-HB-Hib 1 & 2", desc: "Mencegah infeksi difteri, batuk rejan (pertusis), tetanus, penyakit hepatitis B, serta radang selaput otak (meningitis)." },
+                { name: "IPV (atau Rotavirus)", desc: "Mencegah infeksi virus rotavirus merusak usus yang memicu diare akut parah dan dehidrasi tubuh janin." }
+              ].map((row, idx) => (
+                <tr key={idx} className="border-b last:border-0 hover:bg-base-bg/30 transition-colors">
+                  <td className="p-3 font-bold text-base-text-primary bg-base-bg/5">{row.name}</td>
+                  <td className="p-3 leading-relaxed">{row.desc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Bagian 3: Stimulasi Tumbuh Kembang */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
+          🎈 Stimulasi Tumbuh Kembang (29 Hari – 3 Bulan)
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
+          {/* Emosi */}
+          <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-4.5 space-y-2 shadow-xs">
+            <h4 className="font-bold text-status-green-solid flex items-center gap-1">💞 Stimulasi Emosi & Kasih Sayang:</h4>
+            <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+              <li>Peluk, cium, dan ayun tubuh bayi dengan lembut penuh kehangatan keluarga.</li>
+              <li>Senyum, jaga tatapan mata, dan ajak bicara bayi sesering mungkin.</li>
+              <li>Bayi belajar menyerap lingkungan sekitar melalui indra <strong>penglihatan, pendengaran, dan sentuhan</strong>.</li>
+            </ul>
           </div>
-        ))}
+          
+          {/* Motorik */}
+          <div className="bg-status-blue-light/20 border border-status-blue-solid/15 rounded-2xl p-4.5 space-y-2 shadow-xs">
+            <h4 className="font-bold text-status-blue-solid flex items-center gap-1">🧸 Stimulasi Motorik & Sensorik:</h4>
+            <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+              <li>Tunjukkan objek mainan berwarna cerah kontras untuk melatih fokus saraf mata.</li>
+              <li>Perdengarkan alunan suara musik dan nyanyian lembut dari orang tua.</li>
+              <li>Bantu latih tangan bayi untuk <strong>meraih, meraba, dan memegang benda kecil</strong>.</li>
+              <li>Latih kekuatan otot leher lewat posisi tengkurap (<em>tummy time</em>) berkala.</li>
+              <li>Gulingkan tubuh bayi perlahan kanan-kiri melatih fleksibilitas otot badan.</li>
+            </ul>
+          </div>
+        </div>
       </div>
-      <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/20 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed">
-        ⚠️ Jika bayi BELUM bisa melakukan salah satu hal di atas, segera bawa ke Bidan/Puskesmas untuk evaluasi tumbuh kembang lebih lanjut.
+
+      {/* Bagian 4: Penanda Perkembangan (Interactive Checkboxes) */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-status-orange-solid border-b pb-2 flex items-center gap-2">
+          ✅ Penanda Perkembangan Bayi Usia 29 Hari – 3 Bulan
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed font-semibold">
+          Beri tanda ✓ jika bayi SUDAH bisa melakukan hal berikut. Jika ada yang belum, segera konsultasikan ke Bidan atau Puskesmas. (Buku KIA Hal 53)
+        </p>
+        
+        <div className="space-y-2">
+          {milestones.map((item: MilestoneItem, i: number) => (
+            <label 
+              key={item.id} 
+              className={`flex items-start gap-3 p-3 bg-base-white border rounded-xl text-xs cursor-pointer transition-all select-none
+                ${item.checked ? 'border-status-orange-solid bg-status-orange-light/5' : 'border-base-border/20 hover:border-base-border/40'}`}
+            >
+              {/* Checkbox */}
+              <div className="flex items-center h-5 mt-0.5 shrink-0">
+                <input 
+                  type="checkbox" 
+                  checked={item.checked} 
+                  onChange={() => handleCheckboxChange(item.id)} 
+                  className="w-4 h-4 text-status-orange-solid bg-base-white border-base-border rounded focus:ring-status-orange-solid accent-status-orange-solid cursor-pointer" 
+                />
+              </div>
+
+              {/* Nomor Urut */}
+              <span className={`w-5 h-5 shrink-0 rounded-full font-extrabold flex items-center justify-center text-[10px] mt-0.5
+                ${item.checked ? 'bg-status-orange-solid text-base-white' : 'bg-status-orange-light/40 text-status-orange-solid'}`}>
+                {i + 1}
+              </span>
+
+              {/* Teks Deskripsi */}
+              <span className={`font-medium leading-relaxed mt-0.5 transition-colors
+                ${item.checked ? 'text-status-orange-solid font-semibold' : 'text-base-text-secondary'}`}>
+                {item.text}
+              </span>
+            </label>
+          ))}
+        </div>
+
+        {/* Banner Notifikasi Bahaya */}
+        <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/20 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed shadow-xs">
+          ⚠️ Jika bayi BELUM bisa melakukan salah satu hal di atas, segera bawa ke Bidan/Puskesmas untuk evaluasi tumbuh kembang lebih lanjut.
+        </div>
       </div>
     </div>
   );
@@ -2180,18 +2399,53 @@ function L19ArticleContent() {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-lg font-extrabold text-status-orange-solid border-b pb-2 mb-4 flex items-center gap-1.5">
-        ✅ Penanda Perkembangan Bayi Usia 3 – 6 Bulan
-      </h2>
-      <div className="space-y-2 mb-4">
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Judul Bagian */}
+      <div className="space-y-1">
+        <h2 className="text-lg font-extrabold text-status-orange-solid border-b pb-2 flex items-center gap-1.5">
+          ✅ Penanda Perkembangan Bayi Usia 3 – 6 Bulan
+        </h2>
+        <p className="text-xs text-base-text-secondary leading-relaxed font-semibold pt-1">
+          Beri tanda ✓ jika bayi SUDAH bisa melakukan hal berikut. Jika ada yang belum, segera konsultasikan ke Bidan atau Puskesmas. (Buku KIA Hal 55)
+        </p>
+      </div>
+
+      {/* Daftar Item Checklist */}
+      <div className="space-y-2">
         {milestones.map((item: MilestoneItem, i: number) => (
-          <label key={item.id} className={`flex items-start gap-3 p-3 bg-base-white border rounded-xl text-xs cursor-pointer transition-all select-none ${item.checked ? 'border-status-orange-solid bg-status-orange-light/5' : 'border-base-border/20'}`}>
-            <input type="checkbox" checked={item.checked} onChange={() => handleCheckboxChange(item.id)} className="w-4 h-4 text-status-orange-solid accent-status-orange-solid cursor-pointer mt-0.5" />
-            <span className={`w-5 h-5 shrink-0 rounded-full font-extrabold flex items-center justify-center text-[10px] ${item.checked ? 'bg-status-orange-solid text-base-white' : 'bg-status-orange-light/40 text-status-orange-solid'}`}>{i + 1}</span>
-            <span className={`font-medium ${item.checked ? 'text-status-orange-solid font-semibold' : 'text-base-text-secondary'}`}>{item.text}</span>
+          <label 
+            key={item.id} 
+            className={`flex items-start gap-3 p-3 bg-base-white border rounded-xl text-xs cursor-pointer transition-all select-none
+              ${item.checked ? 'border-status-orange-solid bg-status-orange-light/5' : 'border-base-border/20 hover:border-base-border/40'}`}
+          >
+            {/* Checkbox */}
+            <div className="flex items-center h-5 mt-0.5 shrink-0">
+              <input 
+                type="checkbox" 
+                checked={item.checked} 
+                onChange={() => handleCheckboxChange(item.id)} 
+                className="w-4 h-4 text-status-orange-solid bg-base-white border-base-border rounded focus:ring-status-orange-solid accent-status-orange-solid cursor-pointer" 
+              />
+            </div>
+
+            {/* Nomor Urut Indikator */}
+            <span className={`w-5 h-5 shrink-0 rounded-full font-extrabold flex items-center justify-center text-[10px] mt-0.5
+              ${item.checked ? 'bg-status-orange-solid text-base-white' : 'bg-status-orange-light/40 text-status-orange-solid'}`}>
+              {i + 1}
+            </span>
+
+            {/* Teks Pertanyaan Milestone */}
+            <span className={`font-medium leading-relaxed mt-0.5 transition-colors
+              ${item.checked ? 'text-status-orange-solid font-semibold' : 'text-base-text-secondary'}`}>
+              {item.text}
+            </span>
           </label>
         ))}
+      </div>
+
+      {/* Catatan / Peringatan Evaluasi */}
+      <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/20 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed shadow-xs">
+        ⚠️ Jika bayi BELUM bisa melakukan salah satu hal di atas, segera bawa ke Bidan/Puskesmas untuk evaluasi tumbuh kembang lebih lanjut.
       </div>
     </div>
   );
