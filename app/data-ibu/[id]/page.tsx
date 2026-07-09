@@ -9,7 +9,7 @@ import {
   MdArrowBack, MdPerson, MdCalendarToday, MdPhone, 
   MdPregnantWoman, MdBloodtype, MdOutlineError, MdFemale, MdMale,
   MdEdit, MdSave, MdClose, MdCheckCircleOutline, MdCameraAlt, MdHome, MdInfo,
-  MdVaccines, MdCalendarMonth
+  MdVaccines, MdCalendarMonth, MdBabyChangingStation, MdFamilyRestroom
 } from "react-icons/md";
 import { getTtdLogs, upsertTtdLog } from "@/app/actions/ttd";
 import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/weekly";
@@ -22,7 +22,7 @@ export default function MotherDetailPage() {
   const [mother, setMother] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSubTab, setActiveSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
-  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process'>('ttd');
+  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process' | 'postpartum' | 'kb'>('ttd');
   
   const [attendance, setAttendance] = useState([
     { date: "", note: "" },
@@ -32,6 +32,32 @@ export default function MotherDetailPage() {
   const [isEditingAttendance, setIsEditingAttendance] = useState(false);
   const [prepList, setPrepList] = useState<boolean[]>(new Array(10).fill(false));
   const [birthProcessList, setBirthProcessList] = useState<boolean[]>(new Array(7).fill(false));
+  
+  const [postpartumFilter, setPostpartumFilter] = useState<number>(1); // Week 1-6
+  const [postpartumList, setPostpartumList] = useState<any[]>(
+    new Array(42).fill(null).map((_, i) => ({
+      day: i + 1,
+      pemeriksaan_nifas: false,
+      vitamin_a: false,
+      ttd: false,
+      gizi_sesuai: false,
+      masalah_jiwa: false,
+      demam: false,
+      sakit_kepala: false,
+      pandangan_kabur: false,
+      nyeri_ulu_hati: false,
+      jantung_berdebar: false,
+      napas_pendek: false,
+      payudara_bengkak: false,
+      gangguan_bak: false,
+      kelamin_bengkak: false,
+      darah_bau: false,
+      konstipasi_diare: false,
+      keputihan: false
+    }))
+  );
+  const [kbAnswers, setKbAnswers] = useState<boolean[]>(new Array(3).fill(false));
+  const [kbConsent, setKbConsent] = useState<boolean>(false);
 
   useEffect(() => {
     if (!id) return;
@@ -59,6 +85,25 @@ export default function MotherDetailPage() {
       processList.push(localStorage.getItem(`birth_process_${i}_${id}`) === 'true');
     }
     setBirthProcessList(processList);
+
+    const cachedPostpartum = localStorage.getItem(`postpartum_monitoring_${id}`);
+    if (cachedPostpartum) {
+      try {
+        setPostpartumList(JSON.parse(cachedPostpartum));
+      } catch (e) {}
+    }
+
+    const cachedKbAnswers = localStorage.getItem(`kb_answers_${id}`);
+    if (cachedKbAnswers) {
+      try {
+        setKbAnswers(JSON.parse(cachedKbAnswers));
+      } catch (e) {}
+    }
+
+    const cachedKbConsent = localStorage.getItem(`kb_consent_${id}`);
+    if (cachedKbConsent) {
+      setKbConsent(cachedKbConsent === 'true');
+    }
   }, [id]);
 
   const today = new Date();
@@ -1374,6 +1419,20 @@ export default function MotherDetailPage() {
               >
                 <MdCheckCircleOutline className="w-3.5 h-3.5" /> Proses Melahirkan
               </button>
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('postpartum')}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'postpartum' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdBabyChangingStation className="w-3.5 h-3.5" /> Pemantauan Nifas
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('kb')}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'kb' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdFamilyRestroom className="w-3.5 h-3.5" /> KB Pasca Salin
+              </button>
             </div>
 
             {/* Content Body for Card 2 */}
@@ -1960,6 +2019,221 @@ export default function MotherDetailPage() {
                           </div>
                         </label>
                       ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {activePemantauanTab === 'postpartum' && (() => {
+                const daysInWeek = Array.from({ length: 7 }, (_, i) => (postpartumFilter - 1) * 7 + i + 1);
+
+                const handleTogglePostpartum = (dayIdx: number, field: string) => {
+                  const next = [...postpartumList];
+                  const idx = dayIdx - 1;
+                  next[idx] = { ...next[idx], [field]: !next[idx][field] };
+                  setPostpartumList(next);
+                  if (id) {
+                    localStorage.setItem(`postpartum_monitoring_${id}`, JSON.stringify(next));
+                  }
+                };
+
+                const fields = [
+                  { key: "pemeriksaan_nifas", label: "Pemeriksaan Nifas", cat: "health" },
+                  { key: "vitamin_a", label: "Konsumsi Vit A", cat: "health" },
+                  { key: "ttd", label: "Konsumsi TTD", cat: "health" },
+                  { key: "gizi_sesuai", label: "Makan Gizi Cukup", cat: "health" },
+                  { key: "masalah_jiwa", label: "Masalah Jiwa/Sedih", cat: "symptom" },
+                  { key: "demam", label: "Demam >38°C", cat: "danger" },
+                  { key: "sakit_kepala", label: "Sakit Kepala Hebat", cat: "danger" },
+                  { key: "pandangan_kabur", label: "Pandangan Mata Kabur", cat: "danger" },
+                  { key: "nyeri_ulu_hati", label: "Nyeri Ulu Hati", cat: "danger" },
+                  { key: "jantung_berdebar", label: "Jantung Berdebar", cat: "symptom" },
+                  { key: "napas_pendek", label: "Napas Pendek", cat: "danger" },
+                  { key: "payudara_bengkak", label: "Payudara Bengkak/Nyeri", cat: "symptom" },
+                  { key: "gangguan_bak", label: "Gangguan Buang Air Kecil", cat: "symptom" },
+                  { key: "kelamin_bengkak", label: "Kelamin Bengkak/Luka", cat: "danger" },
+                  { key: "darah_bau", label: "Darah Nifas Berbau", cat: "danger" },
+                  { key: "konstipasi_diare", label: "Pencernaan Terganggu", cat: "symptom" },
+                  { key: "keputihan", label: "Keputihan Abnormal", cat: "symptom" }
+                ];
+
+                return (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                      <h4 className="font-bold text-xs text-brand-primary">
+                        Lembar Pemantauan Harian Ibu Nifas (Diisi Ibu)
+                      </h4>
+                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                        Catat pelayanan kesehatan dan pantau tanda bahaya masa nifas setiap hari selama 42 hari pasca melahirkan (Buku KIA Hal 28-31).
+                      </p>
+                    </div>
+
+                    {/* Week Switcher */}
+                    <div className="flex border-b text-[10px] font-bold text-base-text-secondary select-none flex-wrap gap-1">
+                      {[1, 2, 3, 4, 5, 6].map(w => (
+                        <button
+                          key={w}
+                          type="button"
+                          onClick={() => setPostpartumFilter(w)}
+                          className={`flex-1 min-w-[50px] py-2 text-center border-b-2 transition cursor-pointer ${postpartumFilter === w ? 'border-brand-primary text-brand-primary bg-brand-soft/5' : 'border-transparent hover:bg-base-bg/30'}`}
+                        >
+                          Minggu {w}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Accordion for the 7 Days of Selected Week */}
+                    <div className="space-y-3">
+                      {daysInWeek.map(dayNum => {
+                        const record = postpartumList[dayNum - 1] || { day: dayNum };
+                        const checkedCount = fields.filter(f => record[f.key]).length;
+
+                        return (
+                          <details key={dayNum} className="group bg-base-white border border-base-border/25 rounded-xl [&_summary::-webkit-details-marker]:hidden overflow-hidden">
+                            <summary className="flex items-center justify-between p-3.5 cursor-pointer hover:bg-base-bg/10 transition select-none">
+                              <div className="flex items-center gap-2.5">
+                                <span className="text-[11px] font-extrabold text-brand-primary bg-brand-soft/30 px-2 py-0.5 rounded-md">Hari Ke-{dayNum}</span>
+                                <span className="text-[10px] font-bold text-base-text-secondary">Tercatat: {checkedCount} parameter</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                {fields.some(f => f.cat === 'danger' && record[f.key]) && (
+                                  <span className="text-[8px] font-bold text-status-red-solid bg-status-red-light/30 border border-status-red-solid/25 px-1.5 py-0.5 rounded-full uppercase animate-pulse">Bahaya</span>
+                                )}
+                                <span className="text-base-text-secondary group-open:rotate-180 transition-transform duration-200">▼</span>
+                              </div>
+                            </summary>
+                            
+                            <div className="p-4 border-t border-base-border/10 bg-base-bg/5 space-y-4">
+                              <div className="space-y-2">
+                                <h5 className="text-[9px] font-bold text-brand-primary uppercase tracking-wider">I. Pelayanan Kesehatan & Nutrisi</h5>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {fields.filter(f => f.cat === 'health').map(f => (
+                                    <label key={f.key} className="flex items-center gap-2.5 p-2 bg-base-white border border-base-border/15 rounded-lg cursor-pointer hover:border-brand-primary/20 transition">
+                                      <input
+                                        type="checkbox"
+                                        checked={!!record[f.key]}
+                                        onChange={() => handleTogglePostpartum(dayNum, f.key)}
+                                        className="w-4 h-4 rounded text-brand-primary border-base-border/40 focus:ring-brand-primary/25 cursor-pointer"
+                                      />
+                                      <span className="text-[10px] font-semibold text-base-text-primary select-none">{f.label}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="space-y-2">
+                                <h5 className="text-[9px] font-bold text-status-red-solid uppercase tracking-wider">II. Pemantauan Gejala / Tanda Bahaya</h5>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                  {fields.filter(f => f.cat !== 'health').map(f => {
+                                    const isDanger = f.cat === 'danger';
+                                    return (
+                                      <label key={f.key} className={`flex items-center gap-2.5 p-2 bg-base-white border rounded-lg cursor-pointer transition ${isDanger ? 'hover:border-status-red-solid/35 border-base-border/15' : 'hover:border-brand-primary/20 border-base-border/15'}`}>
+                                        <input
+                                          type="checkbox"
+                                          checked={!!record[f.key]}
+                                          onChange={() => handleTogglePostpartum(dayNum, f.key)}
+                                          className={`w-4 h-4 rounded border-base-border/40 cursor-pointer ${isDanger ? 'text-status-red-solid focus:ring-status-red-solid/25' : 'text-brand-primary focus:ring-brand-primary/25'}`}
+                                        />
+                                        <span className={`text-[10px] font-semibold select-none ${isDanger ? 'text-status-red-solid font-bold' : 'text-base-text-primary'}`}>{f.label}</span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          </details>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {activePemantauanTab === 'kb' && (() => {
+                const handleToggleKbAnswer = (idx: number) => {
+                  const next = [...kbAnswers];
+                  next[idx] = !next[idx];
+                  setKbAnswers(next);
+                  if (id) {
+                    localStorage.setItem(`kb_answers_${id}`, JSON.stringify(next));
+                  }
+                };
+
+                const handleToggleConsent = () => {
+                  const next = !kbConsent;
+                  setKbConsent(next);
+                  if (id) {
+                    localStorage.setItem(`kb_consent_${id}`, String(next));
+                  }
+                };
+
+                const questions = [
+                  { title: "1. Pemahaman Pentingnya KB", desc: "Memahami mengapa perlu ikut KB (menjaga jarak kehamilan, membatasi jumlah anak, dll)." },
+                  { title: "2. Pilihan Metode Kontrasepsi Jangka Panjang (MKJP)", desc: "Mengetahui metode steril (MOW/MOP), spiral (IUD), dan susuk (Implan)." },
+                  { title: "3. Pilihan Metode Non Jangka Panjang", desc: "Mengetahui metode Suntik KB 3 bulan, Pil KB Progestin, dan Kondom." }
+                ];
+
+                return (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                      <h4 className="font-bold text-xs text-brand-primary">
+                        Keluarga Berencana (KB) Pasca Salin (Diisi Ibu)
+                      </h4>
+                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                        Merencanakan kehamilan sehat pasca melahirkan bersama suami sesuai Buku KIA halaman 33.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {questions.map((q, idx) => (
+                        <label key={idx} className="flex items-start gap-2.5 p-3.5 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+                          <input 
+                            type="checkbox" 
+                            checked={kbAnswers[idx]} 
+                            onChange={() => handleToggleKbAnswer(idx)} 
+                            className="w-4 h-4 rounded text-brand-primary mt-0.5 cursor-pointer focus:ring-brand-primary/30" 
+                          />
+                          <div className="text-[10px] leading-relaxed select-none">
+                            <span className="font-bold text-base-text-primary block">{q.title}</span>
+                            <span className="text-base-text-secondary">{q.desc}</span>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+
+                    <div className="border border-brand-primary/25 rounded-2xl p-5 bg-brand-soft/10 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id="kb-consent-checkbox"
+                          checked={kbConsent}
+                          onChange={handleToggleConsent}
+                          className="w-5 h-5 rounded text-brand-primary mt-0.5 cursor-pointer border-brand-primary/30 focus:ring-brand-primary/20"
+                        />
+                        <label htmlFor="kb-consent-checkbox" className="text-xs leading-relaxed font-semibold text-base-text-primary select-none cursor-pointer">
+                          PERNYATAAN PERSETUJUAN IBU
+                          <span className="block text-[10px] font-medium text-base-text-secondary mt-1">
+                            "Saya bersedia menggunakan kontrasepsi (KB) pasca bersalin demi menjaga kesehatan saya dan jarak kehamilan untuk tumbuh kembang anak yang optimal."
+                          </span>
+                        </label>
+                      </div>
+
+                      {kbConsent && (
+                        <div className="border-t border-brand-primary/20 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in slide-in-from-top-2 duration-200">
+                          <div className="space-y-0.5">
+                            <span className="text-[9px] font-bold text-brand-primary uppercase tracking-wider block">Status Persetujuan</span>
+                            <span className="text-xs font-bold text-status-green-solid flex items-center gap-1">
+                              ✓ Disetujui secara Digital oleh Ibu
+                            </span>
+                          </div>
+                          <div className="border border-brand-primary/20 rounded-xl px-4 py-2 bg-base-white text-center sm:text-right shrink-0">
+                            <span className="text-[9px] font-bold text-base-text-secondary uppercase block">Paraf/Tanda Tangan digital</span>
+                            <span className="text-xs font-extrabold text-brand-primary italic block font-serif tracking-widest mt-0.5">
+                              {mother ? mother.name : "Ibu Kandung"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

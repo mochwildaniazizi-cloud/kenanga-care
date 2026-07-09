@@ -400,6 +400,10 @@ export default function ArticleDetailPage() {
               <L10ArticleContent />
             ) : id === "L11" ? (
               <L11ArticleContent />
+            ) : id === "L12" ? (
+              <L12ArticleContent />
+            ) : id === "L13" ? (
+              <L13ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2366,6 +2370,178 @@ function L11ArticleContent() {
           <li><strong>Ikatan Kasih Sayang (Bonding):</strong> Membangun ikatan emosional yang kuat antara Ibu dan bayi sejak detik pertama lahir.</li>
           <li><strong>Merangsang Kontraksi Rahim:</strong> Isapan bayi merangsang pelepasan hormon oksitosin yang membantu rahim ibu berkontraksi sehingga meminimalisir risiko perdarahan pasca salin.</li>
         </ul>
+      </div>
+    </div>
+  );
+}
+
+function L12ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Masa nifas (setelah melahirkan hingga 42 hari) adalah masa pemulihan penting bagi organ reproduksi dan kondisi emosional Ibu. Selama masa pemulihan ini, Ibu diwajibkan memeriksakan kesehatan minimal 4 kali dan mengenali tanda bahaya nifas.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+         JADWAL PEMERIKSAAN NIFAS (MINIMAL 4 KALI)
+      </h2>
+      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
+        Sesuai standar Buku KIA 2024, Ibu dan bayi harus mendapatkan pemeriksaan pasca melahirkan minimal 4 kali:
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
+          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Pertama</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">6 Jam - 2 Hari</h4>
+          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Pemeriksaan perdarahan awal, pemulihan rahim, dan inisiasi ASI eksklusif.</p>
+        </div>
+        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
+          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Kedua</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">3 - 7 Hari</h4>
+          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Pemantauan kesehatan bayi, tali pusat, dan kecukupan ASI bagi bayi.</p>
+        </div>
+        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
+          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Ketiga</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">8 - 28 Hari</h4>
+          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Evaluasi pemulihan luka jalan lahir, infeksi pasca salin, dan gizi nifas.</p>
+        </div>
+        <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-2xl p-4 text-center">
+          <span className="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full uppercase">Keempat</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary mt-2">29 - 42 Hari</h4>
+          <p className="text-[11px] text-base-text-secondary mt-1 font-medium leading-relaxed">Pemeriksaan akhir masa pemulihan nifas, konseling kontrasepsi (KB) pasca salin.</p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
+        🚨 Tanda Bahaya Pada Ibu Nifas (Masa Pemulihan)
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🤒</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">1. Demam Tinggi &gt;2 Hari</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Suhu tubuh panas tinggi menandakan adanya infeksi jalan lahir atau rahim.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">😭</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">2. Depresi / Sedih Mendalam</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu terlihat sangat sedih, murung, cemas berlebih, atau menangis terus tanpa sebab.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🥀</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">3. Cairan Nifas Berbau</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Cairan lokia (darah nifas) yang keluar berbau busuk atau sangat tidak sedap.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🤕</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">4. Pusing Berat & Bengkak</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Sakit kepala hebat, pandangan mata kabur, nyeri ulu hati, kaki/wajah bengkak, atau kejang.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🍒</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">5. Payudara Bengkak & Merah</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Payudara bengkak mengeras, kulit memerah, terasa sangat panas dan nyeri (mastitis).</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🩸</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">6. Perdarahan Jalan Lahir</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Keluar darah nifas segar mengalir deras, tanda sisa plasenta tertinggal di rahim.</p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🚫 Hal-hal yang Dilarang Selama Masa Pemulihan
+      </h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-xs leading-relaxed font-semibold">
+        <div className="p-4.5 bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl space-y-3 text-status-red-solid">
+          <p className="flex items-start gap-2">
+            <span>❌</span>
+            <span>Membuang ASI pertama yang berwarna kekuningan (Kolostrum). ASI pertama sangat penting untuk imun bayi.</span>
+          </p>
+          <p className="flex items-start gap-2">
+            <span>❌</span>
+            <span>Membersihkan puting/payudara dengan alkohol, obat merah, atau sabun wangi karena residunya bisa tertelan bayi.</span>
+          </p>
+          <p className="flex items-start gap-2">
+            <span>❌</span>
+            <span>Mengikat perut (stagen) terlalu kencang karena mengganggu aliran darah dan pernapasan.</span>
+          </p>
+        </div>
+        <div className="p-4.5 bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl space-y-3 text-status-red-solid">
+          <p className="flex items-start gap-2">
+            <span>❌</span>
+            <span>Melakukan senam/latihan fisik dengan posisi telungkup sebelum rahim pulih sempurna.</span>
+          </p>
+          <p className="flex items-start gap-2">
+            <span>❌</span>
+            <span>Menempelkan ramuan daun-daunan pada jalan lahir/kemaluan karena berisiko memicu infeksi bakteri akut.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L13ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Setelah melahirkan, perubahan hormon yang drastis dan pola tidur yang terganggu berisiko memicu gangguan kesehatan jiwa pada ibu. Selain itu, perencanaan Keluarga Berencana (KB) pasca salin penting disepakati bersama suami untuk menata kehamilan yang sehat di masa depan.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🧠 Mengenal Depresi Setelah Melahirkan (Nifas)
+      </h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-5">
+          <h4 className="font-bold text-status-purple-solid mb-1.5 flex items-center gap-1">🌸 Baby Blues Syndrome:</h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed mb-3">
+            Terjadi segera setelah melahirkan dan biasanya mereda dalam <strong>2 minggu</strong>. Gejala meliputi: mood tidak stabil, merasa sedih, murung secara tiba-tiba, cemas, sensitif, mudah tersinggung, dan sulit tidur.
+          </p>
+          <h4 className="font-bold text-status-purple-solid mb-1 flex items-center gap-1">Pencegahan & Dukungan:</h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
+            Dibutuhkan perhatian penuh dan pembagian tugas mengasuh bayi dari <strong>suami dan keluarga</strong> agar Ibu memiliki waktu istirahat yang cukup.
+          </p>
+        </div>
+        
+        <div className="bg-status-red-light/10 border border-status-red-solid/15 rounded-2xl p-5">
+          <h4 className="font-bold text-status-red-solid mb-1.5 flex items-center gap-1">🚨 Depresi Pasca Melahirkan (Postpartum Depression):</h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed mb-3">
+            Kondisi klinis yang lebih parah, terjadi dalam 2 minggu hingga beberapa bulan setelah bersalin. Gejala: sedih mendalam terus menerus, merasa tidak berguna, sulit konsentrasi, menjauh dari bayi, cemas ekstrem, hingga hilangnya minat beraktivitas.
+          </p>
+          <h4 className="font-bold text-status-red-solid mb-1 flex items-center gap-1">Penanganan Medis:</h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed mt-1">
+            Jika gejala berlangsung lebih dari 2 minggu, segera lakukan konseling ke psikolog, dokter, atau bidan posyandu untuk penanganan konseling profesional.
+          </p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        👪 Keluarga Berencana (KB) Pasca Salin
+      </h2>
+      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
+        Menjarangkan kehamilan minimal 2 tahun membantu tubuh ibu pulih optimal dan memberikan waktu menyusui terbaik bagi anak. Berikut pilihan metode kontrasepsi resmi:
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5">
+          <h4 className="font-bold text-status-green-solid mb-2 flex items-center gap-1">🔄 KB Jangka Panjang (MKJP):</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li><strong>IUD / Spiral / AKDR:</strong> Alat kontrasepsi dalam rahim yang efektif mencegah kehamilan hingga 10 tahun. Sangat aman bagi ibu menyusui.</li>
+            <li><strong>Implan / Susuk:</strong> Alat kontrasepsi di bawah kulit lengan atas yang efektif hingga 3 tahun.</li>
+            <li><strong>MOW / MOP:</strong> Metode kontrasepsi mantap (sterilisasi) untuk pasangan yang sudah cukup anak.</li>
+          </ul>
+        </div>
+        <div className="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-5">
+          <h4 className="font-bold text-status-blue-solid mb-2 flex items-center gap-1">⏳ Non Jangka Panjang:</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li><strong>Suntik KB 3 Bulan:</strong> Hormon progestin saja yang tidak menghambat produksi ASI. Disuntik berkala setiap 12 minggu.</li>
+            <li><strong>Pil KB Progestin (Minipil):</strong> Pil hormon harian khusus ibu menyusui agar tidak mengganggu kualitas ASI.</li>
+            <li><strong>Kondom:</strong> Metode penghalang yang aman digunakan kapan saja pasca nifas.</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

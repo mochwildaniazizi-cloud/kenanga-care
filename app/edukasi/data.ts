@@ -109,5 +109,23 @@ export const mockArticles: Article[] = [
     duration: "7 Menit",
     imageUrl: "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
+  },
+  {
+    id: "L12",
+    title: "Panduan Pemulihan Masa Nifas & Tanda Bahaya Setelah Melahirkan",
+    categories: ["Ibu Hamil"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L13",
+    title: "Depresi Pasca Melahirkan & Perencanaan Keluarga Berencana (KB)",
+    categories: ["Ibu Hamil"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1536640719371-2e25f8dd9a98?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
   }
 ];
