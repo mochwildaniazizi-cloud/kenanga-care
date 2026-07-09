@@ -1576,8 +1576,10 @@ export default function DataIbuPage() {
                             </div>
                           </label>
                         ))}
-                    );
-                  })()}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                   {activePemantauanTab === 'postpartum' && (() => {
                     const daysInWeek = Array.from({ length: 7 }, (_, i) => (postpartumFilter - 1) * 7 + i + 1);
