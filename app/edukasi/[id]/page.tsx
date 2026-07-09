@@ -413,6 +413,10 @@ export default function ArticleDetailPage() {
               <L16ArticleContent />
             ) : id === "L17" ? (
               <L17ArticleContent />
+            ) : id === "L18" ? (
+              <L18ArticleContent />
+            ) : id === "L19" ? (
+              <L19ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2956,6 +2960,226 @@ function L17ArticleContent() {
           <li>Lingkarkan pita LiLA tepat di titik tengah lengan yang telah ditentukan tadi secara pas (tidak terlalu ketat dan tidak terlalu longgar).</li>
           <li>Baca angka hasil pengukuran serta warna pita yang ditunjukkan oleh panah indikator pita LiLA.</li>
         </ol>
+      </div>
+    </div>
+  );
+}
+
+function L18ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Memasuki usia 29 hari hingga 3 bulan, bayi mulai menunjukkan respons sosial dan berkembang pesat secara motorik. Kunjungan posyandu setiap bulan, stimulasi bermain yang tepat, dan imunisasi tepat waktu adalah kunci tumbuh kembang optimal di fase ini.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🏥 Pelayanan Kesehatan Rutin
+      </h2>
+      <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed mb-4 space-y-2">
+        <p className="font-bold text-brand-primary">Bawa bayi ke Posyandu/Puskesmas setiap bulan untuk:</p>
+        <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+          <li><strong>Pemantauan pertumbuhan dan perkembangan</strong> (berat badan, panjang badan, lingkar kepala).</li>
+          <li><strong>Kelas Ibu Balita</strong> — dihadiri ibu/ayah/keluarga untuk mendapat informasi penting seputar perawatan bayi.</li>
+          <li><strong>Imunisasi</strong> sesuai jadwal (lihat halaman 124–125 Buku KIA).</li>
+        </ul>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        💉 Jadwal Imunisasi Usia 29 Hari – 3 Bulan
+      </h2>
+      <div className="overflow-x-auto rounded-2xl border border-base-border/20 mb-6">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
+              <th className="p-3 text-left">Vaksin</th>
+              <th className="p-3 text-left">Tujuan</th>
+            </tr>
+          </thead>
+          <tbody className="text-base-text-secondary font-medium">
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">BCG</td>
+              <td className="p-3">Mencegah penyakit TBC.</td>
+            </tr>
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">Polio</td>
+              <td className="p-3">Mencegah polio, penyakit yang menyebabkan kelumpuhan kaki pada badann dll. ditularkan.</td>
+            </tr>
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">DPT-HB-Hib 1 & 2</td>
+              <td className="p-3">Mencegah penyakit difteri, pertusis, tetanus, hepatitis B, dan radang otak meningitis. (Diberikan 1x bulan, maksimal 3x) dosis ke-1, dan ke-2 pernah diberikan di hari setelah batas imunisasi pertama.</td>
+            </tr>
+            <tr>
+              <td className="p-3 font-bold text-base-text-primary">IPV (Rotavirus)</td>
+              <td className="p-3">Mencegah infeksi virus yang menyebabkan diare berat dan dehidrasi.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🎈 Stimulasi Tumbuh Kembang (29 Hari – 3 Bulan)
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-xs leading-relaxed">
+        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-4 space-y-2">
+          <h4 className="font-bold text-status-green-solid">💞 Stimulasi Emosi & Kasih Sayang:</h4>
+          <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+            <li>Peluk, cium, dan ayun bayi dengan lembut dan penuh kasih sayang.</li>
+            <li>Senyum, tatap mata, dan ajak bicara bayi sesering mungkin.</li>
+            <li>Bayi menyerap lingkungannya melalui <strong>penglihatan, pendengaran, dan sentuhan</strong>.</li>
+          </ul>
+        </div>
+        <div className="bg-status-blue-light/20 border border-status-blue-solid/15 rounded-2xl p-4 space-y-2">
+          <h4 className="font-bold text-status-blue-solid">🧸 Stimulasi Motorik & Sensorik:</h4>
+          <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+            <li>Tunjukkan benda berwarna cerah dan terang untuk melatih penglihatan.</li>
+            <li>Perdengarkan berbagai suara dan nyanyian lembut.</li>
+            <li>Bantu bayi <strong>meraih, meraba, dan memegang mainan</strong>.</li>
+            <li>Latih bayi <strong>mengangkat kepala</strong> dengan posisi tengkurap (tummy time).</li>
+            <li>Gulingkan bayi perlahan ke kanan dan kiri untuk melatih otot badan.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-status-orange-solid border-b pb-2 mb-4 flex items-center gap-1.5">
+        ✅ Penanda Perkembangan Bayi Usia 29 Hari – 3 Bulan
+      </h2>
+      <p className="text-xs text-base-text-secondary leading-relaxed mb-4 font-semibold">
+        Beri tanda ✓ jika bayi SUDAH bisa melakukan hal berikut. Jika ada yang belum, segera konsultasikan ke Bidan atau Puskesmas. (Buku KIA Hal 53)
+      </p>
+      <div className="space-y-2 mb-4">
+        {[
+          "Bayi bisa mengangkat kepala mandiri hingga 45 derajat?",
+          "Bayi menggunakan kepala dan lengan ke depan saat diletakkan tengkurap?",
+          "Bayi bisa melihat dan menoleh ke arah wajah Anda?",
+          "Bayi bisa melepas genggaman atau meraih dan menggenggam benda kecil?",
+          "Bayi suka tertawa keras?",
+          "Bayi bereaksi terhadap suara keras (terkejut atau menoleh)?",
+          "Bayi membalas tersenyum ketika diajak bicara atau tersenyum padanya?",
+          "Bayi menyerap perhatian Anda dengan penglihatan, pendengaran, dan sentuhan?"
+        ].map((item, i) => (
+          <div key={i} className="flex items-start gap-3 p-3 bg-base-white border border-base-border/20 rounded-xl text-xs">
+            <span className="w-6 h-6 shrink-0 rounded-full bg-status-orange-light/40 text-status-orange-solid font-extrabold flex items-center justify-center text-[10px] mt-0.5">{i + 1}</span>
+            <span className="text-base-text-secondary font-medium leading-relaxed">{item}</span>
+          </div>
+        ))}
+      </div>
+      <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/20 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed">
+        ⚠️ Jika bayi BELUM bisa melakukan salah satu hal di atas, segera bawa ke Bidan/Puskesmas untuk evaluasi tumbuh kembang lebih lanjut.
+      </div>
+    </div>
+  );
+}
+
+function L19ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Usia 3 hingga 6 bulan adalah masa bayi menjadi semakin aktif, mulai berguling, dan sangat responsif secara sosial. Di fase ini, perawatan gigi pertama bayi mulai dilakukan, stimulasi bermain semakin kaya, dan imunisasi dasar dilanjutkan.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🏥 Pelayanan Kesehatan Rutin
+      </h2>
+      <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed mb-4 space-y-2">
+        <p className="font-bold text-brand-primary">Bawa bayi ke Posyandu/Puskesmas setiap bulan untuk:</p>
+        <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+          <li><strong>Pemantauan pertumbuhan dan perkembangan</strong> (berat badan, panjang badan, lingkar kepala).</li>
+          <li><strong>Kelas Ibu Balita</strong> — dihadiri ibu/ayah/keluarga untuk saling berbagi pengalaman dan mendapat panduan dari fasilitator.</li>
+          <li><strong>Imunisasi</strong> sesuai jadwal (lihat halaman 124–125 Buku KIA).</li>
+        </ul>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        💉 Jadwal Imunisasi Usia 3 – 6 Bulan
+      </h2>
+      <div className="overflow-x-auto rounded-2xl border border-base-border/20 mb-6">
+        <table className="w-full text-xs border-collapse">
+          <thead>
+            <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
+              <th className="p-3 text-left">Vaksin</th>
+              <th className="p-3 text-left">Tujuan</th>
+            </tr>
+          </thead>
+          <tbody className="text-base-text-secondary font-medium">
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">DPT-HB-Hib 3</td>
+              <td className="p-3">Dosis ketiga (terakhir) perlindungan dari difteri, pertusis, tetanus, hepatitis B, dan Hib.</td>
+            </tr>
+            <tr className="border-b border-base-border/5">
+              <td className="p-3 font-bold text-base-text-primary">Polio 3 & IPV</td>
+              <td className="p-3">Dosis lanjutan untuk perlindungan polio yang lebih kuat, termasuk injeksi IPV.</td>
+            </tr>
+            <tr>
+              <td className="p-3 font-bold text-base-text-primary">Rotavirus</td>
+              <td className="p-3">Mencegah diare berat akibat infeksi virus rotavirus yang dapat menyebabkan dehidrasi serius.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🎈 Stimulasi Tumbuh Kembang (3 – 6 Bulan)
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-xs leading-relaxed">
+        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-4 space-y-2">
+          <h4 className="font-bold text-status-green-solid">💞 Stimulasi Sosial & Emosi:</h4>
+          <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+            <li>Bermain <strong>cilukba</strong> untuk melatih kemampuan sosial dan rasa percaya.</li>
+            <li>Ajak bayi melihat wajahnya sendiri di cermin.</li>
+            <li>Bernyanyilah sambil memeluk dan mengayun bayi.</li>
+            <li>Lihat, tiru, dan balas ekspresi wajah bayi (menikmati waktu bersama).</li>
+          </ul>
+        </div>
+        <div className="bg-status-blue-light/20 border border-status-blue-solid/15 rounded-2xl p-4 space-y-2">
+          <h4 className="font-bold text-status-blue-solid">🧸 Stimulasi Motorik & Kognitif:</h4>
+          <ul className="list-disc pl-4 space-y-1 text-base-text-secondary font-medium">
+            <li>Bantu bayi berguling dari posisi telentang ke tengkurap dan sebaliknya.</li>
+            <li>Gantungkan mainan berwarna cerah dalam jangkauan bayi agar ia berusaha meraihnya.</li>
+            <li>Berikan mainan kecil yang aman untuk digenggam dan digoyangkan.</li>
+            <li>Amati benda-benda di lingkungan sekitar bersama bayi.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🦷 Perawatan Gigi Pertama Bayi
+      </h2>
+      <div className="p-5 bg-status-orange-light/10 border border-status-orange-solid/15 rounded-2xl text-xs leading-relaxed mb-4 space-y-2">
+        <p className="font-bold text-base-text-primary">Cara Membersihkan Gigi Bayi (Sejak Gigi Pertama Tumbuh):</p>
+        <ol className="list-decimal pl-4 space-y-1.5 text-base-text-secondary font-medium">
+          <li><strong>Bersihkan gusi</strong> bayi dua kali sehari menggunakan kain kasa atau kain bersih yang dilembabkan air, bahkan sebelum gigi pertama muncul.</li>
+          <li>Setelah gigi pertama tumbuh, sikat gigi bayi menggunakan <strong>sikat gigi bayi dengan bulu sikat sangat lembut</strong> dan pasta gigi bayi berfluoride seukuran biji beras.</li>
+          <li>Jangan biarkan bayi tidur dengan <strong>botol susu/ASI</strong> masih di mulut karena dapat menyebabkan kerusakan gigi.</li>
+        </ol>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-status-orange-solid border-b pb-2 mb-4 flex items-center gap-1.5">
+        ✅ Penanda Perkembangan Bayi Usia 3 – 6 Bulan
+      </h2>
+      <p className="text-xs text-base-text-secondary leading-relaxed mb-4 font-semibold">
+        Beri tanda ✓ jika bayi SUDAH bisa melakukan hal berikut. Jika ada yang belum, segera konsultasikan ke Bidan atau Puskesmas. (Buku KIA Hal 55)
+      </p>
+      <div className="space-y-2 mb-4">
+        {[
+          "Bayi berguling dari posisi telungkup ke telentang?",
+          "Bayi mengangkat kepala secara mandiri hingga tegak 90°?",
+          "Bayi bisa mempertahankan posisi kepala tetap tegak dan stabil?",
+          "Bayi menggenggam mainan kecil atau benda berbentuk dengan tangannya?",
+          "Bayi bisa melihat dan meraih benda yang ada dalam jangkauannya?",
+          "Bayi bisa menggerakkan benda atau mainan yang ada di tangannya sendiri?",
+          "Bayi berusaha memperluas pandangannya untuk mengamati lingkungan?",
+          "Bayi menghasilkan suara berceloteh atau bergumam (mengoceh)?",
+          "Bayi mengeluarkan suara tawa atau bereaksi gembira saat diajak bermain?",
+          "Bayi tersenyum ketika melihat wajah orang yang dikenal atau saat bermain sendiri?"
+        ].map((item, i) => (
+          <div key={i} className="flex items-start gap-3 p-3 bg-base-white border border-base-border/20 rounded-xl text-xs">
+            <span className="w-6 h-6 shrink-0 rounded-full bg-status-orange-light/40 text-status-orange-solid font-extrabold flex items-center justify-center text-[10px] mt-0.5">{i + 1}</span>
+            <span className="text-base-text-secondary font-medium leading-relaxed">{item}</span>
+          </div>
+        ))}
+      </div>
+      <div className="p-4 bg-status-orange-light/10 border border-status-orange-solid/20 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed">
+        ⚠️ Jika bayi BELUM bisa melakukan salah satu hal di atas, segera bawa ke Bidan/Puskesmas untuk evaluasi tumbuh kembang lebih lanjut.
       </div>
     </div>
   );

@@ -163,5 +163,23 @@ export const mockArticles: Article[] = [
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1519689680058-324335c77eba?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
+  },
+  {
+    id: "L18",
+    title: "Pemantauan Tumbuh Kembang Bayi 29 Hari - 3 Bulan: Stimulasi, Imunisasi & Milestones",
+    categories: ["Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L19",
+    title: "Pemantauan Tumbuh Kembang Bayi 3 - 6 Bulan: Stimulasi, Perawatan Gigi & Milestones",
+    categories: ["Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1491013516836-7db643ee125a?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
   }
 ];
