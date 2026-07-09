@@ -22,7 +22,44 @@ export default function MotherDetailPage() {
   const [mother, setMother] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSubTab, setActiveSubTab] = useState<'ibu' | 'husband' | 'health'>('ibu');
-  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly'>('ttd');
+  const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process'>('ttd');
+  
+  const [attendance, setAttendance] = useState([
+    { date: "", note: "" },
+    { date: "", note: "" },
+    { date: "", note: "" }
+  ]);
+  const [isEditingAttendance, setIsEditingAttendance] = useState(false);
+  const [prepList, setPrepList] = useState<boolean[]>(new Array(10).fill(false));
+  const [birthProcessList, setBirthProcessList] = useState<boolean[]>(new Array(7).fill(false));
+
+  useEffect(() => {
+    if (!id) return;
+    const cachedAttendance = localStorage.getItem(`attendance_class_ibu_hamil_${id}`);
+    if (cachedAttendance) {
+      try {
+        setAttendance(JSON.parse(cachedAttendance));
+      } catch (e) {}
+    } else {
+      setAttendance([
+        { date: "", note: "" },
+        { date: "", note: "" },
+        { date: "", note: "" }
+      ]);
+    }
+
+    const list = [];
+    for(let i=1; i<=10; i++) {
+      list.push(localStorage.getItem(`birth_prep_${i}_${id}`) === 'true');
+    }
+    setPrepList(list);
+
+    const processList = [];
+    for(let i=1; i<=7; i++) {
+      processList.push(localStorage.getItem(`birth_process_${i}_${id}`) === 'true');
+    }
+    setBirthProcessList(processList);
+  }, [id]);
 
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -1301,20 +1338,41 @@ export default function MotherDetailPage() {
           {/* Card 2: PEMANTAUAN MANDIRI (TTD & MINGGUAN) */}
           <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden mt-6">
             {/* Tabs Selector for Card 2 */}
-            <div className="flex border-b text-xs font-bold text-base-text-secondary select-none">
+            <div className="flex border-b text-xs font-bold text-base-text-secondary select-none flex-wrap">
               <button 
                 type="button" 
                 onClick={() => setActivePemantauanTab('ttd')}
-                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'ttd' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'ttd' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
               >
                 <MdVaccines className="w-3.5 h-3.5" /> Checklist TTD / MMS
               </button>
               <button 
                 type="button" 
                 onClick={() => setActivePemantauanTab('weekly')}
-                className={`flex-1 py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'weekly' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'weekly' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
               >
                 <MdCalendarMonth className="w-3.5 h-3.5" /> Pemantauan Mingguan
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('attendance')}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'attendance' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdEdit className="w-3.5 h-3.5" /> Absensi Kelas
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('birth_prep')}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'birth_prep' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdCalendarMonth className="w-3.5 h-3.5" /> Persiapan Melahirkan
+              </button>
+              <button 
+                type="button" 
+                onClick={() => setActivePemantauanTab('birth_process')}
+                className={`flex-1 min-w-[120px] py-4 text-center border-b-2 flex items-center justify-center gap-1.5 transition cursor-pointer ${activePemantauanTab === 'birth_process' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
+              >
+                <MdCheckCircleOutline className="w-3.5 h-3.5" /> Proses Melahirkan
               </button>
             </div>
 
@@ -1662,9 +1720,249 @@ export default function MotherDetailPage() {
                       </p>
                     </div>
                   </div>
+              })()}
+
+              {activePemantauanTab === 'attendance' && (() => {
+                const formatDate = (isoStr: string) => {
+                  if (!isoStr) return "-";
+                  const d = new Date(isoStr);
+                  if (isNaN(d.getTime())) return "-";
+                  return d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+                };
+
+                const handleSaveAttendance = () => {
+                  if (id) {
+                    localStorage.setItem(`attendance_class_ibu_hamil_${id}`, JSON.stringify(attendance));
+                  }
+                  setIsEditingAttendance(false);
+                };
+
+                return (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                      <h4 className="font-bold text-xs text-brand-primary">
+                        Absensi Kehadiran Kelas Ibu Hamil (Pantauan Kader)
+                      </h4>
+                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                        Mencatat tanggal dan materi kelas ibu hamil yang telah diikuti secara mandiri. Kelas ini penting untuk persiapan persalinan.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-base-text-primary">Daftar Kehadiran:</span>
+                      <div className="flex gap-2">
+                        {isEditingAttendance ? (
+                          <>
+                            <button 
+                              type="button"
+                              onClick={handleSaveAttendance} 
+                              className="px-3 py-1.5 bg-brand-primary hover:bg-status-pink-dark text-base-white text-xs font-bold rounded-lg cursor-pointer transition shadow-sm"
+                            >
+                              Selesai
+                            </button>
+                            <button 
+                              type="button"
+                              onClick={() => setIsEditingAttendance(false)} 
+                              className="px-3 py-1.5 border border-base-border/50 text-base-text-secondary hover:bg-base-bg text-xs font-bold rounded-lg cursor-pointer transition"
+                            >
+                              Batal
+                            </button>
+                          </>
+                        ) : (
+                          <button 
+                            type="button"
+                            onClick={() => setIsEditingAttendance(true)} 
+                            className="px-3 py-1.5 border border-brand-primary hover:bg-brand-soft/20 text-brand-primary text-xs font-bold rounded-lg cursor-pointer transition flex items-center gap-1"
+                          >
+                            <MdEdit className="w-3 h-3" /> Ubah Absensi
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto border border-base-border/20 rounded-xl shadow-sm bg-base-white">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-base-bg text-base-text-primary border-b font-bold">
+                            <th className="py-2.5 px-4 text-center w-12">No.</th>
+                            <th className="py-2.5 px-4 w-48">Tanggal Kelas</th>
+                            <th className="py-2.5 px-4">Materi / Nama & Paraf Kader</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {attendance.map((row, idx) => (
+                            <tr key={idx} className="border-b last:border-b-0 hover:bg-base-bg/5">
+                              <td className="py-2.5 px-4 text-center font-bold text-base-text-primary">{idx + 1}</td>
+                              <td className="py-2.5 px-4 relative overflow-visible">
+                                {isEditingAttendance ? (
+                                  <div className="relative overflow-visible z-50">
+                                    <CustomDatePicker 
+                                      value={row.date} 
+                                      onChange={(val) => {
+                                        const next = [...attendance];
+                                        next[idx].date = val;
+                                        setAttendance(next);
+                                      }} 
+                                      outputFormat="iso" 
+                                      label="Pilih Tanggal"
+                                    />
+                                  </div>
+                                ) : (
+                                  <span className="font-bold text-base-text-primary">{formatDate(row.date)}</span>
+                                )}
+                              </td>
+                              <td className="py-2.5 px-4">
+                                {isEditingAttendance ? (
+                                  <input 
+                                    type="text" 
+                                    value={row.note} 
+                                    onChange={(e) => {
+                                      const next = [...attendance];
+                                      next[idx].note = e.target.value;
+                                      setAttendance(next);
+                                    }} 
+                                    placeholder={`Materi Trimester ${idx + 1} / Nama Bidan`} 
+                                    className="w-full bg-base-white border border-base-border/40 rounded-lg px-2.5 py-1 text-xs outline-none focus:border-brand-primary text-base-text-primary transition"
+                                  />
+                                ) : (
+                                  <span className="font-semibold text-base-text-secondary">{row.note || "-"}</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 );
               })()}
 
+              {activePemantauanTab === 'birth_prep' && (() => {
+                const handleToggle = (idx: number) => {
+                  const next = [...prepList];
+                  next[idx] = !next[idx];
+                  setPrepList(next);
+                  if (id) {
+                    localStorage.setItem(`birth_prep_${idx + 1}_${id}`, String(next[idx]));
+                  }
+                };
+
+                const checkedCount = prepList.filter(Boolean).length;
+                const pct = checkedCount * 10;
+
+                const items = [
+                  { title: "1. Tanggal Perkiraan Persalinan (HPL)", desc: "Sudah menanyakan tanggal perkiraan lahir ke bidan/dokter." },
+                  { title: "2. Pendamping Melahirkan", desc: "Meminta suami atau keluarga mendampingi saat periksa dan melahirkan." },
+                  { title: "3. Tabungan / Dana Cadangan", desc: "Mempersiapkan dana cadangan untuk biaya persalinan dan keperluan tak terduga." },
+                  { title: "4. Kartu JKN / BPJS Kesehatan", desc: "Mempersiapkan kartu BPJS atau mendaftar jika belum memilikinya." },
+                  { title: "5. Tempat Melahirkan", desc: "Sudah menyepakati tempat bersalin (Puskesmas, RS, atau Klinik Bersalin)." },
+                  { title: "6. KTP, KK & Dokumen Lahir", desc: "Menyiapkan berkas KTP, Kartu Keluarga, dan Buku KIA untuk syarat administrasi bayi." },
+                  { title: "7. Calon Pendonor Darah Siaga", desc: "Menyiapkan lebih dari 1 orang yang bergolongan darah sama dan bersedia mendonor." },
+                  { title: "8. Kendaraan Siaga", desc: "Menyepakati kendaraan darurat dengan keluarga atau tetangga untuk transportasi." },
+                  { title: "9. Stiker P4K Terpasang", desc: "Sudah menempelkan stiker Program Perencanaan Persalinan dan Pencegahan Komplikasi (P4K) di depan rumah." },
+                  { title: "10. Rencana KB Pasca Salin", desc: "Sudah merencanakan metode Keluarga Berencana (KB) pasca bersalin." }
+                ];
+
+                return (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                      <h4 className="font-bold text-xs text-brand-primary">
+                        Checklist Mandiri Persiapan Melahirkan (Diisi Ibu)
+                      </h4>
+                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                        Memastikan kelengkapan administrasi, fisik, finansial, dan logistik sebelum tanggal persalinan.
+                      </p>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-[20px] p-4 shadow-sm bg-base-white">
+                      <div className="w-full bg-base-border/40 h-2 rounded-full mb-2 overflow-hidden">
+                        <div className="bg-brand-primary h-full transition-all duration-300" style={{ width: `${pct}%` }}></div>
+                      </div>
+                      <p className="text-[11px] font-bold text-brand-primary">Persiapan selesai: {pct}% ({checkedCount} dari 10)</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {items.map((item, idx) => (
+                        <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+                          <input 
+                            type="checkbox" 
+                            checked={prepList[idx]} 
+                            onChange={() => handleToggle(idx)} 
+                            className="w-4 h-4 rounded text-brand-primary mt-0.5 cursor-pointer focus:ring-brand-primary/30" 
+                          />
+                          <div className="text-[10px] leading-relaxed select-none">
+                            <span className="font-bold text-base-text-primary block">{item.title}</span>
+                            <span className="text-base-text-secondary">{item.desc}</span>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {activePemantauanTab === 'birth_process' && (() => {
+                const handleToggle = (idx: number) => {
+                  const next = [...birthProcessList];
+                  next[idx] = !next[idx];
+                  setBirthProcessList(next);
+                  if (id) {
+                    localStorage.setItem(`birth_process_${idx + 1}_${id}`, String(next[idx]));
+                  }
+                };
+
+                const checkedCount = birthProcessList.filter(Boolean).length;
+                const pct = Math.round(checkedCount * (100 / 7));
+
+                const items = [
+                  { title: "1. Tanda-Tanda Persalinan", desc: "Mengetahui bahwa awal persalinan ditandai mulas teratur yang semakin lama semakin kuat." },
+                  { title: "2. Durasi Persalinan Normal", desc: "Memahami durasi persalinan anak pertama (±12 jam) dan anak kedua/seterusnya yang lebih cepat." },
+                  { title: "3. Hak Pendamping Persalinan", desc: "Ibu berhak menentukan apakah ingin didampingi atau tidak, serta siapa pendampingnya." },
+                  { title: "4. Hak Memilih Posisi Bersalin", desc: "Ibu berhak memilih posisi melahirkan yang diinginkan dan mendiskusikan keamanannya dengan petugas." },
+                  { title: "5. Keinginan Buang Air Besar", desc: "Segera memberitahu petugas kesehatan bila merasa ingin buang air besar (tanda kepala bayi turun)." },
+                  { title: "6. Teknik Mengurangi Rasa Sakit", desc: "Mengetahui teknik menarik napas melalui hidung dan mengeluarkannya lewat mulut saat mulas." },
+                  { title: "7. Inisiasi Menyusu Dini (IMD)", desc: "Siap melakukan kontak kulit ke kulit segera setelah bayi lahir selama minimal 1 jam." }
+                ];
+
+                return (
+                  <div className="space-y-4 animate-in fade-in duration-200">
+                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+                      <h4 className="font-bold text-xs text-brand-primary">
+                        Proses Melahirkan (Diisi Ibu)
+                      </h4>
+                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+                        Memastikan pemahaman Ibu mengenai hal-hal penting selama persalinan dan sesudahnya sesuai Buku KIA halaman 24.
+                      </p>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="bg-brand-soft/10 border border-brand-primary/20 rounded-[20px] p-4 shadow-sm bg-base-white">
+                      <div className="w-full bg-base-border/40 h-2 rounded-full mb-2 overflow-hidden">
+                        <div className="bg-brand-primary h-full transition-all duration-300" style={{ width: `${pct}%` }}></div>
+                      </div>
+                      <p className="text-[11px] font-bold text-brand-primary">Pemahaman selesai: {pct}% ({checkedCount} dari 7)</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {items.map((item, idx) => (
+                        <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/25 rounded-xl cursor-pointer hover:border-brand-primary/30 transition">
+                          <input 
+                            type="checkbox" 
+                            checked={birthProcessList[idx]} 
+                            onChange={() => handleToggle(idx)} 
+                            className="w-4 h-4 rounded text-brand-primary mt-0.5 cursor-pointer focus:ring-brand-primary/30" 
+                          />
+                          <div className="text-[10px] leading-relaxed select-none">
+                            <span className="font-bold text-base-text-primary block">{item.title}</span>
+                            <span className="text-base-text-secondary">{item.desc}</span>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

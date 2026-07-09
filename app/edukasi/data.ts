@@ -91,5 +91,23 @@ export const mockArticles: Article[] = [
     duration: "8 Menit",
     imageUrl: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=600&auto=format&fit=crop",
     isLanjutkanMembaca: false
+  },
+  {
+    id: "L10",
+    title: "Tanda Bahaya Trimester 3 & Panduan Awal Proses Melahirkan",
+    categories: ["Ibu Hamil"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
+  },
+  {
+    id: "L11",
+    title: "Tanda Bahaya pada Proses Melahirkan & Inisiasi Menyusu Dini (IMD)",
+    categories: ["Ibu Hamil", "Gizi & MPASI"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false
   }
 ];

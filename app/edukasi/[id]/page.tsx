@@ -396,6 +396,10 @@ export default function ArticleDetailPage() {
               <L8ArticleContent />
             ) : id === "L9" ? (
               <L9ArticleContent />
+            ) : id === "L10" ? (
+              <L10ArticleContent />
+            ) : id === "L11" ? (
+              <L11ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2187,6 +2191,181 @@ function L9ArticleContent() {
             Mitos ini tidak terbukti secara ilmiah ya, Bu. Mengonsumsi minyak kelapa secara berlebihan justru dapat mengganggu pencernaan ibu (memicu diare), dan makanan pedas berisiko memicu sakit maag/diare. Yang terpenting di akhir trimester ketiga adalah menjaga porsi makan gizi seimbang, istirahat cukup, menjaga hidrasi tubuh, dan senam hamil ringan guna melatih kelenturan panggul.
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function L10ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Memasuki trimester ketiga (usia kehamilan 29-40 minggu), persiapan melahirkan harus mulai dimatangkan. Ibu dan keluarga wajib mengenali tanda bahaya pada trimester ini agar dapat segera mencari pertolongan medis darurat demi keselamatan ibu dan janin.
+      </p>
+
+      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
+        🚨 Tanda Bahaya Kehamilan Trimester 3
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2.5">👶</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">1. Gerakan Bayi Berkurang</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Gerakan bayi tidak ada atau kurang dari 10 kali dalam kurun waktu 12 jam.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2.5">💦</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">2. Ketuban Pecah Dini</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Air ketuban pecah atau merembes keluar dari jalan lahir namun belum ada rasa kram/mulas (kontraksi).</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2.5">🤰</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">3. Nyeri Perut Hebat</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Nyeri perut bagian bawah yang sangat hebat dan menusuk di antara jeda kontraksi.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center sm:col-span-2 md:col-span-1">
+          <span className="text-3xl mb-2.5">🩸</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">4. Perdarahan Hebat</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Keluar darah segar dalam jumlah banyak dari jalan lahir, berisiko solusio plasenta.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4.5 text-center flex flex-col items-center sm:col-span-2 md:col-span-2">
+          <span className="text-3xl mb-2.5">🤯</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">5. Sakit Kepala Berat / Pandangan Buram</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1.5 font-medium">Pusing atau sakit kepala berdenyut sangat berat disertai mata berkunang-kunang. Tanda utama preeklampsia.</p>
+        </div>
+      </div>
+
+      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start mb-8">
+        <span className="text-lg">🚨</span>
+        <div>
+          <h4 className="font-extrabold text-sm mb-1">TINDAKAN SEGERA:</h4>
+          <p className="font-medium leading-relaxed">Jika Ibu hamil merasakan minimal salah satu tanda bahaya di atas, segera bawa ke Puskesmas atau Rumah Sakit terdekat untuk pertolongan medis darurat!</p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🤰 Sambut Kehadiran Sang Buah Hati (Melahirkan)
+      </h2>
+      <p className="text-xs text-base-text-secondary mb-5 leading-relaxed">
+        Persalinan adalah momen yang dinanti-nanti setelah perjuangan 9 bulan. Berikut panduan penting saat menyambut persalinan:
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div className="bg-brand-soft/20 border border-brand-primary/15 rounded-2xl p-5">
+          <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1">🏥 Tempat Melahirkan Terbaik:</h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed mb-3">
+            Proses melahirkan harus dilakukan di fasilitas pelayanan kesehatan resmi (<strong>Puskesmas, Rumah Sakit, atau Klinik Bersalin</strong>) agar jika terjadi penyulit atau keadaan darurat dapat segera ditangani secara tepat oleh nakes.
+          </p>
+          <h4 className="font-bold text-brand-primary mb-1 flex items-center gap-1">👩‍👦 Yang Dialami:</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mt-1">
+            <li>Melahirkan umumnya terjadi pada usia kehamilan 38 - 40 minggu.</li>
+            <li>Ditandai dengan pembukaan jalan lahir, rasa mulas teratur yang intensitasnya semakin sering dan lama, serta keluar lendir bercampur sedikit darah.</li>
+          </ul>
+        </div>
+        
+        <div className="bg-status-green-light/20 border border-status-green-solid/15 rounded-2xl p-5">
+          <h4 className="font-bold text-status-green-solid mb-2 flex items-center gap-1">✅ Yang Harus Dilakukan:</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mb-3">
+            <li>Segera pergi ke fasilitas kesehatan bila merasakan mulas teratur atau ketuban pecah.</li>
+            <li>Siapkan pendamping melahirkan (suami atau keluarga dekat) serta perlengkapan administrasi/bayi.</li>
+            <li>Rawat gabung ibu dan bayi dalam satu ruangan jika kondisi keduanya dalam keadaan sehat.</li>
+          </ul>
+          <h4 className="font-bold text-status-green-solid mb-1 flex items-center gap-1">💡 Mengapa Harus Dilakukan?</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium mt-1">
+            <li>Mempercepat penanganan komplikasi persalinan.</li>
+            <li>Memulai Inisiasi Menyusu Dini (IMD) dalam 1 jam pertama.</li>
+            <li>Menjamin pemantauan kesehatan ibu dan bayi selama 24 jam awal pasca salin.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L11ArticleContent() {
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-base-text-secondary leading-relaxed mb-6">
+        Proses persalinan yang lancar memerlukan deteksi dini atas tanda-tanda persalinan normal maupun tanda bahaya. Setelah bayi lahir, langkah pertama yang sangat dianjurkan oleh Kemenkes adalah pelaksanaan Inisiasi Menyusu Dini (IMD) demi kesehatan optimal bayi.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 text-xs leading-relaxed">
+        <div className="bg-status-blue-light/10 border border-status-blue-solid/15 rounded-2xl p-4.5">
+          <h4 className="font-bold text-status-blue-solid mb-2 flex items-center gap-1.5">⚡ Tanda Awal Proses Melahirkan:</h4>
+          <ul className="list-disc pl-4 space-y-1.5 text-base-text-secondary font-medium">
+            <li>Keluar lendir bercampur darah segar dari jalan lahir.</li>
+            <li>Merembes atau keluar cairan ketuban jernih dari jalan lahir.</li>
+            <li>Perut mulas-mulas yang teratur, timbulnya semakin sering, kram semakin kuat, dan berlangsung semakin lama.</li>
+          </ul>
+        </div>
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-2xl p-4.5">
+          <h4 className="font-bold text-status-purple-solid mb-2 flex items-center gap-1.5">🌬️ Mengurangi Rasa Sakit Bersalin:</h4>
+          <p className="text-base-text-secondary font-medium leading-relaxed">
+            Untuk mengurangi rasa sakit ketika bersalin secara mandiri, Ibu dianjurkan untuk menarik napas panjang melalui hidung secara perlahan dan keluarkan melalui mulut saat kontraksi/mulas datang. Minta suami/pendamping memijat punggung bawah secara perlahan.
+          </p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-status-red-solid border-b pb-2 mb-6 flex items-center gap-2">
+        🚨 Tanda Bahaya Pada Proses Melahirkan
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">💦</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">1. Ketuban Hijau & Bau</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Air ketuban pecah berwarna keruh kehijauan dan berbau tidak sedap/busuk.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">😫</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">2. Ibu Gelisah / Nyeri Hebat</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu tampak sangat gelisah atau mengalami kesakitan yang luar biasa ekstrem.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🧠</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">3. Ibu Mengalami Kejang</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu mengalami kejang-kejang (gejala eklampsia pasca bersalin yang berbahaya).</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🥵</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">4. Ibu Tidak Kuat Mengejan</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Ibu merasa kelelahan hebat dan tidak memiliki tenaga lagi untuk mengejan.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">🩸</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">5. Perdarahan Lewat Jalan Lahir</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Keluar darah segar mengalir sangat banyak dari jalan lahir sebelum bayi lahir.</p>
+        </div>
+        <div className="bg-status-red-light/20 border border-status-red-solid/20 rounded-2xl p-4 text-center flex flex-col items-center">
+          <span className="text-3xl mb-2">👶</span>
+          <h4 className="font-extrabold text-xs text-base-text-primary">6. Tali Pusat/Tangan Keluar</h4>
+          <p className="text-[11px] text-base-text-secondary leading-relaxed mt-1 font-medium">Tali pusat bayi, tangan, atau kaki bayi keluar mendahului kepala bayi.</p>
+        </div>
+      </div>
+
+      <div className="bg-status-red-solid text-base-white p-5 rounded-2xl text-xs font-bold shadow-md shadow-status-red-solid/20 flex gap-3 items-start mb-8">
+        <span className="text-lg">🚨</span>
+        <div>
+          <h4 className="font-extrabold text-sm mb-1">RUJUK DARURAT:</h4>
+          <p className="font-medium leading-relaxed">Jika mengalami minimal salah satu tanda bahaya pada proses melahirkan di atas, petugas kesehatan harus segera merujuk Ibu ke Rumah Sakit terdekat!</p>
+        </div>
+      </div>
+
+      <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 mb-4">
+        🍼 Inisiasi Menyusu Dini (IMD)
+      </h2>
+      <p className="text-xs text-base-text-secondary mb-4 leading-relaxed">
+        Inisiasi Menyusu Dini (IMD) adalah proses meletakkan bayi secara tengkurap di dada ibu segera setelah lahir, sehingga kulit bayi melekat pada kulit ibu selama minimal 1 jam untuk mencari puting susu secara alami.
+      </p>
+
+      <div className="bg-brand-soft/20 border border-brand-primary/15 rounded-2xl p-5 text-xs leading-relaxed mb-6">
+        <h4 className="font-bold text-brand-primary mb-2 flex items-center gap-1">✨ Manfaat IMD bagi Ibu & Bayi:</h4>
+        <ul className="list-disc pl-4 space-y-2 text-base-text-secondary font-medium">
+          <li><strong>Kehangatan Alami:</strong> Sentuhan kulit ke kulit menjaga suhu tubuh bayi tetap hangat dan stabil secara alami.</li>
+          <li><strong>Meningkatkan Kekebalan:</strong> Bayi mendapatkan cairan <strong>Kolostrum</strong> (ASI pertama berwarna kekuningan) yang kaya antibodi untuk melindunginya dari infeksi.</li>
+          <li><strong>Ikatan Kasih Sayang (Bonding):</strong> Membangun ikatan emosional yang kuat antara Ibu dan bayi sejak detik pertama lahir.</li>
+          <li><strong>Merangsang Kontraksi Rahim:</strong> Isapan bayi merangsang pelepasan hormon oksitosin yang membantu rahim ibu berkontraksi sehingga meminimalisir risiko perdarahan pasca salin.</li>
+        </ul>
       </div>
     </div>
   );
