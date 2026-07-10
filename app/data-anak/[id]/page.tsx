@@ -813,6 +813,65 @@ export default function ChildDetailPage() {
             </div>
           </div>
 
+          {/* Quick Stats Bento Row */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Weight card */}
+            <div className="bg-base-white border border-base-border/30 rounded-[20px] p-4 flex items-center gap-3.5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-brand-soft/30 text-brand-primary flex items-center justify-center shrink-0">
+                <MdScale className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold text-base-text-secondary uppercase tracking-wider block">Berat Badan</span>
+                <p className="text-base font-black text-base-text-primary mt-0.5">{child.current_weight || child.birth_weight || "-"} kg</p>
+              </div>
+            </div>
+
+            {/* Height card */}
+            <div className="bg-base-white border border-base-border/30 rounded-[20px] p-4 flex items-center gap-3.5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-status-blue-light text-status-blue-solid flex items-center justify-center shrink-0">
+                <MdHeight className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold text-base-text-secondary uppercase tracking-wider block">Tinggi Badan</span>
+                <p className="text-base font-black text-base-text-primary mt-0.5">{child.current_height || child.birth_length || "-"} cm</p>
+              </div>
+            </div>
+
+            {/* Medical conditions card */}
+            <div className="bg-base-white border border-base-border/30 rounded-[20px] p-4 flex items-center gap-3.5 shadow-sm col-span-1">
+              <div className="w-10 h-10 rounded-xl bg-status-red-light text-status-red-solid flex items-center justify-center shrink-0">
+                <MdOutlineError className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] font-bold text-base-text-secondary uppercase tracking-wider block">Kondisi Medis</span>
+                <div className="truncate text-xs font-bold text-base-text-primary mt-0.5">
+                  {child.special_conditions && child.special_conditions.length > 0 ? (
+                    child.special_conditions.filter((c: string) => c !== "Lainnya...").join(", ")
+                  ) : (
+                    "Normal / Tidak Ada"
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Last Posyandu checkup card */}
+            <div className="bg-base-white border border-base-border/30 rounded-[20px] p-4 flex items-center gap-3.5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-status-green-light text-status-green-solid flex items-center justify-center shrink-0">
+                <MdCalendarMonth className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[10px] font-bold text-base-text-secondary uppercase tracking-wider block">Kunjungan Terakhir</span>
+                <p className="text-xs font-bold text-base-text-primary mt-0.5 truncate">
+                  {child.measurements && child.measurements.length > 0 ? (
+                    child.measurements[0].date
+                  ) : (
+                    "Belum ada catatan"
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Kanban Board Container */}
           <div className="space-y-4">
             <div>
@@ -915,7 +974,7 @@ export default function ChildDetailPage() {
                   </div>
                   <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
                     <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Bayi Baru Lahir (0-28 Hari)</h3>
-                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Log gejala harian neonatus, checklist 12 tanda bahaya, riwayat pemeriksaan nakes, dan absensi kelas balita.</p>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Log gejala harian neonatus, checklist 12 tanda bahaya, dan riwayat pemeriksaan nakes.</p>
                     
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="flex -space-x-1.5 overflow-hidden">
@@ -936,7 +995,6 @@ export default function ChildDetailPage() {
                   </div>
                 </div>
               </div>
-
               {/* Card 4: Tumbuh Kembang */}
               <div 
                 onClick={() => router.push(`/data-anak/${child.child_id}?section=development_monitoring`)}
@@ -1529,70 +1587,71 @@ export default function ChildDetailPage() {
                   );
                 })()}
 
-                {/* Absensi Kelas */}
-                {(() => {
-                  const handleEditKelas = (idx: number, field: string, val: string) => {
-                    const nextKelas = newbornMonitoring.kelasBalita.map((k: any, i: number) =>
-                      i === idx ? { ...k, [field]: val } : k
-                    );
-                    const nextM = { ...newbornMonitoring, kelasBalita: nextKelas };
-                    setNewbornMonitoring(nextM);
-                    if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
-                  };
+                {/* Card: Absensi Kelas Ibu Balita */}
+                <div className="bg-base-white border border-base-border/20 rounded-xl p-5 shadow-sm space-y-4 mt-6">
+                  {(() => {
+                    const handleEditKelas = (idx: number, field: string, val: string) => {
+                      const nextKelas = newbornMonitoring.kelasBalita.map((k: any, i: number) =>
+                        i === idx ? { ...k, [field]: val } : k
+                      );
+                      const nextM = { ...newbornMonitoring, kelasBalita: nextKelas };
+                      setNewbornMonitoring(nextM);
+                      if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                    };
 
-                  const filledCount = newbornMonitoring.kelasBalita?.filter((k: any) => !!k.date).length ?? 0;
+                    const filledCount = newbornMonitoring.kelasBalita?.filter((k: any) => !!k.date).length ?? 0;
 
-                  return (
-                    <div className="space-y-2.5 border-t pt-4">
-                      <div className="flex items-center justify-between">
-                        <h5 className="font-bold text-xs text-brand-primary font-bold">III. Absensi Kelas Ibu Balita</h5>
-                        <span className="text-[9px] font-bold text-brand-primary bg-brand-soft/20 px-2 py-0.5 rounded-full">{filledCount} / 15 Hadir</span>
-                      </div>
-                      <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
-                        Catat kehadiran kelas ibu balita. (Buku KIA Hal 50)
-                      </p>
-                      <div className="w-full h-1.5 bg-base-bg/50 rounded-full overflow-hidden">
-                        <div className="h-full bg-brand-primary rounded-full transition-all duration-300" style={{ width: `${(filledCount / 15) * 100}%` }} />
-                      </div>
-                      <div className="overflow-x-auto rounded-xl border border-base-border/20 bg-base-white">
-                        <table className="w-full text-[10px] border-collapse">
-                          <thead>
-                            <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
-                              <th className="p-2 text-center w-8">No</th>
-                              <th className="p-2 text-left">Tanggal</th>
-                              <th className="p-2 text-left">Catatan Materi / Fasilitator</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {newbornMonitoring.kelasBalita?.map((row: any, idx: number) => (
-                              <tr key={idx} className="border-b border-base-border/5 hover:bg-base-bg/20 transition">
-                                <td className="p-2 text-center font-bold text-base-text-secondary">{row.no}</td>
-                                <td className="p-2">
-                                  <input
-                                    type="date"
-                                    value={row.date || ""}
-                                    onChange={e => handleEditKelas(idx, 'date', e.target.value)}
-                                    className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
-                                  />
-                                </td>
-                                <td className="p-2">
-                                  <input
-                                    type="text"
-                                    value={row.notes || ""}
-                                    onChange={e => handleEditKelas(idx, 'notes', e.target.value)}
-                                    placeholder="Catatan..."
-                                    className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
-                                  />
-                                </td>
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between border-b pb-2">
+                          <h5 className="font-bold text-sm text-brand-primary">III. Absensi Kelas Ibu Balita</h5>
+                          <span className="text-xs font-bold text-brand-primary bg-brand-soft/20 px-3 py-1 rounded-full">{filledCount} / 15 Hadir</span>
+                        </div>
+                        <p className="text-xs text-base-text-secondary leading-relaxed font-medium">
+                          Catat kehadiran kelas ibu balita. (Buku KIA Hal 50)
+                        </p>
+                        <div className="w-full h-2 bg-base-bg/50 rounded-full overflow-hidden">
+                          <div className="h-full bg-brand-primary rounded-full transition-all duration-300" style={{ width: `${(filledCount / 15) * 100}%`, '--brand-primary': 'var(--brand-primary)' } as any} />
+                        </div>
+                        <div className="overflow-x-auto bg-base-white rounded-xl border border-base-border/20">
+                          <table className="w-full text-xs border-collapse">
+                            <thead>
+                              <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
+                                <th className="p-3 text-center w-12">No</th>
+                                <th className="p-3 text-left w-48">Tanggal Pertemuan</th>
+                                <th className="p-3 text-left">Catatan Materi / Nama Fasilitator</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {newbornMonitoring.kelasBalita?.map((row: any, idx: number) => (
+                                <tr key={idx} className="border-b border-base-border/5 hover:bg-base-bg/20 transition">
+                                  <td className="p-3 text-center font-bold text-base-text-secondary">{row.no}</td>
+                                  <td className="p-3">
+                                    <input
+                                      type="date"
+                                      value={row.date || ""}
+                                      onChange={e => handleEditKelas(idx, 'date', e.target.value)}
+                                      className="w-full px-2.5 py-1.5 border border-base-border/20 rounded-lg text-xs focus:outline-none focus:border-brand-primary bg-transparent text-base-text-primary"
+                                    />
+                                  </td>
+                                  <td className="p-3">
+                                    <input
+                                      type="text"
+                                      value={row.notes || ""}
+                                      onChange={e => handleEditKelas(idx, 'notes', e.target.value)}
+                                      placeholder="Catatan materi atau fasilitator..."
+                                      className="w-full px-2.5 py-1.5 border border-base-border/20 rounded-lg text-xs focus:outline-none focus:border-brand-primary bg-transparent text-base-text-primary"
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })()}
-
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           )}
