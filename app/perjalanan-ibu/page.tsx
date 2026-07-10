@@ -198,10 +198,21 @@ export default function PerjalananIbuPage() {
       try {
         const res = await getTtdLogs(motherId, currentYear, currentMonth);
         if (res && res.success) {
-          setTtdLogs(res.logs);
-          setTtdCompanion(res.companion);
-          setTtdRelationship(res.relationship);
-          localStorage.setItem(cacheKey, JSON.stringify(res));
+          const logs = res.logs;
+          setTtdLogs(logs);
+          
+          const latestLog = logs.find((l: any) => l.companion);
+          const companion = latestLog?.companion || localStorage.getItem(`ttd_companion_${motherId}`) || "";
+          const relationship = latestLog?.relationship || localStorage.getItem(`ttd_relationship_${motherId}`) || "Suami";
+          
+          if (companion) setTtdCompanion(companion);
+          if (relationship) setTtdRelationship(relationship);
+
+          localStorage.setItem(cacheKey, JSON.stringify({
+            logs,
+            companion,
+            relationship
+          }));
         }
       } catch (err) {
         console.error(err);
@@ -228,8 +239,10 @@ export default function PerjalananIbuPage() {
 
       try {
         const res = await getWeeklyMonitorings(motherId);
-        setWeeklyLogs(res);
-        localStorage.setItem(cacheKey, JSON.stringify(res));
+        if (res && res.success) {
+          setWeeklyLogs(res.list || []);
+          localStorage.setItem(cacheKey, JSON.stringify(res.list || []));
+        }
       } catch (err) {
         console.error(err);
       }
@@ -267,8 +280,9 @@ export default function PerjalananIbuPage() {
       return;
     }
 
+    const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     try {
-      await upsertTtdLog(motherId, currentYear, currentMonth, day, !hasLog);
+      await upsertTtdLog(motherId, dateStr, !hasLog, ttdCompanion, ttdRelationship);
     } catch (e) {
       console.error("Failed to sync TTD log to server:", e);
     }
@@ -291,8 +305,9 @@ export default function PerjalananIbuPage() {
       return;
     }
 
+    const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`;
     try {
-      await upsertTtdLog(motherId, currentYear, currentMonth, 1, false, ttdCompanion, ttdRelationship);
+      await upsertTtdLog(motherId, dateStr, false, ttdCompanion, ttdRelationship);
     } catch (e) {
       console.error(e);
     }
@@ -339,11 +354,7 @@ export default function PerjalananIbuPage() {
       await upsertWeeklyMonitoring(
         motherId,
         week,
-        rec.fetal_movement,
-        rec.swollen_feet,
-        rec.fever,
-        rec.bleeding,
-        rec.premature_fluid
+        rec
       );
     } catch (e) {
       console.error(e);
@@ -1219,9 +1230,8 @@ export default function PerjalananIbuPage() {
                           <div className="space-y-1">
                             <span className="text-[10px] font-bold text-base-text-secondary uppercase">Tanggal Kelas</span>
                             <CustomDatePicker
-                              selectedDate={classItem.date}
+                              value={classItem.date}
                               onChange={(val) => handleAttendanceChange(idx, "date", val)}
-                              placeholder="Pilih tanggal"
                             />
                           </div>
                           <div className="space-y-1">
