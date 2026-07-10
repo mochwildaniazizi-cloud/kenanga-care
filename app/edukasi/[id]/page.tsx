@@ -425,6 +425,8 @@ export default function ArticleDetailPage() {
               <L20ArticleContent />
             ) : id === "L21" ? (
               <L21ArticleContent />
+            ) : id === "L22" ? (
+              <L22ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -2446,8 +2448,9 @@ function L18ArticleContent() {
         
         <div className="space-y-2">
           {milestones.map((item: MilestoneItem, i: number) => (
-            <label 
+            <div 
               key={item.id} 
+              onClick={() => handleCheckboxChange(item.id)}
               className={`flex items-start gap-3 p-3 bg-base-white border rounded-xl text-xs cursor-pointer transition-all select-none
                 ${item.checked ? 'border-status-orange-solid bg-status-orange-light/5' : 'border-base-border/20 hover:border-base-border/40'}`}
             >
@@ -2456,7 +2459,7 @@ function L18ArticleContent() {
                 <input 
                   type="checkbox" 
                   checked={item.checked} 
-                  onChange={() => handleCheckboxChange(item.id)} 
+                  readOnly 
                   className="w-4 h-4 text-status-orange-solid bg-base-white border-base-border rounded focus:ring-status-orange-solid accent-status-orange-solid cursor-pointer" 
                 />
               </div>
@@ -2472,7 +2475,7 @@ function L18ArticleContent() {
                 ${item.checked ? 'text-status-orange-solid font-semibold' : 'text-base-text-secondary'}`}>
                 {item.text}
               </span>
-            </label>
+            </div>
           ))}
         </div>
 
@@ -2520,8 +2523,9 @@ function L19ArticleContent() {
       {/* Daftar Item Checklist */}
       <div className="space-y-2">
         {milestones.map((item: MilestoneItem, i: number) => (
-          <label 
+          <div 
             key={item.id} 
+            onClick={() => handleCheckboxChange(item.id)}
             className={`flex items-start gap-3 p-3 bg-base-white border rounded-xl text-xs cursor-pointer transition-all select-none
               ${item.checked ? 'border-status-orange-solid bg-status-orange-light/5' : 'border-base-border/20 hover:border-base-border/40'}`}
           >
@@ -2530,7 +2534,7 @@ function L19ArticleContent() {
               <input 
                 type="checkbox" 
                 checked={item.checked} 
-                onChange={() => handleCheckboxChange(item.id)} 
+                readOnly 
                 className="w-4 h-4 text-status-orange-solid bg-base-white border-base-border rounded focus:ring-status-orange-solid accent-status-orange-solid cursor-pointer" 
               />
             </div>
@@ -2546,7 +2550,7 @@ function L19ArticleContent() {
               ${item.checked ? 'text-status-orange-solid font-semibold' : 'text-base-text-secondary'}`}>
               {item.text}
             </span>
-          </label>
+          </div>
         ))}
       </div>
 
@@ -2983,6 +2987,116 @@ function L21ArticleContent() {
             </div>
           </div>
 
+        </div>
+      </div>
+
+    </div>
+  );
+}
+
+function L22ArticleContent() {
+  return (
+    <div className="space-y-6 animate-in fade-in duration-200">
+      
+      {/* HEADER HIGHLIGHT */}
+      <div className="bg-brand-soft/10 border-l-4 border-brand-primary p-4 rounded-r-2xl">
+        <h3 className="text-base font-extrabold text-brand-primary">12 - 24 Bulan: Beri Makanan Bergizi dan Periksa Rutin ke Posyandu</h3>
+        <p className="text-xs text-base-text-secondary mt-1 leading-relaxed">
+          Memasuki usia 1 tahun ke atas, kemampuan fisik, mental, dan sosial anak semakin berkembang. Kebutuhan energi dan protein si kecil semakin bertambah.
+        </p>
+      </div>
+
+      {/* BANNER REKOMENDASI GIZI */}
+      <div className="p-4 bg-status-yellow-light/20 border border-status-yellow-solid/25 rounded-2xl text-xs text-status-yellow-solid font-bold leading-relaxed shadow-xs">
+        💡 Rekomendasi Gizi: Beri Makanan yang kaya protein hewani, seperti telur, ikan dan daging untuk mendukung pertumbuhan otak dan sel-sel tubuh lainnya.
+      </div>
+
+      {/* BENTO GRID: POLA PERKEMBANGAN & PERAWATAN */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        
+        {/* YANG AKAN DIALAMI */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-4.5 shadow-sm">
+          <h4 className="font-extrabold text-xs text-status-blue-solid uppercase tracking-wider mb-2.5">👶 Yang Akan Dialami</h4>
+          <ul className="list-disc pl-4 space-y-2 text-[11px] text-base-text-secondary font-medium leading-relaxed">
+            <li>Anak telah makan makanan keluarga, mulai belajar berjalan dan berkata-kata.</li>
+            <li>70% kebutuhan gizi anak dipenuhi dari MPASI. Namun ASI masih tetap dibutuhkan karena menyumbang 30% kebutuhan gizi anak.</li>
+          </ul>
+        </div>
+
+        {/* YANG HARUS DILAKUKAN */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-4.5 shadow-sm md:col-span-2">
+          <h4 className="font-extrabold text-xs text-status-green-solid uppercase tracking-wider mb-2.5">✅ Yang Harus Dilakukan</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-base-text-secondary font-medium leading-relaxed">
+            <ul className="list-disc pl-4 space-y-1.5">
+              <li>Timbang, ukur dan cek perkembangan anak setiap bulan.</li>
+              <li>Penuhi kecukupan gizi anak dengan pemberian MPASI yang kaya protein hewani.</li>
+              <li>Berikan makanan beragam dan menarik. Tetap berikan ASI hingga usia 2 tahun.</li>
+              <li>Hindari pemberian makanan atau jajanan yang rendah gizi, tinggi gula dan garam, berpengawet dan pemanis.</li>
+              <li>Ajari anak untuk belajar makan sendiri dan berjalan di undakan/tangga.</li>
+            </ul>
+            <ul className="list-disc pl-4 space-y-1.5">
+              <li>Ajari anak mencoret-coret di kertas, menyebut bagian tubuhnya, dan bergerak bebas dalam pengawasan.</li>
+              <li>Ajak anak membersihkan meja dan menyapu, membereskan mainan, bernyanyi, dan bermain dengan teman.</li>
+              <li>Bacakan cerita buat anak, dan bimbing anak untuk mematuhi aturan permainan.</li>
+              <li>Dapatkan imunisasi lanjutan dan pastikan anak mendapatkan suplementasi vitamin A kapsul merah dan obat cacing sebanyak 2 kali dalam setahun.</li>
+              <li>Cek kesehatan anak secara rutin dan segera ke fasilitas kesehatan jika anak sakit.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* MENGAPA HARUS DILAKUKAN */}
+      <div className="bg-status-purple-light/20 border border-status-purple-solid/20 rounded-xl p-4 text-xs font-semibold text-base-text-primary">
+        <h4 className="font-extrabold text-xs text-status-purple-solid mb-1">💡 Mengapa Harus Dilakukan?</h4>
+        <p className="text-[11px] text-base-text-secondary font-medium leading-relaxed">
+          Stunting paling banyak terjadi di kelompok usia ini. Tetap lanjutkan pemantauan tumbuh kembang anak di Posyandu atau fasilitas kesehatan lainnya untuk memastikan anak memiliki kondisi yang sehat, status gizi dan perkembangan terbaik sesuai usianya.
+        </p>
+      </div>
+
+      {/* PANDUAN MAKANAN YANG HARUS DIHINDARI */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">❌ Batasi &amp; Hindari Jenis Makanan Berikut:</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="p-3.5 bg-status-red-light/15 border border-status-red-solid/20 rounded-xl">
+            <span className="font-bold text-status-red-solid block mb-1">🚨 Produk Kemasan &amp; Bersoda</span>
+            <p className="text-base-text-secondary font-medium">Susu atau yoghurt rendah lemak, minuman bersoda, makanan dan minuman yang tinggi kandungan gulanya atau terbuat dari pemanis buatan.</p>
+          </div>
+          <div className="p-3.5 bg-status-red-light/15 border border-status-red-solid/20 rounded-xl">
+            <span className="font-bold text-status-red-solid block mb-1">🚨 Pengawet &amp; MSG</span>
+            <p className="text-base-text-secondary font-medium">Makanan yang banyak mengandung MSG dan bahan pengawet, seperti makanan instan kemasan atau kalengan.</p>
+          </div>
+          <div className="p-3.5 bg-status-red-light/15 border border-status-red-solid/20 rounded-xl">
+            <span className="font-bold text-status-red-solid block mb-1">🚨 Rasa Terlalu Ekstrem</span>
+            <p className="text-base-text-secondary font-medium">Hindari pemberian jenis makanan yang terlalu asam dan terlalu pedas bagi pencernaan anak.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* DETEKSI HIDRASI: WARNA AIR KENCING */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">💧 Edukasi Kesehatan: Pantau Warna Air Kencing Anak</h2>
+        <div className="grid grid-cols-1 gap-2.5 text-xs">
+          <div className="flex items-center gap-4 p-3 bg-status-green-light/20 border border-status-green-solid/25 rounded-xl">
+            <div className="w-8 h-12 bg-[#FFFFE0] rounded border border-gray-300 shrink-0"></div>
+            <div>
+              <span className="font-bold text-status-green-solid text-sm block">Warna Jernih / Kuning Muda (Baik)</span>
+              <p className="text-base-text-secondary font-medium">Anak Ibu sudah terhidrasi dengan baik. Teruskan minum air putih sesuai kebutuhan harian anak.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 p-3 bg-status-orange-light/20 border border-status-orange-solid/25 rounded-xl">
+            <div className="w-8 h-12 bg-[#FFD700] rounded border border-gray-300 shrink-0"></div>
+            <div>
+              <span className="font-bold text-status-orange-solid text-sm block">Warna Kuning Pekat (Kurang Baik)</span>
+              <p className="text-base-text-secondary font-medium">Anak Ibu kurang terhidrasi. Tambahkan takaran porsi minum air putih anak sesuai kebutuhan harian.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 p-3 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl">
+            <div className="w-8 h-12 bg-[#FF8C00] rounded border border-gray-300 shrink-0"></div>
+            <div>
+              <span className="font-bold text-status-red-solid text-sm block">Warna Oranye / Keruh (Tidak Baik)</span>
+              <p className="text-base-text-secondary font-medium">Anak Ibu sangat kurang minum. Segera minum air putih sesuai kebutuhan. Bila warna air kencing tidak membaik, segera hubungi bidan/perawat/dokter untuk penjelasan lebih lanjut.</p>
+            </div>
+          </div>
         </div>
       </div>
 

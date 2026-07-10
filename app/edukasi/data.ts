@@ -222,5 +222,15 @@ export const mockArticles: Article[] = [
     imageUrl: "/cover-article/L21.jpg", // Siapkan aset gambar lokal di folder public/cover-article/
     isLanjutkanMembaca: false,
     isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten resmi KIA ini
+  },
+  {
+    id: "L22",
+    title: "Panduan Gizi Seimbang, Pola Asuh & Deteksi Hidrasi Anak Usia 12 - 24 Bulan",
+    categories: ["Gizi & MPASI", "Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "/cover-article/L22.jpg", // Siapkan aset gambar di folder public/cover-article/
+    isLanjutkanMembaca: false,
+    isNativeKIA: true // Mengunci agar kader tidak bisa mengubah konten resmi ini
   }
 ];
