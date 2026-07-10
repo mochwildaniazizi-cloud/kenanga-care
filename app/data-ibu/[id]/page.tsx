@@ -1411,7 +1411,7 @@ export default function MotherDetailPage() {
                 <span className="text-base-text-secondary block">Tanggal Lahir</span>
                 {isEditing ? (
                   <div className="relative overflow-visible z-50">
-                    <CustomDatePicker value={editForm.birth_date} onChange={(val) => setEditForm((prev) => ({ ...prev, birth_date: val }))} outputFormat="iso" />
+                    <CustomDatePicker value={editForm.birth_date} onChange={(val) => setEditForm((prev: any) => ({ ...prev, birth_date: val }))} outputFormat="iso" />
                   </div>
                 ) : (
                   <p className="text-sm font-bold text-base-text-primary">{mother.dob}</p>
