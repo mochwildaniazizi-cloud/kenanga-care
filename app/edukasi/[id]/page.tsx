@@ -432,6 +432,8 @@ export default function ArticleDetailPage() {
               <L24ArticleContent />
             ) : id === "L25" ? (
               <L25ArticleContent />
+            ) : id === "L26" ? (
+              <L26ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -3258,6 +3260,76 @@ function L25ArticleContent() {
   );
 }
 
+function L26ArticleContent() {
+  const links = [
+    { label: "Website Ayo Sehat", desc: "Portal informasi resmi promosi kesehatan Kemenkes RI", url: "https://ayosehat.kemkes.go.id" },
+    { label: "Chatbot Edukasi Ayo Sehat", desc: "Layanan konsultasi & tanya jawab otomatis via WhatsApp", url: "https://wa.me/6281277889912?text=ayosehat" },
+    { label: "Konseling Menyusui", desc: "Layanan telekonseling PMBA resmi Kemenkes RI", url: "https://telekonseling-pmba-kemenkes.com" },
+    { label: "Kumpulan Resep MPASI", desc: "Buku resep dan referensi MPASI gizi seimbang resmi Kemenkes", url: "https://link.kemkes.go.id/ResepMPASI2" },
+    { label: "Kumpulan Link Penting untuk Kesehatan Mental", desc: "Portal panduan psikologis dan rujukan kesehatan mental keluarga", url: "https://link.kemkes.go.id/KesehatanMentalKeluarga" },
+    { label: "Kumpulan Link Penting untuk Anak Disabilitas", desc: "Sumber informasi, hak, dan rujukan tumbuh kembang anak berkebutuhan khusus", url: "https://link.kemkes.go.id/InfoAnakDisabilitas" },
+    { label: "Hubungi Kemenkes untuk Pertanyaan, Pengaduan & Saran", desc: "Kontak pengaduan masyarakat terpadu Biro Komunikasi Kemenkes", url: "https://www.kemkes.go.id/id/layanan/kontak-kami" }
+  ];
 
+  const phoneNumbers = [
+    { number: "119", label: "Ambulans", color: "bg-[#3f51b5]" },
+    { number: "110", label: "Polisi", color: "bg-[#3f51b5]" },
+    { number: "113", label: "Pemadam Kebakaran", color: "bg-[#3f51b5]" },
+    { number: "117", label: "Bencana", color: "bg-[#3f51b5]" }
+  ];
+
+  return (
+    <div className="space-y-8 text-xs text-base-text-primary leading-relaxed">
+      
+      {/* SECTION: Telepon Darurat */}
+      <div className="space-y-4">
+        <div className="border-b border-base-border/20 pb-2">
+          <h3 className="text-base font-bold text-base-text-primary">Nomor-Nomor Telepon Penting</h3>
+        </div>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {phoneNumbers.map((p, i) => (
+            <div key={i} className="bg-base-white border border-base-border/30 rounded-2xl overflow-hidden flex flex-col shadow-sm">
+              <div className="flex-1 py-6 flex items-center justify-center text-4xl font-extrabold text-base-text-primary tracking-tight">
+                {p.number}
+              </div>
+              <div className={`py-2 px-3 text-center text-[10px] font-extrabold text-base-white uppercase tracking-wider ${p.color}`}>
+                {p.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SECTION: Link Penting */}
+      <div className="space-y-4">
+        <div className="border-b border-base-border/20 pb-2">
+          <h3 className="text-base font-bold text-base-text-primary">Kumpulan Link Penting</h3>
+        </div>
+        
+        <div className="space-y-3">
+          {links.map((link, idx) => (
+            <div key={idx} className="p-4 bg-base-white border border-base-border/30 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <h4 className="font-bold text-sm text-brand-primary">{link.label}</h4>
+                <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">{link.desc}</p>
+                <span className="text-[9px] font-semibold text-brand-primary block break-all">{link.url}</span>
+              </div>
+              <a 
+                href={link.url} 
+                target="_blank" 
+                rel="noreferrer"
+                className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-[10px] font-bold transition whitespace-nowrap text-center shrink-0 cursor-pointer"
+              >
+                Kunjungi Situs
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+}
 
 // -----------------------------------------------------------------------------

@@ -262,5 +262,15 @@ export const mockArticles: Article[] = [
     imageUrl: "/cover-article/L25.jpg",
     isLanjutkanMembaca: false,
     isNativeKIA: true
+  },
+  {
+    id: "L26",
+    title: "Nomor Telepon Penting & Kumpulan Link Rujukan Kesehatan Resmi Kemenkes",
+    categories: ["Informasi Umum"],
+    type: "Artikel",
+    duration: "5 Menit",
+    imageUrl: "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?q=80&w=600&auto=format&fit=crop",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   }
 ];
