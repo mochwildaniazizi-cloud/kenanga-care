@@ -6,7 +6,7 @@ import Link from "next/link";
 import { 
   MdSearch, MdFilterList, MdAdd, 
   MdMonitorWeight, MdOutlineError,
-  MdMale, MdFemale, MdPerson, MdCalendarMonth
+  MdMale, MdFemale, MdPerson, MdCalendarMonth, MdTrendingDown
 } from "react-icons/md";
 import { FiArrowUp, FiArrowDown, FiMinus, FiRefreshCw } from "react-icons/fi";
 import { FaBaby } from "react-icons/fa";
@@ -134,7 +134,13 @@ export default function DataAnakPage() {
   // States for cadre child dashboard
   const [childrenList, setChildrenList] = useState<any[]>([]);
   const [historyList, setHistoryList] = useState<any[]>([]);
-  const [metrics, setMetrics] = useState({ totalChildren: 0, stuntingRisk: 0, underweightCount: 0, measuredThisMonth: 0 });
+  const [metrics, setMetrics] = useState({ 
+    totalChildren: 0, 
+    notWeighedThisMonth: 0, 
+    problematicNutrition: 0, 
+    immunizationScheduled: 0,
+    downwardTrend: 0 
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -339,14 +345,14 @@ export default function DataAnakPage() {
         
         <StatMetricCard 
           icon={MdOutlineError} 
-          title="Berisiko Stunting (PB/U)" 
+          title="Gizi Bermasalah" 
           iconBgColor="bg-status-red-light" 
           iconTextColor="text-status-red-solid" 
           barColor="bg-status-red-solid" 
-          barPercentage={calculatePercentage(metrics.stuntingRisk)}
+          barPercentage={calculatePercentage(metrics.problematicNutrition)}
           isLoading={isLoading}
         >
-          <span className="text-2xl font-bold text-base-text-primary">{metrics.stuntingRisk}</span>
+          <span className="text-2xl font-bold text-base-text-primary">{metrics.problematicNutrition}</span>
           <span className="text-xs text-base-text-secondary">dari</span>
           <span className="text-sm font-bold text-status-red-solid">{metrics.totalChildren}</span>
           <span className="text-xs text-base-text-secondary">anak</span>
@@ -354,15 +360,15 @@ export default function DataAnakPage() {
 
         <StatMetricCard 
           icon={MdTrendingDown} 
-          title="Gizi Kurang (BB/U)" 
+          title="Tren Berat Turun" 
           iconBgColor="bg-status-yellow-light" 
           iconTextColor="text-status-yellow-solid" 
           barColor="bg-status-yellow-solid"
-          barPercentage={calculatePercentage(metrics.underweightCount)}
+          barPercentage={calculatePercentage(metrics.downwardTrend)}
           isLoading={isLoading}
         >
-          <span className="text-2xl font-bold text-base-text-primary">{metrics.underweightCount}</span>
-          <span className="text-xs text-base-text-secondary">balita gizi kurang</span>
+          <span className="text-2xl font-bold text-base-text-primary">{metrics.downwardTrend}</span>
+          <span className="text-xs text-base-text-secondary">balita tren turun</span>
         </StatMetricCard>
 
         <StatMetricCard 
@@ -371,10 +377,10 @@ export default function DataAnakPage() {
           iconBgColor="bg-status-blue-light" 
           iconTextColor="text-status-blue-solid" 
           barColor="bg-status-blue-solid" 
-          barPercentage={calculatePercentage(metrics.measuredThisMonth)}
+          barPercentage={calculatePercentage(metrics.totalChildren - metrics.notWeighedThisMonth)}
           isLoading={isLoading}
         >
-          <span className="text-2xl font-bold text-base-text-primary">{metrics.measuredThisMonth}</span>
+          <span className="text-2xl font-bold text-base-text-primary">{metrics.totalChildren - metrics.notWeighedThisMonth}</span>
           <span className="text-xs text-base-text-secondary">balita (Bulan Ini)</span>
         </StatMetricCard>
       </div>
