@@ -36,6 +36,8 @@ const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; p
   "/data-ibu": { label: "Data Ibu", icon: MdPregnantWoman },
   "/data-ibu/tambah": { label: "Data Ibu", icon: MdPregnantWoman, parent: "/data-ibu", parentLabel: "Tambah Ibu" },
   "/data-ibu/[id]": { label: "Data Ibu", icon: MdPregnantWoman, parent: "/data-ibu", parentLabel: "Detail Ibu" },
+  "/perjalanan-ibu": { label: "Perjalanan Ibu", icon: MdPregnantWoman },
+  "/perjalanan-anak": { label: "Perjalanan Anak", icon: PiBabyFill },
   "/edukasi": { label: "Edukasi", icon: BookOpenIcon },
   "/jadwal": { label: "Jadwal", icon: CalendarDaysIcon },
   "/setting": { label: "Pengaturan", icon: Cog6ToothIcon },
@@ -483,8 +485,8 @@ export default function Header() {
 
   const getBreadcrumbLabel = (key: string, defaultLabel: string) => {
     if (role === "ibu") {
-      if (key === "/data-anak") return "Kesehatan Anak Saya";
-      if (key === "/data-ibu") return "Kesehatan Saya";
+      if (key === "/perjalanan-anak" || key === "/data-anak") return "Perjalanan Anak";
+      if (key === "/perjalanan-ibu" || key === "/data-ibu") return "Perjalanan Ibu";
       if (key === "/edukasi") return "Artikel & Edukasi";
     }
     return defaultLabel;

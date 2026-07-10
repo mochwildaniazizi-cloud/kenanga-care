@@ -624,7 +624,22 @@ export default function DataIbuPage() {
     return Math.round((value / metrics.totalMothers) * 100);
   };
 
+  useEffect(() => {
+    if (role === "ibu") {
+      router.replace("/perjalanan-ibu");
+    }
+  }, [role, router]);
+
   if (role === "ibu") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-sm font-bold text-base-text-secondary">Mengalihkan ke Perjalanan Ibu...</p>
+      </div>
+    );
+  }
+
+  if (false) {
     if (isLoadingMother) {
       return (
         <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-pulse">

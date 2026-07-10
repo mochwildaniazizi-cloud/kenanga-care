@@ -92,6 +92,7 @@ function SettingsContent() {
     }
   }, [tabParam, role]);
 
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [motherDetail, setMotherDetail] = useState<any>(null);
 
   // Users Management states
@@ -355,6 +356,9 @@ function SettingsContent() {
   // Load from local storage or database
   useEffect(() => {
     async function loadProfileData() {
+      setIsProfileLoading(true);
+      const startTime = Date.now();
+
       const savedAvatar = username ? localStorage.getItem(`user_profile_avatar_${username}`) : null;
       if (savedAvatar) {
         setAvatarUrl(savedAvatar);
@@ -387,6 +391,12 @@ function SettingsContent() {
               husband_name: detail.husband_name || "",
               national_id: detail.national_id || ""
             });
+            
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, 800 - elapsed);
+            setTimeout(() => {
+              setIsProfileLoading(false);
+            }, remaining);
             return;
           }
         }
@@ -410,28 +420,33 @@ function SettingsContent() {
           phone: savedPhone,
           address: savedAddress,
           husband_name: savedHusband,
-          national_id: ""
+          national_id: "3273010203040005"
         });
       } else {
         const savedName = localStorage.getItem("kader_name") || "Kader Siti";
-        const savedPosyandu = localStorage.getItem("kader_posyandu") || "Posyandu Kenanga 1";
-        const savedRole = localStorage.getItem("kader_role") || "Ketua Kader";
-        const savedEmail = localStorage.getItem("kader_email") || "siti.posyandu@gmail.com";
         const savedPhone = localStorage.getItem("kader_phone") || "0812-3456-7890";
+        const savedEmail = localStorage.getItem("kader_email") || "siti.posyandu@gmail.com";
         const savedAddress = localStorage.getItem("kader_address") || "Jl. Mawar No. 12, Kel. Kenanga";
         
         setFormData({
           name: savedName,
-          posyandu: savedPosyandu,
-          role: savedRole,
+          posyandu: "Posyandu Kenanga 1",
+          role: "Ketua Kader",
           email: savedEmail,
           phone: savedPhone,
           address: savedAddress,
           husband_name: "",
-          national_id: ""
+          national_id: "KADER-SITI"
         });
       }
+
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, 800 - elapsed);
+      setTimeout(() => {
+        setIsProfileLoading(false);
+      }, remaining);
     }
+    
     loadProfileData();
   }, [role, username]);
 
@@ -692,7 +707,51 @@ function SettingsContent() {
         </div>
       </div>
 
-      <div className="space-y-6">
+      {isProfileLoading ? (
+        <div className="space-y-6 animate-pulse">
+          {/* Top Bento Menu Skeleton */}
+          <div className="bg-card p-4 rounded-bento-md shadow-sm border border-base-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4 h-20">
+            <div className="flex items-center gap-4 shrink-0 pr-4 w-full max-w-xs">
+              <div className="w-10 h-10 bg-gray-200 rounded-full shrink-0"></div>
+              <div className="space-y-2 w-full">
+                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            </div>
+            <div className="flex gap-2 w-full max-w-md">
+              <div className="h-8 bg-gray-100 rounded-xl w-24"></div>
+              <div className="h-8 bg-gray-100 rounded-xl w-24"></div>
+              <div className="h-8 bg-gray-100 rounded-xl w-24"></div>
+            </div>
+          </div>
+
+          {/* Form Content Skeleton */}
+          <div className="bg-card rounded-bento-lg p-6 md:p-8 shadow-sm border border-base-border/20">
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Profile Image Column */}
+              <div className="flex flex-col items-center md:items-start gap-4 shrink-0">
+                <div className="w-28 h-28 rounded-full bg-gray-200"></div>
+                <div className="h-8 bg-gray-100 rounded-xl w-32"></div>
+              </div>
+              
+              {/* Profile Details Column */}
+              <div className="flex-1 space-y-6 w-full">
+                <div className="h-5 bg-gray-250 rounded w-1/4 mb-4"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div className="h-3.5 bg-gray-200 rounded w-1/3"></div>
+                      <div className="h-10 bg-gray-100 border border-base-border/10 rounded-xl w-full"></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="h-10 bg-gray-200 rounded-xl w-32 mt-6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
         
         {/* Top Side: Horizontal Bento Menu Tabs */}
         <div className="bg-card p-4 rounded-bento-md shadow-sm border border-base-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1350,8 +1409,7 @@ function SettingsContent() {
           )}
 
         </div>
-
-      </div>
+      )}
 
       {/* Success Alert Modal */}
       {showSuccessModal && (

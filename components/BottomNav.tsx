@@ -22,8 +22,8 @@ const kaderItems = [
 
 const ibuItems = [
   { href: "/", label: "Beranda", icon: HomeIcon },
-  { href: "/data-anak", label: "Anak Saya", icon: PiBabyFill },
-  { href: "/data-ibu", label: "Kesehatan", icon: MdFavorite },
+  { href: "/perjalanan-anak", label: "Anak Saya", icon: PiBabyFill },
+  { href: "/perjalanan-ibu", label: "Kesehatan", icon: MdFavorite },
   { href: "/edukasi", label: "Edukasi", icon: BookOpenIcon },
   { href: "/setting", label: "Pengaturan", icon: Cog6ToothIcon },
 ];

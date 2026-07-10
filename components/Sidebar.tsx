@@ -28,8 +28,8 @@ const kaderNavItems = [
 
 const ibuNavItems = [
   { href: "/", label: "Beranda", icon: HomeIcon },
-  { href: "/data-anak", label: "Kesehatan Anak Saya", icon: PiBabyFill },
-  { href: "/data-ibu", label: "Kesehatan Saya", icon: MdFavorite },
+  { href: "/perjalanan-anak", label: "Perjalanan Anak", icon: PiBabyFill },
+  { href: "/perjalanan-ibu", label: "Perjalanan Ibu", icon: MdFavorite },
   { href: "/edukasi", label: "Artikel & Edukasi", icon: BookOpenIcon },
   { href: "/setting", label: "Pengaturan", icon: Cog6ToothIcon },
 ];
