@@ -21,7 +21,7 @@ export default function ChildDetailPage() {
   const { role } = useUserRole();
   const [child, setChild] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSubTab, setActiveSubTab] = useState<'biodata' | 'health_service' | 'newborn_monitoring'>('biodata');
+  const [activeSubTab, setActiveSubTab] = useState<'biodata' | 'health_service' | 'newborn_monitoring' | 'development_monitoring'>('biodata');
   const [newbornMonitoring, setNewbornMonitoring] = useState<any>({
     pemeriksaan: [false, false, false, false],
     dangerSigns: new Array(12).fill(false),
@@ -207,6 +207,19 @@ export default function ChildDetailPage() {
     }
   };
 
+  const [milestones69, setMilestones69] = useState<any[]>([
+    { id: 1, text: "Apakah bayi bisa duduk secara mandiri?", status: null },
+    { id: 2, text: "Apakah bayi belajar berdiri, kedua kakinya menyangga sebagian besar badan?", status: null },
+    { id: 3, text: "Apakah bayi bisa merangkak meraih mainan atau mendekati seseorang?", status: null },
+    { id: 4, text: "Apakah bayi bisa memindahkan benda dari satu tangan ke tangan lainnya?", status: null },
+    { id: 5, text: "Apakah bayi bisa memungut 2 benda, kedua tangan memegang 2 benda pada saat bersamaan?", status: null },
+    { id: 6, text: "Apakah bayi bisa memungut benda sebesar kacang dengan cara meraup?", status: null },
+    { id: 7, text: "Apakah bayi bersuara tanpa arti: mamama, bababa, dadada, tatata?", status: null },
+    { id: 8, text: "Apakah bayi mencari mainan/benda yang dijatuhkan?", status: null },
+    { id: 9, text: "Apakah bayi bermain tepuk tangan / Cilukba?", status: null },
+    { id: 10, text: "Apakah bayi bergembira dengan melempar benda?", status: null },
+  ]);
+
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -296,6 +309,14 @@ export default function ChildDetailPage() {
           }
           setNewbornMonitoring(parsed);
         } catch (e) {}
+      }
+      const cachedMilestones = localStorage.getItem(`milestones_69_${decodedId}`);
+      if (cachedMilestones) {
+        try {
+          setMilestones69(JSON.parse(cachedMilestones));
+        } catch (e) {
+          console.error("Error loading cached milestones", e);
+        }
       }
     }
   }, [id]);
@@ -1282,9 +1303,18 @@ export default function ChildDetailPage() {
                   </div>
                 );
               })()}
+              
+              {/* TAB 4: PEMANTAUAN TUMBUH KEMBANG BALITA (6-12 BULAN) */}
+              {activeSubTab === 'development_monitoring' && (
+                <DevelopmentMonitoringTab 
+                  role={role} 
+                  child={child} 
+                  milestones69={milestones69} 
+                  setMilestones69={setMilestones69} 
+                />
+              )}
             </div>
           </div>
-
         </div>
 
         {/* Card: Antropometri Lahir & Pengukuran Terbaru (Col span 7) */}
@@ -1656,6 +1686,84 @@ export default function ChildDetailPage() {
         </div>
       )}
 
+    </div>
+  );
+}
+
+// =========================================================================
+// KOMPONEN PEMBANTU: SUB-TAB PEMANTAUAN TUMBUH KEMBANG 6-12 BULAN
+// =========================================================================
+interface DevelopmentMonitoringTabProps {
+  role: string;
+  child: any;
+  milestones69: any[];
+  setMilestones69: React.Dispatch<React.SetStateAction<any[]>>;
+}
+
+function DevelopmentMonitoringTab({ role, child, milestones69, setMilestones69 }: DevelopmentMonitoringTabProps) {
+  const handleRadioChange = (itemId: number, val: boolean) => {
+    if (role !== "ibu") return; // Proteksi hak akses agar kader hanya bisa melihat (Read-Only)
+
+    const nextMilestones = milestones69.map(item => 
+      item.id === itemId ? { ...item, status: val } : item
+    );
+    setMilestones69(nextMilestones);
+    if (child) {
+      localStorage.setItem(`milestones_69_${child.child_id}`, JSON.stringify(nextMilestones));
+    }
+  };
+
+  const hasDanger = milestones69.some(item => item.status === false);
+
+  return (
+    <div className="space-y-4 text-xs animate-in fade-in duration-200">
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
+        <h4 className="font-bold text-xs text-brand-primary">
+          Evaluasi Perkembangan Anak Mandiri (Usia 6-9 Bulan)
+        </h4>
+        <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
+          {role === "ibu" 
+            ? "Silakan centang kondisi perkembangan terkini anak Anda sesuai panduan Buku KIA Hal 62." 
+            : "Mode Pemantauan Kader: Menampilkan riwayat pengisian instrumen Buku KIA harian dari Ibu (Read-Only)."}
+        </p>
+      </div>
+
+      {hasDanger && (
+        <div className="p-3 bg-status-red-light/10 border border-status-red-solid/20 rounded-xl text-[10px] text-status-red-solid font-bold leading-relaxed animate-in shake duration-300">
+          ⚠️ PERINGATAN: Balita terdeteksi belum menguasai salah satu penanda perkembangan penting. Ibu disarankan untuk segera membawa anak berkonsultasi ke tenaga kesehatan.
+        </div>
+      )}
+
+      {/* List Form Kuesioner */}
+      <div className="space-y-2">
+        {milestones69.map((item) => (
+          <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-base-bg/20 rounded-xl gap-2.5">
+            <span className="font-medium text-base-text-primary leading-relaxed">{item.id}. {item.text}</span>
+            <div className="flex gap-4 shrink-0 select-none font-semibold">
+              <label className={`flex items-center gap-1.5 text-status-green-solid text-[11px] ${role === "ibu" ? "cursor-pointer" : "opacity-60 cursor-not-allowed"}`}>
+                <input 
+                  type="radio" 
+                  name={`milestone-q-${item.id}`} 
+                  checked={item.status === true} 
+                  disabled={role !== "ibu"}
+                  onChange={() => handleRadioChange(item.id, true)}
+                  className="accent-status-green-solid w-4 h-4 cursor-pointer disabled:cursor-not-allowed" 
+                /> Ya
+              </label>
+              <label className={`flex items-center gap-1.5 text-status-red-solid text-[11px] ${role === "ibu" ? "cursor-pointer" : "opacity-60 cursor-not-allowed"}`}>
+                <input 
+                  type="radio" 
+                  name={`milestone-q-${item.id}`} 
+                  checked={item.status === false} 
+                  disabled={role !== "ibu"}
+                  onChange={() => handleRadioChange(item.id, false)}
+                  className="accent-status-red-solid w-4 h-4 cursor-pointer disabled:cursor-not-allowed" 
+                /> Tidak
+              </label>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

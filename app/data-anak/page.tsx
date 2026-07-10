@@ -132,7 +132,22 @@ export default function DataAnakPage() {
   const [selectedChildDetail, setSelectedChildDetail] = useState<any>(null);
   const [isLoadingChildDetail, setIsLoadingChildDetail] = useState(true);
   const [activeChildSubTab, setActiveChildSubTab] = useState<'info' | 'growth'>('info');
+  const [milestones69, setMilestones69] = useState<any[]>([
+    { id: 1, text: "Apakah bayi bisa duduk secara mandiri?", status: null },
+    { id: 2, text: "Apakah bayi belajar berdiri, kedua kakinya menyangga sebagian besar badan?", status: null },
+    { id: 3, text: "Apakah bayi bisa merangkak meraih mainan atau mendekati seseorang?", status: null },
+    { id: 4, text: "Apakah bayi bisa memindahkan benda dari satu tangan ke tangan lainnya?", status: null },
+    { id: 5, text: "Apakah bayi bisa memungut 2 benda, kedua tangan memegang 2 benda pada saat bersamaan?", status: null },
+    { id: 6, text: "Apakah bayi bisa memungut benda sebesar kacang dengan cara meraup?", status: null },
+    { id: 7, text: "Apakah bayi bersuara tanpa arti: mamama, bababa, dadada, tatata?", status: null },
+    { id: 8, text: "Apakah bayi mencari mainan/benda yang dijatuhkan?", status: null },
+    { id: 9, text: "Apakah bayi bermain tepuk tangan / Cilukba?", status: null },
+    { id: 10, text: "Apakah bayi bergembira dengan melempar benda?", status: null },
+  ]);
 
+  const handleMilestoneRadioChange = (id: number, value: boolean) => {
+    setMilestones69(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+  };
   // Load mother's children if role === "ibu"
   useEffect(() => {
     async function loadMotherChildren() {
@@ -967,6 +982,55 @@ export default function DataAnakPage() {
                   <p className="text-[10px] text-base-text-secondary mt-1.5 font-semibold">Z-Score: {zScoreTB ? zScoreTB.toFixed(2) : "0.00"} SD</p>
                 </div>
               </div>
+            </div>
+
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 animate-in fade-in duration-300">
+              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                <span className="text-xl">📋</span>
+                <div>
+                  <h2 className="font-bold text-base-text-primary text-base leading-tight">Lembar Penanda Perkembangan Anak</h2>
+                  <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Evaluasi mandiri berkala Buku KIA 2024 Halaman 62 - Usia 6 s.d 9 Bulan.</p>
+                </div>
+              </div>
+
+              {/* List Kuesioner Radio Button */}
+              <div className="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+                {milestones69.map((item) => (
+                  <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-base-bg/20 rounded-xl gap-2.5 text-xs">
+                    <span className="font-medium text-base-text-primary leading-relaxed">{item.id}. {item.text}</span>
+                    <div className="flex gap-4 shrink-0 select-none font-semibold">
+                      <label className="flex items-center gap-1.5 cursor-pointer text-status-green-solid text-[11px]">
+                        <input 
+                          type="radio" 
+                          name={`milestone-q-${item.id}`} 
+                          checked={item.status === true} 
+                          onChange={() => handleMilestoneRadioChange(item.id, true)}
+                          className="accent-status-green-solid w-4 h-4 cursor-pointer" 
+                        /> Ya
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer text-status-red-solid text-[11px]">
+                        <input 
+                          type="radio" 
+                          name={`milestone-q-${item.id}`} 
+                          checked={item.status === false} 
+                          onChange={() => handleMilestoneRadioChange(item.id, false)}
+                          className="accent-status-red-solid w-4 h-4 cursor-pointer" 
+                        /> Tidak
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Banner Peringatan Otomatis Jika Ada Pilihan 'Tidak' */}
+              {milestones69.some(item => item.status === false) && (
+                <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start shadow-xs animate-in shake duration-300">
+                  <span className="text-base mt-0.5">⚠️</span>
+                  <p className="font-semibold text-status-red-solid">
+                    <strong>PENTING:</strong> Jika anak BELUM bisa melakukan salah satu indikator di atas, mohon segera bawa balita ke dokter anak atau Puskesmas terdekat untuk pemeriksaan dini tumbuh kembang!
+                  </p>
+                </div>
+              )}
             </div>
 
           </div>
