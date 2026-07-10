@@ -213,14 +213,14 @@ export const mockArticles: Article[] = [
     isLanjutkanMembaca: false,
     isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten ini
   },
-{
+  {
     id: "L21",
-    title: "Pemenuhan Gizi Usia 6 - 24 Bulan",
+    title: "Panduan Lengkap Tumbuh Kembang, Pola Asuh & Menu MPASI Bayi Usia 6 - 12 Bulan",
     categories: ["Gizi & MPASI", "Tumbuh Kembang"],
     type: "Artikel",
     duration: "10 Menit",
-    imageUrl: "/cover-article/L21.jpg",
+    imageUrl: "/cover-article/L21.jpg", // Siapkan aset gambar lokal di folder public/cover-article/
     isLanjutkanMembaca: false,
-    isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten ini
+    isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten resmi KIA ini
   }
 ];

@@ -2704,137 +2704,288 @@ function L20ArticleContent() {
 function L21ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Pengantar */}
-      <p className="text-sm text-base-text-secondary leading-relaxed">
-        Di usia 6-12 bulan, bayi berkembang semakin pesat secara fisik dan mental. Kebutuhan gizi bayi tidak lagi dapat dipenuhi hanya oleh ASI, sehingga membutuhkan pemenuhan gizi lengkap yang kaya protein hewani untuk mencegah stunting dan mendukung anak tumbuh cerdas.
-      </p>
-
-      {/* Banner Bahaya Stunting */}
-      <div className="p-4 bg-status-orange-light/20 border border-status-orange-solid/25 rounded-2xl text-xs text-status-orange-solid font-bold leading-relaxed shadow-xs flex items-center gap-2">
-        <span>⚠️</span>
-        <p>
-          <strong>Awas Bahaya Stunting!</strong> Kekurangan gizi pada fase ini dapat menyebabkan gagal pertumbuhan fisik dan performa otak anak menjadi kurang cerdas saat dewasa.
+      
+      {/* PENGANTAR & HIGHLIGHT */}
+      <div className="bg-brand-soft/10 border-l-4 border-brand-primary p-4 rounded-r-2xl">
+        <h3 className="text-base font-extrabold text-brand-primary">6 - 12 Bulan: Cegah Stunting dengan MPASI Kaya Protein Hewani</h3>
+        <p className="text-xs text-base-text-secondary mt-1 leading-relaxed">
+          Di usia 6-12 bulan, bayi berkembang semakin pesat secara fisik dan mental, sehingga membutuhkan gizi lengkap terutama yang kaya protein hewani.
         </p>
       </div>
 
-      {/* Syarat Utama MPASI */}
-      <div className="space-y-3 pt-2">
-        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
-          🥣 4 Syarat Utama Pemenuhan MPASI (Usia 6 - 24 Bulan)
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs leading-relaxed">
-          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
-            <h4 className="font-bold text-brand-primary mb-1">1. Tepat Waktu</h4>
-            <p className="text-base-text-secondary font-medium">MPASI diberikan saat ASI saja sudah tidak dapat memenuhi kebutuhan gizi bayi. Diberikan mulai tepat usia 6 bulan.</p>
-          </div>
-          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
-            <h4 className="font-bold text-brand-primary mb-1">2. Cukup (Adekuat)</h4>
-            <p className="text-base-text-secondary font-medium">MPASI mempertimbangkan jumlah, frekuensi, konsistensi/tekstur, dan variasi makanan yang mengandung karbohidrat, protein hewani (prioritas), protein nabati, dan lemak tambahan.</p>
-          </div>
-          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
-            <h4 className="font-bold text-brand-primary mb-1">3. Aman</h4>
-            <p className="text-base-text-secondary font-medium">Memperhatikan kebersihan bahan makanan, peralatan memasak, serta wajib mencuci tangan bersih sebelum menyiapkan makanan anak.</p>
-          </div>
-          <div className="bg-base-white border border-base-border/25 rounded-2xl p-4.5 shadow-xs">
-            <h4 className="font-bold text-brand-primary mb-1">4. Diberikan dengan Cara Benar</h4>
-            <p className="text-base-text-secondary font-medium">Diberikan secara teratur (pagi, siang, sore, selingan), lama makan maksimal 30 menit, ciptakan lingkungan netral (tanpa TV/gadget), dan ajari anak makan mandiri.</p>
+      {/* BANNER UTAMA */}
+      <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-2xl text-xs text-status-red-solid font-bold leading-relaxed shadow-xs flex items-center gap-2">
+        <span>⚠️</span>
+        <p>Awas bahaya stunting, karena dapat menyebabkan gagal pertumbuhan dan anak menjadi kurang cerdas.</p>
+      </div>
+
+      {/* SECTION 1: POLA PERKEMBANGAN & PERAWATAN ASUH */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        
+        {/* YANG AKAN DIALAMI */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-4.5 shadow-sm">
+          <h4 className="font-extrabold text-xs text-status-blue-solid uppercase tracking-wider mb-2.5 flex items-center gap-1.5">👶 Yang Akan Dialami</h4>
+          <ul className="list-disc pl-4 space-y-2 text-[11px] text-base-text-secondary font-medium leading-relaxed">
+            <li>Bayi mendapatkan pengalaman makan pertama kalinya dan beradaptasi dengan berbagai tekstur makanan sesuai usia.</li>
+            <li>Bayi mulai tumbuh gigi disertai diare dan demam.</li>
+            <li>Bayi mulai berbalik dari posisi telentang ke telungkup atau tengkurap dan menjaga kepala tetap tegak.</li>
+            <li>Meraih benda di sekitarnya, menirukan bunyi, dan tersenyum melihat hal-hal yang menarik.</li>
+            <li>Bayi menjelajah lingkungannya dengan merangkak di usia 8-9 bulan.</li>
+          </ul>
+        </div>
+
+        {/* YANG HARUS DILAKUKAN */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-4.5 shadow-sm md:col-span-2">
+          <h4 className="font-extrabold text-xs text-status-green-solid uppercase tracking-wider mb-2.5 flex items-center gap-1.5">✅ Yang Harus Dilakukan</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-base-text-secondary font-medium leading-relaxed">
+            <ul className="list-disc pl-4 space-y-1.5">
+              <li>Berikan MPASI yang kaya protein hewani.</li>
+              <li>Latih bayi menyenangi suasana makan dan ibu perlu peka terhadap respons bayi.</li>
+              <li>Berikan ASI hingga usia 2 tahun atau lebih.</li>
+              <li>Cek perkembangan bayi tiap bulan di Posyandu atau fasilitas pelayanan kesehatan.</li>
+              <li>Pastikan bayi mendapat vitamin A kapsul biru 1 kali setahun untuk daya tahan tubuhnya.</li>
+              <li>Dapatkan Pemeriksaan Kesehatan Anak Terintegrasi (PKAT) di usia 6-7 bulan.</li>
+              <li>Dapatkan imunisasi dasar lengkap sesuai usia (lihat halaman 124).</li>
+            </ul>
+            <ul className="list-disc pl-4 space-y-1.5">
+              <li>Ajari bayi makan sendiri dengan sendok dan minum sendiri dengan gelas.</li>
+              <li>Ajari bayi duduk, memegang benda kecil dengan 2 jari, serta berdiri dan berjalan dengan berpegangan.</li>
+              <li>Ajak bayi main Cilukba dan bicara sesering mungkin.</li>
+              <li>Cek kesehatan bayi dan kenali tanda bahaya. Segera ke fasilitas kesehatan jika bayi sakit atau mengalami tanda bahaya.</li>
+            </ul>
           </div>
         </div>
       </div>
 
-      {/* 8 Kelompok Bahan Makanan */}
+      {/* MENGAPA HARUS DILAKUKAN */}
+      <div className="bg-status-purple-light/20 border border-status-purple-solid/20 rounded-xl p-4 text-xs font-semibold text-base-text-primary">
+        <h4 className="font-extrabold text-xs text-status-purple-solid mb-1.5">💡 Mengapa Harus Dilakukan?</h4>
+        <ul className="list-disc pl-4 space-y-1 text-base-text-secondary">
+          <li>Meningkatkan sistem imun, mencegah stunting, dan menangkal komplikasi penyakit infeksi kronis.</li>
+          <li>Memastikan anak bisa bicara bahasa dengan lancar, bersosialisasi aktif dengan lingkungan, serta mandiri.</li>
+        </ul>
+      </div>
+
+      {/* SECTION 2: PRINSIP NUTRISI & KELOMPOK MAKANAN */}
       <div className="space-y-3 pt-2">
-        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
-          🥦 8 Kelompok Bahan Makanan Utama MPASI
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">🥦 8 Kelompok Bahan Makanan Utama MPASI Usia 6-12 Bulan</h2>
+        <p className="text-xs text-base-text-secondary font-medium leading-relaxed">
+          Di usia 6 hingga 12 bulan, makanan yang diberikan pada bayi harus mengandung sumber gizi lengkap yang dibutuhkan untuk tumbuh kembang terbaik. Perkenalkan makanan satu per satu sambil memperhatikan apakah anak memiliki alergi terhadap makanan tertentu. Pastikan cara memasak makanan direbus atau dikukus, serta hindari makanan yang digoreng, mengandung bahan pengawat, dan tinggi gula dan garam.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs font-bold">
           {[
-            { id: "1", title: "Air Susu Ibu (ASI)", icon: "🤱" },
-            { id: "2", title: "Makanan Pokok (Beras, Jagung, Ubi)", icon: "🌾" },
-            { id: "3", title: "Kacang-kacangan (Tempe, Tahu)", icon: "🫘" },
-            { id: "4", title: "Susu Hewani & Turunannya", icon: "🥛" },
-            { id: "5", title: "Daging-dagingan (Ikan, Daging, Ayam)", icon: "🐟" },
-            { id: "6", title: "Telur", icon: "🥚" },
-            { id: "7", title: "Buah & Sayur Kaya Vit A", icon: "🥕" },
-            { id: "8", title: "Buah & Sayuran Lainnya", icon: "🥑" },
+            { id: 1, text: "Air Susu Ibu (ASI)", emoji: "🤱" },
+            { id: 2, text: "Makanan Pokok", emoji: "🍚" },
+            { id: 3, text: "Kacang-kacangan", emoji: "🫘" },
+            { id: 4, text: "Susu Hewani & Produk Turunannya", emoji: "🥛" },
+            { id: 5, text: "Daging-dagingan", emoji: "🐟" },
+            { id: 6, text: "Telur", emoji: "🥚" },
+            { id: 7, text: "Buah & Sayuran Kaya Vitamin A", emoji: "🥕" },
+            { id: 8, text: "Buah & Sayuran Lainnya", emoji: "🥑" }
           ].map((item) => (
-            <div key={item.id} className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-3 shadow-xs">
-              <span className="text-2xl block mb-1">{item.icon}</span>
-              <span className="text-[10px] bg-status-purple-solid text-white px-1.5 py-0.5 rounded-full font-extrabold block w-fit mx-auto mb-1">{item.id}</span>
-              <h5 className="font-bold text-[11px] text-base-text-primary leading-tight">{item.title}</h5>
+            <div key={item.id} className="bg-base-bg/30 border border-base-border/30 rounded-xl p-3 flex flex-col items-center justify-center">
+              <span className="text-xl mb-1">{item.emoji}</span>
+              <span className="text-[9px] bg-brand-primary text-white font-extrabold px-1.5 py-0.2 rounded-full mb-1">{item.id}</span>
+              <span className="text-[10px] text-base-text-primary font-semibold leading-tight">{item.text}</span>
             </div>
           ))}
         </div>
+        <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium bg-base-bg/20 p-3 rounded-xl italic">
+          * Catatan Tekstur: Ibu bisa memulai dengan makanan bertekstur lunak dan lembut, seperti bubur pisang campur apel dan pir, bubur sup daging kacang merah atau puding kentang ayam dan telur. Kemudian, lanjutkan dengan makanan yang bertekstur lebih kasar tapi tetap lembut di usia 9-11 bulan, seperti sup daging cincang, nasi tim ikan kembung telur puyuh, dan tim bubur manado daging dan udang.
+        </p>
       </div>
 
-      {/* Panduan Tekstur */}
-      <div className="space-y-3 pt-2">
-        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
-          📊 Panduan Tekstur dan Porsi Makan Berkala
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="border border-base-border/30 rounded-2xl p-4 bg-base-white shadow-xs">
-            <span className="text-[10px] uppercase bg-status-green-solid text-white px-2 py-0.5 rounded-full font-bold">6 - 8 Bulan</span>
-            <h4 className="font-bold text-base-text-primary mt-2 mb-1">Tekstur: DISARING</h4>
-            <p className="text-base-text-secondary mb-3 font-medium">Makanan dilumatkan dan disaring halus. Konsistensi kental (tidak mudah jatuh dari sendok).</p>
-            <div className="text-[11px] font-semibold text-status-green-solid border-t pt-2">
-              ⏱️ 2-3 kali makanan utama + 1-2 kali selingan.<br/>
-              🍚 Porsi: Mulai 2-3 sendok makan hingga 1/2 mangkuk (125 ml).
-            </div>
-          </div>
-          <div className="border border-base-border/30 rounded-2xl p-4 bg-base-white shadow-xs">
-            <span className="text-[10px] uppercase bg-status-blue-solid text-white px-2 py-0.5 rounded-full font-bold">9 - 11 Bulan</span>
-            <h4 className="font-bold text-base-text-primary mt-2 mb-1">Tekstur: DICINCANG</h4>
-            <p className="text-base-text-secondary mb-3 font-medium">Makanan dicincang halus, cincang kasar, atau makanan siap genggam (finger food).</p>
-            <div className="text-[11px] font-semibold text-status-blue-solid border-t pt-2">
-              ⏱️ 3-4 kali makanan utama + 1-2 kali selingan.<br/>
-              🍚 Porsi: 1/2 hingga 3/4 mangkuk ukuran 250 ml.
-            </div>
-          </div>
-          <div className="border border-base-border/30 rounded-2xl p-4 bg-base-white shadow-xs">
-            <span className="text-[10px] uppercase bg-status-purple-solid text-white px-2 py-0.5 rounded-full font-bold">12 - 23 Bulan</span>
-            <h4 className="font-bold text-base-text-primary mt-2 mb-1">Tekstur: MASAK BIASA</h4>
-            <p className="text-base-text-secondary mb-3 font-medium">Makanan keluarga yang dihaluskan seperlunya atau dipotong kecil jika dirasa perlu.</p>
-            <div className="text-[11px] font-semibold text-status-purple-solid border-t pt-2">
-              ⏱️ 3-4 kali makanan utama + 1-2 kali selingan.<br/>
-              🍚 Porsi: 3/4 hingga 1 mangkuk penuh ukuran 250 ml.
-            </div>
-          </div>
+      {/* SECTION 3: MPASI DARI MAKANAN KELUARGA (MATANG) & BAHAN MENTAH */}
+      <div className="space-y-4 pt-2">
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">🍳 Rekomendasi Menu Gizi Seimbang Usia 6 - 24 Bulan</h2>
+        
+        {/* TABEL PERBANDINGAN FORMULA MASAK */}
+        <div className="overflow-x-auto border border-base-border/20 rounded-xl bg-base-white shadow-sm text-xs">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-base-bg text-base-text-primary border-b font-bold">
+                <th className="p-3 w-1/4">Kategori Usia</th>
+                <th className="p-3 w-1/3">Metode 1: Dari Makanan Keluarga (Matang)</th>
+                <th className="p-3 w-1/3">Metode 2: Dari Bahan Mentah</th>
+              </tr>
+            </thead>
+            <tbody className="text-base-text-secondary font-medium leading-relaxed align-top">
+              
+              {/* 6-8 BULAN */}
+              <tr className="border-b hover:bg-base-bg/10 transition-colors">
+                <td className="p-3 font-bold text-status-green-solid bg-status-green-light/10 text-center">Bayi 6 - 8 Bulan (Tekstur Disaring)</td>
+                <td className="p-3 space-y-1">
+                  <p className="font-bold text-base-text-primary">Bahan:</p>
+                  <p>Nasi putih 30 g, Dadar telur 35 g, Sayur kare wortel tempe 20 g.</p>
+                  <p className="font-bold text-base-text-primary pt-1">Cara Membuat:</p>
+                  <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
+                    <li>Nasi, telur dadar, tempe dan wortel (dari sayur kare) dilumatkan kemudian disaring.</li>
+                    <li>Ditambahkan kuah sayur (santan kare) sampai mendapatkan konsistensi bubur kental.</li>
+                    <li>Sajikan harian.</li>
+                  </ol>
+                </td>
+                <td className="p-3 space-y-1 border-l">
+                  <p className="font-bold text-base-text-primary">Bahan:</p>
+                  <p>Beras putih 10 g, Telur ayam 30 g, Tempe kedelai 10 g, Wortel 10 g, Santan 30 g.</p>
+                  <p className="font-bold text-base-text-primary pt-1">Cara Membuat:</p>
+                  <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
+                    <li>Memasak beras, tambahkan santan dan bumbu yang telah ditumis dengan sedikit minyak (bawang merah, daun salam, kunyit).</li>
+                    <li>Setelah nasi masak, masukkan telur yang telah dikocok lepas, tempe dan wortel yang telah dicincang.</li>
+                    <li>Aduk sampai mendapatkan konsistensi bubur kental lalu sajikan harian.</li>
+                  </ol>
+                </td>
+              </tr>
+
+              {/* 9-11 BULAN */}
+              <tr className="border-b hover:bg-base-bg/10 transition-colors">
+                <td className="p-3 font-bold text-status-blue-solid bg-status-blue-light/10 text-center">Bayi 9 - 11 Bulan (Tekstur Dicincang)</td>
+                <td className="p-3 space-y-1">
+                  <p className="font-bold text-base-text-primary">Bahan:</p>
+                  <p>Nasi putih 45 g, Ikan kembung bumbu kuning 30 g, Tumis buncis 25 g.</p>
+                  <p className="font-bold text-base-text-primary pt-1">Cara Membuat:</p>
+                  <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
+                    <li>Nasi, ikan kembung bumbu kuning dan tumis buncis dicincang.</li>
+                    <li>Sajikan dengan kuah sayur (santan kare).</li>
+                  </ol>
+                </td>
+                <td className="p-3 space-y-1 border-l">
+                  <p className="font-bold text-base-text-primary">Bahan:</p>
+                  <p>Beras putih 15 g, Ikan kembung 30 g, Minyak kelapa 10 g, Wortel 15 g, Tempe 10 g.</p>
+                  <p className="font-bold text-base-text-primary pt-1">Cara Membuat:</p>
+                  <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
+                    <li>Memasak beras, tambahkan bumbu yg telah ditumis (bawang merah, daun salam, kunyit) dengan minyak kelapa.</li>
+                    <li>Setelah nasi masak, masukkan ikan kembung dan buncis yang telah dicincang.</li>
+                    <li>Aduk sampai mendapatkan konsistensi bubur kasar/cincang.</li>
+                    <li>Sajikan harian.</li>
+                  </ol>
+                </td>
+              </tr>
+
+              {/* 12-23 BULAN */}
+              <tr className="hover:bg-base-bg/10 transition-colors">
+                <td className="p-3 font-bold text-status-purple-solid bg-status-purple-light/10 text-center">Bayi 12 - 23 Bulan (Makanan Biasa)</td>
+                <td className="p-3 space-y-1">
+                  <p className="font-bold text-base-text-primary">Bahan:</p>
+                  <p>Nasi putih 55 g, Semur hati ayam 45 g, Bening/bobor bayam 20 g.</p>
+                  <p className="font-bold text-base-text-primary pt-1">Cara Membuat:</p>
+                  <p className="text-[11px]">MPASI untuk anak 12-23 bulan disajikan dalam bentuk makanan keluarga (dicincang gak besar jika diperlukan).</p>
+                </td>
+                <td className="p-3 space-y-1 border-l">
+                  <p className="font-bold text-base-text-primary">Bahan:</p>
+                  <p>Beras putih 25 g, Hati ayam 50 g, Minyak kelapa 5 g, Bayam 20 g, Santan 50 g.</p>
+                  <p className="font-bold text-base-text-primary pt-1">Cara Membuat:</p>
+                  <ol className="list-decimal pl-4 space-y-0.5 text-[11px]">
+                    <li>Memasak beras sampai menjadi nasi.</li>
+                    <li>Membuat hati ayam goreng (goreng/tumis hati ayam dengan minyak kelapa).</li>
+                    <li>Membuat sayur bayam.</li>
+                    <li>Sajikan harian bersama-sama.</li>
+                  </ol>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* Menu dan Resep */}
+      {/* BENTO CARD: MENU SELINGAN */}
+      <div className="bg-brand-soft/20 border border-brand-primary/20 rounded-2xl p-5 text-xs">
+        <h4 className="font-bold text-brand-primary text-sm mb-2">🥔 Contoh Makanan Selingan: Perkedel Kentang Isi Daging</h4>
+        <p className="text-base-text-secondary mb-3 font-medium">Takaran porsi pembuatan formula selingan padat gizi harian:</p>
+        <div className="flex flex-wrap items-center gap-3 font-bold text-center text-base-text-primary">
+          <div className="bg-base-white px-4 py-2 border rounded-xl shadow-xs">🥔 Kentang <br/> <span className="text-brand-primary">25 g</span></div>
+          <span className="text-lg">+</span>
+          <div className="bg-base-white px-4 py-2 border rounded-xl shadow-xs">🥩 Daging Giling <br/> <span className="text-brand-primary">5 g</span></div>
+          <span className="text-lg">+</span>
+          <div className="bg-base-white px-4 py-2 border rounded-xl shadow-xs">🥣 Minyak <br/> <span className="text-brand-primary">5 g</span></div>
+          <span className="text-lg">+</span>
+          <div className="bg-base-white px-4 py-2 border rounded-xl shadow-xs">🥚 Telur Ayam <br/> <span className="text-brand-primary">5 g</span></div>
+          <span className="text-lg">➡️</span>
+          <div className="bg-brand-primary text-white px-5 py-3.5 rounded-xl shadow-sm font-extrabold flex items-center justify-center">Olah &amp; Goreng Perkedel Sehat</div>
+        </div>
+      </div>
+
+      {/* SECTION 4: FORMULA DETAILED RESEP PORSI MASAK BESAR */}
       <div className="space-y-3 pt-2">
-        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">
-          🍳 Menu Masak &amp; Resep Resmi MPASI KIA (Untuk 3 Porsi)
-        </h2>
+        <h2 className="text-lg font-extrabold text-base-text-primary border-b pb-2 flex items-center gap-2">📑 Detail Komposisi Formula Resep (Untuk 3 Porsi)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
-          <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 shadow-xs">
-            <h4 className="font-bold text-brand-primary text-sm mb-2">🥣 Bubur Sup Daging Kacang Merah (6-8 Bulan)</h4>
-            <div className="space-y-1 text-base-text-secondary font-medium mb-3">
-              <p><strong>Bahan:</strong> 50g nasi, 30g daging ayam cincang, 25g telur ayam, 10g kacang merah, 10g wortel, 10g tomat, bumbu halus (bawang merah &amp; putih), 300ml kaldu ayam, 5g minyak.</p>
+          
+          {/* Bubur Sup Daging Kacang Merah */}
+          <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-sm space-y-3 flex flex-col justify-between">
+            <div>
+              <h4 className="font-bold text-brand-primary text-sm border-b pb-1.5">🥣 Bubur Sup Daging Kacang Merah (6-8 Bulan)</h4>
+              <div className="grid grid-cols-2 gap-2 pt-2 leading-relaxed text-base-text-secondary font-medium">
+                <div>
+                  <p className="font-bold text-base-text-primary">Bahan Baku:</p>
+                  <p>&bull; 50 g (6 sdm) nasi</p>
+                  <p>&bull; 30 g (3 sdm) daging ayam cincang</p>
+                  <p>&bull; 25 g (1/2 butir) telur ayam</p>
+                  <p>&bull; 10 g (1 sdm) buncis</p>
+                  <p>&bull; 10 g (1 sdm) wortel</p>
+                  <p>&bull; 10 g (1 sdm) kacang merah</p>
+                  <p>&bull; 10 g (1 batang) bawang daun, bawang bombay, seledri</p>
+                  <p>&bull; 300 ml kaldu ayam</p>
+                  <p>&bull; 2.5 g (1/2 sdt) minyak untuk menumis</p>
+                </div>
+                <div>
+                  <p className="font-bold text-base-text-primary">Bumbu Halus:</p>
+                  <p>&bull; 2 siung bawang merah</p>
+                  <p>&bull; 2 siung bawang putih</p>
+                  <p className="font-bold text-base-text-primary pt-2">Buah Selingan:</p>
+                  <p>&bull; 100 g (2 buah) jeruk, diambil sarinya</p>
+                </div>
+              </div>
             </div>
-            <ol className="list-decimal pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium border-t border-brand-primary/10 pt-2">
-              <li>Didihkan air kaldu ayam, masukkan kacang merah dan daging sampai empuk.</li>
-              <li>Tumis bumbu halus sampai harum, masukkan ke dalam air kaldu masakan.</li>
-              <li>Masukkan nasi, buncis, wortel. Tambahkan kocokan telur, aduk rata hingga matang.</li>
-              <li>Haluskan bubur disaring dengan saringan kawat hingga mencapai tekstur lumat kental.</li>
-            </ol>
-          </div>
-          <div className="bg-brand-soft/10 border border-brand-primary/15 rounded-2xl p-5 shadow-xs">
-            <h4 className="font-bold text-brand-primary text-sm mb-2">🍛 Nasi Tim Ikan Kembung Telur Puyuh (9-12 Bulan)</h4>
-            <div className="space-y-1 text-base-text-secondary font-medium mb-3">
-              <p><strong>Bahan:</strong> 75g nasi, 30g ikan kembung (ambil dagingnya), 30g telur puyuh, 15g wortel, 10g tomat, bumbu halus, 75ml kaldu ayam, 7.5g minyak kelapa, buah semangka (selingan).</p>
+            <div className="border-t border-base-border/20 pt-3">
+              <p className="font-bold text-base-text-primary mb-1">Cara Memasak:</p>
+              <ol className="list-decimal pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium">
+                <li>Didihkan air kaldu ayam, masukkan kacang merah dan daging sampai empuk.</li>
+                <li>Tumis bumbu halus sampai harum, masukkan daging ayam cincang, lalu masak sampai berubah warna.</li>
+                <li>Masukkan tumisan daging ayam ke dalam air kaldu, masak sampai daging empuk.</li>
+                <li>Masukkan nasi, buncis, dan wortel.</li>
+                <li>Tambahkan kocokan telur, aduk merata dan masak sampai matang.</li>
+                <li>Haluskan bubur sampai mencapai tekstur yang diinginkan, lalu sajikan harian.</li>
+              </ol>
             </div>
-            <ol className="list-decimal pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium border-t border-brand-primary/10 pt-2">
-              <li>Masukkan nasi, daging ikan kembung, telur puyuh, dan minyak kelapa ke dalam mangkok tim.</li>
-              <li>Tambahkan air kaldu ayam secukupnya.</li>
-              <li>Masukkan parutan wortel dan tomat, tim hingga matang sempurna.</li>
-              <li>Angkat dan sajikan hangat bersama potongan buah semangka secara terpisah.</li>
-            </ol>
           </div>
+
+          {/* Nasi Tim Ikan Kembung Telur Puyuh */}
+          <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-sm space-y-3 flex flex-col justify-between">
+            <div>
+              <h4 className="font-bold text-brand-primary text-sm border-b pb-1.5">🍛 Nasi Tim Ikan Kembung Telur Puyuh (9-12 Bulan)</h4>
+              <div className="grid grid-cols-2 gap-2 pt-2 leading-relaxed text-base-text-secondary font-medium">
+                <div>
+                  <p className="font-bold text-base-text-primary">Bahan Baku:</p>
+                  <p>&bull; 115 g (12 sdm) nasi putih</p>
+                  <p>&bull; 30 g (1 potong kecil) ikan kembung segar, haluskan</p>
+                  <p>&bull; 30 g (3 butir) telur puyuh</p>
+                  <p>&bull; 15 g (1 potong besar) wortel</p>
+                  <p>&bull; 10 g (1 buah sedang) tomat</p>
+                  <p>&bull; 7.5 g (1.5 sdt) minyak kelapa</p>
+                  <p>&bull; 75 cc (1/3 gelas belimbing) kaldu ayam</p>
+                </div>
+                <div>
+                  <p className="font-bold text-base-text-primary">Sayur &amp; Isian:</p>
+                  <p>&bull; 50 g (1/2 potong) pepaya, haluskan</p>
+                  <p className="font-bold text-base-text-primary pt-2">Buah Selingan:</p>
+                  <p>&bull; 180 g (1 potong besar) semangka</p>
+                </div>
+              </div>
+            </div>
+            <div className="border-t border-base-border/20 pt-3">
+              <p className="font-bold text-base-text-primary mb-1">Cara Memasak:</p>
+              <ol className="list-decimal pl-4 space-y-1 text-[11px] text-base-text-secondary font-medium">
+                <li>Masukkan nasi, ikan kembung, telur puyuh, dan minyak kelapa ke dalam mangkok tim.</li>
+                <li>Tambahkan air kaldu.</li>
+                <li>Masukkan wortel dan tomat, tim hingga matang.</li>
+                <li>Angkat, sajikan harian dengan saus pepaya.</li>
+              </ol>
+            </div>
+          </div>
+
         </div>
       </div>
+
     </div>
   );
 }
