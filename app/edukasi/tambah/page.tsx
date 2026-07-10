@@ -16,10 +16,14 @@ import { mockArticles } from "../data";
 import { useUserRole } from "@/context/UserRoleContext";
 
 const AVAILABLE_CATEGORIES = [
-  "Gizi & MPASI",
-  "Imunisasi",
-  "Kesehatan Ibu",
-  "Tumbuh Kembang",
+  "Kehamilan",
+  "Melahirkan",
+  "Setelah Melahirkan",
+  "Menyusui",
+  "0 - 6 Bulan",
+  "6 - 12 Bulan",
+  "12 - 24 Bulan",
+  "2 - 6 Tahun",
   "Informasi Umum"
 ];
 

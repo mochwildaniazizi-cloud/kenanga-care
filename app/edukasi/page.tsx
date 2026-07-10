@@ -1,28 +1,30 @@
 "use client";
-
+ 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   MdDashboard, MdVaccines, MdPregnantWoman, 
   MdChildCare, MdOutlineLocalDining, MdOutlineExtension,
   MdAdd, MdBookmark, MdSearch, MdMenuBook, MdFavorite,
-  MdInfo
+  MdInfo, MdCheckCircleOutline, MdBabyChangingStation
 } from "react-icons/md";
 import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import ArticleCard from "@/components/ArticleCard";
 import { mockArticles } from "./data";
 import type { CategoryType } from "./data";
 import { useUserRole } from "@/context/UserRoleContext";
-
+ 
 type TabType = CategoryType | "Semua" | "Tersimpan";
-
+ 
 export default function EdukasiPage() {
   const { role } = useUserRole();
   const [activeTab, setActiveTab] = useState<TabType>("Semua");
   const [savedArticles, setSavedArticles] = useState<Set<string>>(new Set());
   const [articles, setArticles] = useState<any[]>(mockArticles);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const [viewedHistory, setViewedHistory] = useState<string[]>([]);
+  const [historyPageIndex, setHistoryPageIndex] = useState<number>(0);
+ 
   useEffect(() => {
     const local = localStorage.getItem("custom_articles");
     let customList: any[] = [];
@@ -33,7 +35,7 @@ export default function EdukasiPage() {
         console.error("Failed to parse custom articles", e);
       }
     }
-
+ 
     const deleted = localStorage.getItem("deleted_articles_ids");
     let deletedIds = new Set<string>();
     if (deleted) {
@@ -43,14 +45,14 @@ export default function EdukasiPage() {
         console.error("Failed to parse deleted articles list", e);
       }
     }
-
+ 
     // Filter and deduplicate
     const customIds = new Set(customList.map((a: any) => a.id));
     const filteredMock = mockArticles.filter(a => !deletedIds.has(a.id) && !customIds.has(a.id));
     const filteredCustom = customList.filter((a: any) => !deletedIds.has(a.id));
-
+ 
     setArticles([...filteredMock, ...filteredCustom]);
-
+ 
     // Load saved bookmarks from localStorage
     const bookmarks = localStorage.getItem("saved_articles_ids");
     if (bookmarks) {
@@ -61,6 +63,22 @@ export default function EdukasiPage() {
         console.error("Failed to parse saved articles bookmarks", e);
       }
     }
+
+    // Load viewed history from localStorage
+    const historyJson = localStorage.getItem("viewed_articles_history");
+    let historyList: string[] = [];
+    if (historyJson) {
+      try {
+        historyList = JSON.parse(historyJson);
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      // Pre-populate if empty
+      historyList = ["L4", "L5", "L11", "L12", "L14", "L15", "L20", "L23"];
+      localStorage.setItem("viewed_articles_history", JSON.stringify(historyList));
+    }
+    setViewedHistory(historyList);
   }, []);
 
   const toggleBookmark = (id: string) => {
@@ -76,41 +94,70 @@ export default function EdukasiPage() {
     });
   };
 
-  const TABS: { id: TabType; label: string; icon: any; colorStyle: string; activeStyle: string; iconColor?: string }[] = [
+  const UTILITY_TABS = [
     { 
-      id: "Semua", label: "Semua", icon: MdDashboard, 
-      colorStyle: "border-base-text-secondary/30 text-base-text-secondary", 
+      id: "Semua" as TabType, label: "Semua", icon: MdDashboard, 
+      colorStyle: "border-base-text-secondary/30 text-base-text-secondary hover:bg-base-text-secondary/5", 
       activeStyle: "bg-base-text-secondary text-base-white border-base-text-secondary", 
     },
     { 
-      id: "Gizi & MPASI", label: "Gizi & MPASI", icon: MdOutlineLocalDining, 
-      colorStyle: "border-status-green-solid text-status-green-solid", 
-      activeStyle: "bg-status-green-solid text-base-white border-status-green-solid" 
-    },
-    { 
-      id: "Imunisasi", label: "Imunisasi", icon: MdVaccines, 
-      colorStyle: "border-status-orange-solid text-status-orange-solid", 
-      activeStyle: "bg-status-orange-solid text-base-white border-status-orange-solid" 
-    },
-    { 
-      id: "Kesehatan Ibu", label: "Kesehatan Ibu", icon: MdPregnantWoman, 
-      colorStyle: "border-status-blue-solid text-status-blue-solid", 
-      activeStyle: "bg-status-blue-solid text-base-white border-status-blue-solid" 
-    },
-    { 
-      id: "Tumbuh Kembang", label: "Tumbuh Kembang", icon: MdOutlineExtension, 
-      colorStyle: "border-status-cerulean-solid text-status-cerulean-solid", 
-      activeStyle: "bg-status-cerulean-solid text-base-white border-status-cerulean-solid" 
-    },
-    { 
-      id: "Informasi Umum", label: "Informasi Umum", icon: MdInfo, 
-      colorStyle: "border-status-purple-solid text-status-purple-solid", 
-      activeStyle: "bg-status-purple-solid text-base-white border-status-purple-solid" 
-    },
-    { 
-      id: "Tersimpan", label: "Tersimpan", icon: MdBookmark, 
-      colorStyle: "border-brand-primary text-brand-primary", 
+      id: "Tersimpan" as TabType, label: "Tersimpan", icon: MdBookmark, 
+      colorStyle: "border-brand-primary text-brand-primary hover:bg-brand-soft/20", 
       activeStyle: "bg-brand-primary text-base-white border-brand-primary" 
+    },
+  ];
+
+  const PERJALANAN_IBU_TABS = [
+    { 
+      id: "Kehamilan" as TabType, label: "Kehamilan", icon: MdPregnantWoman, 
+      colorStyle: "border-[#EA2986]/30 text-[#EA2986] hover:bg-[#FCE8F0]/30", 
+      activeStyle: "bg-[#EA2986] text-base-white border-[#EA2986]" 
+    },
+    { 
+      id: "Melahirkan" as TabType, label: "Melahirkan", icon: MdCheckCircleOutline, 
+      colorStyle: "border-[#4A85F6]/30 text-[#4A85F6] hover:bg-[#ECF2FE]/30", 
+      activeStyle: "bg-[#4A85F6] text-base-white border-[#4A85F6]" 
+    },
+    { 
+      id: "Setelah Melahirkan" as TabType, label: "Setelah Melahirkan", icon: MdBabyChangingStation, 
+      colorStyle: "border-[#7A5AF8]/30 text-[#7A5AF8] hover:bg-[#F5F3FF]/30", 
+      activeStyle: "bg-[#7A5AF8] text-base-white border-[#7A5AF8]" 
+    },
+    { 
+      id: "Menyusui" as TabType, label: "Menyusui", icon: MdChildCare, 
+      colorStyle: "border-[#1E9D5D]/30 text-[#1E9D5D] hover:bg-[#E6F8ED]/30", 
+      activeStyle: "bg-[#1E9D5D] text-base-white border-[#1E9D5D]" 
+    },
+  ];
+
+  const PERJALANAN_ANAK_TABS = [
+    { 
+      id: "0 - 6 Bulan" as TabType, label: "0 - 6 Bulan", icon: MdChildCare, 
+      colorStyle: "border-[#9333EA]/30 text-[#9333EA] hover:bg-[#F3E8FF]/30", 
+      activeStyle: "bg-[#9333EA] text-base-white border-[#9333EA]" 
+    },
+    { 
+      id: "6 - 12 Bulan" as TabType, label: "6 - 12 Bulan", icon: MdChildCare, 
+      colorStyle: "border-[#EA580C]/30 text-[#EA580C] hover:bg-[#FFF7ED]/30", 
+      activeStyle: "bg-[#EA580C] text-base-white border-[#EA580C]" 
+    },
+    { 
+      id: "12 - 24 Bulan" as TabType, label: "12 - 24 Bulan", icon: MdChildCare, 
+      colorStyle: "border-[#0284C7]/30 text-[#0284C7] hover:bg-[#E0F2FE]/30", 
+      activeStyle: "bg-[#0284C7] text-base-white border-[#0284C7]" 
+    },
+    { 
+      id: "2 - 6 Tahun" as TabType, label: "2 - 6 Tahun", icon: MdChildCare, 
+      colorStyle: "border-[#DC2626]/30 text-[#DC2626] hover:bg-[#FEF2F2]/30", 
+      activeStyle: "bg-[#DC2626] text-base-white border-[#DC2626]" 
+    },
+  ];
+
+  const INFORMASI_UMUM_TABS = [
+    { 
+      id: "Informasi Umum" as TabType, label: "Informasi Umum", icon: MdInfo, 
+      colorStyle: "border-gray-400/40 text-gray-700 hover:bg-gray-100/30", 
+      activeStyle: "bg-gray-700 text-base-white border-gray-700" 
     },
   ];
 
@@ -166,25 +213,105 @@ export default function EdukasiPage() {
 
       {/* TABS SECTION */}
       {!searchQuery && (
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 hide-scrollbar select-none">
-          {TABS.map(tab => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all border-2 cursor-pointer ${
-                  isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
-                }`}
-              >
-                <div className={`p-1 rounded-full ${isActive ? "bg-base-white" : ""}`}>
-                  <Icon className={`w-4 h-4 ${tab.colorStyle.split(" ")[1]}`} />
-                </div>
-                {tab.label}
-              </button>
-            );
-          })}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-sm space-y-4 select-none animate-in fade-in duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/10 pb-3">
+            <div>
+              <span className="text-[10px] font-black tracking-widest text-[#EA2986] uppercase block">Daftar Isi Buku KIA Digital</span>
+              <h2 className="text-sm font-bold text-base-text-primary mt-0.5">Pilih Perjalanan KIA Anda</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {UTILITY_TABS.map(tab => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border cursor-pointer ${
+                      isActive ? tab.activeStyle : `bg-base-bg/50 ${tab.colorStyle}`
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            {/* PERJALANAN IBU */}
+            <div className="space-y-2.5">
+              <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Ibu</span>
+              <div className="grid grid-cols-2 gap-2">
+                {PERJALANAN_IBU_TABS.map(tab => {
+                  const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
+                        isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                      }`}
+                    >
+                      <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? "bg-base-white/20" : "bg-base-bg/50"}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="truncate">{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* PERJALANAN ANAK */}
+            <div className="space-y-2.5">
+              <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Anak</span>
+              <div className="grid grid-cols-2 gap-2">
+                {PERJALANAN_ANAK_TABS.map(tab => {
+                  const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
+                        isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                      }`}
+                    >
+                      <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? "bg-base-white/20" : "bg-base-bg/50"}`}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <span className="truncate">{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-base-border/10 pt-3 text-[11px] font-semibold text-base-text-secondary">
+            <span>Menyesuaikan halaman dan sub-bab Buku KIA Resmi Kementerian Kesehatan</span>
+            <div className="flex items-center gap-2">
+              {INFORMASI_UMUM_TABS.map(tab => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition ${
+                      isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
@@ -254,158 +381,286 @@ export default function EdukasiPage() {
               </Link>
             )}
           </div>
-        ) : (
-          <div className="space-y-10">
-            
-            {/* Lanjutkan Membaca */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-base-text-primary">Lanjutkan Membaca</h2>
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-full border border-base-border/50 flex items-center justify-center text-base-text-secondary hover:text-brand-primary transition-colors cursor-pointer">
-                    <FiChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button className="w-8 h-8 rounded-full bg-brand-primary flex items-center justify-center text-base-white hover:bg-status-pink-dark transition-colors shadow-sm cursor-pointer">
-                    <FiChevronRight className="w-4 h-4" />
-                  </button>
+        ) : (() => {
+          // Resolve viewed history articles
+          const historyArticles = viewedHistory
+            .map(histId => articles.find(a => a.id === histId))
+            .filter(Boolean) as any[];
+
+          return (
+            <div className="space-y-10">
+              
+              {/* Lanjutkan Membaca (History Slider) */}
+              {historyArticles.length > 0 && (
+                <div className="animate-in fade-in duration-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-bold text-base-text-primary">Lanjutkan Membaca</h2>
+                      <p className="text-[10px] text-base-text-secondary font-semibold">Histori artikel terakhir yang selesai Anda lihat.</p>
+                    </div>
+                    {historyArticles.length > 4 && (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => setHistoryPageIndex(0)}
+                          disabled={historyPageIndex === 0}
+                          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+                            historyPageIndex === 0 
+                              ? "border-base-border/30 text-base-text-secondary/40 cursor-not-allowed" 
+                              : "border-brand-primary text-brand-primary hover:bg-[#FCE8F0]/30"
+                          }`}
+                        >
+                          <FiChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => setHistoryPageIndex(1)}
+                          disabled={historyPageIndex === 1}
+                          className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors shadow-sm cursor-pointer ${
+                            historyPageIndex === 1
+                              ? "bg-brand-soft text-brand-primary/40 cursor-not-allowed"
+                              : "bg-brand-primary text-base-white hover:bg-status-pink-dark"
+                          }`}
+                        >
+                          <FiChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-300">
+                    {historyArticles.slice(historyPageIndex * 4, (historyPageIndex + 1) * 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Baru Ditambahkan (Kustom) */}
+              {articles.some(a => a.id.startsWith("CUSTOM_")) && (
+                <div className="animate-in fade-in duration-500">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-brand-primary flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-brand-primary animate-pulse"></span>
+                      Baru Ditambahkan
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.id.startsWith("CUSTOM_")).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* PERJALANAN IBU */}
+              <div className="space-y-6 pt-6 border-t border-base-border/20">
+                <div className="flex items-center gap-2.5">
+                  <MdPregnantWoman className="w-6 h-6 text-[#EA2986]" />
+                  <h2 className="text-xl font-black text-[#EA2986] tracking-wide uppercase">Perjalanan Ibu</h2>
+                </div>
+                
+                {/* Kehamilan */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#EA2986]"></span> Kehamilan
+                    </h3>
+                    <button onClick={() => setActiveTab("Kehamilan")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("Kehamilan")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Melahirkan */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#4A85F6]"></span> Melahirkan
+                    </h3>
+                    <button onClick={() => setActiveTab("Melahirkan")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("Melahirkan")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Setelah Melahirkan */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#7A5AF8]"></span> Setelah Melahirkan
+                    </h3>
+                    <button onClick={() => setActiveTab("Setelah Melahirkan")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("Setelah Melahirkan")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Menyusui */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#1E9D5D]"></span> Menyusui
+                    </h3>
+                    <button onClick={() => setActiveTab("Menyusui")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("Menyusui")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.isLanjutkanMembaca).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
-            </div>
 
-            {/* Baru Ditambahkan (Kustom) */}
-            {articles.some(a => a.id.startsWith("CUSTOM_")) && (
-              <div className="animate-in fade-in duration-500">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-brand-primary flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-brand-primary animate-pulse"></span>
-                    Baru Ditambahkan
-                  </h2>
+              {/* PERJALANAN ANAK */}
+              <div className="space-y-6 pt-6 border-t border-base-border/20">
+                <div className="flex items-center gap-2.5">
+                  <MdChildCare className="w-6 h-6 text-[#9333EA]" />
+                  <h2 className="text-xl font-black text-[#9333EA] tracking-wide uppercase">Perjalanan Anak</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {articles.filter(a => a.id.startsWith("CUSTOM_")).map(article => (
-                    <ArticleCard 
-                      key={article.id} 
-                      article={article} 
-                      isSaved={savedArticles.has(article.id)}
-                      onToggleSave={() => toggleBookmark(article.id)}
-                    />
-                  ))}
+                
+                {/* 0 - 6 Bulan */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#9333EA]"></span> 0 - 6 Bulan
+                    </h3>
+                    <button onClick={() => setActiveTab("0 - 6 Bulan")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("0 - 6 Bulan")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6 - 12 Bulan */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#EA580C]"></span> 6 - 12 Bulan
+                    </h3>
+                    <button onClick={() => setActiveTab("6 - 12 Bulan")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("6 - 12 Bulan")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 12 - 24 Bulan */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#0284C7]"></span> 12 - 24 Bulan
+                    </h3>
+                    <button onClick={() => setActiveTab("12 - 24 Bulan")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("12 - 24 Bulan")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2 - 6 Tahun */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold text-base-text-primary flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span> 2 - 6 Tahun
+                    </h3>
+                    <button onClick={() => setActiveTab("2 - 6 Tahun")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("2 - 6 Tahun")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* Kategori 1: Gizi & MPASI */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-status-green-solid flex items-center gap-2">
-                  <MdOutlineLocalDining className="w-5 h-5" /> Gizi &amp; MPASI
-                </h2>
-                <button onClick={() => setActiveTab("Gizi & MPASI")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+              {/* INFORMASI UMUM */}
+              <div className="space-y-6 pt-6 border-t border-base-border/20">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-base-text-primary flex items-center gap-2">
+                      <MdInfo className="w-5 h-5 text-gray-600" /> Informasi Umum
+                    </h3>
+                    <button onClick={() => setActiveTab("Informasi Umum")} className="text-brand-primary text-xs font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {articles.filter(a => a.categories.includes("Informasi Umum")).slice(0, 4).map(article => (
+                      <ArticleCard 
+                        key={article.id} 
+                        article={article} 
+                        isSaved={savedArticles.has(article.id)}
+                        onToggleSave={() => toggleBookmark(article.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Gizi & MPASI") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
+
             </div>
-
-            {/* Kategori 2: Imunisasi */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-status-orange-solid flex items-center gap-2">
-                  <MdVaccines className="w-5 h-5" /> Imunisasi
-                </h2>
-                <button onClick={() => setActiveTab("Imunisasi")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Imunisasi") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Kategori 3: Kesehatan Ibu */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-status-blue-solid flex items-center gap-2">
-                  <MdPregnantWoman className="w-5 h-5" /> Kesehatan Ibu
-                </h2>
-                <button onClick={() => setActiveTab("Kesehatan Ibu")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Kesehatan Ibu") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Kategori 4: Tumbuh Kembang */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-status-cerulean-solid flex items-center gap-2">
-                  <MdOutlineExtension className="w-5 h-5" /> Tumbuh Kembang
-                </h2>
-                <button onClick={() => setActiveTab("Tumbuh Kembang")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Tumbuh Kembang") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Kategori 5: Informasi Umum */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-status-purple-solid flex items-center gap-2">
-                  <MdInfo className="w-5 h-5" /> Informasi Umum
-                </h2>
-                <button onClick={() => setActiveTab("Informasi Umum")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Informasi Umum") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-          </div>
-        )
+          );
+        })()
       ) : activeTab === "Tersimpan" ? (
         // --- TERSIMPAN VIEW ---
         <div className="space-y-6">

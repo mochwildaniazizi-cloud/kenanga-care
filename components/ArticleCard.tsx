@@ -12,11 +12,15 @@ interface ArticleCardProps {
 export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleCardProps) {
   const getCategoryColor = (cat: string) => {
     switch (cat) {
-      case "Gizi & MPASI": return "bg-status-green-solid text-base-white";
-      case "Imunisasi": return "bg-status-orange-solid text-base-white";
-      case "Kesehatan Ibu": return "bg-status-blue-solid text-base-white";
-      case "Tumbuh Kembang": return "bg-[#0277BD] text-base-white";
-      case "Informasi Umum": return "bg-status-purple-solid text-base-white";
+      case "Kehamilan": return "bg-[#FCE8F0] text-[#EA2986] border border-[#EA2986]/25";
+      case "Melahirkan": return "bg-[#ECF2FE] text-[#4A85F6] border border-[#4A85F6]/25";
+      case "Setelah Melahirkan": return "bg-[#F5F3FF] text-[#7A5AF8] border border-[#7A5AF8]/25";
+      case "Menyusui": return "bg-[#E6F8ED] text-[#1E9D5D] border border-[#1E9D5D]/25";
+      case "0 - 6 Bulan": return "bg-[#F3E8FF] text-[#9333EA] border border-[#9333EA]/25";
+      case "6 - 12 Bulan": return "bg-[#FFF7ED] text-[#EA580C] border border-[#EA580C]/25";
+      case "12 - 24 Bulan": return "bg-[#E0F2FE] text-[#0284C7] border border-[#0284C7]/25";
+      case "2 - 6 Tahun": return "bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/25";
+      case "Informasi Umum": return "bg-gray-100 text-gray-700 border border-gray-300/30";
       default: return "bg-gray-200 text-gray-800";
     }
   };

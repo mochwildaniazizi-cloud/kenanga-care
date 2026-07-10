@@ -581,21 +581,21 @@ export default function DashboardPage() {
               
               <div className="flex flex-col gap-3">
                 <div className="p-3 border border-base-border/30 rounded-xl hover:border-brand-primary/30 transition hover:shadow-sm">
-                  <span className="text-[9px] font-bold text-brand-primary uppercase">Nutrisi Ibu Hamil</span>
+                  <span className="text-[9px] font-bold text-brand-primary uppercase">Kehamilan</span>
                   <h4 className="font-bold text-xs text-base-text-primary mt-0.5">Asupan Nutrisi Penting di Trimester Kedua</h4>
                   <p className="text-[10px] text-base-text-secondary mt-1">Panduan lengkap tentang makanan kaya asam folat dan zat besi.</p>
                   <Link href="/edukasi" className="text-[10px] font-bold text-brand-primary hover:underline mt-2 inline-block">Baca Artikel →</Link>
                 </div>
 
                 <div className="p-3 border border-base-border/30 rounded-xl hover:border-brand-primary/30 transition hover:shadow-sm">
-                  <span className="text-[9px] font-bold text-status-blue-solid uppercase">Tumbuh Kembang</span>
+                  <span className="text-[9px] font-bold text-status-blue-solid uppercase">0 - 6 Bulan</span>
                   <h4 className="font-bold text-xs text-base-text-primary mt-0.5">Imunisasi Dasar Lengkap Balita 0-24 Bulan</h4>
                   <p className="text-[10px] text-base-text-secondary mt-1">Ketahui daftar vaksin wajib dan jadwal pemberiannya.</p>
                   <Link href="/edukasi" className="text-[10px] font-bold text-brand-primary hover:underline mt-2 inline-block">Baca Artikel →</Link>
                 </div>
 
                 <div className="p-3 border border-base-border/30 rounded-xl hover:border-brand-primary/30 transition hover:shadow-sm">
-                  <span className="text-[9px] font-bold text-status-green-solid uppercase">Kesehatan Balita</span>
+                  <span className="text-[9px] font-bold text-status-green-solid uppercase">6 - 12 Bulan</span>
                   <h4 className="font-bold text-xs text-base-text-primary mt-0.5">MPASI Pertama: Jadwal, Menu, dan Aturan</h4>
                   <p className="text-[10px] text-base-text-secondary mt-1">Tips memberikan makanan pendamping ASI yang padat gizi.</p>
                   <Link href="/edukasi" className="text-[10px] font-bold text-brand-primary hover:underline mt-2 inline-block">Baca Artikel →</Link>
