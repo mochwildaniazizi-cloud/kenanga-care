@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getChildDetail, updateChild } from "@/app/actions/children";
 import { 
@@ -18,6 +18,9 @@ import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator"
 
 export default function ChildDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeSection = searchParams.get("section") || "";
   const { role } = useUserRole();
   const [child, setChild] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -424,7 +427,6 @@ export default function ChildDetailPage() {
         try { setMilestones69(JSON.parse(cachedMilestones)); } catch (e) {}
       }
       
-      // TAMBAHKAN SINKRONISASI INI JUGA:
       const cachedMilestones912 = localStorage.getItem(`milestones_912_${decodedId}`);
       if (cachedMilestones912) {
         try { setMilestones912(JSON.parse(cachedMilestones912)); } catch (e) {}
@@ -553,8 +555,7 @@ export default function ChildDetailPage() {
     setEditForm((prev: any) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async () => {
     if (!editForm.child_name || !editForm.birth_date) {
       alert("Nama Anak dan Tanggal Lahir wajib diisi.");
       return;
@@ -753,69 +754,32 @@ export default function ChildDetailPage() {
         </div>
       )}
 
-      {/* Header & Back Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/20 pb-4">
-        <div className="flex items-center gap-4">
-          <Link 
-            href="/data-anak"
-            className="p-2.5 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary bg-base-white rounded-xl hover:bg-brand-soft/20 transition cursor-pointer shrink-0"
-          >
-            <MdArrowBack className="w-5 h-5" />
-          </Link>
-          
-          {/* Avatar Profile Picture */}
-          {isEditing ? (
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="relative w-16 h-16 rounded-full overflow-hidden border border-brand-primary shadow-sm shrink-0 flex items-center justify-center cursor-pointer group bg-status-yellow-light text-status-yellow-solid animate-in fade-in"
-              title="Klik untuk ubah foto profil"
-            >
-              {editForm.avatarUrl ? (
-                <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-              ) : (
-                editForm.gender === "M" ? <MdMale className="w-9 h-9 text-status-blue-solid" /> : <MdFemale className="w-9 h-9 text-brand-primary" />
-              )}
-              <div className="absolute inset-0 bg-base-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <MdCameraAlt className="w-6 h-6 text-base-white" />
-              </div>
-              <input 
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-            </div>
-          ) : (
-            <div className={`w-16 h-16 rounded-full overflow-hidden border border-base-border/30 shadow-sm shrink-0 flex items-center justify-center ${
-              displayGender === "M" ? "bg-gender-male-bg text-gender-male-solid" : "bg-gender-female-bg text-gender-female-solid"
-            }`}>
-              {child.avatarUrl ? (
-                <img src={child.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-              ) : (
-                displayGender === "M" ? <MdMale className="w-9 h-9" /> : <MdFemale className="w-9 h-9" />
-              )}
-            </div>
-          )}
-
-          <div>
-            <div className="flex items-center gap-3">
-              {isEditing ? (
-                <input 
-                  type="text" 
-                  name="child_name"
-                  value={editForm.child_name}
-                  onChange={handleInputChange}
-                  className="px-3 py-1 border border-brand-primary rounded-lg font-bold text-xl text-base-text-primary focus:outline-none w-64 bg-base-white"
-                  placeholder="Nama Lengkap Anak"
-                  required
-                />
-              ) : (
-                <h1 className="text-2xl font-bold text-base-text-primary">{displayName}</h1>
-              )}
+      {activeSection === "" ? (
+        // =========================================================================
+        // KANBAN CARDS DASHBOARD OVERVIEW (MENU UTAMA)
+        // =========================================================================
+        <div className="space-y-6">
+          {/* Header & Back Button */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/20 pb-4">
+            <div className="flex items-center gap-4">
+              <Link 
+                href="/data-anak"
+                className="p-2.5 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary bg-base-white rounded-xl hover:bg-brand-soft/20 transition cursor-pointer shrink-0"
+              >
+                <MdArrowBack className="w-5 h-5" />
+              </Link>
               
-              {!isEditing ? (
-                <>
+              <div className={`w-16 h-16 rounded-full overflow-hidden border border-base-border/30 shadow-sm shrink-0 flex items-center justify-center bg-base-white`}>
+                {child.avatarUrl ? (
+                  <img src={child.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                ) : (
+                  displayGender === "M" ? <MdMale className="w-9 h-9 text-status-blue-solid" /> : <MdFemale className="w-9 h-9 text-brand-primary" />
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-bold text-base-text-primary">{displayName}</h1>
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                     displayGender === "M" 
                       ? "bg-status-blue-light text-status-blue-solid border border-status-blue-solid/25" 
@@ -826,142 +790,344 @@ export default function ChildDetailPage() {
                   <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getStatusBadgeStyle(child.status)}`}>
                     Status Gizi: {child.status}
                   </span>
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <select
-                    name="gender"
-                    value={editForm.gender}
-                    onChange={handleInputChange}
-                    className="px-2.5 py-0.5 border border-brand-primary rounded-full text-xs font-semibold focus:outline-none bg-base-white text-base-text-primary cursor-pointer"
-                  >
-                    <option value="M">Laki-laki (M)</option>
-                    <option value="F">Perempuan (F)</option>
-                  </select>
-                  {editForm.current_weight && editForm.current_height && editForm.birth_date && (
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      getStatusBadgeStyle(
-                        getNutritionalStatus(
-                          calculateZScore(Number(editForm.current_weight), getAgeInMonths(editForm.birth_date), editForm.gender, "BB"),
-                          calculateZScore(Number(editForm.current_height), getAgeInMonths(editForm.birth_date), editForm.gender, "TB")
-                        )
-                      )
-                    }`}>
-                      Status Gizi: {getNutritionalStatus(
-                        calculateZScore(Number(editForm.current_weight), getAgeInMonths(editForm.birth_date), editForm.gender, "BB"),
-                        calculateZScore(Number(editForm.current_height), getAgeInMonths(editForm.birth_date), editForm.gender, "TB")
-                      )}
-                    </span>
-                  )}
                 </div>
-              )}
+                
+                <div className="flex items-center gap-2 mt-1.5 text-xs text-base-text-secondary font-medium">
+                  <span>NIK: <span className="font-semibold text-base-text-primary">{displayNik}</span></span>
+                  <span>&bull;</span>
+                  <span>Umur: <span className="font-semibold text-base-text-primary">{child.age || (child.ageInMonths + " Bulan")}</span></span>
+                </div>
+              </div>
             </div>
             
-            <div className="flex items-center gap-2 mt-1.5 text-xs text-base-text-secondary">
-              <span>NIK:</span>
-              {isEditing ? (
-                <input 
-                  type="text" 
-                  name="national_id"
-                  value={editForm.national_id}
-                  onChange={handleInputChange}
-                  className="px-2 py-0.5 border border-base-border/50 rounded text-xs focus:outline-none w-36 bg-base-white"
-                  placeholder="NIK Anak"
-                />
-              ) : (
-                <span className="font-semibold text-base-text-primary">{displayNik}</span>
+            <div className="flex items-center gap-3">
+              {role !== "ibu" && (
+                <button 
+                  type="button"
+                  onClick={() => router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`)}
+                  className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                >
+                  <MdEdit className="w-4 h-4" /> Edit Data Balita
+                </button>
               )}
-              <span>&bull;</span>
-              <span>ID Anak: {child.child_id}</span>
+            </div>
+          </div>
+
+          {/* Kanban Board Container */}
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-black text-base-text-primary font-bold">Kurikulum Pemantauan Kesehatan Balita</h2>
+              <p className="text-xs text-base-text-secondary font-semibold">Pilih modul kartu di bawah untuk mengisi data check-up harian dan melihat perkembangan.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              
+              {/* Card 1: Biodata & Identitas */}
+              <div 
+                onClick={() => router.push(`/data-anak/${child.child_id}?section=biodata`)}
+                className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#FF5C5C] rounded-full"></span> BIODATA BALITA</span>
+                  <span>Urgent</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#FF5C5C] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">
+                    BIODATA &amp; ALERGI
+                  </div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Identitas Lengkap Anak</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Data NIK, tempat/tanggal lahir, nama ibu kandung, golongan darah, serta kondisi medis khusus/riwayat alergi.</p>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="flex -space-x-1.5 overflow-hidden">
+                        <div className="w-6 h-6 rounded-full bg-brand-soft text-brand-primary flex items-center justify-center text-[10px] font-bold border border-base-white">
+                          {displayName.charAt(0)}
+                        </div>
+                        <div className="w-6 h-6 rounded-full bg-status-yellow-light text-status-yellow-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
+                          M
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-red-50 text-[#FF5C5C]">
+                        Lengkap
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">⚖️ {child.birth_weight || "-"} kg</span>
+                      <span className="flex items-center gap-1">📏 {child.birth_length || "-"} cm</span>
+                    </div>
+                    <span>Detail &bull; Edit</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Layanan Kesehatan */}
+              <div 
+                onClick={() => router.push(`/data-anak/${child.child_id}?section=health_service`)}
+                className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#FF9F43] rounded-full"></span> LAYANAN KESEHATAN</span>
+                  <span>Aktif</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#FF9F43] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">
+                    LAYANAN KESEHATAN
+                  </div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Jaminan &amp; Faskes</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Informasi nomor BPJS/JKN, asuransi, Faskes Tingkat I (Puskesmas/Posyandu), serta Faskes Rujukan.</p>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="flex -space-x-1.5 overflow-hidden">
+                        <div className="w-6 h-6 rounded-full bg-status-blue-light text-status-blue-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
+                          H
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-orange-50 text-[#FF9F43]">
+                        BPJS Aktif
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">💳 {child.jkn_number ? "Kartu Ada" : "-"}</span>
+                    </div>
+                    <span>Detail &bull; Edit</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: Neonatal harian */}
+              <div 
+                onClick={() => router.push(`/data-anak/${child.child_id}?section=newborn_monitoring`)}
+                className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#4CA3FF] rounded-full"></span> NEONATAL MONITORING</span>
+                  <span>Hari 1-28</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#4CA3FF] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">
+                    NEONATUS
+                  </div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Bayi Baru Lahir (0-28 Hari)</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Log gejala harian neonatus, checklist 12 tanda bahaya, riwayat pemeriksaan nakes, dan absensi kelas balita.</p>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="flex -space-x-1.5 overflow-hidden">
+                        <div className="w-6 h-6 rounded-full bg-status-purple-light text-status-purple-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
+                          👶
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-[#4CA3FF]">
+                        Neonatal
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">📋 28 Hari Log</span>
+                    </div>
+                    <span>Buka Lembar</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 4: Tumbuh Kembang */}
+              <div 
+                onClick={() => router.push(`/data-anak/${child.child_id}?section=development_monitoring`)}
+                className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#4CD964] rounded-full"></span> TUMBUH KEMBANG</span>
+                  <span>Buku KIA</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#4CD964] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">
+                    TUMBUH KEMBANG
+                  </div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Checklist Kuesioner Buku KIA</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Evaluasi mandiri penanda perkembangan (milestones) motorik kasar/halus &amp; sensorik anak usia 6 bulan - 6 tahun.</p>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="flex -space-x-1.5 overflow-hidden">
+                        <div className="w-6 h-6 rounded-full bg-status-green-light text-status-green-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
+                          📈
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-green-50 text-[#4CD964]">
+                        Sesuai Umur
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">📋 8 Fase Usia</span>
+                    </div>
+                    <span>Buka Checklist</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 5: Grafik & Riwayat */}
+              <div 
+                onClick={() => router.push(`/data-anak/${child.child_id}?section=growth_history`)}
+                className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#00BCD4] rounded-full"></span> TREN PERTUMBUHAN</span>
+                  <span>Posyandu</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#00BCD4] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">
+                    TREN &amp; GRAFIK PERTUMBUHAN
+                  </div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Grafik &amp; Log Timbangan</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Tren grafik tinggi/berat badan Posyandu beserta log tabel kunjungan lengkap catatan kader.</p>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="flex -space-x-1.5 overflow-hidden">
+                        <div className="w-6 h-6 rounded-full bg-status-cerulean-light text-status-cerulean-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
+                          📊
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-cyan-50 text-[#00BCD4]">
+                        {child.measurements.length} Kunjungan
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">📊 Kurva KMS</span>
+                    </div>
+                    <span>Lihat Grafik</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
-        
-        {/* Actions Button */}
-        <div className="flex items-center gap-3">
-          {isEditing ? (
-            <div className="flex items-center gap-2">
-              <button 
-                type="button"
-                onClick={handleCancelEdit}
-                className="px-4 py-2 border border-base-border/50 hover:bg-base-bg text-base-text-secondary rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
-                disabled={isSubmitting}
-              >
-                <MdClose className="w-4 h-4" /> Batal
-              </button>
-              <button 
-                type="button"
-                onClick={handleSave}
-                className="px-4 py-2 bg-brand-primary text-base-white hover:bg-brand-primary/95 rounded-xl text-xs font-bold shadow-md shadow-brand-primary/10 transition cursor-pointer flex items-center gap-1"
-                disabled={isSubmitting}
-              >
-                <MdSave className="w-4 h-4" /> {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
-              </button>
-            </div>
-          ) : (
-            role !== "ibu" && (
-              <button 
-                type="button"
-                onClick={handleStartEdit}
-                className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
-              >
-                <MdEdit className="w-4 h-4" /> Edit Data Balita
-              </button>
-            )
-          )}
-        </div>
-      </div>
+      ) : (
+        // =========================================================================
+        // FULL-SCREEN SUB-VIEWS DENGAN TOMBOL KEMBALI
+        // =========================================================================
+        <div className="space-y-6">
+          {/* Sub-header */}
+          <div className="flex items-center justify-between border-b pb-4">
+            <button 
+              type="button" 
+              onClick={() => {
+                setIsEditing(false);
+                router.push(`/data-anak/${child.child_id}`);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-base-text-secondary hover:text-brand-primary transition border border-base-border/30 rounded-xl bg-base-white cursor-pointer"
+            >
+              <MdArrowBack className="w-4 h-4" /> Kembali ke Dashboard
+            </button>
+            <h2 className="text-base font-extrabold text-base-text-primary capitalize flex items-center gap-2">
+              <span>{activeSection.replace("_", " ")}</span>
+              <span className="text-[10px] bg-brand-soft text-brand-primary font-bold px-2.5 py-0.5 rounded-full border border-brand-primary/20">{displayName}</span>
+            </h2>
+          </div>
 
-      {/* Bento Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Left Column: Biodata & Services (Col span 5) */}
-        <div className="lg:col-span-5 space-y-6">
-          
-          {/* Card: TABBED BENTO CONTAINER */}
-          <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden">
-            {/* Tabs Selector */}
-            <div className="flex border-b text-xs font-bold text-base-text-secondary select-none">
-              <button 
-                type="button" 
-                onClick={() => setActiveSubTab('biodata')}
-                className={`flex-1 py-3 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'biodata' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
-              >
-                <FaUser className="w-3.5 h-3.5" /> Identitas Balita
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setActiveSubTab('health_service')}
-                className={`flex-1 py-3 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'health_service' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
-              >
-                <FaFileMedical className="w-3.5 h-3.5" /> Layanan Kesehatan
-              </button>
-              <button 
-                type="button" 
-                onClick={() => setActiveSubTab('newborn_monitoring')}
-                className={`flex-1 py-3 text-center border-b-2 flex items-center justify-center gap-1.5 transition ${activeSubTab === 'newborn_monitoring' ? 'border-brand-primary text-brand-primary bg-brand-soft/10' : 'border-transparent hover:bg-base-bg/30'}`}
-              >
-                <MdChildCare className="w-3.5 h-3.5" /> Pemantauan Neonatus
-              </button>
-            </div>
+          {activeSection === "biodata" && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Profile card & editing form */}
+              <div className="lg:col-span-1 bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
+                <div className="flex flex-col items-center text-center space-y-3">
+                  {isEditing || searchParams.get("edit") === "true" ? (
+                    <div 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="relative w-28 h-28 rounded-full overflow-hidden border border-brand-primary shadow-sm flex items-center justify-center cursor-pointer group bg-status-yellow-light text-status-yellow-solid"
+                    >
+                      {editForm.avatarUrl ? (
+                        <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                      ) : (
+                        editForm.gender === "M" ? <MdMale className="w-14 h-14 text-status-blue-solid" /> : <MdFemale className="w-14 h-14 text-brand-primary" />
+                      )}
+                      <div className="absolute inset-0 bg-base-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <MdCameraAlt className="w-8 h-8 text-base-white" />
+                      </div>
+                      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                    </div>
+                  ) : (
+                    <div className={`w-28 h-28 rounded-full overflow-hidden border border-base-border/30 shadow-sm flex items-center justify-center ${
+                      displayGender === "M" ? "bg-gender-male-bg text-gender-male-solid" : "bg-gender-female-bg text-gender-female-solid"
+                    }`}>
+                      {child.avatarUrl ? (
+                        <img src={child.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                      ) : (
+                        displayGender === "M" ? <MdMale className="w-14 h-14" /> : <MdFemale className="w-14 h-14" />
+                      )}
+                    </div>
+                  )}
 
-            {/* Content Body */}
-            <div className="p-6">
-              
-              {/* TAB 1: IDENTITAS BALITA */}
-              {activeSubTab === 'biodata' && (
-                <div className="grid grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-lg text-base-text-primary">{displayName}</h3>
+                    <span className="text-[10px] text-base-text-secondary font-bold uppercase tracking-wider block">ID: {child.child_id}</span>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 space-y-3 text-xs font-semibold text-base-text-secondary">
+                  <div className="flex justify-between"><span>Lahir Prematur</span><span className="text-base-text-primary">{child.special_conditions?.includes("Lahir Prematur") ? "Ya" : "Tidak"}</span></div>
+                  <div className="flex justify-between"><span>Berat Lahir</span><span className="text-base-text-primary">{child.birth_weight || "-"} kg</span></div>
+                  <div className="flex justify-between"><span>Panjang Lahir</span><span className="text-base-text-primary">{child.birth_length || "-"} cm</span></div>
+                </div>
+              </div>
+
+              {/* Identity Details Form */}
+              <div className="lg:col-span-2 bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
+                <div className="flex justify-between items-center border-b pb-2">
+                  <h3 className="font-bold text-sm text-base-text-primary">Detail Identitas Anak</h3>
+                  {!(isEditing || searchParams.get("edit") === "true") && role !== "ibu" && (
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        handleStartEdit();
+                        router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`);
+                      }}
+                      className="text-xs font-bold text-brand-primary flex items-center gap-1 hover:underline cursor-pointer"
+                    >
+                      <MdEdit className="w-3.5 h-3.5" /> Ubah Profil
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">Nama Lengkap Anak</span>
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <input type="text" name="child_name" value={editForm.child_name} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" required />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{child.name}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-base-text-secondary block">NIK Anak</span>
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <input type="text" name="national_id" value={editForm.national_id} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                    ) : (
+                      <p className="text-sm font-bold text-base-text-primary">{child.national_id || "-"}</p>
+                    )}
+                  </div>
                   <div className="space-y-1">
                     <span className="text-base-text-secondary block">Tempat Lahir</span>
-                    {isEditing ? (
-                      <input type="text" name="birth_place" value={editForm.birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <input type="text" name="birth_place" value={editForm.birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
                     ) : (
                       <p className="text-sm font-bold text-base-text-primary">{child.birth_place || "-"}</p>
                     )}
                   </div>
                   <div className="space-y-1">
                     <span className="text-base-text-secondary block">Tanggal Lahir</span>
-                    {isEditing ? (
+                    {isEditing || searchParams.get("edit") === "true" ? (
                       <div className="relative overflow-visible z-50">
                         <CustomDatePicker value={editForm.birth_date} onChange={(val) => setEditForm((prev: any) => ({ ...prev, birth_date: val }))} outputFormat="iso" />
                       </div>
@@ -970,13 +1136,9 @@ export default function ChildDetailPage() {
                     )}
                   </div>
                   <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Umur Sekarang</span>
-                    <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{displayAge} Bulan</p>
-                  </div>
-                  <div className="space-y-1">
                     <span className="text-base-text-secondary block">Anak Ke-</span>
-                    {isEditing ? (
-                      <select name="birth_order" value={editForm.birth_order} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white cursor-pointer">
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <select name="birth_order" value={editForm.birth_order} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-base-white cursor-pointer">
                         {[1,2,3,4,5,6,7,8,9,10].map(num => (
                           <option key={num} value={num}>{num}</option>
                         ))}
@@ -986,25 +1148,9 @@ export default function ChildDetailPage() {
                     )}
                   </div>
                   <div className="space-y-1">
-                    <span className="text-base-text-secondary block">No. JKN / BPJS Anak</span>
-                    {isEditing ? (
-                      <input type="text" name="jkn_number" value={editForm.jkn_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.jkn_number || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">No. Akta Kelahiran</span>
-                    {isEditing ? (
-                      <input type="text" name="birth_certificate_number" value={editForm.birth_certificate_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.birth_certificate_number || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
                     <span className="text-base-text-secondary block">Golongan Darah</span>
-                    {isEditing ? (
-                      <select name="blood_type" value={editForm.blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white cursor-pointer">
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <select name="blood_type" value={editForm.blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-base-white cursor-pointer">
                         <option value="-">-</option>
                         <option value="A">A</option>
                         <option value="B">B</option>
@@ -1015,737 +1161,618 @@ export default function ChildDetailPage() {
                       <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{child.blood_type || "-"}</p>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">No. Telepon Keluarga</span>
-                    {isEditing ? (
-                      <input type="text" name="phone_number" value={editForm.phone_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
+                  <div className="col-span-2 space-y-1">
+                    <span className="text-base-text-secondary block">No. Akta Kelahiran</span>
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <input type="text" name="birth_certificate_number" value={editForm.birth_certificate_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
                     ) : (
-                      <p className="text-sm font-bold text-base-text-primary flex items-center gap-1">
-                        <MdPhone className="w-3.5 h-3.5 text-base-text-secondary" /> {child.phone_number || "-"}
-                      </p>
+                      <p className="text-sm font-bold text-base-text-primary">{child.birth_certificate_number || "-"}</p>
                     )}
                   </div>
                   <div className="col-span-2 space-y-1">
-                    <span className="text-base-text-secondary block">Alamat Rumah Anak</span>
-                    {isEditing ? (
-                      <textarea name="address" value={editForm.address} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs resize-none" />
+                    <span className="text-base-text-secondary block">Alamat Rumah</span>
+                    {isEditing || searchParams.get("edit") === "true" ? (
+                      <textarea name="address" value={editForm.address} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs resize-none" />
                     ) : (
                       <p className="text-sm font-bold text-base-text-primary">{child.address || "-"}</p>
                     )}
                   </div>
+                  <div className="col-span-2 space-y-1 pt-2 border-t">
+                    <span className="text-base-text-secondary block">Ibu Kandung</span>
+                    <p className="text-sm font-bold text-brand-primary">{child.mother_name || "-"}</p>
+                  </div>
+                </div>
 
-                  <div className="col-span-2 space-y-1 pt-2 border-t border-base-border/10">
-                    <span className="text-base-text-secondary">Ibu Kandung</span>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="w-6 h-6 rounded-full bg-status-yellow-light text-status-yellow-solid flex items-center justify-center">
-                        <MdPerson className="w-3.5 h-3.5" />
+                {/* Tags & notes inside biodata view */}
+                <div className="pt-4 border-t space-y-2">
+                  <span className="text-xs font-bold text-base-text-primary">Kondisi Medis &amp; Riwayat Alergi</span>
+                  {isEditing || searchParams.get("edit") === "true" ? (
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap gap-2">
+                        {AVAILABLE_TAGS.map((tag) => {
+                          const isSelected = editForm.special_conditions?.includes(tag);
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => handleTagToggle(tag)}
+                              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition cursor-pointer ${
+                                isSelected
+                                  ? "bg-brand-soft/80 text-brand-primary border-brand-primary"
+                                  : "bg-base-bg text-base-text-secondary border-base-border/50 hover:bg-base-border/20"
+                              }`}
+                            >
+                              {tag}
+                            </button>
+                          );
+                        })}
                       </div>
-                      {child.mother_id ? (
-                        <Link href={`/data-ibu/${child.mother_id}`} className="text-sm font-bold text-brand-primary hover:underline transition cursor-pointer">
-                          {child.mother_name}
-                        </Link>
+                      {editForm.special_conditions?.includes("Lainnya...") && (
+                        <textarea
+                          name="special_conditions_notes"
+                          value={editForm.special_conditions_notes || ""}
+                          onChange={(e) => setEditForm((prev: any) => ({ ...prev, special_conditions_notes: e.target.value }))}
+                          placeholder="Masukkan detail kondisi medis atau alergi lainnya..."
+                          rows={3}
+                          className="w-full px-3 py-2 text-xs border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white resize-none"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {(!child.special_conditions || child.special_conditions.length === 0) ? (
+                        <p className="text-xs text-base-text-secondary italic">Tidak ada kondisi khusus / riwayat alergi.</p>
                       ) : (
-                        <span className="text-sm font-bold text-base-text-primary">{child.mother_name}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 2: HEALTH SERVICES */}
-              {activeSubTab === 'health_service' && (
-                <div className="grid grid-cols-2 gap-4 text-xs font-medium animate-in fade-in duration-200">
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Faskes Tingkat I</span>
-                    {isEditing ? (
-                      <input type="text" name="faskes_1" value={editForm.faskes_1} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.faskes_1 || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Faskes Rujukan</span>
-                    {isEditing ? (
-                      <input type="text" name="faskes_referral" value={editForm.faskes_referral} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.faskes_referral || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Pembiayaan Lain</span>
-                    {isEditing ? (
-                      <input type="text" name="other_financing" value={editForm.other_financing} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.other_financing || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Asuransi Lain</span>
-                    {isEditing ? (
-                      <input type="text" name="insurance_other" value={editForm.insurance_other} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.insurance_other || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Nomor Asuransi</span>
-                    {isEditing ? (
-                      <input type="text" name="insurance_number" value={editForm.insurance_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.insurance_number || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi</span>
-                    {isEditing ? (
-                      <input type="date" name="insurance_validity" value={editForm.insurance_validity} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs text-base-text-primary" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.insurance_validity || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Faskes Primer</span>
-                    {isEditing ? (
-                      <input type="text" name="faskes_primary" value={editForm.faskes_primary} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.faskes_primary || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Puskesmas Domisili</span>
-                    {isEditing ? (
-                      <input type="text" name="puskesmas_domicile" value={editForm.puskesmas_domicile} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.puskesmas_domicile || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">No. Reg Kohort Bayi</span>
-                    {isEditing ? (
-                      <input type="text" name="cohort_register_number_baby" value={editForm.cohort_register_number_baby} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.cohort_register_number_baby || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">No. Reg Kohort Balita</span>
-                    {isEditing ? (
-                      <input type="text" name="cohort_register_number_toddler" value={editForm.cohort_register_number_toddler} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.cohort_register_number_toddler || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Faskes Sekunder</span>
-                    {isEditing ? (
-                      <input type="text" name="faskes_secondary" value={editForm.faskes_secondary} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.faskes_secondary || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">No. Catatan Medik RS</span>
-                    {isEditing ? (
-                      <input type="text" name="medical_record_number" value={editForm.medical_record_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.medical_record_number || "-"}</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 3: NEWBORN MONITORING (0-28 HARI) */}
-              {activeSubTab === 'newborn_monitoring' && (() => {
-                const handleTogglePemeriksaan = (idx: number) => {
-                  const nextP = [...newbornMonitoring.pemeriksaan];
-                  nextP[idx] = !nextP[idx];
-                  const nextMonitoring = { ...newbornMonitoring, pemeriksaan: nextP };
-                  setNewbornMonitoring(nextMonitoring);
-                  if (child) {
-                    localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextMonitoring));
-                  }
-                };
-
-                const handleToggleDanger = (idx: number) => {
-                  const nextD = [...newbornMonitoring.dangerSigns];
-                  nextD[idx] = !nextD[idx];
-                  const nextMonitoring = { ...newbornMonitoring, dangerSigns: nextD };
-                  setNewbornMonitoring(nextMonitoring);
-                  if (child) {
-                    localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextMonitoring));
-                  }
-                };
-
-                const pItems = [
-                  { label: "1. Pemeriksaan Neonatus 1 (KN1)", desc: "Umur 6-48 jam setelah lahir." },
-                  { label: "2. Pemeriksaan Neonatus 2 (KN2)", desc: "Umur 3-7 hari setelah lahir." },
-                  { label: "3. Pemeriksaan Neonatus 3 (KN3)", desc: "Umur 8-28 hari setelah lahir." },
-                  { label: "4. Salep Mata, Vit K1, & Imunisasi HB0", desc: "Umur 0-5 jam setelah lahir." }
-                ];
-
-                const dangerItems = [
-                  { title: "Demam / Panas Tinggi", desc: "Suhu tubuh bayi >37.5°C.", emoji: "🤒" },
-                  { title: "Badan Dingin", desc: "Suhu tubuh <36°C (Hipotermia).", emoji: "🥶" },
-                  { title: "Kejang-Kejang", desc: "Kejang kaku atau kelojotan.", emoji: "⚡" },
-                  { title: "Lemah / Tidak Aktif", desc: "Bayi lunglai dan sulit dibangunkan.", emoji: "💤" },
-                  { title: "Napas Cepat / Sesak Napas", desc: "Napas cepat (>60 x/menit).", emoji: "👃" },
-                  { title: "Merintih / Merintih Terus", desc: "Bernapas mengeluarkan suara merintih.", emoji: "🔊" },
-                  { title: "Tidak Mau Menyusu", desc: "Menolak menyusu sama sekali.", emoji: "🍼" },
-                  { title: "Tali Pusat Kemerahan / Bau", desc: "Meluas ke kulit perut, basah/berbau.", emoji: "🔗" },
-                  { title: "Kulit & Mata Kuning", desc: "Kuning muncul pada hari pertama/meluas.", emoji: "🟡" },
-                  { title: "Muntah-Muntah", desc: "Memuntahkan semua yang diminum.", emoji: "🤮" },
-                  { title: "Diare", desc: "Buang air besar cair berkali-kali.", emoji: "💩" },
-                  { title: "Tinja Berwarna Pucat", desc: "Tinja berwarna putih keabu-abuan.", emoji: "⚪" }
-                ];
-
-                const hasDanger = newbornMonitoring.dangerSigns.some(Boolean);
-
-                return (
-                  <div className="space-y-5 text-xs animate-in fade-in duration-200">
-                    
-                    <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
-                      <h4 className="font-bold text-xs text-brand-primary">
-                        Pemantauan Bayi Baru Lahir (Neonatus 0-28 Hari)
-                      </h4>
-                      <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
-                        Pantau pelayanan kesehatan dan kenali tanda bahaya bayi baru lahir secara mandiri (Buku KIA Hal 40-41).
-                      </p>
-                    </div>
-
-                    {/* I. Pemeriksaan Kesehatan */}
-                    <div className="space-y-2.5">
-                      <h5 className="font-bold text-xs text-brand-primary">I. Kunjungan Pemeriksaan Kesehatan</h5>
-                      <div className="grid grid-cols-1 gap-2">
-                        {pItems.map((item, idx) => (
-                          <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/20 rounded-xl cursor-pointer hover:border-brand-primary/20 transition">
-                            <input 
-                              type="checkbox" 
-                              checked={!!newbornMonitoring.pemeriksaan[idx]} 
-                              onChange={() => handleTogglePemeriksaan(idx)} 
-                              className="w-4 h-4 rounded text-brand-primary mt-0.5 cursor-pointer focus:ring-brand-primary/30" 
-                            />
-                            <div className="text-[10px] leading-relaxed select-none">
-                              <span className="font-bold text-base-text-primary block">{item.label}</span>
-                              <span className="text-base-text-secondary">{item.desc}</span>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* II. Tanda Bahaya */}
-                    <div className="space-y-2.5">
-                      <h5 className="font-bold text-xs text-status-red-solid flex items-center gap-1">
-                        II. Deteksi Dini Tanda Bahaya 
-                        {hasDanger && (
-                          <span className="text-[8px] font-bold text-status-red-solid bg-status-red-light/35 border border-status-red-solid/25 px-2 py-0.5 rounded-full uppercase animate-pulse shrink-0">Bahaya</span>
-                        )}
-                      </h5>
-
-                      {hasDanger && (
-                        <div className="p-3 bg-status-red-light/10 border border-status-red-solid/20 rounded-xl text-[10px] text-status-red-solid font-bold leading-relaxed animate-in slide-in-from-top-2 duration-200">
-                          ⚠️ PERINGATAN: Gejala bahaya neonatus terdeteksi! Segera hubungi faskes/dokter anak untuk pemeriksaan lebih lanjut.
+                        <div className="flex flex-wrap gap-2">
+                          {child.special_conditions.map((tag: string) => (
+                            <span key={tag} className="bg-brand-soft/50 text-brand-primary border border-brand-primary/20 rounded-full px-3 py-1 text-xs font-semibold">
+                              {tag}
+                            </span>
+                          ))}
                         </div>
                       )}
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {dangerItems.map((item, idx) => (
-                          <label key={idx} className="flex items-start gap-2.5 p-3 bg-base-white border border-base-border/20 rounded-xl cursor-pointer hover:border-status-red-solid/20 transition">
-                            <input 
-                              type="checkbox" 
-                              checked={!!newbornMonitoring.dangerSigns[idx]} 
-                              onChange={() => handleToggleDanger(idx)} 
-                              className="w-4 h-4 rounded text-status-red-solid mt-0.5 cursor-pointer focus:ring-status-red-solid/30" 
-                            />
-                            <div className="text-[10px] leading-relaxed select-none">
-                              <span className="font-bold text-base-text-primary flex items-center gap-1">{item.emoji} {item.title}</span>
-                              <span className="text-base-text-secondary block mt-0.5">{item.desc}</span>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
                     </div>
-
-                    {/* III. Lembar Pemantauan Harian 0-28 Hari */}
-                    {(() => {
-                      const harianSymptoms = [
-                        "Sesak napas / dada tertarik ke dalam",
-                        "Lemah / menangis merintih",
-                        "Kulit biru di sekitar mulut / ujung jari",
-                        "Hisapan lemah / muntah cairan hijau",
-                        "Kejang (mata mendelik / tangisan melengking)",
-                        "Suhu panas (>37.5°C) atau dingin (<36.5°C)",
-                        "BAB berdarah atau diare encer",
-                        "Kencing sedikit / warna pekat/kecoklatan",
-                        "Tali pusat merah / berdarah / berbau",
-                        "Mata merah / bernanah",
-                        "Kulit berbintil air / bernanah",
-                        "Belum mendapat imunisasi HB0 / Vit K1"
-                      ];
-
-                      const weeks = [
-                        { label: "Minggu 1", days: [1,2,3,4,5,6,7] },
-                        { label: "Minggu 2", days: [8,9,10,11,12,13,14] },
-                        { label: "Minggu 3", days: [15,16,17,18,19,20,21] },
-                        { label: "Minggu 4", days: [22,23,24,25,26,27,28] }
-                      ];
-
-                      const handleToggleSymptom = (dayIdx: number, symIdx: number) => {
-                        const nextHarian = newbornMonitoring.harianList.map((d: any, i: number) => {
-                          if (i !== dayIdx) return d;
-                          const nextSymptoms = [...d.symptoms];
-                          nextSymptoms[symIdx] = !nextSymptoms[symIdx];
-                          return { ...d, symptoms: nextSymptoms };
-                        });
-                        const nextM = { ...newbornMonitoring, harianList: nextHarian };
-                        setNewbornMonitoring(nextM);
-                        if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
-                      };
-
-                      const getDayStatus = (dayEntry: any) => {
-                        if (!dayEntry?.symptoms) return null;
-                        const count = dayEntry.symptoms.filter(Boolean).length;
-                        return count;
-                      };
-
-                      return (
-                        <div className="space-y-2.5">
-                          <h5 className="font-bold text-xs text-brand-primary">III. Lembar Pemantauan Harian (Hari 1-28)</h5>
-                          <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
-                            Centang gejala yang muncul setiap hari. Jika ada tanda, segera hubungi bidan atau puskesmas. (Buku KIA Hal 42-45)
-                          </p>
-
-                          {/* Week selector */}
-                          <div className="flex gap-1.5 flex-wrap">
-                            {weeks.map((wk, wi) => {
-                              const weekDayEntries = wk.days.map(d => newbornMonitoring.harianList?.[d - 1]);
-                              const weekHasAlert = weekDayEntries.some((d: any) => d?.symptoms?.some(Boolean));
-                              return (
-                                <button
-                                  key={wi}
-                                  type="button"
-                                  onClick={() => {
-                                    const nextM = { ...newbornMonitoring, _weekSel: wi };
-                                    setNewbornMonitoring(nextM);
-                                    if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
-                                  }}
-                                  className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-bold transition border ${(newbornMonitoring._weekSel ?? 0) === wi ? 'bg-brand-primary text-white border-brand-primary' : 'bg-base-white border-base-border/30 text-base-text-secondary hover:border-brand-primary/30'}`}
-                                >
-                                  {wk.label}
-                                  {weekHasAlert && <span className="w-1.5 h-1.5 rounded-full bg-status-red-solid inline-block animate-pulse" />}
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {/* Days in selected week */}
-                          <div className="grid grid-cols-1 gap-2">
-                            {weeks[newbornMonitoring._weekSel ?? 0]?.days.map((dayNum: number) => {
-                              const dayIdx = dayNum - 1;
-                              const dayEntry = newbornMonitoring.harianList?.[dayIdx];
-                              const symCount = getDayStatus(dayEntry);
-                              const hasAlert = symCount > 0;
-                              return (
-                                <details key={dayNum} className="group border border-base-border/20 rounded-xl overflow-hidden bg-base-white">
-                                  <summary className="flex items-center justify-between p-3 cursor-pointer select-none list-none">
-                                    <div className="flex items-center gap-2">
-                                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-extrabold shrink-0 ${hasAlert ? 'bg-status-red-solid text-white' : 'bg-brand-soft/20 text-brand-primary'}`}>{dayNum}</span>
-                                      <span className="font-bold text-[10px] text-base-text-primary">Hari ke-{dayNum}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                      {hasAlert ? (
-                                        <span className="text-[8px] font-bold text-status-red-solid bg-status-red-light/30 border border-status-red-solid/20 px-1.5 py-0.5 rounded-full animate-pulse">{symCount} Gejala</span>
-                                      ) : (
-                                        <span className="text-[8px] font-bold text-status-green-solid bg-status-green-light/30 border border-status-green-solid/20 px-1.5 py-0.5 rounded-full">Sehat ✓</span>
-                                      )}
-                                      <span className="text-base-text-secondary text-[10px] group-open:rotate-180 transition-transform duration-200">▼</span>
-                                    </div>
-                                  </summary>
-                                  <div className="px-3 pb-3 grid grid-cols-1 gap-1.5 border-t border-base-border/10 pt-2.5">
-                                    {harianSymptoms.map((sym, si) => (
-                                      <label key={si} className="flex items-center gap-2 cursor-pointer hover:bg-base-bg/30 px-1.5 py-1 rounded-lg transition">
-                                        <input
-                                          type="checkbox"
-                                          checked={!!dayEntry?.symptoms?.[si]}
-                                          onChange={() => handleToggleSymptom(dayIdx, si)}
-                                          className="w-3.5 h-3.5 rounded text-status-red-solid cursor-pointer focus:ring-status-red-solid/30 shrink-0"
-                                        />
-                                        <span className={`text-[10px] font-medium select-none ${dayEntry?.symptoms?.[si] ? 'text-status-red-solid font-bold' : 'text-base-text-secondary'}`}>{sym}</span>
-                                      </label>
-                                    ))}
-                                  </div>
-                                </details>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* IV. Absensi Kelas Ibu Balita */}
-                    {(() => {
-                      const handleEditKelas = (idx: number, field: string, val: string) => {
-                        const nextKelas = newbornMonitoring.kelasBalita.map((k: any, i: number) =>
-                          i === idx ? { ...k, [field]: val } : k
-                        );
-                        const nextM = { ...newbornMonitoring, kelasBalita: nextKelas };
-                        setNewbornMonitoring(nextM);
-                        if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
-                      };
-
-                      const filledCount = newbornMonitoring.kelasBalita?.filter((k: any) => !!k.date).length ?? 0;
-
-                      return (
-                        <div className="space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <h5 className="font-bold text-xs text-brand-primary">IV. Absensi Kelas Ibu Balita</h5>
-                            <span className="text-[9px] font-bold text-brand-primary bg-brand-soft/20 px-2 py-0.5 rounded-full">{filledCount} / 15 Hadir</span>
-                          </div>
-                          <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
-                            Catat kehadiran kelas ibu balita. (Buku KIA Hal 50)
-                          </p>
-                          {/* Progress bar */}
-                          <div className="w-full h-1.5 bg-base-bg/50 rounded-full overflow-hidden">
-                            <div className="h-full bg-brand-primary rounded-full transition-all duration-300" style={{ width: `${(filledCount / 15) * 100}%` }} />
-                          </div>
-                          <div className="overflow-x-auto rounded-xl border border-base-border/20">
-                            <table className="w-full text-[10px] border-collapse">
-                              <thead>
-                                <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
-                                  <th className="p-2 text-center w-8">No</th>
-                                  <th className="p-2 text-left">Tanggal</th>
-                                  <th className="p-2 text-left">Catatan Materi / Fasilitator</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {newbornMonitoring.kelasBalita?.map((row: any, idx: number) => (
-                                  <tr key={idx} className="border-b border-base-border/5 hover:bg-base-bg/20 transition">
-                                    <td className="p-2 text-center font-bold text-base-text-secondary">{row.no}</td>
-                                    <td className="p-2">
-                                      <input
-                                        type="date"
-                                        value={row.date || ""}
-                                        onChange={e => handleEditKelas(idx, 'date', e.target.value)}
-                                        className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
-                                      />
-                                    </td>
-                                    <td className="p-2">
-                                      <input
-                                        type="text"
-                                        value={row.notes || ""}
-                                        onChange={e => handleEditKelas(idx, 'notes', e.target.value)}
-                                        placeholder="Catatan..."
-                                        className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
-                                      />
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                  </div>
-                );
-              })()}
-              
-              {/* TAB 4: PEMANTAUAN TUMBUH KEMBANG BALITA COMPLETE (6 BULAN - 6 TAHUN) */}
-              {activeSubTab === 'development_monitoring' && (
-                <DevelopmentMonitoringTab 
-                  role={role} 
-                  child={child} 
-                  ageRange={monitoringAgeRange}
-                  setAgeRange={setMonitoringAgeRange}
-                  milestones69={milestones69} 
-                  setMilestones69={setMilestones69} 
-                  milestones912={milestones912}
-                  setMilestones912={setMilestones912}
-                  milestones1218={milestones1218}
-                  setMilestones1218={setMilestones1218}
-                  milestones1824={milestones1824}
-                  setMilestones1824={setMilestones1824}
-                  milestones23={milestones23}
-                  setMilestones23={setMilestones23}
-                  milestones34={milestones34}
-                  setMilestones34={setMilestones34}
-                  milestones45={milestones45}
-                  setMilestones45={setMilestones45}
-                  milestones56={milestones56}
-                  setMilestones56={setMilestones56}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Card: Antropometri Lahir & Pengukuran Terbaru (Col span 7) */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-6">
-            
-            {/* Lahir */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
-                <FaBaby className="w-4 h-4 text-brand-primary" />
-                <h3 className="font-bold text-sm text-base-text-primary">Kondisi Saat Lahir</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="bg-base-bg/30 p-3 rounded-xl">
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Lahir</span>
-                  {isEditing ? (
-                    <div className="flex items-center gap-1 mt-1 justify-center">
-                      <input type="number" step="0.01" min="0" name="birth_weight" value={editForm.birth_weight} onChange={handleInputChange} className="w-16 px-1.5 py-0.5 border rounded text-center text-xs focus:outline-none" />
-                      <span className="text-[10px] text-base-text-secondary">kg</span>
-                    </div>
-                  ) : (
-                    <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_weight} kg</p>
                   )}
                 </div>
 
-                <div className="bg-base-bg/30 p-3 rounded-xl">
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Panjang Lahir</span>
-                  {isEditing ? (
-                    <div className="flex items-center gap-1 mt-1 justify-center">
-                      <input type="number" step="0.1" min="0" name="birth_length" value={editForm.birth_length} onChange={handleInputChange} className="w-16 px-1.5 py-0.5 border rounded text-center text-xs focus:outline-none" />
-                      <span className="text-[10px] text-base-text-secondary">cm</span>
-                    </div>
-                  ) : (
-                    <p className="text-lg font-bold text-base-text-primary mt-1">{child.birth_length} cm</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Terbaru */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 border-b border-base-border/10 pb-2">
-                <FaNotesMedical className="w-4 h-4 text-brand-primary" />
-                <h3 className="font-bold text-sm text-base-text-primary">Pengukuran Terbaru</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
-                  <MdMonitorWeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Sekarang</span>
-                  {isEditing ? (
-                    <div className="flex items-center gap-1 mt-1 justify-center">
-                      <input type="number" step="0.01" min="0" name="current_weight" value={editForm.current_weight} onChange={handleInputChange} className="w-16 px-1.5 py-0.5 border border-brand-primary/30 rounded text-center text-xs focus:outline-none font-semibold text-brand-primary" />
-                      <span className="text-[10px] text-brand-primary font-semibold">kg</span>
-                    </div>
-                  ) : (
-                    <p className="text-xl font-bold text-brand-primary mt-1">{child.current_weight} kg</p>
-                  )}
-                </div>
-
-                <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
-                  <MdHeight className="w-4 h-4 text-brand-primary absolute top-2 right-2" />
-                  <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Tinggi Sekarang</span>
-                  {isEditing ? (
-                    <div className="flex items-center gap-1 mt-1 justify-center">
-                      <input type="number" step="0.1" min="0" name="current_height" value={editForm.current_height} onChange={handleInputChange} className="w-16 px-1.5 py-0.5 border border-brand-primary/30 rounded text-center text-xs focus:outline-none font-semibold text-brand-primary" />
-                      <span className="text-[10px] text-brand-primary font-semibold">cm</span>
-                    </div>
-                  ) : (
-                    <p className="text-xl font-bold text-brand-primary mt-1">{child.current_height} cm</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      {/* ROW 2: Growth Charts & Medical Tags */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Growth Charts */}
-        <div className="lg:col-span-7 bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-pulse"></span>
-              <h2 className="font-bold text-base-text-primary text-base">Tren Tumbuh Kembang (Pemeriksaan Posyandu)</h2>
-            </div>
-            <span className="text-[10px] font-bold bg-brand-soft text-brand-primary border border-brand-primary/20 px-2.5 py-1 rounded-full uppercase">
-              {child.measurements.length} kunjungan
-            </span>
-          </div>
-
-          {hasHistory ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold text-base-text-secondary">
-                <div className="flex items-center justify-center gap-2">
-                  <span className="w-3 h-0.5 bg-brand-primary inline-block"></span>
-                  <span>Berat Badan (kg)</span>
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="w-3 h-0.5 bg-blue-500 inline-block"></span>
-                  <span>Tinggi Badan (cm)</span>
-                </div>
-              </div>
-
-              <div className="relative border border-base-border/20 rounded-2xl p-4 bg-base-bg/5 flex items-center justify-center">
-                <svg className="w-full max-w-[500px] h-[160px]" viewBox="0 0 500 160">
-                  <line x1="20" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
-                  <line x1="20" y1="60" x2="480" y2="60" stroke="#f1f5f9" strokeWidth="1" />
-                  <line x1="20" y1="100" x2="480" y2="100" stroke="#f1f5f9" strokeWidth="1" />
-                  <line x1="20" y1="140" x2="480" y2="140" stroke="#e2e8f0" strokeWidth="1.5" />
-
-                  <polyline fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={heightPoints} />
-                  <polyline fill="none" stroke="#ea2986" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={weightPoints} />
-
-                  {chronologicalMeasurements.map((m: any, i: number) => {
-                    const maxWeight = Math.max(...chronologicalMeasurements.map((x: any) => x.weight), 15);
-                    const minWeight = Math.min(...chronologicalMeasurements.map((x: any) => x.weight), 3);
-                    const wDiff = maxWeight - minWeight || 1;
-                    const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
-                    const y = 140 - ((m.weight - minWeight) / wDiff) * 100;
-                    return (
-                      <g key={`w-${i}`} className="group cursor-pointer">
-                        <circle cx={x} cy={y} r="4" fill="#ea2986" stroke="#fff" strokeWidth="1.5" />
-                      </g>
-                    );
-                  })}
-
-                  {chronologicalMeasurements.map((m: any, i: number) => {
-                    const maxHeight = Math.max(...chronologicalMeasurements.map((x: any) => x.height), 110);
-                    const minHeight = Math.min(...chronologicalMeasurements.map((x: any) => x.height), 40);
-                    const hDiff = maxHeight - minHeight || 1;
-                    const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
-                    const y = 140 - ((m.height - minHeight) / hDiff) * 100;
-                    return (
-                      <g key={`h-${i}`} className="group cursor-pointer">
-                        <circle cx={x} cy={y} r="4" fill="#3b82f6" stroke="#fff" strokeWidth="1.5" />
-                      </g>
-                    );
-                  })}
-                </svg>
-              </div>
-            </div>
-          ) : (
-            <div className="py-12 border border-dashed border-base-border/50 rounded-2xl text-center space-y-2 text-base-text-secondary text-sm">
-              <p>Belum memiliki riwayat pemeriksaan posyandu yang cukup.</p>
-              <p className="text-xs">Diperlukan minimal 2 riwayat penimbangan untuk memvisualisasikan tren grafik.</p>
-            </div>
-          )}
-        </div>
-
-        {/* Medical tags & notes */}
-        <div className="lg:col-span-5 bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-          <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
-            <MdLocalHospital className="w-5 h-5 text-brand-primary" />
-            <h2 className="font-bold text-base-text-primary text-base">Kondisi Medis &amp; Alergi</h2>
-          </div>
-          
-          {isEditing ? (
-            <div className="space-y-4">
-              <p className="text-xs text-base-text-secondary">Pilih kondisi medis atau riwayat alergi balita:</p>
-              <div className="flex flex-wrap gap-2">
-                {AVAILABLE_TAGS.map((tag) => {
-                  const isSelected = editForm.special_conditions?.includes(tag);
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => handleTagToggle(tag)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition cursor-pointer ${
-                        isSelected
-                          ? "bg-brand-soft/80 text-brand-primary border-brand-primary"
-                          : "bg-base-bg text-base-text-secondary border-base-border/50 hover:bg-base-border/20"
-                      }`}
+                {/* Edit Form Actions */}
+                {(isEditing || searchParams.get("edit") === "true") && (
+                  <div className="flex justify-end gap-2 pt-4 border-t">
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setIsEditing(false);
+                        router.push(`/data-anak/${child.child_id}?section=biodata`);
+                      }}
+                      className="px-4 py-2 border border-base-border/50 hover:bg-base-bg text-base-text-secondary rounded-xl text-xs font-bold transition cursor-pointer"
                     >
-                      {tag}
+                      Batal
                     </button>
-                  );
-                })}
-              </div>
-              {editForm.special_conditions?.includes("Lainnya...") && (
-                <div className="space-y-1 animate-in slide-in-from-top duration-200">
-                  <label className="text-[10px] font-bold text-base-text-secondary uppercase block">Catatan Medis Tambahan</label>
-                  <textarea
-                    name="special_conditions_notes"
-                    value={editForm.special_conditions_notes || ""}
-                    onChange={(e) => setEditForm((prev: any) => ({ ...prev, special_conditions_notes: e.target.value }))}
-                    placeholder="Masukkan detail kondisi medis atau alergi lainnya..."
-                    rows={3}
-                    className="w-full px-3 py-2 text-xs border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white resize-none"
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {(!child.special_conditions || child.special_conditions.length === 0) ? (
-                <p className="text-xs text-base-text-secondary italic">Tidak ada kondisi khusus / riwayat alergi.</p>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    {child.special_conditions.map((tag: string) => (
-                      <span key={tag} className="bg-brand-soft/50 text-brand-primary border border-brand-primary/20 rounded-full px-3 py-1 text-xs font-semibold">
-                        {tag}
-                      </span>
-                    ))}
+                    <button 
+                      type="button" 
+                      onClick={async () => {
+                        await handleSave();
+                        router.push(`/data-anak/${child.child_id}?section=biodata`);
+                      }}
+                      className="px-4 py-2 bg-brand-primary text-base-white hover:bg-brand-primary/95 rounded-xl text-xs font-bold shadow-md transition cursor-pointer"
+                    >
+                      {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                    </button>
                   </div>
-                  {child.special_conditions.includes("Lainnya...") && child.special_conditions_notes && (
-                    <div className="bg-base-bg/30 p-3 rounded-xl border border-base-border/20">
-                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block mb-1">Catatan Tambahan</span>
-                      <p className="text-xs text-base-text-primary font-medium">{child.special_conditions_notes}</p>
-                    </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeSection === "health_service" && (
+            <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
+              <div className="flex justify-between items-center border-b pb-2">
+                <h3 className="font-bold text-sm text-base-text-primary">Layanan Kesehatan &amp; Jaminan Sosial</h3>
+                {!isEditing && role !== "ibu" && (
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      handleStartEdit();
+                      router.push(`/data-anak/${child.child_id}?section=health_service&edit=true`);
+                    }}
+                    className="text-xs font-bold text-brand-primary flex items-center gap-1 hover:underline cursor-pointer"
+                  >
+                    <MdEdit className="w-3.5 h-3.5" /> Edit Jaminan
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">No. JKN / BPJS Anak</span>
+                  {isEditing || searchParams.get("edit") === "true" ? (
+                    <input type="text" name="jkn_number" value={editForm.jkn_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{child.jkn_number || "-"}</p>
                   )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Faskes Tingkat I</span>
+                  {isEditing || searchParams.get("edit") === "true" ? (
+                    <input type="text" name="faskes_1" value={editForm.faskes_1} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{child.faskes_1 || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Faskes Rujukan</span>
+                  {isEditing || searchParams.get("edit") === "true" ? (
+                    <input type="text" name="faskes_referral" value={editForm.faskes_referral} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{child.faskes_referral || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Asuransi Lain</span>
+                  {isEditing || searchParams.get("edit") === "true" ? (
+                    <input type="text" name="insurance_other" value={editForm.insurance_other} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{child.insurance_other || "-"}</p>
+                  )}
+                </div>
+              </div>
+
+              {(isEditing || searchParams.get("edit") === "true") && (
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setIsEditing(false);
+                      router.push(`/data-anak/${child.child_id}?section=health_service`);
+                    }}
+                    className="px-4 py-2 border border-base-border/50 hover:bg-base-bg text-base-text-secondary rounded-xl text-xs font-bold transition cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={async () => {
+                      await handleSave();
+                      router.push(`/data-anak/${child.child_id}?section=health_service`);
+                    }}
+                    className="px-4 py-2 bg-brand-primary text-base-white hover:bg-brand-primary/95 rounded-xl text-xs font-bold shadow-md transition cursor-pointer"
+                  >
+                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                  </button>
                 </div>
               )}
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Full Measurement Log Table */}
-      <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-        <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
-          <h2 className="font-bold text-base-text-primary text-base">Riwayat Lengkap Kunjungan &amp; Penimbangan</h2>
-        </div>
+          {activeSection === "newborn_monitoring" && (
+            <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-6">
+              <div className="space-y-6 text-xs">
+                
+                {/* Gejala Bahaya Neonatus */}
+                <div className="space-y-2.5">
+                  <h5 className="font-bold text-xs text-brand-primary">I. Pemeriksaan Neonatal Nakes &amp; Tanda Bahaya</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Tanda Bahaya Checklist */}
+                    <div className="border border-base-border/20 rounded-xl p-4 bg-base-bg/5 space-y-2">
+                      <span className="font-bold text-[10px] text-base-text-secondary uppercase block">Tanda Bahaya Bayi Baru Lahir (Buku KIA Hal 36)</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] font-medium">
+                        {[
+                          "Bayi tidak mau menyusu / muntah", "Bayi kejang", "Bayi lemah / bergerak jika dipegang",
+                          "Napas cepat (>60x/menit)", "Napas lambat (<30x/menit)", "Tarikan dinding dada dalam",
+                          "Merintih saat bernapas", "Demam / Panas (>37.5 C)", "Suhu dingin (<36 C)",
+                          "Mata merah / bernanah", "Kulit bernanah / tali pusat kemerahan", "Kulit/mata kuning"
+                        ].map((sign, idx) => {
+                          const isChecked = newbornMonitoring.dangerSigns?.[idx] ?? false;
+                          return (
+                            <label key={idx} className="flex items-center gap-2 cursor-pointer hover:bg-base-bg/30 p-1 rounded-lg transition">
+                              <input 
+                                type="checkbox" 
+                                checked={isChecked} 
+                                disabled={role !== "ibu"}
+                                onChange={() => {
+                                  if (role !== "ibu") return;
+                                  const nextDanger = [...newbornMonitoring.dangerSigns];
+                                  nextDanger[idx] = !nextDanger[idx];
+                                  const nextM = { ...newbornMonitoring, dangerSigns: nextDanger };
+                                  setNewbornMonitoring(nextM);
+                                  if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                                }}
+                                className="w-3.5 h-3.5 rounded text-status-red-solid cursor-pointer focus:ring-status-red-solid/35 shrink-0" 
+                              />
+                              <span className={isChecked ? 'text-status-red-solid font-bold' : 'text-base-text-secondary'}>{sign}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[1000px]">
-            <thead>
-              <tr className="border-b border-gray-100 text-xs font-bold text-base-text-secondary uppercase tracking-wider">
-                <th className="py-3 px-4">Tanggal Kunjungan</th>
-                <th className="py-3 px-4 text-center">Umur</th>
-                <th className="py-3 px-4 text-center">Berat (kg)</th>
-                <th className="py-3 px-4 text-center">Tinggi (cm)</th>
-                <th className="py-3 px-4 text-center">Lila/Lika (cm)</th>
-                <th className="py-3 px-4 text-center">Vit A</th>
-                <th className="py-3 px-4 text-center">Obat Cacing</th>
-                <th className="py-3 px-4">Imunisasi</th>
-                <th className="py-3 px-4 text-center">Pemberian PMT</th>
-                <th className="py-3 px-4">Catatan Kader</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm">
-              {child.measurements.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="py-8 text-center text-base-text-secondary text-xs">Belum ada riwayat penimbangan.</td>
-                </tr>
-              ) : (
-                child.measurements.map((m: any, idx: number) => (
-                  <tr key={idx} className="border-b border-gray-50 hover:bg-base-bg/30 transition-colors">
-                    <td className="py-3 px-4 font-bold text-base-text-primary whitespace-nowrap">{m.date}</td>
-                    <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.ageAtVisit} Bln</td>
-                    <td className="py-3 px-4 text-center font-bold text-brand-primary">{m.weight} kg</td>
-                    <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.height} cm</td>
-                    <td className="py-3 px-4 text-center font-medium text-base-text-secondary">{m.head_circumference > 0 ? `${m.head_circumference} cm` : "-"}</td>
-                    <td className="py-3 px-4 text-center font-semibold text-base-text-secondary">{m.vitamin_a_capsule}</td>
-                    <td className="py-3 px-4 text-center font-semibold text-base-text-secondary">{m.deworming_pill}</td>
-                    <td className="py-3 px-4 font-medium text-base-text-primary">{m.immunizations}</td>
-                    <td className="py-3 px-4 text-center font-semibold text-base-text-secondary">{m.supplementary_feeding}</td>
-                    <td className="py-3 px-4 text-base-text-secondary font-medium italic">{m.cadre_notes}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                    {/* Kunjungan Neonatal (KN) */}
+                    <div className="border border-base-border/20 rounded-xl p-4 bg-base-bg/5 space-y-2.5">
+                      <span className="font-bold text-[10px] text-base-text-secondary uppercase block">Pemeriksaan Neonatal (KN) Oleh Dokter/Bidan</span>
+                      <div className="space-y-2 font-semibold">
+                        {[
+                          "KN 1: Hari ke 1-2 (Pelayanan standar bayi baru lahir, salep mata, Vit K1, HB0)",
+                          "KN 2: Hari ke 3-7 (Pencegahan stunting, konseling ASI, pencegahan hipotermia)",
+                          "KN 3: Hari ke 8-28 (Pemantauan tumbuh kembang harian, deteksi infeksi neonatus)"
+                        ].map((label, idx) => {
+                          const isChecked = newbornMonitoring.pemeriksaan?.[idx] ?? false;
+                          return (
+                            <label key={idx} className="flex items-center gap-2 cursor-pointer hover:bg-base-bg/30 p-1.5 rounded-lg transition">
+                              <input 
+                                type="checkbox" 
+                                checked={isChecked} 
+                                disabled={role !== "ibu"}
+                                onChange={() => {
+                                  if (role !== "ibu") return;
+                                  const nextPem = [...newbornMonitoring.pemeriksaan];
+                                  nextPem[idx] = !nextPem[idx];
+                                  const nextM = { ...newbornMonitoring, pemeriksaan: nextPem };
+                                  setNewbornMonitoring(nextM);
+                                  if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                                }}
+                                className="w-4 h-4 text-brand-primary cursor-pointer focus:ring-brand-primary/35 shrink-0" 
+                              />
+                              <span className={isChecked ? 'text-brand-primary font-bold text-[11px]' : 'text-base-text-secondary text-[11px]'}>{label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Harian List */}
+                {(() => {
+                  const harianSymptoms = [
+                    "Suhu panas / dingin",
+                    "Bayi tidak mau menyusu",
+                    "Tali pusat kemerahan / berbau",
+                    "Mata merah / bernanah",
+                    "Kulit berbintil air / bernanah",
+                    "Belum mendapat imunisasi HB0 / Vit K1"
+                  ];
+
+                  const weeks = [
+                    { label: "Minggu 1", days: [1,2,3,4,5,6,7] },
+                    { label: "Minggu 2", days: [8,9,10,11,12,13,14] },
+                    { label: "Minggu 3", days: [15,16,17,18,19,20,21] },
+                    { label: "Minggu 4", days: [22,23,24,25,26,27,28] }
+                  ];
+
+                  const handleToggleSymptom = (dayIdx: number, symIdx: number) => {
+                    const nextHarian = newbornMonitoring.harianList.map((d: any, i: number) => {
+                      if (i !== dayIdx) return d;
+                      const nextSymptoms = [...d.symptoms];
+                      nextSymptoms[symIdx] = !nextSymptoms[symIdx];
+                      return { ...d, symptoms: nextSymptoms };
+                    });
+                    const nextM = { ...newbornMonitoring, harianList: nextHarian };
+                    setNewbornMonitoring(nextM);
+                    if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                  };
+
+                  const getDayStatus = (dayEntry: any) => {
+                    if (!dayEntry?.symptoms) return null;
+                    const count = dayEntry.symptoms.filter(Boolean).length;
+                    return count;
+                  };
+
+                  return (
+                    <div className="space-y-2.5 border-t pt-4">
+                      <h5 className="font-bold text-xs text-brand-primary">II. Lembar Pemantauan Harian (Hari 1-28)</h5>
+                      <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
+                        Centang gejala yang muncul setiap hari. Jika ada tanda, segera hubungi bidan atau puskesmas. (Buku KIA Hal 42-45)
+                      </p>
+
+                      <div className="flex gap-1.5 flex-wrap">
+                        {weeks.map((wk, wi) => {
+                          const weekDayEntries = wk.days.map(d => newbornMonitoring.harianList?.[d - 1]);
+                          const weekHasAlert = weekDayEntries.some((d: any) => d?.symptoms?.some(Boolean));
+                          return (
+                            <button
+                              key={wi}
+                              type="button"
+                              onClick={() => {
+                                const nextM = { ...newbornMonitoring, _weekSel: wi };
+                                setNewbornMonitoring(nextM);
+                                if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                              }}
+                              className={`flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-bold transition border ${(newbornMonitoring._weekSel ?? 0) === wi ? 'bg-brand-primary text-white border-brand-primary' : 'bg-base-white border-base-border/30 text-base-text-secondary hover:border-brand-primary/30'}`}
+                            >
+                              {wk.label}
+                              {weekHasAlert && <span className="w-1.5 h-1.5 rounded-full bg-status-red-solid inline-block animate-pulse" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-2">
+                        {weeks[newbornMonitoring._weekSel ?? 0]?.days.map((dayNum: number) => {
+                          const dayIdx = dayNum - 1;
+                          const dayEntry = newbornMonitoring.harianList?.[dayIdx];
+                          const symCount = getDayStatus(dayEntry);
+                          const hasAlert = symCount > 0;
+                          return (
+                            <details key={dayNum} className="group border border-base-border/20 rounded-xl overflow-hidden bg-base-white">
+                              <summary className="flex items-center justify-between p-3 cursor-pointer select-none list-none">
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-extrabold shrink-0 ${hasAlert ? 'bg-status-red-solid text-white' : 'bg-brand-soft/20 text-brand-primary'}`}>{dayNum}</span>
+                                  <span className="font-bold text-[10px] text-base-text-primary">Hari ke-{dayNum}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  {hasAlert ? (
+                                    <span className="text-[8px] font-bold text-status-red-solid bg-status-red-light/30 border border-status-red-solid/20 px-1.5 py-0.5 rounded-full animate-pulse">{symCount} Gejala</span>
+                                  ) : (
+                                    <span className="text-[8px] font-bold text-status-green-solid bg-status-green-light/30 border border-status-green-solid/20 px-1.5 py-0.5 rounded-full">Sehat ✓</span>
+                                  )}
+                                  <span className="text-base-text-secondary text-[10px] group-open:rotate-180 transition-transform duration-200">▼</span>
+                                </div>
+                              </summary>
+                              <div className="px-3 pb-3 grid grid-cols-1 gap-1.5 border-t border-base-border/10 pt-2.5">
+                                {harianSymptoms.map((sym, si) => (
+                                  <label key={si} className="flex items-center gap-2 cursor-pointer hover:bg-base-bg/30 px-1.5 py-1 rounded-lg transition">
+                                    <input
+                                      type="checkbox"
+                                      checked={!!dayEntry?.symptoms?.[si]}
+                                      onChange={() => handleToggleSymptom(dayIdx, si)}
+                                      className="w-3.5 h-3.5 rounded text-status-red-solid cursor-pointer focus:ring-status-red-solid/30 shrink-0"
+                                    />
+                                    <span className={`text-[10px] font-medium select-none ${dayEntry?.symptoms?.[si] ? 'text-status-red-solid font-bold' : 'text-base-text-secondary'}`}>{sym}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            </details>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Absensi Kelas */}
+                {(() => {
+                  const handleEditKelas = (idx: number, field: string, val: string) => {
+                    const nextKelas = newbornMonitoring.kelasBalita.map((k: any, i: number) =>
+                      i === idx ? { ...k, [field]: val } : k
+                    );
+                    const nextM = { ...newbornMonitoring, kelasBalita: nextKelas };
+                    setNewbornMonitoring(nextM);
+                    if (child) localStorage.setItem(`newborn_monitoring_${child.child_id}`, JSON.stringify(nextM));
+                  };
+
+                  const filledCount = newbornMonitoring.kelasBalita?.filter((k: any) => !!k.date).length ?? 0;
+
+                  return (
+                    <div className="space-y-2.5 border-t pt-4">
+                      <div className="flex items-center justify-between">
+                        <h5 className="font-bold text-xs text-brand-primary font-bold">III. Absensi Kelas Ibu Balita</h5>
+                        <span className="text-[9px] font-bold text-brand-primary bg-brand-soft/20 px-2 py-0.5 rounded-full">{filledCount} / 15 Hadir</span>
+                      </div>
+                      <p className="text-[10px] text-base-text-secondary font-medium leading-relaxed">
+                        Catat kehadiran kelas ibu balita. (Buku KIA Hal 50)
+                      </p>
+                      <div className="w-full h-1.5 bg-base-bg/50 rounded-full overflow-hidden">
+                        <div className="h-full bg-brand-primary rounded-full transition-all duration-300" style={{ width: `${(filledCount / 15) * 100}%` }} />
+                      </div>
+                      <div className="overflow-x-auto rounded-xl border border-base-border/20 bg-base-white">
+                        <table className="w-full text-[10px] border-collapse">
+                          <thead>
+                            <tr className="bg-brand-soft/10 text-brand-primary font-bold border-b border-base-border/10">
+                              <th className="p-2 text-center w-8">No</th>
+                              <th className="p-2 text-left">Tanggal</th>
+                              <th className="p-2 text-left">Catatan Materi / Fasilitator</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {newbornMonitoring.kelasBalita?.map((row: any, idx: number) => (
+                              <tr key={idx} className="border-b border-base-border/5 hover:bg-base-bg/20 transition">
+                                <td className="p-2 text-center font-bold text-base-text-secondary">{row.no}</td>
+                                <td className="p-2">
+                                  <input
+                                    type="date"
+                                    value={row.date || ""}
+                                    onChange={e => handleEditKelas(idx, 'date', e.target.value)}
+                                    className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
+                                  />
+                                </td>
+                                <td className="p-2">
+                                  <input
+                                    type="text"
+                                    value={row.notes || ""}
+                                    onChange={e => handleEditKelas(idx, 'notes', e.target.value)}
+                                    placeholder="Catatan..."
+                                    className="w-full px-1.5 py-1 border border-base-border/20 rounded-lg text-[10px] focus:outline-none focus:border-brand-primary bg-transparent"
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+              </div>
+            </div>
+          )}
+
+          {activeSection === "development_monitoring" && (
+            <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm">
+              <DevelopmentMonitoringTab 
+                role={role} 
+                child={child} 
+                ageRange={monitoringAgeRange}
+                setAgeRange={setMonitoringAgeRange}
+                milestones69={milestones69} 
+                setMilestones69={setMilestones69} 
+                milestones912={milestones912}
+                setMilestones912={setMilestones912}
+                milestones1218={milestones1218}
+                setMilestones1218={setMilestones1218}
+                milestones1824={milestones1824}
+                setMilestones1824={setMilestones1824}
+                milestones23={milestones23}
+                setMilestones23={setMilestones23}
+                milestones34={milestones34}
+                setMilestones34={setMilestones34}
+                milestones45={milestones45}
+                setMilestones45={setMilestones45}
+                milestones56={milestones56}
+                setMilestones56={setMilestones56}
+              />
+            </div>
+          )}
+
+          {activeSection === "growth_history" && (
+            <div className="space-y-6">
+              {/* Growth Charts & Antropometri */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Growth Chart curve */}
+                <div className="lg:col-span-8 bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 bg-brand-primary rounded-full animate-pulse"></span>
+                      <h2 className="font-bold text-base-text-primary text-base">Kurva Pertumbuhan Balita</h2>
+                    </div>
+                    <span className="text-[10px] font-bold bg-brand-soft text-brand-primary border border-brand-primary/20 px-2.5 py-1 rounded-full uppercase">
+                      {child.measurements.length} Kunjungan
+                    </span>
+                  </div>
+
+                  {hasHistory ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold text-base-text-secondary">
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-3 h-0.5 bg-[#ea2986] inline-block"></span>
+                          <span>Berat Badan (kg)</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-3 h-0.5 bg-[#3b82f6] inline-block"></span>
+                          <span>Tinggi Badan (cm)</span>
+                        </div>
+                      </div>
+
+                      <div className="relative border border-base-border/20 rounded-2xl p-4 bg-base-bg/5 flex items-center justify-center">
+                        <svg className="w-full max-w-[500px] h-[160px]" viewBox="0 0 500 160">
+                          <line x1="20" y1="20" x2="480" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                          <line x1="20" y1="60" x2="480" y2="60" stroke="#f1f5f9" strokeWidth="1" />
+                          <line x1="20" y1="100" x2="480" y2="100" stroke="#f1f5f9" strokeWidth="1" />
+                          <line x1="20" y1="140" x2="480" y2="140" stroke="#e2e8f0" strokeWidth="1.5" />
+
+                          <polyline fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={heightPoints} />
+                          <polyline fill="none" stroke="#ea2986" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={weightPoints} />
+
+                          {chronologicalMeasurements.map((m: any, i: number) => {
+                            const maxWeight = Math.max(...chronologicalMeasurements.map((x: any) => x.weight), 15);
+                            const minWeight = Math.min(...chronologicalMeasurements.map((x: any) => x.weight), 3);
+                            const wDiff = maxWeight - minWeight || 1;
+                            const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
+                            const y = 140 - ((m.weight - minWeight) / wDiff) * 100;
+                            return (
+                              <g key={`w-${i}`} className="group cursor-pointer">
+                                <circle cx={x} cy={y} r="4" fill="#ea2986" stroke="#fff" strokeWidth="1.5" />
+                              </g>
+                            );
+                          })}
+
+                          {chronologicalMeasurements.map((m: any, i: number) => {
+                            const maxHeight = Math.max(...chronologicalMeasurements.map((x: any) => x.height), 110);
+                            const minHeight = Math.min(...chronologicalMeasurements.map((x: any) => x.height), 40);
+                            const hDiff = maxHeight - minHeight || 1;
+                            const x = (i / (chronologicalMeasurements.length - 1)) * 460 + 20;
+                            const y = 140 - ((m.height - minHeight) / hDiff) * 100;
+                            return (
+                              <g key={`h-${i}`} className="group cursor-pointer">
+                                <circle cx={x} cy={y} r="4" fill="#3b82f6" stroke="#fff" strokeWidth="1.5" />
+                              </g>
+                            );
+                          })}
+                        </svg>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="py-12 border border-dashed border-base-border/50 rounded-2xl text-center space-y-2 text-base-text-secondary text-sm bg-base-white">
+                      <p>Belum memiliki riwayat pemeriksaan posyandu yang cukup.</p>
+                      <p className="text-xs">Diperlukan minimal 2 riwayat penimbangan untuk memvisualisasikan tren grafik.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Measurements values */}
+                <div className="lg:col-span-4 bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                    <FaNotesMedical className="w-4 h-4 text-brand-primary" />
+                    <h3 className="font-bold text-sm text-base-text-primary font-bold">Pengukuran Terakhir</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
+                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Berat Badan</span>
+                      <p className="text-xl font-bold text-brand-primary mt-1">{child.current_weight || "-"} kg</p>
+                    </div>
+                    <div className="bg-brand-soft/20 p-3.5 border border-brand-primary/10 rounded-xl relative">
+                      <span className="text-[10px] font-bold text-base-text-secondary uppercase block">Tinggi Badan</span>
+                      <p className="text-xl font-bold text-brand-primary mt-1">{child.current_height || "-"} cm</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* TABLE log log Posyandu */}
+              <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
+                  <h2 className="font-bold text-base-text-primary text-base">Riwayat Lengkap Kunjungan &amp; Penimbangan</h2>
+                </div>
+
+                <div className="overflow-x-auto bg-base-white">
+                  <table className="w-full text-left border-collapse min-w-[1000px]">
+                    <thead>
+                      <tr className="border-b border-gray-100 text-xs font-bold text-base-text-secondary uppercase tracking-wider">
+                        <th className="py-3 px-4">Tanggal Kunjungan</th>
+                        <th className="py-3 px-4 text-center">Umur</th>
+                        <th className="py-3 px-4 text-center">Berat (kg)</th>
+                        <th className="py-3 px-4 text-center">Tinggi (cm)</th>
+                        <th className="py-3 px-4 text-center">Lila/Lika (cm)</th>
+                        <th className="py-3 px-4 text-center">Vit A</th>
+                        <th className="py-3 px-4 text-center">Obat Cacing</th>
+                        <th className="py-3 px-4">Imunisasi</th>
+                        <th className="py-3 px-4 text-center">Pemberian PMT</th>
+                        <th className="py-3 px-4">Catatan Kader</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm">
+                      {child.measurements.length === 0 ? (
+                        <tr>
+                          <td colSpan={10} className="py-8 text-center text-base-text-secondary text-xs">Belum ada riwayat penimbangan.</td>
+                        </tr>
+                      ) : (
+                        child.measurements.map((m: any, idx: number) => (
+                          <tr key={idx} className="border-b border-gray-50 hover:bg-base-bg/30 transition-colors">
+                            <td className="py-3 px-4 font-bold text-base-text-primary whitespace-nowrap">{m.date}</td>
+                            <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.ageAtVisit} Bln</td>
+                            <td className="py-3 px-4 text-center font-bold text-brand-primary">{m.weight} kg</td>
+                            <td className="py-3 px-4 text-center font-semibold text-base-text-primary">{m.height} cm</td>
+                            <td className="py-3 px-4 text-center font-medium text-base-text-secondary">{m.head_circumference > 0 ? `${m.head_circumference} cm` : "-"}</td>
+                            <td className="py-3 px-4 text-center font-semibold text-base-text-secondary">{m.vitamin_a_capsule}</td>
+                            <td className="py-3 px-4 text-center font-semibold text-base-text-secondary">{m.deworming_pill}</td>
+                            <td className="py-3 px-4 font-medium text-base-text-primary">{m.immunizations}</td>
+                            <td className="py-3 px-4 text-center font-semibold text-base-text-secondary">{m.supplementary_feeding}</td>
+                            <td className="py-3 px-4 text-base-text-secondary font-medium italic">{m.cadre_notes}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          )}
+
         </div>
-      </div>
+      )}
 
       {/* Success Modal Pop-up */}
       {showSuccessModal && (
@@ -1755,7 +1782,7 @@ export default function ChildDetailPage() {
               <div className="w-16 h-16 bg-status-green-light text-status-green-solid rounded-full flex items-center justify-center mx-auto mb-2">
                 <MdCheckCircleOutline className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-base-text-primary">Berhasil Diperbarui</h3>
+              <h3 className="text-xl font-bold text-base-text-primary font-bold">Berhasil Diperbarui</h3>
               <p className="text-sm text-base-text-secondary">
                 Data rekam medis balita berhasil diperbarui ke database.
               </p>
@@ -1793,10 +1820,8 @@ export default function ChildDetailPage() {
               onTouchMove={handleTouchMove}
               onTouchEnd={handleMouseUp}
             >
-              {/* Circular view overlay masking everything outside */}
               <div className="absolute w-48 h-48 rounded-full border-2 border-brand-primary z-10 pointer-events-none shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]"></div>
               
-              {/* The Image inside */}
               <img 
                 src={cropImageSrc} 
                 alt="Raw Preview" 
