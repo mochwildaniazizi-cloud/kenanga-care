@@ -1409,6 +1409,7 @@ function SettingsContent() {
           )}
 
         </div>
+      </div>
       )}
 
       {/* Success Alert Modal */}
