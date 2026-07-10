@@ -423,6 +423,8 @@ export default function ArticleDetailPage() {
               <L19ArticleContent />
             ) : id === "L20" ? (
               <L20ArticleContent />
+            ) : id === "L21" ? (
+              <L21ArticleContent />
             ) : (
               <div
                 className="article-content"
