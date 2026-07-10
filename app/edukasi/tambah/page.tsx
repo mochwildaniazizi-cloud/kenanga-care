@@ -18,9 +18,9 @@ import { useUserRole } from "@/context/UserRoleContext";
 const AVAILABLE_CATEGORIES = [
   "Gizi & MPASI",
   "Imunisasi",
-  "Ibu Hamil",
-  "Ibu Nifas",
-  "Tumbuh Kembang"
+  "Kesehatan Ibu",
+  "Tumbuh Kembang",
+  "Informasi Umum"
 ];
 
 function TambahArtikelForm() {

@@ -138,10 +138,9 @@ export default function ArticleDetailPage() {
     switch (cat) {
       case "Gizi & MPASI": return "bg-status-green-light text-status-green-solid border border-status-green-solid/20";
       case "Imunisasi": return "bg-status-orange-light text-status-orange-solid border border-status-orange-solid/20";
-      case "Ibu Hamil": return "bg-status-blue-light text-status-blue-solid border border-status-blue-solid/20";
-      case "Ibu Nifas": return "bg-status-purple-light text-status-purple-solid border border-status-purple-solid/20";
-      case "Ibu Menyusui": return "bg-pink-50 text-pink-600 border border-pink-200";
+      case "Kesehatan Ibu": return "bg-status-blue-light text-status-blue-solid border border-status-blue-solid/20";
       case "Tumbuh Kembang": return "bg-sky-50 text-sky-600 border border-sky-200";
+      case "Informasi Umum": return "bg-status-purple-light text-status-purple-solid border border-status-purple-solid/20";
       default: return "bg-gray-100 text-gray-800";
     }
   };

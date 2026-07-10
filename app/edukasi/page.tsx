@@ -5,7 +5,8 @@ import Link from "next/link";
 import { 
   MdDashboard, MdVaccines, MdPregnantWoman, 
   MdChildCare, MdOutlineLocalDining, MdOutlineExtension,
-  MdAdd, MdBookmark, MdSearch, MdMenuBook, MdFavorite
+  MdAdd, MdBookmark, MdSearch, MdMenuBook, MdFavorite,
+  MdInfo
 } from "react-icons/md";
 import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import ArticleCard from "@/components/ArticleCard";
@@ -92,14 +93,9 @@ export default function EdukasiPage() {
       activeStyle: "bg-status-orange-solid text-base-white border-status-orange-solid" 
     },
     { 
-      id: "Ibu Hamil", label: "Ibu Hamil", icon: MdPregnantWoman, 
+      id: "Kesehatan Ibu", label: "Kesehatan Ibu", icon: MdPregnantWoman, 
       colorStyle: "border-status-blue-solid text-status-blue-solid", 
       activeStyle: "bg-status-blue-solid text-base-white border-status-blue-solid" 
-    },
-    { 
-      id: "Ibu Nifas", label: "Ibu Nifas", icon: MdChildCare, 
-      colorStyle: "border-status-purple-solid text-status-purple-solid", 
-      activeStyle: "bg-status-purple-solid text-base-white border-status-purple-solid" 
     },
     { 
       id: "Tumbuh Kembang", label: "Tumbuh Kembang", icon: MdOutlineExtension, 
@@ -107,9 +103,9 @@ export default function EdukasiPage() {
       activeStyle: "bg-status-cerulean-solid text-base-white border-status-cerulean-solid" 
     },
     { 
-      id: "Ibu Menyusui", label: "Ibu Menyusui", icon: MdFavorite, 
-      colorStyle: "border-status-pink-solid text-status-pink-solid", 
-      activeStyle: "bg-status-pink-solid text-base-white border-status-pink-solid" 
+      id: "Informasi Umum", label: "Informasi Umum", icon: MdInfo, 
+      colorStyle: "border-status-purple-solid text-status-purple-solid", 
+      activeStyle: "bg-status-purple-solid text-base-white border-status-purple-solid" 
     },
     { 
       id: "Tersimpan", label: "Tersimpan", icon: MdBookmark, 
@@ -348,16 +344,16 @@ export default function EdukasiPage() {
               </div>
             </div>
 
-            {/* Kategori 3: Ibu Hamil */}
+            {/* Kategori 3: Kesehatan Ibu */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-status-blue-solid flex items-center gap-2">
-                  <MdPregnantWoman className="w-5 h-5" /> Ibu Hamil
+                  <MdPregnantWoman className="w-5 h-5" /> Kesehatan Ibu
                 </h2>
-                <button onClick={() => setActiveTab("Ibu Hamil")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+                <button onClick={() => setActiveTab("Kesehatan Ibu")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Ibu Hamil") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
+                {articles.filter(a => a.categories.includes("Kesehatan Ibu") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
                   <ArticleCard 
                     key={article.id} 
                     article={article} 
@@ -368,27 +364,7 @@ export default function EdukasiPage() {
               </div>
             </div>
 
-            {/* Kategori 4: Ibu Nifas */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-status-purple-solid flex items-center gap-2">
-                  <MdChildCare className="w-5 h-5" /> Ibu Nifas
-                </h2>
-                <button onClick={() => setActiveTab("Ibu Nifas")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {articles.filter(a => a.categories.includes("Ibu Nifas") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
-                  <ArticleCard 
-                    key={article.id} 
-                    article={article} 
-                    isSaved={savedArticles.has(article.id)}
-                    onToggleSave={() => toggleBookmark(article.id)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Kategori 5: Tumbuh Kembang */}
+            {/* Kategori 4: Tumbuh Kembang */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-status-cerulean-solid flex items-center gap-2">
@@ -398,6 +374,26 @@ export default function EdukasiPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {articles.filter(a => a.categories.includes("Tumbuh Kembang") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
+                  <ArticleCard 
+                    key={article.id} 
+                    article={article} 
+                    isSaved={savedArticles.has(article.id)}
+                    onToggleSave={() => toggleBookmark(article.id)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Kategori 5: Informasi Umum */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-status-purple-solid flex items-center gap-2">
+                  <MdInfo className="w-5 h-5" /> Informasi Umum
+                </h2>
+                <button onClick={() => setActiveTab("Informasi Umum")} className="text-brand-primary text-sm font-bold hover:underline cursor-pointer">Lihat Selengkapnya &gt;</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {articles.filter(a => a.categories.includes("Informasi Umum") && !a.isLanjutkanMembaca).slice(0,4).map(article => (
                   <ArticleCard 
                     key={article.id} 
                     article={article} 
