@@ -212,5 +212,15 @@ export const mockArticles: Article[] = [
     imageUrl: "/cover-article/L20.jpg", // Jangan lupa siapkan file gambar di folder public/cover-article
     isLanjutkanMembaca: false,
     isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten ini
+  },
+{
+    id: "L21",
+    title: "Pemenuhan Gizi Usia 6 - 24 Bulan",
+    categories: ["Gizi & MPASI", "Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "10 Menit",
+    imageUrl: "/cover-article/L21.jpg",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true // Mengunci agar kader tidak bisa mengedit konten ini
   }
 ];
