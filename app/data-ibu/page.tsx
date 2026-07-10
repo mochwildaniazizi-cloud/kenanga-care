@@ -640,6 +640,7 @@ export default function DataIbuPage() {
   }
 
   if (false) {
+    const handleToggleKbAnswer = (idx: number) => {};
     if (isLoadingMother) {
       return (
         <div className="space-y-6 max-w-[1600px] mx-auto pb-10 animate-pulse">
