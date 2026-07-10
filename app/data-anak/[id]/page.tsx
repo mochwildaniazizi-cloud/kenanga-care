@@ -207,6 +207,10 @@ export default function ChildDetailPage() {
     }
   };
 
+  // State Filter Kategori Umur Pemantauan Buku KIA
+  const [monitoringAgeRange, setMonitoringAgeRange] = useState<'6-9' | '9-12'>('6-9');
+
+  // Kuesioner Umur 6-9 Bulan (Halaman 62)
   const [milestones69, setMilestones69] = useState<any[]>([
     { id: 1, text: "Apakah bayi bisa duduk secara mandiri?", status: null },
     { id: 2, text: "Apakah bayi belajar berdiri, kedua kakinya menyangga sebagian besar badan?", status: null },
@@ -218,6 +222,22 @@ export default function ChildDetailPage() {
     { id: 8, text: "Apakah bayi mencari mainan/benda yang dijatuhkan?", status: null },
     { id: 9, text: "Apakah bayi bermain tepuk tangan / Cilukba?", status: null },
     { id: 10, text: "Apakah bayi bergembira dengan melempar benda?", status: null },
+  ]);
+
+  // Kuesioner Umur 9-12 Bulan (Halaman 63)
+  const [milestones912, setMilestones912] = useState<any[]>([
+    { id: 1, text: "Apakah bayi bisa mengangkat badannya ke posisi berdiri?", status: null },
+    { id: 2, text: "Apakah bayi belajar berdiri selama 30 detik atau berpegangan di kursi?", status: null },
+    { id: 3, text: "Apakah bayi dapat berjalan dengan dituntun?", status: null },
+    { id: 4, text: "Apakah bayi mengulurkan lengan/badan untuk meraih mainan yang diinginkan?", status: null },
+    { id: 5, text: "Apakah bayi bisa menggenggam erat pensil?", status: null },
+    { id: 6, text: "Apakah bayi memasukkan benda ke mulut?", status: null },
+    { id: 7, text: "Apakah bayi mengulang/menirukan bunyi yang didengar?", status: null },
+    { id: 8, text: "Apakah bayi menyebut 2-3 suku kata yang sama tanpa arti?", status: null },
+    { id: 9, text: "Apakah bayi mengeksplorasi sekitar, ingin tahu, ingin menyentuh apa saja?", status: null },
+    { id: 10, text: "Apakah bayi bereaksi terhadap suara yang perlahan atau bisikan?", status: null },
+    { id: 11, text: "Apakah bayi senang diajak bermain Cilukba?", status: null },
+    { id: 12, text: "Apakah bayi mengenal anggota keluarga, takut pada orang yang belum dikenal?", status: null },
   ]);
 
   const [error, setError] = useState<string | null>(null);
@@ -312,11 +332,13 @@ export default function ChildDetailPage() {
       }
       const cachedMilestones = localStorage.getItem(`milestones_69_${decodedId}`);
       if (cachedMilestones) {
-        try {
-          setMilestones69(JSON.parse(cachedMilestones));
-        } catch (e) {
-          console.error("Error loading cached milestones", e);
-        }
+        try { setMilestones69(JSON.parse(cachedMilestones)); } catch (e) {}
+      }
+      
+      // TAMBAHKAN SINKRONISASI INI JUGA:
+      const cachedMilestones912 = localStorage.getItem(`milestones_912_${decodedId}`);
+      if (cachedMilestones912) {
+        try { setMilestones912(JSON.parse(cachedMilestones912)); } catch (e) {}
       }
     }
   }, [id]);
@@ -1309,8 +1331,12 @@ export default function ChildDetailPage() {
                 <DevelopmentMonitoringTab 
                   role={role} 
                   child={child} 
+                  ageRange={monitoringAgeRange}
+                  setAgeRange={setMonitoringAgeRange}
                   milestones69={milestones69} 
                   setMilestones69={setMilestones69} 
+                  milestones912={milestones912}
+                  setMilestones912={setMilestones912}
                 />
               )}
             </div>
@@ -1696,54 +1722,86 @@ export default function ChildDetailPage() {
 interface DevelopmentMonitoringTabProps {
   role: string;
   child: any;
+  ageRange: '6-9' | '9-12';
+  setAgeRange: React.Dispatch<React.SetStateAction<'6-9' | '9-12'>>;
   milestones69: any[];
   setMilestones69: React.Dispatch<React.SetStateAction<any[]>>;
+  milestones912: any[];
+  setMilestones912: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-function DevelopmentMonitoringTab({ role, child, milestones69, setMilestones69 }: DevelopmentMonitoringTabProps) {
-  const handleRadioChange = (itemId: number, val: boolean) => {
-    if (role !== "ibu") return; // Proteksi hak akses agar kader hanya bisa melihat (Read-Only)
+function DevelopmentMonitoringTab({ 
+  role, child, ageRange, setAgeRange, 
+  milestones69, setMilestones69, milestones912, setMilestones912 
+}: DevelopmentMonitoringTabProps) {
+  
+  const currentList = ageRange === '6-9' ? milestones69 : milestones912;
 
-    const nextMilestones = milestones69.map(item => 
-      item.id === itemId ? { ...item, status: val } : item
-    );
-    setMilestones69(nextMilestones);
-    if (child) {
-      localStorage.setItem(`milestones_69_${child.child_id}`, JSON.stringify(nextMilestones));
+  const handleRadioChange = (itemId: number, val: boolean) => {
+    if (role !== "ibu") return; // Proteksi hak akses Kader (Read-Only)
+
+    if (ageRange === '6-9') {
+      const nextList = milestones69.map(item => item.id === itemId ? { ...item, status: val } : item);
+      setMilestones69(nextList);
+      if (child) localStorage.setItem(`milestones_69_${child.child_id}`, JSON.stringify(nextList));
+    } else {
+      const nextList = milestones912.map(item => item.id === itemId ? { ...item, status: val } : item);
+      setMilestones912(nextList);
+      if (child) localStorage.setItem(`milestones_912_${child.child_id}`, JSON.stringify(nextList));
     }
   };
 
-  const hasDanger = milestones69.some(item => item.status === false);
+  const hasDanger = currentList.some(item => item.status === false);
 
   return (
     <div className="space-y-4 text-xs animate-in fade-in duration-200">
+      {/* Informasi Peran Hak Akses */}
       <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
         <h4 className="font-bold text-xs text-brand-primary">
-          Evaluasi Perkembangan Anak Mandiri (Usia 6-9 Bulan)
+          Evaluasi Perkembangan Anak Mandiri (Usia 6-12 Bulan)
         </h4>
         <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
           {role === "ibu" 
-            ? "Silakan centang kondisi perkembangan terkini anak Anda sesuai panduan Buku KIA Hal 62." 
+            ? "Silakan centang kondisi perkembangan terkini anak Anda sesuai kurikulum Buku KIA." 
             : "Mode Pemantauan Kader: Menampilkan riwayat pengisian instrumen Buku KIA harian dari Ibu (Read-Only)."}
         </p>
       </div>
 
+      {/* Segmented Filter Umur Pemantauan */}
+      <div className="flex bg-base-bg/50 p-1 rounded-xl border border-base-border/20 max-w-xs select-none">
+        <button
+          type="button"
+          onClick={() => setAgeRange('6-9')}
+          className={`flex-1 text-center py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${ageRange === '6-9' ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
+        >
+          Usia 6 - 9 Bulan
+        </button>
+        <button
+          type="button"
+          onClick={() => setAgeRange('9-12')}
+          className={`flex-1 text-center py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${ageRange === '9-12' ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
+        >
+          Usia 9 - 12 Bulan
+        </button>
+      </div>
+
+      {/* Banner Bahaya Tumbuh Kembang */}
       {hasDanger && (
         <div className="p-3 bg-status-red-light/10 border border-status-red-solid/20 rounded-xl text-[10px] text-status-red-solid font-bold leading-relaxed animate-in shake duration-300">
-          ⚠️ PERINGATAN: Balita terdeteksi belum menguasai salah satu penanda perkembangan penting. Ibu disarankan untuk segera membawa anak berkonsultasi ke tenaga kesehatan.
+          ⚠️ PERINGATAN: Balita terdeteksi belum menguasai salah satu penanda perkembangan penting di rentang usia ini. Ibu disarankan segera berkonsultasi ke nakes Posyandu/Puskesmas.
         </div>
       )}
 
-      {/* List Form Kuesioner */}
+      {/* List Form Kuesioner Checklist */}
       <div className="space-y-2">
-        {milestones69.map((item) => (
+        {currentList.map((item) => (
           <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-base-bg/20 rounded-xl gap-2.5">
             <span className="font-medium text-base-text-primary leading-relaxed">{item.id}. {item.text}</span>
             <div className="flex gap-4 shrink-0 select-none font-semibold">
               <label className={`flex items-center gap-1.5 text-status-green-solid text-[11px] ${role === "ibu" ? "cursor-pointer" : "opacity-60 cursor-not-allowed"}`}>
                 <input 
                   type="radio" 
-                  name={`milestone-q-${item.id}`} 
+                  name={`milestone-range-q-${item.id}`} 
                   checked={item.status === true} 
                   disabled={role !== "ibu"}
                   onChange={() => handleRadioChange(item.id, true)}
@@ -1753,7 +1811,7 @@ function DevelopmentMonitoringTab({ role, child, milestones69, setMilestones69 }
               <label className={`flex items-center gap-1.5 text-status-red-solid text-[11px] ${role === "ibu" ? "cursor-pointer" : "opacity-60 cursor-not-allowed"}`}>
                 <input 
                   type="radio" 
-                  name={`milestone-q-${item.id}`} 
+                  name={`milestone-range-q-${item.id}`} 
                   checked={item.status === false} 
                   disabled={role !== "ibu"}
                   onChange={() => handleRadioChange(item.id, false)}
