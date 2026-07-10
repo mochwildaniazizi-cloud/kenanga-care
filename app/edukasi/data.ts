@@ -232,5 +232,35 @@ export const mockArticles: Article[] = [
     imageUrl: "/cover-article/L22.jpg", // Siapkan aset gambar di folder public/cover-article/
     isLanjutkanMembaca: false,
     isNativeKIA: true // Mengunci agar kader tidak bisa mengubah konten resmi ini
+  },
+  {
+    id: "L23",
+    title: "Panduan Tumbuh Kembang, Golden Age & Pola Asuh Anak Usia 2 - 6 Tahun",
+    categories: ["Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L23.jpg",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
+  },
+  {
+    id: "L24",
+    title: "Manajemen Gizi Seimbang & Tindakan Pencegahan Diare Dehidrasi Balita",
+    categories: ["Gizi & MPASI"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L24.jpg",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
+  },
+  {
+    id: "L25",
+    title: "Menjaga Kesehatan Mental Orang Tua & Manajemen Stres Pengasuhan Anak",
+    categories: ["Tumbuh Kembang"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L25.jpg",
+    isLanjutkanMembaca: false,
+    isNativeKIA: true
   }
 ];

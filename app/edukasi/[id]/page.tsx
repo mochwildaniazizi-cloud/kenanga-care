@@ -427,6 +427,12 @@ export default function ArticleDetailPage() {
               <L21ArticleContent />
             ) : id === "L22" ? (
               <L22ArticleContent />
+            ) : id === "L23" ? (
+              <L23ArticleContent />
+            ) : id === "L24" ? (
+              <L24ArticleContent />
+            ) : id === "L25" ? (
+              <L25ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -3107,6 +3113,150 @@ function L22ArticleContent() {
 // Fallback Mock Content Generator
 function getMockContent(id: string, title: string): string {
   return `<p>Konten artikel statis untuk ID <strong>${id}</strong> - <strong>${title}</strong>.</p>`;
+}
+
+// =========================================================================
+// ARTIKEL L23: TUMBUH KEMBANG & POLA ASUH (HALAMAN 71 & 73)
+// =========================================================================
+function L23ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Di usia 2 tahun ke atas, perkembangan fisik, mental, dan sosial anak berkembang sangat pesat hingga usia 6 tahun. Fase ini merupakan landasan penting bagi pembentukan karakter dan kecerdasan anak.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs">
+          <h4 className="font-extrabold text-brand-primary text-xs mb-2.5">🤰 Yang Akan Dialami</h4>
+          <ul className="list-disc pl-4 space-y-2 font-medium">
+            <li>Anak mulai disapih, lebih banyak melakukan aktivitas, bergaul lebih luas dan memasuki masa pra sekolah.</li>
+            <li>Di usia 3 tahun pertama, otak anak berkembang sangat pesat, sehingga asupan gizi disertai stimulasi perkembangan penting agar anak memiliki kesempatan belajar sejak dini.</li>
+            <li>Pelayanan kesehatan, pola asuh yang peka dengan kebutuhan anak, serta perlindungan dan keamanan juga penting bagi anak.</li>
+          </ul>
+        </div>
+
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs">
+          <h4 className="font-extrabold text-status-green-solid text-xs mb-2.5">✅ Yang Harus Dilakukan</h4>
+          <ul className="list-disc pl-4 space-y-1.5 font-medium">
+            <li>Penuhi gizi anak dengan pemberian makanan keluarga yang bervariasi dan kaya protein hewani.</li>
+            <li>Timbang dan ukur serta cek perkembangan anak setiap bulan di Posyandu, atau fasilitas pelayanan kesehatan lainnya, serta PAUD.</li>
+            <li>Ajak anak mulai melibatkan diri dalam kegiatan bersama.</li>
+            <li>Ajarkan anak perbedaan jenis kelamin dan menjaga alat kelaminnya.</li>
+            <li>Kembangkan kreativitas anak dan kemampuan bergaul.</li>
+            <li>Cek kesehatan anak secara rutin dan segera ke fasilitas pelayanan kesehatan, jika anak sakit atau mengalami tanda bahaya.</li>
+            <li>Pastikan anak balita mendapatkan suplementasi Vitamin A kapsul merah dan obat cacing sebanyak 2 kali dalam setahun.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5">
+        <h4 className="font-bold text-brand-primary text-xs mb-2">📋 Panduan Pola Asuh Anak (Usia 1,5 - 3 Tahun)</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px]">
+          <ul className="list-disc pl-4 space-y-1 font-medium">
+            <li>Selalu menghargai dan mengakui kemampuan anak.</li>
+            <li>Mendorong anak bergerak bebas, hindari larangan-larangan yang tidak perlu, namun orang tua harus melindunginya dari bahaya.</li>
+            <li>Mengajak anak bermain dan berbicara dengan kalimat pendek-pendek yang penuh arti.</li>
+            <li>Mendorong anak bermain dengan anak lain.</li>
+          </ul>
+          <ul className="list-disc pl-4 space-y-1 font-medium">
+            <li>Melatih sopan santun dan disiplin secara sederhana.</li>
+            <li>Memberi anak permainan yang sederhana.</li>
+            <li>Anak 1-2 tahun perlu tidur 11-14 jam sehari (termasuk tidur siang).</li>
+            <li><strong>Aturan Gawai (18-24 bln):</strong> Hanya memilih konten program yang berkualitas untuk anak, batasi tidak lebih dari 1 jam per hari, dimainkan bersama orang tua, dan hindari anak menggunakan gawai sendirian.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================================
+// ARTIKEL L24: MANAJEMEN GIZI & PENCEGAHAN DIARE (HALAMAN 72 & 78)
+// =========================================================================
+function L24ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Pengolahan dan penyajian makanan yang tidak bersih dan sehat dapat membuat anak rentan terkena diare. Ibu harus dapat mengenali tanda dan gejala diare, karena diare dapat menyebabkan dehidrasi yang membahayakan kesehatan dan jiwa si kecil.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="p-4 bg-status-blue-light/10 border border-status-blue-solid/10 rounded-xl space-y-1">
+          <span className="font-bold text-status-blue-solid block">🥛 Pemenuhan Cairan Harian anak</span>
+          <ul className="list-disc pl-4 font-medium space-y-0.5">
+            <li>Anak usia 2-6 tahun wajib mencukupi kebutuhan cairan 5 - 7 gelas air setiap hari.</li>
+            <li>Umur 2-3 tahun membutuhkan sekitar 1.300 mL/hari atau sekitar 5 gelas belimbing.</li>
+            <li>Umur di atas 3 tahun membutuhkan cairan sekitar 1.700 mL/hari atau sekitar 7 gelas belimbing.</li>
+          </ul>
+        </div>
+        <div className="p-4 bg-status-green-light/10 border border-status-green-solid/10 rounded-xl space-y-1">
+          <span className="font-bold text-status-green-solid block">🧼 Kebersihan &amp; Perawatan Gigi</span>
+          <ul className="list-disc pl-4 font-medium space-y-0.5">
+            <li>Biasakan cuci tangan dan kaki anak dengan air bersih dan sabun setiap habis bermain.</li>
+            <li>Gunting kuku tangan dan kaki secara teratur dan jaga kebersihan.</li>
+            <li>Mulai ajari anak menyikat gigi di depan cermin seukuran 1 biji kacang polong secara teratur selama 2 menit sesudah makan dan sebelum tidur.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-3">
+        <h4 className="font-bold text-status-red-solid text-xs flex items-center gap-1.5">🚨 4 Langkah Tindakan Pencegahan Dehidrasi Saat Anak Diare:</h4>
+        <ol className="list-decimal pl-4 font-medium space-y-2">
+          <li><strong>Memberikan Oplosan ASI:</strong> Berikan ASI lebih sering and lebih lama dari biasanya jika anak masih dalam masa menyusu.</li>
+          <li><strong>Pemberian Oralit:</strong> Memberikan cairan oralit sampai kondisi diare anak benar-benar berhenti.</li>
+          <li><strong>Suplementasi Obat Zinc:</strong> Memberikan obat zinc sehari sekali selama 10 hari berturut-turut untuk mengurangi tingkat keparahan diare.</li>
+          <li><strong>Pemberian Air Mineral &amp; Nutrisi Lembek:</strong> Memberikan air minum atau mineral, dan makanan berkuah seperti sayur dan sup.</li>
+        </ol>
+        <p className="text-[10px] text-status-red-solid bg-status-red-light/10 p-2.5 rounded-xl font-bold">
+          ⚠️ SEGERA bawa balita ke fasilitas pelayanan kesehatan dan minta bantuan tenaga kesehatan jika kondisinya tidak membaik.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================================
+// ARTIKEL L25: KESEHATAN MENTAL ORANG TUA (HALAMAN 84)
+// =========================================================================
+function L25ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Orang tua memiliki peran utama dalam membentuk lingkungan yang sangat dibutuhkan anak untuk tumbuh kembang sehat. Untuk itu, orang tua harus memiliki kemampuan mengelola kesehatan fisik dan mentalnya. Orang tua yang sehat mental mampu mengatasi stres, memberi aturan yang jelas pada anak, paham kebutuhan anak, serta mau memperbaiki hubungan kembali setelah melepas emosi berlebihan.
+      </p>
+
+      <div className="space-y-4">
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-4 space-y-1.5">
+          <h4 className="font-bold text-status-purple-solid text-xs">1. Bekerja Sama dalam Pengasuhan Positif</h4>
+          <p className="font-medium">Ayah dan ibu bekerja sama dalam menerapkan pengasuhan yang tegas dan penuh kasih sayang.</p>
+          <ul className="list-disc pl-4 font-medium text-[11px] text-base-text-secondary/90">
+            <li>Orang tua menyepakati aturan yang diterapkan pada anak.</li>
+            <li>Tidak saling menyalahkan saat menghadapi masalah dalam pengasuhan.</li>
+          </ul>
+        </div>
+
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-4 space-y-1.5">
+          <h4 className="font-bold text-status-purple-solid text-xs">2. Mengenali dan Mengelola Emosi dalam Pengasuhan</h4>
+          <p className="font-medium">Mengasuh anak tentunya memunculkan banyak tantangan yang dapat mempengaruhi kondisi emosi orang tua. Oleh karena itu, orang tua perlu mengelola emosinya dengan baik.</p>
+          <ul className="list-disc pl-4 font-medium text-[11px] text-base-text-secondary/90">
+            <li>Kenali diri sendiri. Apa yang membuat saya marah? Apa yang bisa saya lakukan untuk membuat diri merasa lebih baik?</li>
+            <li>Atur harapan dan prioritas. Misalnya, anak sedang sakit dan orang tua kelelahan. Jangan memaksakan diri untuk melakukan semua hal, seperti mencuci atau menyetrika baju.</li>
+            <li>Bekerja sama dengan pasangan untuk meringankan beban.</li>
+            <li>Tetap melakukan hobi untuk menjaga rasa bahagia.</li>
+          </ul>
+        </div>
+
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-4 space-y-1.5">
+          <h4 className="font-bold text-status-purple-solid text-xs">3. Memahami dan Mengelola Stres Pengasuhan</h4>
+          <p className="font-medium">Ketika orang tua merasa tidak mampu menghadapi tantangan saat mengasuh anak, seperti anak sulit makan, berat badan anak kurang, atau perilaku anak tidak sesuai, maka akan timbul stres pengasuhan.</p>
+          <ul className="list-disc pl-4 font-medium text-[11px] text-base-text-secondary/90">
+            <li>Kelola stres dengan baik, misalnya dengan melakukan relaksasi.</li>
+            <li>Cari bantuan tenaga kesehatan di Puskesmas, jika stres sudah mengganggu kehidupan sehari-hari.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 

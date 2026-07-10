@@ -207,8 +207,73 @@ export default function ChildDetailPage() {
     }
   };
 
-  // State Filter Kategori Umur Pemantauan Buku KIA
-  const [monitoringAgeRange, setMonitoringAgeRange] = useState<'6-9' | '9-12' | '12-18' | '18-24'>('6-9');
+  // Perbarui range tipe umur agar mendukung balita hingga 6 tahun
+  const [monitoringAgeRange, setMonitoringAgeRange] = useState<'6-9' | '9-12' | '12-18' | '18-24' | '2-3' | '3-4' | '4-5' | '5-6'>('6-9');
+
+  // Kuesioner Umur 2-3 Tahun (Halaman 79)
+  const [milestones23, setMilestones23] = useState<any[]>([
+    { id: 1, text: "Apakah anak bisa jalan naik tangga sendiri?", status: null },
+    { id: 2, text: "Apakah anak bisa bermain dan menendang bola kecil?", status: null },
+    { id: 3, text: "Apakah anak bisa mencoret-coret pensil pada kertas?", status: null },
+    { id: 4, text: "Apakah anak bisa bicara dengan baik, menggunakan 2 kata?", status: null },
+    { id: 5, text: "Apakah anak bisa menunjuk 1 atau lebih bagian tubuhnya ketika diminta?", status: null },
+    { id: 6, text: "Apakah anak bisa melihat gambar dan dapat menyebut dengan benar nama 2 benda atau lebih?", status: null },
+    { id: 7, text: "Apakah anak bisa membantu memungut mainannya sendiri atau membantu mengangkat piring jika diminta?", status: null },
+    { id: 8, text: "Apakah anak bisa makan nasi sendiri tanpa banyak tumpah?", status: null },
+    { id: 9, text: "Apakah anak bisa melepas pakaiannya sendiri?", status: null },
+  ]);
+
+  // Kuesioner Umur 3-4 Tahun (Halaman 81)
+  const [milestones34, setMilestones34] = useState<any[]>([
+    { id: 1, text: "Apakah anak bisa berdiri 1 kaki selama 2 detik?", status: null },
+    { id: 2, text: "Apakah anak bisa melompat kedua kaki diangkat?", status: null },
+    { id: 3, text: "Apakah anak bisa mengayuh sepeda roda tiga?", status: null },
+    { id: 4, text: "Apakah anak bisa menggambar garis lurus?", status: null },
+    { id: 5, text: "Apakah anak bisa menumpuk 8 buah kubus?", status: null },
+    { id: 6, text: "Apakah anak bisa mengenal 2-4 warna?", status: null },
+    { id: 7, text: "Apakah anak bisa menyebut nama, umur, tempat?", status: null },
+    { id: 8, text: "Apakah anak bisa mengerti arti kata di atas, di bawah, di depan?", status: null },
+    { id: 9, text: "Apakah anak bisa mendengarkan cerita?", status: null },
+    { id: 10, text: "Apakah anak bisa mencuci dan mengeringkan tangan sendiri?", status: null },
+    { id: 11, text: "Apakah anak bermain bersama teman, mengikuti aturan permainan?", status: null },
+    { id: 12, text: "Apakah anak bisa mengenakan sepatu sendiri?", status: null },
+    { id: 13, text: "Apakah anak bisa mengenakan celana panjang, kemeja, baju?", status: null },
+  ]);
+
+  // Kuesioner Umur 4-5 Tahun (Halaman 82)
+  const [milestones45, setMilestones45] = useState<any[]>([
+    { id: 1, text: "Apakah anak bisa berdiri 1 kaki selama 6 detik?", status: null },
+    { id: 2, text: "Apakah anak bisa melompat-lompat 1 kaki?", status: null },
+    { id: 3, text: "Apakah anak bisa menari?", status: null },
+    { id: 4, text: "Apakah anak bisa menggambar tanda silang?", status: null },
+    { id: 5, text: "Apakah anak bisa menggambar lingkaran?", status: null },
+    { id: 6, text: "Apakah anak bisa menggambar orang dengan 3 bagian tubuh?", status: null },
+    { id: 7, text: "Apakah anak bisa mengancingkan baju atau pakaian boneka?", status: null },
+    { id: 8, text: "Apakah anak bisa menyebut nama lengkap tanpa dibantu?", status: null },
+    { id: 9, text: "Apakah anak bisa senang menyebut kata-kata baru?", status: null },
+    { id: 10, text: "Apakah anak bisa senang bertanya tentang sesuatu?", status: null },
+    { id: 11, text: "Apakah anak bisa menjawab pertanyaan dengan kata-kata yang benar?", status: null },
+    { id: 12, text: "Apakah anak bisa bicara yang mudah dimengerti?", status: null },
+    { id: 13, text: "Apakah anak bisa membandingkan/membedakan sesuatu dari ukuran dan bentuknya?", status: null },
+    { id: 14, text: "Apakah anak bisa menyebut angka, menghitung jari?", status: null },
+  ]);
+
+  // Kuesioner Umur 5-6 Tahun (Halaman 83)
+  const [milestones56, setMilestones56] = useState<any[]>([
+    { id: 1, text: "Apakah anak bisa berjalan lurus?", status: null },
+    { id: 2, text: "Apakah anak bisa berdiri dengan 1 kaki selama 11 detik?", status: null },
+    { id: 3, text: "Apakah anak bisa menggambar dengan 6 bagian, menggambar orang lengkap?", status: null },
+    { id: 4, text: "Apakah anak bisa menangkap bola kecil dengan kedua tangan?", status: null },
+    { id: 5, text: "Apakah anak bisa menggambar segi empat?", status: null },
+    { id: 6, text: "Apakah anak bisa mengerti arti lawan kata?", status: null },
+    { id: 7, text: "Apakah anak bisa mengerti pembicaraan yang menggunakan 7 kata atau lebih?", status: null },
+    { id: 8, text: "Apakah anak bisa menjawab pertanyaan tentang benda terbuat dari apa dan kegunaannya?", status: null },
+    { id: 9, text: "Apakah anak bisa mengenal angka, bisa menghitung angka 5 -10?", status: null },
+    { id: 10, text: "Apakah anak bisa mengenal warna-warni?", status: null },
+    { id: 11, text: "Apakah anak bisa mengungkapkan simpati?", status: null },
+    { id: 12, text: "Apakah anak bisa mengikuti aturan permainan?", status: null },
+    { id: 13, text: "Apakah anak bisa berpakaian sendiri tanpa dibantu?", status: null },
+  ]);
 
   // Kuesioner Umur 12-18 Bulan (Halaman 68)
   const [milestones1218, setMilestones1218] = useState<any[]>([
@@ -374,6 +439,18 @@ export default function ChildDetailPage() {
       if (cachedMilestones1824) {
         try { setMilestones1824(JSON.parse(cachedMilestones1824)); } catch (e) {}
       }
+
+      const cachedMilestones23 = localStorage.getItem(`milestones_23_${decodedId}`);
+      if (cachedMilestones23) { try { setMilestones23(JSON.parse(cachedMilestones23)); } catch (e) {} }
+
+      const cachedMilestones34 = localStorage.getItem(`milestones_34_${decodedId}`);
+      if (cachedMilestones34) { try { setMilestones34(JSON.parse(cachedMilestones34)); } catch (e) {} }
+
+      const cachedMilestones45 = localStorage.getItem(`milestones_45_${decodedId}`);
+      if (cachedMilestones45) { try { setMilestones45(JSON.parse(cachedMilestones45)); } catch (e) {} }
+
+      const cachedMilestones56 = localStorage.getItem(`milestones_56_${decodedId}`);
+      if (cachedMilestones56) { try { setMilestones56(JSON.parse(cachedMilestones56)); } catch (e) {} }
     }
   }, [id]);
 
@@ -383,7 +460,11 @@ export default function ChildDetailPage() {
       if (age >= 6 && age < 9) setMonitoringAgeRange('6-9');
       else if (age >= 9 && age < 12) setMonitoringAgeRange('9-12');
       else if (age >= 12 && age < 18) setMonitoringAgeRange('12-18');
-      else if (age >= 18 && age <= 24) setMonitoringAgeRange('18-24');
+      else if (age >= 18 && age < 24) setMonitoringAgeRange('18-24');
+      else if (age >= 24 && age < 36) setMonitoringAgeRange('2-3');
+      else if (age >= 36 && age < 48) setMonitoringAgeRange('3-4');
+      else if (age >= 48 && age < 60) setMonitoringAgeRange('4-5');
+      else if (age >= 60 && age <= 72) setMonitoringAgeRange('5-6');
     }
   }, [child]);
 
@@ -1370,7 +1451,7 @@ export default function ChildDetailPage() {
                 );
               })()}
               
-              {/* TAB 4: PEMANTAUAN TUMBUH KEMBANG BALITA (6-24 BULAN) */}
+              {/* TAB 4: PEMANTAUAN TUMBUH KEMBANG BALITA COMPLETE (6 BULAN - 6 TAHUN) */}
               {activeSubTab === 'development_monitoring' && (
                 <DevelopmentMonitoringTab 
                   role={role} 
@@ -1385,6 +1466,14 @@ export default function ChildDetailPage() {
                   setMilestones1218={setMilestones1218}
                   milestones1824={milestones1824}
                   setMilestones1824={setMilestones1824}
+                  milestones23={milestones23}
+                  setMilestones23={setMilestones23}
+                  milestones34={milestones34}
+                  setMilestones34={setMilestones34}
+                  milestones45={milestones45}
+                  setMilestones45={setMilestones45}
+                  milestones56={milestones56}
+                  setMilestones56={setMilestones56}
                 />
               )}
             </div>
@@ -1768,135 +1857,94 @@ export default function ChildDetailPage() {
 // KOMPONEN PEMBANTU: SUB-TAB PEMANTAUAN TUMBUH KEMBANG 6-24 BULAN
 // =========================================================================
 interface DevelopmentMonitoringTabProps {
-  role: string;
-  child: any;
-  ageRange: '6-9' | '9-12' | '12-18' | '18-24';
-  setAgeRange: React.Dispatch<React.SetStateAction<'6-9' | '9-12' | '12-18' | '18-24'>>;
-  milestones69: any[];
-  setMilestones69: React.Dispatch<React.SetStateAction<any[]>>;
-  milestones912: any[];
-  setMilestones912: React.Dispatch<React.SetStateAction<any[]>>;
-  milestones1218: any[];
-  setMilestones1218: React.Dispatch<React.SetStateAction<any[]>>;
-  milestones1824: any[];
-  setMilestones1824: React.Dispatch<React.SetStateAction<any[]>>;
+  role: string; child: any;
+  ageRange: '6-9' | '9-12' | '12-18' | '18-24' | '2-3' | '3-4' | '4-5' | '5-6';
+  setAgeRange: React.Dispatch<React.SetStateAction<any>>;
+  milestones69: any[]; setMilestones69: any;
+  milestones912: any[]; setMilestones912: any;
+  milestones1218: any[]; setMilestones1218: any;
+  milestones1824: any[]; setMilestones1824: any;
+  milestones23: any[]; setMilestones23: any;
+  milestones34: any[]; setMilestones34: any;
+  milestones45: any[]; setMilestones45: any;
+  milestones56: any[]; setMilestones56: any;
 }
 
 function DevelopmentMonitoringTab({ 
   role, child, ageRange, setAgeRange, 
   milestones69, setMilestones69, milestones912, setMilestones912,
-  milestones1218, setMilestones1218, milestones1824, setMilestones1824
+  milestones1218, setMilestones1218, milestones1824, setMilestones1824,
+  milestones23, setMilestones23, milestones34, setMilestones34,
+  milestones45, setMilestones45, milestones56, setMilestones56
 }: DevelopmentMonitoringTabProps) {
   
-  // Tentukan daftar kuesioner aktif berdasarkan Segmented Filter yang dipilih
   const currentList = 
-    ageRange === '6-9' ? milestones69 : 
-    ageRange === '9-12' ? milestones912 : 
-    ageRange === '12-18' ? milestones1218 : milestones1824;
+    ageRange === '6-9' ? milestones69 : ageRange === '9-12' ? milestones912 : 
+    ageRange === '12-18' ? milestones1218 : ageRange === '18-24' ? milestones1824 :
+    ageRange === '2-3' ? milestones23 : ageRange === '3-4' ? milestones34 :
+    ageRange === '4-5' ? milestones45 : milestones56;
 
   const handleRadioChange = (itemId: number, val: boolean) => {
-    if (role !== "ibu") return; // Proteksi hak akses Kader (Read-Only)
+    if (role !== "ibu") return;
 
-    if (ageRange === '6-9') {
-      const nextList = milestones69.map(item => item.id === itemId ? { ...item, status: val } : item);
-      setMilestones69(nextList);
-      if (child) localStorage.setItem(`milestones_69_${child.child_id}`, JSON.stringify(nextList));
-    } else if (ageRange === '9-12') {
-      const nextList = milestones912.map(item => item.id === itemId ? { ...item, status: val } : item);
-      setMilestones912(nextList);
-      if (child) localStorage.setItem(`milestones_912_${child.child_id}`, JSON.stringify(nextList));
-    } else if (ageRange === '12-18') {
-      const nextList = milestones1218.map(item => item.id === itemId ? { ...item, status: val } : item);
-      setMilestones1218(nextList);
-      if (child) localStorage.setItem(`milestones_1218_${child.child_id}`, JSON.stringify(nextList));
-    } else {
-      const nextList = milestones1824.map(item => item.id === itemId ? { ...item, status: val } : item);
-      setMilestones1824(nextList);
-      if (child) localStorage.setItem(`milestones_1824_${child.child_id}`, JSON.stringify(nextList));
-    }
+    const updateItem = (list: any[]) => list.map(item => item.id === itemId ? { ...item, status: val } : item);
+
+    if (ageRange === '6-9') { const n = updateItem(milestones69); setMilestones69(n); if (child) localStorage.setItem(`milestones_69_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '9-12') { const n = updateItem(milestones912); setMilestones912(n); if (child) localStorage.setItem(`milestones_912_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '12-18') { const n = updateItem(milestones1218); setMilestones1218(n); if (child) localStorage.setItem(`milestones_1218_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '18-24') { const n = updateItem(milestones1824); setMilestones1824(n); if (child) localStorage.setItem(`milestones_1824_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '2-3') { const n = updateItem(milestones23); setMilestones23(n); if (child) localStorage.setItem(`milestones_23_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '3-4') { const n = updateItem(milestones34); setMilestones34(n); if (child) localStorage.setItem(`milestones_34_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '4-5') { const n = updateItem(milestones45); setMilestones45(n); if (child) localStorage.setItem(`milestones_45_${child.child_id}`, JSON.stringify(n)); }
+    else if (ageRange === '5-6') { const n = updateItem(milestones56); setMilestones56(n); if (child) localStorage.setItem(`milestones_56_${child.child_id}`, JSON.stringify(n)); }
   };
 
   const hasDanger = currentList.some(item => item.status === false);
 
   return (
     <div className="space-y-4 text-xs animate-in fade-in duration-200">
-      
-      {/* Banner Keterangan Tab */}
       <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
-        <h4 className="font-bold text-xs text-brand-primary">
-          Evaluasi Perkembangan Anak Mandiri (Buku KIA 2024)
-        </h4>
+        <h4 className="font-bold text-xs text-brand-primary">Evaluasi Perkembangan Anak Mandiri (Buku KIA Complete)</h4>
         <p className="text-base-text-secondary text-[10px] leading-relaxed font-medium">
-          {role === "ibu" 
-            ? "Silakan centang kondisi perkembangan terkini anak Anda sesuai kelompok umurnya." 
-            : "Mode Pemantauan Kader: Menampilkan riwayat pengisian instrumen Buku KIA harian dari Ibu (Read-Only)."}
+          {role === "ibu" ? "Silakan centang kondisi perkembangan terkini anak Anda sesuai kelompok umurnya." : "Mode Pemantauan Kader: Menampilkan riwayat pengisian Buku KIA dari Ibu (Read-Only)."}
         </p>
       </div>
 
-      {/* Segmented Filter Umur yang Diperluas (4 Pilihan Tombol) */}
-      <div className="flex bg-base-bg/50 p-1 rounded-xl border border-base-border/20 gap-1 select-none overflow-x-auto hide-scrollbar">
-        <button
-          type="button"
-          onClick={() => setAgeRange('6-9')}
-          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all whitespace-nowrap cursor-pointer ${ageRange === '6-9' ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
-        >
-          6-9 Bulan
-        </button>
-        <button
-          type="button"
-          onClick={() => setAgeRange('9-12')}
-          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all whitespace-nowrap cursor-pointer ${ageRange === '9-12' ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
-        >
-          9-12 Bulan
-        </button>
-        <button
-          type="button"
-          onClick={() => setAgeRange('12-18')}
-          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all whitespace-nowrap cursor-pointer ${ageRange === '12-18' ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
-        >
-          12-18 Bulan
-        </button>
-        <button
-          type="button"
-          onClick={() => setAgeRange('18-24')}
-          className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all whitespace-nowrap cursor-pointer ${ageRange === '18-24' ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
-        >
-          18-24 Bulan
-        </button>
+      {/* SEGMENTED FILTER UMUR DINAMIS (8 KATEGORI USIA) */}
+      <div className="flex bg-base-bg/50 p-1 rounded-xl border border-base-border/20 gap-1 overflow-x-auto hide-scrollbar select-none">
+        {[
+          { key: '6-9', label: '6-9 Bln' }, { key: '9-12', label: '9-12 Bln' },
+          { key: '12-18', label: '12-18 Bln' }, { key: '18-24', label: '18-24 Bln' },
+          { key: '2-3', label: '2-3 Thn' }, { key: '3-4', label: '3-4 Thn' },
+          { key: '4-5', label: '4-5 Thn' }, { key: '5-6', label: '5-6 Thn' }
+        ].map(tab => (
+          <button
+            key={tab.key} type="button" onClick={() => setAgeRange(tab.key)}
+            className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all whitespace-nowrap cursor-pointer ${ageRange === tab.key ? 'bg-brand-primary text-white shadow-sm' : 'text-base-text-secondary hover:text-base-text-primary'}`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Banner Peringatan Risiko Penyimpangan */}
+      {/* Banner Deteksi Dini Keterlambatan */}
       {hasDanger && (
         <div className="p-3 bg-status-red-light/10 border border-status-red-solid/20 rounded-xl text-[10px] text-status-red-solid font-bold leading-relaxed animate-in shake duration-300">
-          ⚠️ BERI TANDA (✓) PADA KOLOM TIDAK: Jika anak belum bisa melakukan salah satu dari hal berikut ini, segera bawa balita Anda ke Puskesmas/Tenaga Kesehatan terdekat!
+          ⚠️ BERI TANDA (✓) PADA KOLOM TIDAK: Jika anak belum bisa melakukan salah satu dari hal di atas, segera bawa anak ke Puskesmas agar dideteksi dini penyimpangan tumbuh kembangnya!
         </div>
       )}
 
-      {/* Daftar Form Kuesioner */}
+      {/* Kuesioner Render Output */}
       <div className="space-y-2">
         {currentList.map((item) => (
           <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-base-bg/20 rounded-xl gap-2.5">
             <span className="font-medium text-base-text-primary leading-relaxed">{item.id}. {item.text}</span>
             <div className="flex gap-4 shrink-0 select-none font-semibold">
               <label className={`flex items-center gap-1.5 text-status-green-solid text-[11px] ${role === "ibu" ? "cursor-pointer" : "opacity-60 cursor-not-allowed"}`}>
-                <input 
-                  type="radio" 
-                  name={`milestone-range-total-q-${item.id}`} 
-                  checked={item.status === true} 
-                  disabled={role !== "ibu"}
-                  onChange={() => handleRadioChange(item.id, true)}
-                  className="accent-status-green-solid w-4 h-4 cursor-pointer disabled:cursor-not-allowed" 
-                /> Ya
+                <input type="radio" name={`range-total-q-${item.id}`} checked={item.status === true} disabled={role !== "ibu"} onChange={() => handleRadioChange(item.id, true)} className="accent-status-green-solid w-4 h-4 cursor-pointer" /> Ya
               </label>
               <label className={`flex items-center gap-1.5 text-status-red-solid text-[11px] ${role === "ibu" ? "cursor-pointer" : "opacity-60 cursor-not-allowed"}`}>
-                <input 
-                  type="radio" 
-                  name={`milestone-range-total-q-${item.id}`} 
-                  checked={item.status === false} 
-                  disabled={role !== "ibu"}
-                  onChange={() => handleRadioChange(item.id, false)}
-                  className="accent-status-red-solid w-4 h-4 cursor-pointer disabled:cursor-not-allowed" 
-                /> Tidak
+                <input type="radio" name={`range-total-q-${item.id}`} checked={item.status === false} disabled={role !== "ibu"} onChange={() => handleRadioChange(item.id, false)} className="accent-status-red-solid w-4 h-4 cursor-pointer" /> Tidak
               </label>
             </div>
           </div>
