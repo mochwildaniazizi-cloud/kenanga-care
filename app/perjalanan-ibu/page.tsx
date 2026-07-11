@@ -8,7 +8,7 @@ import {
   MdOutlineError, MdPerson, MdCalendarMonth, MdPregnantWoman,
   MdPhone, MdBloodtype, MdMale, MdFemale, MdVaccines, MdEdit,
   MdCheckCircleOutline, MdBabyChangingStation, MdFamilyRestroom,
-  MdArrowBack, MdSave, MdClose, MdScale
+  MdArrowBack, MdSave, MdClose, MdScale, MdNotifications
 } from "react-icons/md";
 import { FaHeartbeat, FaHeart, FaUser } from "react-icons/fa";
 import { getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
@@ -34,6 +34,26 @@ function PerjalananIbuContent() {
     { date: "", facilitator: "", note: "" }
   ]);
   const [editingAttendanceIdx, setEditingAttendanceIdx] = useState<number | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    show: false,
+    title: "",
+    message: "",
+    onConfirm: () => {}
+  });
+  const [alertModal, setAlertModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    title: "",
+    message: ""
+  });
   const [prepList, setPrepList] = useState<boolean[]>(new Array(10).fill(false));
   const [birthProcessList, setBirthProcessList] = useState<boolean[]>(new Array(7).fill(false));
 
@@ -269,50 +289,56 @@ function PerjalananIbuContent() {
     fetchWeeklyData();
   }, [motherDetail]);
 
-  const handleTtdCheck = async (day: number) => {
+  const handleTtdCheck = (day: number) => {
     if (!motherDetail) return;
     const motherId = motherDetail.mother_id;
     const hasLog = ttdLogs.includes(day);
-    
-    // Confirmation alert pop up
+
+    const title = hasLog ? "Batalkan Catatan TTD" : "Catat Minum TTD";
     const message = hasLog 
-      ? `Apakah Anda yakin ingin membatalkan catatan meminum TTD pada tanggal ${day}?`
-      : `Apakah Anda yakin ingin mencatat telah meminum TTD pada tanggal ${day}?`;
-      
-    if (!confirm(message)) return;
+      ? `Apakah Bunda yakin ingin membatalkan catatan meminum TTD pada tanggal ${day}?`
+      : `Apakah Bunda yakin ingin mencatat telah meminum TTD pada tanggal ${day}?`;
 
-    // Toggle
-    let updatedLogs: number[];
-    if (hasLog) {
-      updatedLogs = ttdLogs.filter(d => d !== day);
-    } else {
-      updatedLogs = [...ttdLogs, day];
-    }
-    setTtdLogs(updatedLogs);
+    setConfirmModal({
+      show: true,
+      title,
+      message,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, show: false }));
+        
+        let updatedLogs: number[];
+        if (hasLog) {
+          updatedLogs = ttdLogs.filter(d => d !== day);
+        } else {
+          updatedLogs = [...ttdLogs, day];
+        }
+        setTtdLogs(updatedLogs);
 
-    // Save Offline first
-    const offlineData = {
-      logs: updatedLogs,
-      companion: ttdCompanion,
-      relationship: ttdRelationship
-    };
-    localStorage.setItem(`offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`, JSON.stringify(offlineData));
+        // Save Offline first
+        const offlineData = {
+          logs: updatedLogs,
+          companion: ttdCompanion,
+          relationship: ttdRelationship
+        };
+        localStorage.setItem(`offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`, JSON.stringify(offlineData));
 
-    if (!navigator.onLine) {
-      // Queue sync
-      const syncQueue = JSON.parse(localStorage.getItem("pending_ttd_syncs") || "[]");
-      syncQueue.push({ motherId, day, action: hasLog ? "remove" : "add", year: currentYear, month: currentMonth });
-      localStorage.setItem("pending_ttd_syncs", JSON.stringify(syncQueue));
-      return;
-    }
+        if (!navigator.onLine) {
+          const syncQueue = JSON.parse(localStorage.getItem("pending_ttd_syncs") || "[]");
+          syncQueue.push({ motherId, day, action: hasLog ? "remove" : "add", year: currentYear, month: currentMonth });
+          localStorage.setItem("pending_ttd_syncs", JSON.stringify(syncQueue));
+          return;
+        }
 
-    const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    try {
-      await upsertTtdLog(motherId, dateStr, !hasLog, ttdCompanion, ttdRelationship);
-    } catch (e) {
-      console.error("Failed to sync TTD log to server:", e);
-    }
+        const dateStr = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        try {
+          await upsertTtdLog(motherId, dateStr, !hasLog, ttdCompanion, ttdRelationship);
+        } catch (e) {
+          console.error("Failed to sync TTD log to server:", e);
+        }
+      }
+    });
   };
+
 
   const handleSaveCompanion = async () => {
     if (!motherDetail) return;
@@ -1224,7 +1250,23 @@ function PerjalananIbuContent() {
 
                 <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
                   <div className="flex items-center justify-between border-b pb-3 border-base-border/10">
-                    <span className="font-extrabold text-base-text-primary text-sm uppercase">Bulan: {monthName} {currentYear}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-base-text-primary text-sm uppercase">Bulan: {monthName} {currentYear}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAlertModal({
+                            show: true,
+                            title: "Pengingat Harian Aktif 🔔",
+                            message: "Sistem akan mengirimkan notifikasi pengingat harian ke perangkat Bunda setiap malam jika Bunda belum mencatat log minum Tablet Tambah Darah (TTD) hari ini."
+                          });
+                        }}
+                        className="p-1.5 text-brand-primary hover:bg-brand-soft rounded-lg transition"
+                        title="Atur Pengingat Harian"
+                      >
+                        <MdNotifications className="w-4 h-4" />
+                      </button>
+                    </div>
                     <span className="text-[10px] font-bold text-brand-primary bg-brand-soft border border-brand-primary/20 px-3 py-1 rounded-full">
                       {ttdLogs.length} Hari Diminum
                     </span>
@@ -1822,8 +1864,61 @@ function PerjalananIbuContent() {
                   </div>
                 </div>
               </div>
-            );
           })()}
+        </div>
+      )}
+      {/* Custom Confirmation Modal */}
+      {confirmModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-2xl border border-base-border/30 shadow-xl max-w-sm w-full p-6 space-y-4 animate-in scale-in duration-200">
+            <div className="flex items-center gap-3 text-brand-primary border-b border-base-border/10 pb-3">
+              <MdPregnantWoman className="w-6 h-6 text-brand-primary" />
+              <h3 className="font-extrabold text-sm text-base-text-primary uppercase tracking-wider">{confirmModal.title}</h3>
+            </div>
+            <p className="text-xs text-base-text-secondary leading-relaxed font-semibold">
+              {confirmModal.message}
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmModal(prev => ({ ...prev, show: false }))}
+                className="px-4 py-2 border border-base-border/50 text-base-text-secondary hover:text-base-text-primary hover:bg-base-bg font-bold rounded-xl transition cursor-pointer text-xs"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={confirmModal.onConfirm}
+                className="px-4 py-2 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl shadow-md transition cursor-pointer text-xs"
+              >
+                Ya, Konfirmasi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Alert Modal */}
+      {alertModal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-2xl border border-base-border/30 shadow-xl max-w-sm w-full p-6 space-y-4 animate-in scale-in duration-200">
+            <div className="flex items-center gap-3 text-brand-primary border-b border-base-border/10 pb-3">
+              <MdNotifications className="w-6 h-6 text-brand-primary animate-bounce" />
+              <h3 className="font-extrabold text-sm text-base-text-primary uppercase tracking-wider">{alertModal.title}</h3>
+            </div>
+            <p className="text-xs text-base-text-secondary leading-relaxed font-semibold">
+              {alertModal.message}
+            </p>
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setAlertModal(prev => ({ ...prev, show: false }))}
+                className="px-5 py-2.5 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl shadow-md transition cursor-pointer text-xs"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
