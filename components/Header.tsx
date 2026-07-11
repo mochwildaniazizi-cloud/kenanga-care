@@ -227,6 +227,61 @@ export default function Header() {
     return () => clearInterval(interval);
   }, [role, username, isLoggedIn]);
 
+  // Daily TTD reminder checker
+  useEffect(() => {
+    if (role !== "ibu" || !isLoggedIn) return;
+
+    const checkAndNotifyTTD = () => {
+      try {
+        const motherDetailStr = localStorage.getItem("offline_mother_detail");
+        if (!motherDetailStr) return;
+        const motherDetailObj = JSON.parse(motherDetailStr);
+        const motherId = motherDetailObj?.mother_id;
+        if (!motherId) return;
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1; // 1-indexed
+        const day = now.getDate();
+
+        // Check if already notified today
+        const todayKey = `${year}-${month}-${day}`;
+        const lastNotified = localStorage.getItem(`ttd_notified_date_${motherId}`);
+        if (lastNotified === todayKey) return;
+
+        // Let's check if today's TTD is already logged
+        const cacheKey = `offline_ttd_logs_${motherId}_${year}_${month}`;
+        const cached = localStorage.getItem(cacheKey);
+        let ttdLogs: number[] = [];
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            ttdLogs = parsed.logs || [];
+          } catch (e) {}
+        }
+
+        // If today's day is not in logs, send a reminder
+        if (!ttdLogs.includes(day)) {
+          // Show notification
+          showLocalNotification("Reminder Minum TTD 💊", {
+            body: "Bunda, jangan lupa untuk meminum Tablet Tambah Darah (TTD) hari ini dan mencatatnya di kartu pemantauan ya!",
+            tag: "ttd-daily-reminder",
+            requireInteraction: true
+          });
+          // Record that we notified today to avoid spamming
+          localStorage.setItem(`ttd_notified_date_${motherId}`, todayKey);
+        }
+      } catch (err) {
+        console.error("Error in TTD reminder check:", err);
+      }
+    };
+
+    // Run on load and every 1 hour
+    checkAndNotifyTTD();
+    const interval = setInterval(checkAndNotifyTTD, 3600000);
+    return () => clearInterval(interval);
+  }, [role, isLoggedIn]);
+
   const kaderNotifications = [
     { category: "Jadwal Posyandu", time: "1 jam yang lalu", message: "Pelaksanaan Posyandu Kenanga 1 dijadwalkan besok mulai pukul 08:00 WIB." },
     { category: "Balita Kurang Gizi", time: "4 jam yang lalu", message: "Sistem mendeteksi 3 balita di wilayah Anda memiliki kurva pertumbuhan menurun. Mohon pantau PMT." },
