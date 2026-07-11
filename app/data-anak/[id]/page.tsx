@@ -1124,9 +1124,9 @@ export default function ChildDetailPage() {
 
           {activeSection === "biodata" && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="flex flex-col gap-6">
                 {/* Profile card & editing form */}
-              <div className="lg:col-span-1 bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
+                <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
                 <div className="flex flex-col items-center text-center space-y-3">
                   {isEditing || searchParams.get("edit") === "true" ? (
                     <div 
@@ -1169,7 +1169,7 @@ export default function ChildDetailPage() {
               </div>
 
               {/* Identity Details Form */}
-              <div className="lg:col-span-2 bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
+              <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
                 <div className="flex justify-between items-center border-b pb-2">
                   <h3 className="font-bold text-sm text-base-text-primary">Detail Identitas Anak</h3>
                   {!(isEditing || searchParams.get("edit") === "true") && role !== "ibu" && (

@@ -1362,8 +1362,8 @@ export default function MotherDetailPage() {
 
       {/* VIEW: BIODATA & KELUARGA */}
       {activeSection === "biodata" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in duration-200">
-          <div className="lg:col-span-7 bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden p-6 space-y-6">
+        <div className="flex flex-col gap-6 animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-bento-lg border border-base-border/30 shadow-sm overflow-hidden p-6 space-y-6">
             <div className="flex justify-between items-center border-b pb-2">
               <h3 className="font-bold text-sm text-base-text-primary">Identitas Lengkap Ibu</h3>
               {!isEditing && role !== "ibu" && (
@@ -1669,50 +1669,7 @@ export default function MotherDetailPage() {
             </div>
           </div>
 
-          {/* Right Column with Children */}
-          <div className="lg:col-span-5 bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
-              <div className="flex items-center gap-2">
-                <MdBabyChangingStation className="w-5 h-5 text-brand-primary" />
-                <h2 className="font-bold text-base-text-primary text-base">Balita Terdaftar</h2>
-              </div>
-              <span className="text-[10px] font-bold bg-brand-soft text-brand-primary border border-brand-primary/20 px-2.5 py-1 rounded-full uppercase">
-                {mother.children.length} Balita
-              </span>
-            </div>
 
-            {mother.children.length === 0 ? (
-              <div className="py-12 border border-dashed border-base-border/50 rounded-2xl text-center text-sm text-base-text-secondary">
-                Belum ada data anak terdaftar yang terhubung.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {mother.children.map((child: any, idx: number) => (
-                  <div key={idx} className="border border-base-border/30 rounded-xl p-4 bg-base-bg/5 hover:border-brand-primary/40 transition-all flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <p className="font-bold text-base-text-primary leading-tight">{child.name}</p>
-                        {child.gender === "M" ? (
-                          <MdMale className="w-4 h-4 text-status-blue-solid" />
-                        ) : (
-                          <MdFemale className="w-4 h-4 text-brand-primary" />
-                        )}
-                      </div>
-                      <p className="text-xs text-base-text-secondary mt-1">{child.age} &bull; {child.dob}</p>
-                    </div>
-                    <div className="mt-4 pt-3 border-t border-base-border/10 flex justify-end">
-                      <Link 
-                        href={`/data-anak/${child.child_id}`}
-                        className="text-xs font-bold text-brand-primary hover:underline transition cursor-pointer"
-                      >
-                        Lihat Detail Balita &rarr;
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
         </div>
       )}
