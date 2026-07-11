@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { 
@@ -45,7 +45,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export default function PerjalananAnakPage() {
+function PerjalananAnakContent() {
   const { role, username, isLoggedIn } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -684,5 +684,17 @@ export default function PerjalananAnakPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PerjalananAnakPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <PerjalananAnakContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
@@ -17,7 +17,7 @@ import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/week
 import { useUserRole } from "@/context/UserRoleContext";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
-export default function PerjalananIbuPage() {
+function PerjalananIbuContent() {
   const { role, username, isLoggedIn } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1641,5 +1641,17 @@ export default function PerjalananIbuPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PerjalananIbuPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <PerjalananIbuContent />
+    </Suspense>
   );
 }

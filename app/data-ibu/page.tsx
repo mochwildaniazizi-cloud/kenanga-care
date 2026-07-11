@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { 
   MdSearch, MdFilterList, MdAdd, 
   MdOutlineError, MdPerson, MdCalendarMonth, MdPregnantWoman,
@@ -121,7 +121,7 @@ function MotherTypeBadge({ type }: { type: string }) {
 export default function DataIbuPage() {
   const { role, username } = useUserRole();
   const router = useRouter();
-  const searchParams = useSearchParams();
+
 
   useEffect(() => {
     if (role === "ibu") {
