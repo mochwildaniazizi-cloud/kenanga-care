@@ -28,12 +28,12 @@ function PerjalananIbuContent() {
   const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process' | 'postpartum' | 'kb' | 'breastfeeding'>('ttd');
   const [breastfeedingAnswers, setBreastfeedingAnswers] = useState<boolean[]>(new Array(12).fill(false));
   
-  const [attendance, setAttendance] = useState([
-    { date: "", note: "" },
-    { date: "", note: "" },
-    { date: "", note: "" }
+  const [attendance, setAttendance] = useState<any[]>([
+    { date: "", facilitator: "", note: "" },
+    { date: "", facilitator: "", note: "" },
+    { date: "", facilitator: "", note: "" }
   ]);
-  const [isEditingAttendance, setIsEditingAttendance] = useState(false);
+  const [editingAttendanceIdx, setEditingAttendanceIdx] = useState<number | null>(null);
   const [prepList, setPrepList] = useState<boolean[]>(new Array(10).fill(false));
   const [birthProcessList, setBirthProcessList] = useState<boolean[]>(new Array(7).fill(false));
 
@@ -76,13 +76,19 @@ function PerjalananIbuContent() {
     const cachedAttendance = localStorage.getItem(`attendance_class_ibu_hamil_${motherId}`);
     if (cachedAttendance) {
       try {
-        setAttendance(JSON.parse(cachedAttendance));
+        const parsed = JSON.parse(cachedAttendance);
+        const normalized = parsed.map((item: any) => ({
+          date: item.date || "",
+          facilitator: item.facilitator || "",
+          note: item.note || ""
+        }));
+        setAttendance(normalized);
       } catch (e) {}
     } else {
       setAttendance([
-        { date: "", note: "" },
-        { date: "", note: "" },
-        { date: "", note: "" }
+        { date: "", facilitator: "", note: "" },
+        { date: "", facilitator: "", note: "" },
+        { date: "", facilitator: "", note: "" }
       ]);
     }
 
@@ -368,15 +374,41 @@ function PerjalananIbuContent() {
     }
   };
 
-  const handleSaveAttendance = () => {
-    if (!motherDetail) return;
-    setIsEditingAttendance(false);
-    localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(attendance));
+  const handleAddAttendanceClass = () => {
+    const updated = [...attendance, { date: "", facilitator: "", note: "" }];
+    setAttendance(updated);
+    setEditingAttendanceIdx(updated.length - 1);
+    if (motherDetail) {
+      localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(updated));
+    }
   };
 
-  const handleAttendanceChange = (idx: number, field: 'date' | 'note', value: string) => {
+  const handleDeleteAttendanceClass = (idx: number) => {
+    const updated = attendance.filter((_, i) => i !== idx);
+    setAttendance(updated);
+    if (editingAttendanceIdx === idx) {
+      setEditingAttendanceIdx(null);
+    } else if (editingAttendanceIdx !== null && editingAttendanceIdx > idx) {
+      setEditingAttendanceIdx(editingAttendanceIdx - 1);
+    }
+    if (motherDetail) {
+      localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(updated));
+    }
+  };
+
+  const handleSaveSingleAttendance = (idx: number) => {
+    setEditingAttendanceIdx(null);
+    if (motherDetail) {
+      localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(attendance));
+    }
+  };
+
+  const handleAttendanceChange = (idx: number, field: 'date' | 'facilitator' | 'note', value: string) => {
     const updated = [...attendance];
-    updated[idx][field] = value;
+    updated[idx] = {
+      ...updated[idx],
+      [field]: value
+    };
     setAttendance(updated);
   };
 
@@ -719,7 +751,7 @@ function PerjalananIbuContent() {
                         </div>
                       </div>
                       <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-indigo-50 text-[#5856D6]">
-                        {attendance.filter((r: any) => !!r.date).length} / 3 Selesai
+                        {attendance.filter((r: any) => !!r.date).length} Hadir
                       </span>
                     </div>
                   </div>
@@ -1329,75 +1361,114 @@ function PerjalananIbuContent() {
               <div className="bg-base-white p-6 rounded-bento-lg border border-base-border/30 shadow-sm space-y-6">
                 <div className="flex items-center justify-between border-b pb-3 border-base-border/10">
                   <span className="font-bold text-base-text-primary text-sm uppercase">Log Kelas Ibu Hamil</span>
-                  {!isEditingAttendance && (
-                    <button 
-                      onClick={() => setIsEditingAttendance(true)}
-                      className="px-4 py-2 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl flex items-center gap-1 shadow-sm transition cursor-pointer text-xs"
-                    >
-                      <MdEdit className="w-3.5 h-3.5" /> Edit Data Kelas
-                    </button>
-                  )}
+                  <button 
+                    onClick={handleAddAttendanceClass}
+                    className="px-4 py-2 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl flex items-center gap-1 shadow-sm transition cursor-pointer text-xs"
+                  >
+                    <MdAdd className="w-4 h-4" /> Tambah Data Kelas
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-medium">
-                  {attendance.map((classItem, idx) => (
-                    <div key={idx} className="border border-base-border/30 rounded-2xl p-4 bg-base-bg/5 space-y-4">
-                      <div className="flex items-center justify-between border-b pb-2 border-base-border/10">
-                        <span className="font-black text-brand-primary text-xs uppercase">Pertemuan Ke-{idx + 1}</span>
-                      </div>
-                      
-                      {isEditingAttendance ? (
-                        <div className="space-y-3">
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Tanggal Kelas</span>
-                            <CustomDatePicker
-                              value={classItem.date}
-                              onChange={(val) => handleAttendanceChange(idx, "date", val)}
-                            />
+                  {attendance.map((classItem, idx) => {
+                    const isEditing = editingAttendanceIdx === idx;
+                    return (
+                      <div key={idx} className="border border-base-border/30 rounded-2xl p-4 bg-base-bg/5 space-y-4 relative flex flex-col justify-between">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between border-b pb-2 border-base-border/10">
+                            <span className="font-black text-brand-primary text-xs uppercase">Pertemuan Ke-{idx + 1}</span>
+                            {!isEditing && (
+                              <div className="flex items-center gap-2">
+                                <button 
+                                  onClick={() => setEditingAttendanceIdx(idx)}
+                                  className="p-1.5 text-brand-primary hover:bg-brand-soft rounded-lg transition"
+                                  title="Edit Pertemuan"
+                                >
+                                  <MdEdit className="w-4 h-4" />
+                                </button>
+                                <button 
+                                  onClick={() => {
+                                    if (confirm("Apakah Anda yakin ingin menghapus kelas pertemuan ini?")) {
+                                      handleDeleteAttendanceClass(idx);
+                                    }
+                                  }}
+                                  className="p-1.5 text-status-red-solid hover:bg-status-red-solid/10 rounded-lg transition"
+                                  title="Hapus Pertemuan"
+                                >
+                                  <MdClose className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )}
                           </div>
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Fasilitator / Catatan</span>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. Bidan Rina..."
-                              value={classItem.note}
-                              onChange={(e) => handleAttendanceChange(idx, "note", e.target.value)}
-                              className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary"
-                            />
-                          </div>
+                          
+                          {isEditing ? (
+                            <div className="space-y-3">
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold text-base-text-secondary uppercase">Tanggal Kelas</span>
+                                <CustomDatePicker
+                                  value={classItem.date}
+                                  onChange={(val) => handleAttendanceChange(idx, "date", val)}
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold text-base-text-secondary uppercase">Fasilitator</span>
+                                <input 
+                                  type="text" 
+                                  placeholder="Nama Bidan / Dokter..."
+                                  value={classItem.facilitator || ""}
+                                  onChange={(e) => handleAttendanceChange(idx, "facilitator", e.target.value)}
+                                  className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold text-base-text-secondary uppercase">Catatan</span>
+                                <input 
+                                  type="text" 
+                                  placeholder="Catatan kelas..."
+                                  value={classItem.note || ""}
+                                  onChange={(e) => handleAttendanceChange(idx, "note", e.target.value)}
+                                  className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold text-base-text-secondary block">Tanggal Kelas</span>
+                                <p className="text-sm font-black text-base-text-primary">{classItem.date || "-"}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold text-base-text-secondary block">Fasilitator</span>
+                                <p className="text-sm font-black text-base-text-primary">{classItem.facilitator || "-"}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-bold text-base-text-secondary block">Catatan</span>
+                                <p className="text-sm font-black text-base-text-primary">{classItem.note || "-"}</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-base-text-secondary block">Tanggal Kelas</span>
-                            <p className="text-sm font-black text-base-text-primary">{classItem.date || "-"}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-bold text-base-text-secondary block">Fasilitator / Catatan</span>
-                            <p className="text-sm font-black text-base-text-primary">{classItem.note || "-"}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
 
-                {isEditingAttendance && (
-                  <div className="flex justify-end gap-3 pt-4 border-t border-base-border/10">
-                    <button 
-                      onClick={() => setIsEditingAttendance(false)}
-                      className="px-5 py-2 border border-base-border/50 text-base-text-secondary hover:text-base-text-primary hover:bg-base-bg font-bold rounded-xl transition cursor-pointer text-xs"
-                    >
-                      Batal
-                    </button>
-                    <button 
-                      onClick={handleSaveAttendance}
-                      className="px-5 py-2 bg-status-green-solid hover:bg-status-green-solid/90 text-base-white font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer text-xs"
-                    >
-                      <MdSave className="w-4 h-4" /> Simpan Data Kelas
-                    </button>
-                  </div>
-                )}
+                        {isEditing && (
+                          <div className="flex justify-end gap-2 pt-3 mt-2 border-t border-base-border/10">
+                            <button 
+                              onClick={() => setEditingAttendanceIdx(null)}
+                              className="px-3 py-1.5 border border-base-border/50 text-base-text-secondary hover:text-base-text-primary hover:bg-base-bg font-bold rounded-lg transition cursor-pointer text-[10px]"
+                            >
+                              Batal
+                            </button>
+                            <button 
+                              onClick={() => handleSaveSingleAttendance(idx)}
+                              className="px-3 py-1.5 bg-status-green-solid hover:bg-status-green-solid/90 text-base-white font-bold rounded-lg flex items-center gap-1 shadow-sm transition cursor-pointer text-[10px]"
+                            >
+                              <MdSave className="w-3 h-3" /> Simpan
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}

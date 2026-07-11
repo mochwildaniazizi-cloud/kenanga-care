@@ -28,12 +28,12 @@ export default function MotherDetailPage() {
   const [activePemantauanTab, setActivePemantauanTab] = useState<'ttd' | 'weekly' | 'attendance' | 'birth_prep' | 'birth_process' | 'postpartum' | 'kb' | 'breastfeeding'>('ttd');
   const [breastfeedingAnswers, setBreastfeedingAnswers] = useState<boolean[]>(new Array(12).fill(false));
   
-  const [attendance, setAttendance] = useState([
-    { date: "", note: "" },
-    { date: "", note: "" },
-    { date: "", note: "" }
+  const [attendance, setAttendance] = useState<any[]>([
+    { date: "", facilitator: "", note: "" },
+    { date: "", facilitator: "", note: "" },
+    { date: "", facilitator: "", note: "" }
   ]);
-  const [isEditingAttendance, setIsEditingAttendance] = useState(false);
+  const [editingAttendanceIdx, setEditingAttendanceIdx] = useState<number | null>(null);
   const [prepList, setPrepList] = useState<boolean[]>(new Array(10).fill(false));
   const [birthProcessList, setBirthProcessList] = useState<boolean[]>(new Array(7).fill(false));
   
@@ -68,13 +68,19 @@ export default function MotherDetailPage() {
     const cachedAttendance = localStorage.getItem(`attendance_class_ibu_hamil_${id}`);
     if (cachedAttendance) {
       try {
-        setAttendance(JSON.parse(cachedAttendance));
+        const parsed = JSON.parse(cachedAttendance);
+        const normalized = parsed.map((item: any) => ({
+          date: item.date || "",
+          facilitator: item.facilitator || "",
+          note: item.note || ""
+        }));
+        setAttendance(normalized);
       } catch (e) {}
     } else {
       setAttendance([
-        { date: "", note: "" },
-        { date: "", note: "" },
-        { date: "", note: "" }
+        { date: "", facilitator: "", note: "" },
+        { date: "", facilitator: "", note: "" },
+        { date: "", facilitator: "", note: "" }
       ]);
     }
 
@@ -2001,122 +2007,172 @@ export default function MotherDetailPage() {
           </div>
         );
       })()}
-
       {/* VIEW: KELAS IBU HAMIL */}
       {activeSection === "attendance" && (() => {
-        const formatDate = (isoStr: string) => {
-          if (!isoStr) return "-";
-          const d = new Date(isoStr);
-          if (isNaN(d.getTime())) return "-";
-          return d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+        const handleAddAttendanceClass = () => {
+          const updated = [...attendance, { date: "", facilitator: "", note: "" }];
+          setAttendance(updated);
+          setEditingAttendanceIdx(updated.length - 1);
+          if (id) {
+            localStorage.setItem(`attendance_class_ibu_hamil_${id}`, JSON.stringify(updated));
+          }
         };
 
-        const handleSaveAttendance = () => {
+        const handleDeleteAttendanceClass = (idx: number) => {
+          const updated = attendance.filter((_, i) => i !== idx);
+          setAttendance(updated);
+          if (editingAttendanceIdx === idx) {
+            setEditingAttendanceIdx(null);
+          } else if (editingAttendanceIdx !== null && editingAttendanceIdx > idx) {
+            setEditingAttendanceIdx(editingAttendanceIdx - 1);
+          }
+          if (id) {
+            localStorage.setItem(`attendance_class_ibu_hamil_${id}`, JSON.stringify(updated));
+          }
+        };
+
+        const handleSaveSingleAttendance = (idx: number) => {
+          setEditingAttendanceIdx(null);
           if (id) {
             localStorage.setItem(`attendance_class_ibu_hamil_${id}`, JSON.stringify(attendance));
           }
-          setIsEditingAttendance(false);
+        };
+
+        const handleAttendanceChange = (idx: number, field: 'date' | 'facilitator' | 'note', value: string) => {
+          const updated = [...attendance];
+          updated[idx] = {
+            ...updated[idx],
+            [field]: value
+          };
+          setAttendance(updated);
         };
 
         return (
-          <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4 animate-in fade-in duration-200">
+          <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-6 animate-in fade-in duration-200 text-xs">
             <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-1">
-              <h4 className="font-bold text-xs text-brand-primary font-bold">
-                Absensi Kehadiran Kelas Ibu Hamil (Pantauan Kader)
+              <h4 className="font-bold text-sm text-brand-primary flex items-center gap-1.5">
+                <MdFamilyRestroom className="w-4 h-4" /> Pemantauan Kehadiran Kelas Ibu Hamil (Pantauan Kader)
               </h4>
-              <p className="text-base-text-secondary text-[10px] leading-relaxed font-semibold">
-                Mencatat tanggal dan materi kelas ibu hamil yang telah diikuti secara mandiri. Kelas ini penting untuk persiapan persalinan.
+              <p className="text-base-text-secondary text-[11px] leading-relaxed font-semibold">
+                Ibu hamil disarankan mengikuti minimal 3 kali pertemuan kelas ibu hamil untuk pembekalan persalinan, menyusui, dan perawatan bayi.
               </p>
             </div>
 
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-base-text-primary">Daftar Kehadiran:</span>
-              <div className="flex gap-2">
-                {isEditingAttendance ? (
-                  <>
-                    <button 
-                      type="button"
-                      onClick={handleSaveAttendance} 
-                      className="px-3 py-1.5 bg-brand-primary hover:bg-status-pink-dark text-base-white text-xs font-bold rounded-lg cursor-pointer transition shadow-sm"
-                    >
-                      Selesai
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={() => setIsEditingAttendance(false)} 
-                      className="px-3 py-1.5 border border-base-border/50 text-base-text-secondary hover:bg-base-bg text-xs font-bold rounded-lg cursor-pointer transition"
-                    >
-                      Batal
-                    </button>
-                  </>
-                ) : (
-                  <button 
-                    type="button"
-                    onClick={() => setIsEditingAttendance(true)} 
-                    className="px-3 py-1.5 border border-brand-primary hover:bg-brand-soft/20 text-brand-primary text-xs font-bold rounded-lg cursor-pointer transition flex items-center gap-1"
-                  >
-                    <MdEdit className="w-3 h-3" /> Ubah Absensi
-                  </button>
-                )}
-              </div>
+            <div className="flex items-center justify-between border-b pb-3 border-base-border/10">
+              <span className="font-bold text-base-text-primary text-sm uppercase">Log Kelas Ibu Hamil</span>
+              <button 
+                onClick={handleAddAttendanceClass}
+                className="px-4 py-2 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl flex items-center gap-1 shadow-sm transition cursor-pointer text-xs"
+              >
+                <MdAdd className="w-4 h-4" /> Tambah Data Kelas
+              </button>
             </div>
 
-            <div className="overflow-x-auto border border-base-border/20 rounded-xl shadow-sm bg-base-white">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-base-bg text-base-text-primary border-b font-bold">
-                    <th className="py-2.5 px-4 text-center w-12">No.</th>
-                    <th className="py-2.5 px-4 w-48">Tanggal Kelas</th>
-                    <th className="py-2.5 px-4">Materi / Nama &amp; Paraf Kader</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendance.map((row, idx) => (
-                    <tr key={idx} className="border-b last:border-b-0 hover:bg-base-bg/5 font-semibold text-base-text-primary">
-                      <td className="py-2.5 px-4 text-center font-bold text-base-text-primary">{idx + 1}</td>
-                      <td className="py-2.5 px-4 relative overflow-visible">
-                        {isEditingAttendance ? (
-                          <div className="relative overflow-visible z-50">
-                            <CustomDatePicker 
-                              value={row.date} 
-                              onChange={(val) => {
-                                const next = [...attendance];
-                                next[idx].date = val;
-                                setAttendance(next);
-                              }} 
-                              outputFormat="iso" 
-                              label="Pilih Tanggal"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-medium">
+              {attendance.map((classItem, idx) => {
+                const isEditing = editingAttendanceIdx === idx;
+                return (
+                  <div key={idx} className="border border-base-border/30 rounded-2xl p-4 bg-base-bg/5 space-y-4 relative flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b pb-2 border-base-border/10">
+                        <span className="font-black text-brand-primary text-xs uppercase">Pertemuan Ke-{idx + 1}</span>
+                        {!isEditing && (
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => setEditingAttendanceIdx(idx)}
+                              className="p-1.5 text-brand-primary hover:bg-brand-soft rounded-lg transition"
+                              title="Edit Pertemuan"
+                            >
+                              <MdEdit className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => {
+                                if (confirm("Apakah Anda yakin ingin menghapus kelas pertemuan ini?")) {
+                                  handleDeleteAttendanceClass(idx);
+                                }
+                              }}
+                              className="p-1.5 text-status-red-solid hover:bg-status-red-solid/10 rounded-lg transition"
+                              title="Hapus Pertemuan"
+                            >
+                              <MdClose className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Tanggal Kelas</span>
+                            <CustomDatePicker
+                              value={classItem.date}
+                              onChange={(val) => handleAttendanceChange(idx, "date", val)}
                             />
                           </div>
-                        ) : (
-                          <span className="font-bold text-base-text-primary">{formatDate(row.date)}</span>
-                        )}
-                      </td>
-                      <td className="py-2.5 px-4">
-                        {isEditingAttendance ? (
-                          <input 
-                            type="text" 
-                            value={row.note} 
-                            onChange={(e) => {
-                              const next = [...attendance];
-                              next[idx].note = e.target.value;
-                              setAttendance(next);
-                            }} 
-                            placeholder={`Materi Trimester ${idx + 1} / Nama Bidan`} 
-                            className="w-full bg-base-white border border-base-border/40 rounded-lg px-2.5 py-1 text-xs outline-none focus:border-brand-primary text-base-text-primary transition"
-                          />
-                        ) : (
-                          <span className="font-semibold text-base-text-secondary">{row.note || "-"}</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Fasilitator</span>
+                            <input 
+                              type="text" 
+                              placeholder="Nama Bidan / Dokter..."
+                              value={classItem.facilitator || ""}
+                              onChange={(e) => handleAttendanceChange(idx, "facilitator", e.target.value)}
+                              className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary uppercase">Catatan</span>
+                            <input 
+                              type="text" 
+                              placeholder="Catatan kelas..."
+                              value={classItem.note || ""}
+                              onChange={(e) => handleAttendanceChange(idx, "note", e.target.value)}
+                              className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary block">Tanggal Kelas</span>
+                            <p className="text-sm font-black text-base-text-primary">{classItem.date ? new Date(classItem.date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-"}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary block">Fasilitator</span>
+                            <p className="text-sm font-black text-base-text-primary">{classItem.facilitator || "-"}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-bold text-base-text-secondary block">Catatan</span>
+                            <p className="text-sm font-black text-base-text-primary">{classItem.note || "-"}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {isEditing && (
+                      <div className="flex justify-end gap-2 pt-3 mt-2 border-t border-base-border/10">
+                        <button 
+                          onClick={() => setEditingAttendanceIdx(null)}
+                          className="px-3 py-1.5 border border-base-border/50 text-base-text-secondary hover:text-base-text-primary hover:bg-base-bg font-bold rounded-lg transition cursor-pointer text-[10px]"
+                        >
+                          Batal
+                        </button>
+                        <button 
+                          onClick={() => handleSaveSingleAttendance(idx)}
+                          className="px-3 py-1.5 bg-status-green-solid hover:bg-status-green-solid/90 text-base-white font-bold rounded-lg flex items-center gap-1 shadow-sm transition cursor-pointer text-[10px]"
+                        >
+                          <MdSave className="w-3 h-3" /> Simpan
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
       })()}
+
+
 
       {/* VIEW: PERSIAPAN & PROSES PERSALINAN */}
       {activeSection === "birth_prep" && (() => {
