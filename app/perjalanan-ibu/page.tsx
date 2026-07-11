@@ -1864,6 +1864,7 @@ function PerjalananIbuContent() {
                   </div>
                 </div>
               </div>
+            );
           })()}
         </div>
       )}
