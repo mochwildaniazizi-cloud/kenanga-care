@@ -10,6 +10,22 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleCardProps) {
+  const handleRecordHistory = () => {
+    try {
+      const historyJson = localStorage.getItem("viewed_articles_history");
+      let historyList: string[] = [];
+      if (historyJson) {
+        historyList = JSON.parse(historyJson);
+      }
+      historyList = [article.id, ...historyList.filter((x) => x !== article.id)].slice(0, 8);
+      localStorage.setItem("viewed_articles_history", JSON.stringify(historyList));
+      // Dispatch storage event to notify other components instantly
+      window.dispatchEvent(new Event("storage"));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const getCategoryColor = (cat: string) => {
     switch (cat) {
       case "Kehamilan": return "bg-[#FCE8F0] text-[#EA2986] border border-[#EA2986]/25";
@@ -30,7 +46,11 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
       
       {/* Thumbnail Container */}
       <div className="relative h-44 w-full overflow-hidden bg-gray-100">
-        <Link href={`/edukasi/${article.id}`} className="block w-full h-full">
+        <Link 
+          href={`/edukasi/${article.id}`} 
+          className="block w-full h-full"
+          onClick={handleRecordHistory}
+        >
           <Image 
             src={article.imageUrl} 
             alt={article.title}
@@ -60,7 +80,11 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <Link href={`/edukasi/${article.id}`} className="flex-1 flex flex-col">
+        <Link 
+          href={`/edukasi/${article.id}`} 
+          className="flex-1 flex flex-col"
+          onClick={handleRecordHistory}
+        >
           {/* Badges */}
           <div className="flex flex-wrap gap-2 mb-3">
             {article.categories.map((cat, idx) => (

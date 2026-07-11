@@ -26,59 +26,71 @@ export default function EdukasiPage() {
   const [historyPageIndex, setHistoryPageIndex] = useState<number>(0);
  
   useEffect(() => {
-    const local = localStorage.getItem("custom_articles");
-    let customList: any[] = [];
-    if (local) {
-      try {
-        customList = JSON.parse(local);
-      } catch (e) {
-        console.error("Failed to parse custom articles", e);
+    const loadData = () => {
+      const local = localStorage.getItem("custom_articles");
+      let customList: any[] = [];
+      if (local) {
+        try {
+          customList = JSON.parse(local);
+        } catch (e) {
+          console.error("Failed to parse custom articles", e);
+        }
       }
-    }
- 
-    const deleted = localStorage.getItem("deleted_articles_ids");
-    let deletedIds = new Set<string>();
-    if (deleted) {
-      try {
-        deletedIds = new Set(JSON.parse(deleted));
-      } catch (e) {
-        console.error("Failed to parse deleted articles list", e);
+   
+      const deleted = localStorage.getItem("deleted_articles_ids");
+      let deletedIds = new Set<string>();
+      if (deleted) {
+        try {
+          deletedIds = new Set(JSON.parse(deleted));
+        } catch (e) {
+          console.error("Failed to parse deleted articles list", e);
+        }
       }
-    }
- 
-    // Filter and deduplicate
-    const customIds = new Set(customList.map((a: any) => a.id));
-    const filteredMock = mockArticles.filter(a => !deletedIds.has(a.id) && !customIds.has(a.id));
-    const filteredCustom = customList.filter((a: any) => !deletedIds.has(a.id));
- 
-    setArticles([...filteredMock, ...filteredCustom]);
- 
-    // Load saved bookmarks from localStorage
-    const bookmarks = localStorage.getItem("saved_articles_ids");
-    if (bookmarks) {
-      try {
-        const ids = JSON.parse(bookmarks) as string[];
-        setSavedArticles(new Set(ids));
-      } catch (e) {
-        console.error("Failed to parse saved articles bookmarks", e);
+   
+      // Filter and deduplicate
+      const customIds = new Set(customList.map((a: any) => a.id));
+      const filteredMock = mockArticles.filter(a => !deletedIds.has(a.id) && !customIds.has(a.id));
+      const filteredCustom = customList.filter((a: any) => !deletedIds.has(a.id));
+   
+      setArticles([...filteredMock, ...filteredCustom]);
+   
+      // Load saved bookmarks from localStorage
+      const bookmarks = localStorage.getItem("saved_articles_ids");
+      if (bookmarks) {
+        try {
+          const ids = JSON.parse(bookmarks) as string[];
+          setSavedArticles(new Set(ids));
+        } catch (e) {
+          console.error("Failed to parse saved articles bookmarks", e);
+        }
       }
-    }
+  
+      // Load viewed history from localStorage
+      const historyJson = localStorage.getItem("viewed_articles_history");
+      let historyList: string[] = [];
+      if (historyJson) {
+        try {
+          historyList = JSON.parse(historyJson);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        // Pre-populate if empty
+        historyList = ["L4", "L5", "L11", "L12", "L14", "L15", "L20", "L23"];
+        localStorage.setItem("viewed_articles_history", JSON.stringify(historyList));
+      }
+      setViewedHistory(historyList);
+    };
 
-    // Load viewed history from localStorage
-    const historyJson = localStorage.getItem("viewed_articles_history");
-    let historyList: string[] = [];
-    if (historyJson) {
-      try {
-        historyList = JSON.parse(historyJson);
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      // Pre-populate if empty
-      historyList = ["L4", "L5", "L11", "L12", "L14", "L15", "L20", "L23"];
-      localStorage.setItem("viewed_articles_history", JSON.stringify(historyList));
-    }
-    setViewedHistory(historyList);
+    loadData();
+
+    window.addEventListener("storage", loadData);
+    window.addEventListener("focus", loadData);
+
+    return () => {
+      window.removeEventListener("storage", loadData);
+      window.removeEventListener("focus", loadData);
+    };
   }, []);
 
   const toggleBookmark = (id: string) => {
