@@ -802,22 +802,13 @@ export default function ChildDetailPage() {
             
             <div className="flex items-center gap-3">
               {role !== "ibu" && (
-                <>
-                  <button 
-                    type="button"
-                    onClick={() => router.push(`/data-anak/${id}/pemeriksaan-klinis`)}
-                    className="px-4 py-2 bg-brand-primary text-base-white hover:bg-brand-dark rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm"
-                  >
-                    <MdChildCare className="w-4 h-4" /> Input Rekam Medis (EHR)
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`)}
-                    className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
-                  >
-                    <MdEdit className="w-4 h-4" /> Edit Data Balita
-                  </button>
-                </>
+                <button 
+                  type="button"
+                  onClick={() => router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`)}
+                  className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                >
+                  <MdEdit className="w-4 h-4" /> Edit Data Balita
+                </button>
               )}
             </div>
           </div>
@@ -1074,6 +1065,33 @@ export default function ChildDetailPage() {
                       <span className="flex items-center gap-1">📊 Kurva KMS</span>
                     </div>
                     <span>Lihat Grafik</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 6: Rekam Medis Klinis EHR */}
+              <div 
+                onClick={() => router.push(`/data-anak/${child.child_id}/pemeriksaan-klinis`)}
+                className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
+              >
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#AC1959] rounded-full"></span> EHR KLINIS</span>
+                  <span>Catatan Nakes</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#AC1959] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">
+                    REKAM MEDIS ELEKTRONIK (EHR)
+                  </div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">EHR SDIDTK &amp; Pemeriksaan Gigi</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Lihat rekam medis formal hasil pemeriksaan tumbuh kembang klinis (SDIDTK), grafik plak gigi, dan riwayat kesehatan dari nakes.</p>
+                    
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="w-6 h-6 rounded-full bg-pink-100 text-[#AC1959] flex items-center justify-center text-[10px] font-bold border border-base-white">
+                        🩺
+                      </div>
+                      <span className="text-[10px] font-bold text-[#AC1959] hover:underline">Buka EHR &gt;</span>
+                    </div>
                   </div>
                 </div>
               </div>

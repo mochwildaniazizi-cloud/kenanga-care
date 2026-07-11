@@ -3,18 +3,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaFileMedical, FaUser } from "react-icons/fa";
-import { MdArrowBack as MdArrowBackIcon, MdSave as MdSaveIcon, MdCheckCircleOutline as MdCheckIcon, MdClose as MdCloseIcon, MdPregnantWoman as MdPregIcon, MdMedicalServices as MdMedIcon, MdShield as MdShieldIcon, MdBabyChangingStation as MdBabyIcon, MdHome as MdHomeIcon, MdOutlineAssignmentTurnedIn as MdSklIcon, MdEdit as MdEditIcon } from "react-icons/md";
+import { MdArrowBack, MdSave, MdCheckCircleOutline, MdPregnantWoman, MdMedicalServices, MdShield, MdBabyChangingStation, MdHome, MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { getMotherDetail } from "@/app/actions/mothers";
 
 export default function PemeriksaanKlinisIbuPage() {
   const { id } = useParams();
   const router = useRouter();
   const [mother, setMother] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"anc" | "usg_fisik" | "preeklampsia_dmg" | "persalinan" | "nifas">("anc");
   const [showSuccess, setShowSuccess] = useState(false);
-  
-  // Modal editor states
-  const [editingSection, setEditingSection] = useState<"anc" | "usg_fisik" | "preeklampsia_dmg" | "rencana_persalinan" | "skl" | "nifas" | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<any>({
@@ -52,6 +49,7 @@ export default function PemeriksaanKlinisIbuPage() {
       faskes1: "", faskes2: "", finance: "JKN",
       ambulance_driver1: "", ambulance_phone1: "", ambulance_driver2: "", ambulance_phone2: "",
       kb_chosen: "", donor_name1: "", donor_phone1: "", donor_name2: "", donor_phone2: "",
+      // Ringkasan Persalinan
       delivery_date: "", delivery_time: "", gestation_age: "", order: "", penolong: "Bidan", cara: "Normal", keadaan_ibu: "Sehat", kb_postpartum: "",
       baby_gender: "Laki-laki", baby_weight: "", baby_height: "", baby_head: "", baby_status: "Segera menangis", baby_asuhan: { imd: false, vit_k1: false, salep: false, hb0: false }
     },
@@ -106,11 +104,10 @@ export default function PemeriksaanKlinisIbuPage() {
     }
   }, [id]);
 
-  const handleSaveSection = () => {
+  const handleSave = () => {
     if (!id) return;
     const decodedId = decodeURIComponent(id as string);
     localStorage.setItem(`pemeriksaan_klinis_ibu_${decodedId}`, JSON.stringify(formData));
-    setEditingSection(null);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 2000);
   };
@@ -136,10 +133,10 @@ export default function PemeriksaanKlinisIbuPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-base-border/30">
         <div className="flex items-center gap-3">
           <Link href={`/data-ibu/${id}`} className="p-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition bg-base-white shadow-sm flex items-center justify-center cursor-pointer">
-            <MdArrowBackIcon className="w-5 h-5" />
+            <MdArrowBack className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-brand-primary uppercase tracking-wider">Dashboard Rekam Medis (Kader Workstation)</h1>
+            <h1 className="text-xl font-bold text-brand-primary uppercase tracking-wider">Pemeriksaan &amp; Pencatatan Klinis Ibu</h1>
             <p className="text-xs text-base-text-secondary font-medium">
               Nama Ibu: <span className="font-bold text-base-text-primary">{mother?.name || "-"}</span> &bull; NIK: <span className="font-semibold text-base-text-primary">{mother?.national_id || "-"}</span>
             </p>
@@ -147,501 +144,359 @@ export default function PemeriksaanKlinisIbuPage() {
         </div>
       </div>
 
-      {/* Bento Grid layout like Mother's page, but with Edit Button per Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Card 1: ANC */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdPregIcon className="w-4.5 h-4.5" /> ANC TRIMESTER 1-3
-              </span>
-              <button 
-                onClick={() => setEditingSection("anc")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEditIcon className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>📅 K1: <span className="text-base-text-primary">{formData.anc.t1.date || "-"} ({formData.anc.t1.place || "-"})</span></p>
-              <p>📅 K2: <span className="text-base-text-primary">{formData.anc.t2_1.date || "-"}</span></p>
-              <p>📅 K3: <span className="text-base-text-primary">{formData.anc.t2_2.date || "-"}</span></p>
-              <p>📅 K4: <span className="text-base-text-primary">{formData.anc.t3_1.date || "-"}</span></p>
-              <p>📅 K5: <span className="text-base-text-primary">{formData.anc.t3_2.date || "-"}</span></p>
-              <p>📅 K6: <span className="text-base-text-primary">{formData.anc.t3_3.date || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: USG & Fisik */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdMedIcon className="w-4.5 h-4.5" /> USG &amp; FISIK OBSTETRIK
-              </span>
-              <button 
-                onClick={() => setEditingSection("usg_fisik")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEditIcon className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>⚖️ IMT: <span className="text-base-text-primary">{formData.usg_fisik.imt || "Normal"}</span></p>
-              <p>🍼 Vagina / Porsio: <span className="text-base-text-primary">{formData.usg_fisik.vagina || "Normal"} / {formData.usg_fisik.porsio || "Normal"}</span></p>
-              <p>🩺 USG T1: <span className="text-base-text-primary">{formData.usg_fisik.usg_t1.gs || "Tunggal"} ({formData.usg_fisik.usg_t1.crl ? `${formData.usg_fisik.usg_t1.crl} cm` : "-"})</span></p>
-              <p>🩺 USG T3: <span className="text-base-text-primary">{formData.usg_fisik.usg_t3.done === "Ya" ? `${formData.usg_fisik.usg_t3.presentation} (${formData.usg_fisik.usg_t3.efw} g)` : "Tidak dilakukan"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: Preeklampsia & DMG */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdShieldIcon className="w-4.5 h-4.5" /> PREEKLAMPSIA &amp; DMG
-              </span>
-              <button 
-                onClick={() => setEditingSection("preeklampsia_dmg")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEditIcon className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>🩺 Tensi: <span className="text-base-text-primary">{formData.preeklampsia_dmg.sistole || "-"}/{formData.preeklampsia_dmg.diastole || "-"} mmHg</span></p>
-              <p>🧪 MAP: <span className={`font-bold ${mapValue && mapValue > 90 ? "text-status-red-solid" : "text-status-green-solid"}`}>{mapValue || "-"} mmHg</span></p>
-              <p>🧪 Protein Urine: <span className="text-base-text-primary">{formData.preeklampsia_dmg.urin_celup}</span></p>
-              <p>🍬 DMG (GDP/GD2JPP): <span className="text-base-text-primary">{formData.preeklampsia_dmg.dmg.gdp || "-"} / {formData.preeklampsia_dmg.dmg.gd2jpp || "-"} mg/dL</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: Persalinan */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdBabyIcon className="w-4.5 h-4.5" /> RENCANA &amp; RINGKASAN PERSALINAN
-              </span>
-              <button 
-                onClick={() => setEditingSection("rencana_persalinan")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEditIcon className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>🏢 Rencana Faskes: <span className="text-base-text-primary">{formData.rencana_persalinan.faskes1 || "-"}</span></p>
-              <p>📅 Realisasi Lahir: <span className="text-base-text-primary">{formData.rencana_persalinan.delivery_date || "-"} {formData.rencana_persalinan.delivery_time || ""}</span></p>
-              <p>👩‍⚕️ Penolong / Cara: <span className="text-base-text-primary">{formData.rencana_persalinan.penolong || "-"} / {formData.rencana_persalinan.cara || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 5: SKL */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdSklIcon className="w-4.5 h-4.5" /> SURAT KETERANGAN LAHIR (SKL)
-              </span>
-              <button 
-                onClick={() => setEditingSection("skl")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEditIcon className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>📄 No. SKL: <span className="text-base-text-primary">{formData.skl.no_skl || "Belum Diterbitkan"}</span></p>
-              <p>👶 Nama Bayi: <span className="text-base-text-primary">{formData.skl.baby_name || "-"}</span></p>
-              <p>⚖️ Berat / Panjang: <span className="text-base-text-primary">{formData.skl.weight || "-"} g / {formData.skl.height || "-"} cm</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 6: Nifas */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdHomeIcon className="w-4.5 h-4.5" /> PELAYANAN NIFAS (KF 1-4)
-              </span>
-              <button 
-                onClick={() => setEditingSection("nifas")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEditIcon className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>📅 KF 1: <span className="text-base-text-primary">{formData.nifas.kf1.date || "-"}</span></p>
-              <p>📅 KF 2: <span className="text-base-text-primary">{formData.nifas.kf2.date || "-"}</span></p>
-              <p>📅 KF 3: <span className="text-base-text-primary">{formData.nifas.kf3.date || "-"}</span></p>
-              <p>📅 KF 4: <span className="text-base-text-primary">{formData.nifas.kf4.date || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
+      {/* Tabs */}
+      <div className="flex bg-base-white border border-base-border/30 p-1 rounded-2xl gap-1 text-[11px] font-bold overflow-x-auto no-scrollbar shadow-xs">
+        {[
+          { id: "anc", label: "ANC Trimester 1-3", icon: <MdPregnantWoman className="w-4 h-4" /> },
+          { id: "usg_fisik", label: "Pemeriksaan Fisik & USG", icon: <MdMedicalServices className="w-4 h-4" /> },
+          { id: "preeklampsia_dmg", label: "Skrining Preeklampsia & DMG", icon: <MdShield className="w-4 h-4" /> },
+          { id: "persalinan", label: "Rencana & Ringkasan Persalinan", icon: <MdBabyChangingStation className="w-4 h-4" /> },
+          { id: "nifas", label: "Pelayanan Nifas (KF)", icon: <MdHome className="w-4 h-4" /> }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${activeTab === tab.id ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* SECTION EDITING MODALS */}
-      {editingSection && (
-        <div className="fixed inset-0 bg-base-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-base-white rounded-[32px] max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl border border-base-border/30 space-y-6">
-            
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-brand-primary uppercase tracking-wide">
-                Edit Bagian: {editingSection.toUpperCase()}
-              </h3>
-              <button 
-                onClick={() => setEditingSection(null)}
-                className="p-1.5 border border-base-border/50 text-base-text-secondary hover:text-brand-primary rounded-xl cursor-pointer"
-              >
-                <MdCloseIcon className="w-5 h-5" />
+      {/* TAB CONTENT: SEPARATE CARDS PER SECTION */}
+      
+      {/* 1. ANC TRIMESTER TABS */}
+      {activeTab === "anc" && (
+        <div className="space-y-6">
+          
+          {/* Card ANC Trimester 1 */}
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Trimester I (Kunjungan 1)</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Trimester I
               </button>
             </div>
-
-            {/* Sub Form rendering depending on editingSection */}
-            {editingSection === "anc" && (
-              <div className="space-y-6 text-xs max-h-[50vh] overflow-y-auto pr-1">
-                {[
-                  { key: "t1", title: "Trimester I (Kunjungan 1)", activeFields: { height: true, lila: true, screening: true, goldar: true, triple: true } },
-                  { key: "t2_1", title: "Trimester II (Kunjungan 2)", activeFields: {} },
-                  { key: "t2_2", title: "Trimester II (Kunjungan 3)", activeFields: {} },
-                  { key: "t3_1", title: "Trimester III (Kunjungan 4)", activeFields: {} },
-                  { key: "t3_2", title: "Trimester III (Kunjungan 5)", activeFields: { screening: true, usg: true } },
-                  { key: "t3_3", title: "Trimester III (Kunjungan 6)", activeFields: { hb: true, protein: true, sugar: true } }
-                ].map((visit) => (
-                  <div key={visit.key} className="p-4 bg-base-bg/10 rounded-2xl space-y-4 border border-base-border/10">
-                    <h4 className="font-bold text-xs text-brand-primary">{visit.title}</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tanggal Periksa</label>
-                        <input 
-                          type="date" 
-                          value={formData.anc[visit.key].date}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], date: e.target.value } } })}
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tempat Periksa</label>
-                        <input 
-                          type="text" 
-                          value={formData.anc[visit.key].place}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], place: e.target.value } } })}
-                          placeholder="Faskes"
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Berat Badan (kg)</label>
-                        <input 
-                          type="number" 
-                          value={formData.anc[visit.key].weight}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], weight: e.target.value } } })}
-                          placeholder="kg"
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tinggi Badan (cm)</label>
-                        <input 
-                          type="number" 
-                          value={formData.anc[visit.key].height}
-                          disabled={!visit.activeFields.height}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], height: e.target.value } } })}
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs disabled:bg-gray-100" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">LiLA (cm)</label>
-                        <input 
-                          type="number" 
-                          value={formData.anc[visit.key].lila}
-                          disabled={!visit.activeFields.lila}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], lila: e.target.value } } })}
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs disabled:bg-gray-100" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tekanan Darah</label>
-                        <input 
-                          type="text" 
-                          value={formData.anc[visit.key].bp}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], bp: e.target.value } } })}
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">TFU (cm)</label>
-                        <input 
-                          type="number" 
-                          value={formData.anc[visit.key].tfu}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], tfu: e.target.value } } })}
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">DJJ</label>
-                        <input 
-                          type="text" 
-                          value={formData.anc[visit.key].djj}
-                          onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, [visit.key]: { ...formData.anc[visit.key], djj: e.target.value } } })}
-                          className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tanggal Periksa</label>
+                <input 
+                  type="date" 
+                  value={formData.anc.t1.date}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, date: e.target.value } } })}
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
               </div>
-            )}
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tempat Periksa</label>
+                <input 
+                  type="text" 
+                  value={formData.anc.t1.place}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, place: e.target.value } } })}
+                  placeholder="Faskes"
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Berat Badan (kg)</label>
+                <input 
+                  type="number" 
+                  value={formData.anc.t1.weight}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, weight: e.target.value } } })}
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tinggi Badan (cm)</label>
+                <input 
+                  type="number" 
+                  value={formData.anc.t1.height}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, height: e.target.value } } })}
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">LiLA (cm)</label>
+                <input 
+                  type="number" 
+                  value={formData.anc.t1.lila}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, lila: e.target.value } } })}
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Tekanan Darah</label>
+                <input 
+                  type="text" 
+                  value={formData.anc.t1.bp}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, bp: e.target.value } } })}
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Lab Golongan Darah</label>
+                <input 
+                  type="text" 
+                  value={formData.anc.t1.goldar}
+                  onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t1: { ...formData.anc.t1, goldar: e.target.value } } })}
+                  className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs" 
+                />
+              </div>
+            </div>
+          </div>
 
-            {editingSection === "usg_fisik" && (
-              <div className="space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">IMT</label>
-                    <select 
-                      value={formData.usg_fisik.imt}
-                      onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, imt: e.target.value } })}
-                      className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs"
-                    >
-                      <option value="Kurus">Kurus</option>
-                      <option value="Normal">Normal</option>
-                      <option value="Gemuk">Gemuk</option>
-                      <option value="Obesitas">Obesitas</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Porsio &amp; Uretra</label>
-                    <input 
-                      type="text"
-                      value={`${formData.usg_fisik.porsio || ""}/${formData.usg_fisik.uretra || ""}`}
-                      onChange={(e) => {
-                        const parts = e.target.value.split("/");
-                        setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, porsio: parts[0] || "", uretra: parts[1] || "" } });
-                      }}
-                      className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-4 bg-base-bg/10 rounded-2xl space-y-2">
-                  <span className="font-bold text-[10px] uppercase text-brand-primary block">USG Trimester 1</span>
-                  <div className="grid grid-cols-3 gap-3">
-                    <input 
-                      type="text" placeholder="Kantung GS"
-                      value={formData.usg_fisik.usg_t1.gs}
-                      onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t1: { ...formData.usg_fisik.usg_t1, gs: e.target.value } } })}
-                      className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                    />
-                    <input 
-                      type="text" placeholder="GS Diameter"
-                      value={formData.usg_fisik.usg_t1.gs_diameter}
-                      onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t1: { ...formData.usg_fisik.usg_t1, gs_diameter: e.target.value } } })}
-                      className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                    />
-                    <input 
-                      type="text" placeholder="CRL"
-                      value={formData.usg_fisik.usg_t1.crl}
-                      onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t1: { ...formData.usg_fisik.usg_t1, crl: e.target.value } } })}
-                      className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                    />
-                  </div>
+          {/* Card ANC Trimester 2 */}
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Trimester II (Kunjungan 2 &amp; 3)</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Trimester II
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+              {/* Kunjungan 2 */}
+              <div className="space-y-3 bg-base-bg/10 p-4 rounded-2xl">
+                <span className="font-bold text-[10px] text-brand-primary block">Kunjungan ke-2</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="date" value={formData.anc.t2_1.date} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_1: { ...formData.anc.t2_1, date: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tempat" value={formData.anc.t2_1.place} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_1: { ...formData.anc.t2_1, place: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="number" placeholder="BB (kg)" value={formData.anc.t2_1.weight} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_1: { ...formData.anc.t2_1, weight: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tensi" value={formData.anc.t2_1.bp} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_1: { ...formData.anc.t2_1, bp: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
                 </div>
               </div>
-            )}
 
-            {editingSection === "preeklampsia_dmg" && (
-              <div className="space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Sistole</label>
-                    <input 
-                      type="number"
-                      value={formData.preeklampsia_dmg.sistole}
-                      onChange={(e) => setFormData({ ...formData, preeklampsia_dmg: { ...formData.preeklampsia_dmg, sistole: e.target.value } })}
-                      className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Diastole</label>
-                    <input 
-                      type="number"
-                      value={formData.preeklampsia_dmg.diastole}
-                      onChange={(e) => setFormData({ ...formData, preeklampsia_dmg: { ...formData.preeklampsia_dmg, diastole: e.target.value } })}
-                      className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs"
-                    />
-                  </div>
+              {/* Kunjungan 3 */}
+              <div className="space-y-3 bg-base-bg/10 p-4 rounded-2xl">
+                <span className="font-bold text-[10px] text-brand-primary block">Kunjungan ke-3</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="date" value={formData.anc.t2_2.date} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_2: { ...formData.anc.t2_2, date: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tempat" value={formData.anc.t2_2.place} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_2: { ...formData.anc.t2_2, place: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="number" placeholder="BB (kg)" value={formData.anc.t2_2.weight} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_2: { ...formData.anc.t2_2, weight: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tensi" value={formData.anc.t2_2.bp} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t2_2: { ...formData.anc.t2_2, bp: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card ANC Trimester 3 */}
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Trimester III (Kunjungan 4, 5 &amp; 6)</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Trimester III
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+              {/* Kunjungan 4 */}
+              <div className="space-y-3 bg-base-bg/10 p-4 rounded-2xl">
+                <span className="font-bold text-[10px] text-brand-primary block">Kunjungan ke-4</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="date" value={formData.anc.t3_1.date} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_1: { ...formData.anc.t3_1, date: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="number" placeholder="BB (kg)" value={formData.anc.t3_1.weight} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_1: { ...formData.anc.t3_1, weight: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tensi" value={formData.anc.t3_1.bp} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_1: { ...formData.anc.t3_1, bp: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                </div>
+              </div>
+
+              {/* Kunjungan 5 */}
+              <div className="space-y-3 bg-base-bg/10 p-4 rounded-2xl">
+                <span className="font-bold text-[10px] text-brand-primary block">Kunjungan ke-5</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="date" value={formData.anc.t3_2.date} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_2: { ...formData.anc.t3_2, date: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="number" placeholder="BB (kg)" value={formData.anc.t3_2.weight} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_2: { ...formData.anc.t3_2, weight: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tensi" value={formData.anc.t3_2.bp} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_2: { ...formData.anc.t3_2, bp: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                </div>
+              </div>
+
+              {/* Kunjungan 6 */}
+              <div className="space-y-3 bg-base-bg/10 p-4 rounded-2xl">
+                <span className="font-bold text-[10px] text-brand-primary block">Kunjungan ke-6</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="date" value={formData.anc.t3_3.date} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_3: { ...formData.anc.t3_3, date: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="number" placeholder="BB (kg)" value={formData.anc.t3_3.weight} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_3: { ...formData.anc.t3_3, weight: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="text" placeholder="Tensi" value={formData.anc.t3_3.bp} onChange={(e) => setFormData({ ...formData, anc: { ...formData.anc, t3_3: { ...formData.anc.t3_3, bp: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* 2. PEMERIKSAAN FISIK & USG */}
+      {activeTab === "usg_fisik" && (
+        <div className="space-y-6">
+          
+          {/* Card Pemeriksaan Fisik */}
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Pemeriksaan Fisik Obstetrik</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Fisik
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">IMT</label>
+                <select value={formData.usg_fisik.imt} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, imt: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2">
+                  <option value="Kurus">Kurus</option>
+                  <option value="Normal">Normal</option>
+                  <option value="Gemuk">Gemuk</option>
+                  <option value="Obesitas">Obesitas</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Porsio</label>
+                <input type="text" value={formData.usg_fisik.porsio} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, porsio: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Vagina</label>
+                <input type="text" value={formData.usg_fisik.vagina} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, vagina: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Fluksus</label>
+                  <select value={formData.usg_fisik.fluksus} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, fluksus: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl p-2"><option value="Tidak">Tidak</option><option value="Ya">Ya</option></select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">Protein Urine Celup</label>
-                  <select 
-                    value={formData.preeklampsia_dmg.urin_celup}
-                    onChange={(e) => setFormData({ ...formData, preeklampsia_dmg: { ...formData.preeklampsia_dmg, urin_celup: e.target.value } })}
-                    className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2 text-xs"
-                  >
-                    <option value="Negatif">Negatif (-)</option>
-                    <option value="+1">+1</option>
-                    <option value="+2">+2</option>
-                    <option value="+3">+3</option>
-                    <option value="+4">+4</option>
-                  </select>
+                  <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Fluor</label>
+                  <select value={formData.usg_fisik.fluor} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, fluor: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl p-2"><option value="Tidak">Tidak</option><option value="Ya">Ya</option></select>
                 </div>
               </div>
-            )}
+            </div>
+          </div>
 
-            {editingSection === "rencana_persalinan" && (
-              <div className="space-y-4 text-xs">
-                <div className="grid grid-cols-2 gap-4">
-                  <input 
-                    type="text" placeholder="Fasyankes 1"
-                    value={formData.rencana_persalinan.faskes1}
-                    onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, faskes1: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2.5 text-xs"
-                  />
-                  <input 
-                    type="text" placeholder="Metode KB dipilih"
-                    value={formData.rencana_persalinan.kb_chosen}
-                    onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, kb_chosen: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2.5 text-xs"
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <input 
-                    type="date" placeholder="Tanggal Realisasi"
-                    value={formData.rencana_persalinan.delivery_date}
-                    onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, delivery_date: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                  />
-                  <input 
-                    type="time" placeholder="Pukul"
-                    value={formData.rencana_persalinan.delivery_time}
-                    onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, delivery_time: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                  />
-                  <input 
-                    type="text" placeholder="Penolong"
-                    value={formData.rencana_persalinan.penolong}
-                    onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, penolong: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                  />
-                </div>
-              </div>
-            )}
-
-            {editingSection === "skl" && (
-              <div className="space-y-4 text-xs">
-                <input 
-                  type="text" placeholder="Nomor SKL Resmi"
-                  value={formData.skl.no_skl}
-                  onChange={(e) => setFormData({ ...formData, skl: { ...formData.skl, no_skl: e.target.value } })}
-                  className="w-full bg-base-white border border-base-border/40 rounded-xl p-2.5 text-xs"
-                />
-                <input 
-                  type="text" placeholder="Nama Lengkap Bayi"
-                  value={formData.skl.baby_name}
-                  onChange={(e) => setFormData({ ...formData, skl: { ...formData.skl, baby_name: e.target.value } })}
-                  className="w-full bg-base-white border border-base-border/40 rounded-xl p-2.5 text-xs"
-                />
-                <div className="grid grid-cols-3 gap-3">
-                  <input 
-                    type="number" placeholder="Berat (gram)"
-                    value={formData.skl.weight}
-                    onChange={(e) => setFormData({ ...formData, skl: { ...formData.skl, weight: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                  />
-                  <input 
-                    type="number" placeholder="Panjang (cm)"
-                    value={formData.skl.height}
-                    onChange={(e) => setFormData({ ...formData, skl: { ...formData.skl, height: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                  />
-                  <input 
-                    type="number" placeholder="Lingkar Kepala"
-                    value={formData.skl.head}
-                    onChange={(e) => setFormData({ ...formData, skl: { ...formData.skl, head: e.target.value } })}
-                    className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                  />
-                </div>
-              </div>
-            )}
-
-            {editingSection === "nifas" && (
-              <div className="space-y-4 text-xs">
-                {[
-                  { key: "kf1", title: "KF 1" },
-                  { key: "kf2", title: "KF 2" },
-                  { key: "kf3", title: "KF 3" },
-                  { key: "kf4", title: "KF 4" }
-                ].map((kf) => (
-                  <div key={kf.key} className="p-3 bg-base-bg/10 rounded-xl space-y-2">
-                    <span className="font-bold text-[10px] text-brand-primary">{kf.title}</span>
-                    <div className="grid grid-cols-3 gap-2">
-                      <input 
-                        type="date"
-                        value={formData.nifas[kf.key].date}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          nifas: {
-                            ...formData.nifas,
-                            [kf.key]: { ...formData.nifas[kf.key], date: e.target.value }
-                          }
-                        })}
-                        className="bg-base-white border border-base-border/40 rounded-lg p-1.5 text-[10px]"
-                      />
-                      <input 
-                        type="text" placeholder="Tempat"
-                        value={formData.nifas[kf.key].place}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          nifas: {
-                            ...formData.nifas,
-                            [kf.key]: { ...formData.nifas[kf.key], place: e.target.value }
-                          }
-                        })}
-                        className="bg-base-white border border-base-border/40 rounded-lg p-1.5 text-[10px]"
-                      />
-                      <input 
-                        type="text" placeholder="ASI"
-                        value={formData.nifas[kf.key].breast}
-                        onChange={(e) => setFormData({
-                          ...formData,
-                          nifas: {
-                            ...formData.nifas,
-                            [kf.key]: { ...formData.nifas[kf.key], breast: e.target.value }
-                          }
-                        })}
-                        className="bg-base-white border border-base-border/40 rounded-lg p-1.5 text-[10px]"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3 pt-3 border-t">
-              <button 
-                onClick={() => setEditingSection(null)}
-                className="px-4 py-2 border border-base-border/50 text-base-text-secondary rounded-xl hover:bg-base-bg font-bold cursor-pointer text-xs"
-              >
-                Batal
+          {/* Card USG Trimester 1 & 3 */}
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Ultrasonografi (USG) Obstetrik</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan USG
               </button>
-              <button 
-                onClick={handleSaveSection}
-                className="flex items-center gap-1.5 bg-brand-primary text-base-white px-5 py-2 rounded-xl font-bold hover:bg-brand-dark transition shadow-md cursor-pointer text-xs"
-              >
-                <MdSaveIcon className="w-4 h-4" /> Simpan Bagian
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+              <div className="p-4 bg-base-bg/10 rounded-2xl space-y-3">
+                <span className="font-bold text-[10px] text-brand-primary block">USG Trimester I</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <input type="text" placeholder="Jumlah GS" value={formData.usg_fisik.usg_t1.gs} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t1: { ...formData.usg_fisik.usg_t1, gs: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                  <input type="number" placeholder="CRL (cm)" value={formData.usg_fisik.usg_t1.crl} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t1: { ...formData.usg_fisik.usg_t1, crl: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                </div>
+              </div>
+
+              <div className="p-4 bg-base-bg/10 rounded-2xl space-y-3">
+                <span className="font-bold text-[10px] text-brand-primary block">USG Trimester III</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <select value={formData.usg_fisik.usg_t3.done} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t3: { ...formData.usg_fisik.usg_t3, done: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2">
+                    <option value="Tidak">Tidak dilakukan</option>
+                    <option value="Ya">Ya dilakukan</option>
+                  </select>
+                  <input type="number" placeholder="EFW (gram)" value={formData.usg_fisik.usg_t3.efw} onChange={(e) => setFormData({ ...formData, usg_fisik: { ...formData.usg_fisik, usg_t3: { ...formData.usg_fisik.usg_t3, efw: e.target.value } } })} className="bg-base-white border border-base-border/40 rounded-xl p-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* 3. SKRINING PREEKLAMPSIA & DMG */}
+      {activeTab === "preeklampsia_dmg" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Skrining Preeklampsia &amp; DM Gestasional</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Skrining
               </button>
             </div>
 
+            {isReferralNeeded && (
+              <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start">
+                <span>🚨</span>
+                <div>
+                  <h5 className="font-black text-xs">Rekomendasi Rujuk ke FKRTL / RS:</h5>
+                  <p className="font-semibold text-status-red-solid/90 mt-0.5">Ditemukan faktor risiko preeklampsia atau nilai MAP &gt; 90 / Protein urine celup positif.</p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Sistole (mmHg)</label>
+                <input type="number" value={formData.preeklampsia_dmg.sistole} onChange={(e) => setFormData({ ...formData, preeklampsia_dmg: { ...formData.preeklampsia_dmg, sistole: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Diastole (mmHg)</label>
+                <input type="number" value={formData.preeklampsia_dmg.diastole} onChange={(e) => setFormData({ ...formData, preeklampsia_dmg: { ...formData.preeklampsia_dmg, diastole: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Protein Urine</label>
+                <select value={formData.preeklampsia_dmg.urin_celup} onChange={(e) => setFormData({ ...formData, preeklampsia_dmg: { ...formData.preeklampsia_dmg, urin_celup: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl p-2">
+                  <option value="Negatif">Negatif</option>
+                  <option value="+1">+1</option>
+                  <option value="+2">+2</option>
+                  <option value="+3">+3</option>
+                  <option value="+4">+4</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. RENCANA & RINGKASAN PERSALINAN */}
+      {activeTab === "persalinan" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Rencana &amp; Ringkasan Persalinan</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Persalinan
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Rencana Faskes</label>
+                <input type="text" value={formData.rencana_persalinan.faskes1} onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, faskes1: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Tanggal Melahirkan</label>
+                <input type="date" value={formData.rencana_persalinan.delivery_date} onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, delivery_date: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary mb-1">Penolong Persalinan</label>
+                <input type="text" value={formData.rencana_persalinan.penolong} onChange={(e) => setFormData({ ...formData, rencana_persalinan: { ...formData.rencana_persalinan, penolong: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-xl px-3 py-2" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. NIFAS (KF) */}
+      {activeTab === "nifas" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Pelayanan Nifas (KF 1 - 4)</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Nifas
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+              {["kf1", "kf2", "kf3", "kf4"].map((kf) => (
+                <div key={kf} className="bg-base-bg/15 p-4 rounded-2xl space-y-2">
+                  <span className="font-bold text-xs uppercase text-brand-primary">{kf.toUpperCase()}</span>
+                  <input type="date" value={formData.nifas[kf].date} onChange={(e) => setFormData({ ...formData, nifas: { ...formData.nifas, [kf]: { ...formData.nifas[kf], date: e.target.value } } })} className="w-full bg-base-white border border-base-border/40 rounded-lg p-2" />
+                  <input type="text" placeholder="Tempat" value={formData.nifas[kf].place} onChange={(e) => setFormData({ ...formData, nifas: { ...formData.nifas, [kf]: { ...formData.nifas[kf], place: e.target.value } } })} className="w-full bg-base-white border border-base-border/40 rounded-lg p-2" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -651,10 +506,10 @@ export default function PemeriksaanKlinisIbuPage() {
         <div className="fixed inset-0 bg-base-black/40 backdrop-blur-xs flex items-center justify-center z-50 animate-in fade-in duration-200">
           <div className="bg-base-white p-6 rounded-3xl max-w-sm w-full mx-4 shadow-xl border border-base-border/30 text-center space-y-3">
             <div className="w-12 h-12 rounded-full bg-[#E6F8ED] text-status-green-solid flex items-center justify-center text-2xl mx-auto shadow-xs border border-status-green-solid/10">
-              <MdCheckIcon className="w-6 h-6" />
+              <MdCheckCircleOutline className="w-6 h-6" />
             </div>
             <h4 className="font-extrabold text-sm text-base-text-primary">Data Berhasil Disimpan</h4>
-            <p className="text-[11px] text-base-text-secondary leading-relaxed font-semibold">Rekam medis bagian ini telah berhasil diperbarui dan disimpan.</p>
+            <p className="text-[11px] text-base-text-secondary leading-relaxed font-semibold">Rekam medis bagian ini telah berhasil diperbarui.</p>
           </div>
         </div>
       )}

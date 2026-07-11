@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { MdArrowBack, MdSave, MdCheckCircleOutline, MdChildCare, MdBrush, MdVaccines, MdFastfood, MdShield, MdScale, MdEdit, MdClose } from "react-icons/md";
+import { MdArrowBack, MdSave, MdCheckCircleOutline, MdChildCare, MdBrush, MdVaccines, MdFastfood, MdShield, MdScale } from "react-icons/md";
 
 export default function PemeriksaanKlinisAnakPage() {
   const { id } = useParams();
   const router = useRouter();
   const [child, setChild] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<"neonatus" | "sdidtk" | "gigi" | "gizi_pmba" | "imunisasi" | "lila">("neonatus");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [editingSection, setEditingSection] = useState<"neonatus" | "sdidtk" | "gigi" | "gizi_pmba" | "imunisasi" | "lila" | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number>(1);
 
   // Form States
@@ -149,7 +149,7 @@ export default function PemeriksaanKlinisAnakPage() {
     }
   }, [id]);
 
-  const handleSaveSection = () => {
+  const handleSave = () => {
     if (!id) return;
     const decodedId = decodeURIComponent(id as string);
     localStorage.setItem(`pemeriksaan_neonatus_${decodedId}`, JSON.stringify(neonatus));
@@ -159,12 +159,9 @@ export default function PemeriksaanKlinisAnakPage() {
     localStorage.setItem(`pemeriksaan_imunisasi_${decodedId}`, JSON.stringify(imunisasi));
     localStorage.setItem(`pemeriksaan_lila_${decodedId}`, JSON.stringify(lila));
 
-    setEditingSection(null);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 2000);
   };
-
-  const currentSdidtk = sdidtkList.find(item => item.month === selectedMonth) || {};
 
   return (
     <div className="min-h-screen bg-base-bg text-base-text-primary p-4 sm:p-6 lg:p-8 space-y-6">
@@ -176,7 +173,7 @@ export default function PemeriksaanKlinisAnakPage() {
             <MdArrowBack className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-brand-primary uppercase tracking-wider">Dashboard Rekam Medis Anak (Kader Workstation)</h1>
+            <h1 className="text-xl font-bold text-brand-primary uppercase tracking-wider">Pemeriksaan &amp; Pencatatan Klinis Anak</h1>
             <p className="text-xs text-base-text-secondary font-medium">
               Nama Anak: <span className="font-bold text-base-text-primary">{child?.name || child?.child_name || "-"}</span> &bull; Gender: <span className="font-semibold text-base-text-primary">{child?.gender === "M" ? "Laki-laki" : "Perempuan"}</span>
             </p>
@@ -184,292 +181,212 @@ export default function PemeriksaanKlinisAnakPage() {
         </div>
       </div>
 
-      {/* Bento Grid layout like Child EHR view, but with Edit Button per Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        {/* Card 1: Neonatus */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdChildCare className="w-4.5 h-4.5" /> NEONATUS (0-28 HARI)
-              </span>
-              <button 
-                onClick={() => setEditingSection("neonatus")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEdit className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>⚖️ Berat Lahir: <span className="text-base-text-primary">{neonatus.h06.bb || "-"} g</span></p>
-              <p>🍼 ASI Eksklusif: <span className="text-base-text-primary">{neonatus.kn1.breast || "Ya"}</span></p>
-              <p>⚠️ Kuning Kremer: <span className="text-base-text-primary">Tingkat {neonatus.kn2.kremer || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: SDIDTK */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdScale className="w-4.5 h-4.5" /> TUMBUH KEMBANG (SDIDTK)
-              </span>
-              <button 
-                onClick={() => setEditingSection("sdidtk")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEdit className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>⚖️ BB/U (Status): <span className="text-base-text-primary">{sdidtkList[selectedMonth - 1]?.weight_status || "-"}</span></p>
-              <p>🧠 KPSP: <span className="text-brand-primary">{sdidtkList[selectedMonth - 1]?.kpsp || "-"}</span></p>
-              <p>🩺 Intervensi: <span className="text-base-text-primary italic">{sdidtkList[selectedMonth - 1]?.intervention || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: Gigi */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdBrush className="w-4.5 h-4.5" /> KESEHATAN GIGI
-              </span>
-              <button 
-                onClick={() => setEditingSection("gigi")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEdit className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>🦷 Gigi Ada: <span className="text-base-text-primary">{gigiList[0]?.count || "0"} Gigi</span></p>
-              <p>⚠️ Gigi Berlubang: <span className="text-status-red-solid">{gigiList[0]?.cavities || "0"} Lubang</span></p>
-              <p>🧼 Kondisi Plak: <span className="text-base-text-primary">{gigiList[0]?.plaque || "Bersih"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 4: PMBA & Gizi */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdFastfood className="w-4.5 h-4.5" /> PMBA &amp; GIZI
-              </span>
-              <button 
-                onClick={() => setEditingSection("gizi_pmba")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEdit className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>🍼 ASI Freq: <span className="text-base-text-primary">{giziPmba.months[0]?.asi_freq || "-"}</span></p>
-              <p>🍚 Tekstur: <span className="text-base-text-primary">{giziPmba.months[0]?.texture || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 5: Imunisasi */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdVaccines className="w-4.5 h-4.5" /> IMUNISASI
-              </span>
-              <button 
-                onClick={() => setEditingSection("imunisasi")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEdit className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>💉 HB0: <span className="text-base-text-primary">{imunisasi.hb0?.date || "-"}</span></p>
-              <p>💉 BCG: <span className="text-base-text-primary">{imunisasi.bcg?.date || "-"}</span></p>
-              <p>💉 Polio 1: <span className="text-base-text-primary">{imunisasi.polio1?.date || "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 6: LiLA */}
-        <div className="bg-base-white border border-base-border/30 rounded-[28px] p-5 shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex justify-between items-center border-b pb-2">
-              <span className="flex items-center gap-1.5 text-xs font-bold text-brand-primary">
-                <MdShield className="w-4.5 h-4.5" /> LINGKAR LENGAN (LILA)
-              </span>
-              <button 
-                onClick={() => setEditingSection("lila")}
-                className="flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 bg-brand-primary/10 text-brand-primary rounded-lg hover:bg-brand-primary hover:text-base-white transition cursor-pointer"
-              >
-                <MdEdit className="w-3.5 h-3.5" /> Edit Bagian
-              </button>
-            </div>
-            <div className="mt-3 space-y-2 text-xs font-semibold text-base-text-secondary">
-              <p>📏 LiLA Bulan 1: <span className="text-base-text-primary">{lila.m1 ? `${lila.m1} cm` : "-"}</span></p>
-              <p>📏 LiLA Bulan 6: <span className="text-base-text-primary">{lila.m6 ? `${lila.m6} cm` : "-"}</span></p>
-            </div>
-          </div>
-        </div>
-
+      {/* Tabs */}
+      <div className="flex bg-base-white border border-base-border/30 p-1 rounded-2xl gap-1 text-[11px] font-bold overflow-x-auto no-scrollbar shadow-xs">
+        {[
+          { id: "neonatus", label: "Neonatus (0-28 Hari)", icon: <MdChildCare className="w-4 h-4" /> },
+          { id: "sdidtk", label: "Tumbuh Kembang (SDIDTK)", icon: <MdScale className="w-4 h-4" /> },
+          { id: "gigi", label: "Kesehatan Gigi", icon: <MdBrush className="w-4 h-4" /> },
+          { id: "gizi_pmba", label: "PMBA & Pelayanan Gizi", icon: <MdFastfood className="w-4 h-4" /> },
+          { id: "imunisasi", label: "Imunisasi Lengkap", icon: <MdVaccines className="w-4 h-4" /> },
+          { id: "lila", label: "Pengukuran LiLA", icon: <MdShield className="w-4 h-4" /> }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${activeTab === tab.id ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* SECTION EDITING MODALS */}
-      {editingSection && (
-        <div className="fixed inset-0 bg-base-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-base-white rounded-[32px] max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl border border-base-border/30 space-y-6">
-            
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="font-extrabold text-sm text-brand-primary uppercase tracking-wide">
-                Edit Bagian: {editingSection.toUpperCase()}
-              </h3>
-              <button 
-                onClick={() => setEditingSection(null)}
-                className="p-1.5 border border-base-border/50 text-base-text-secondary hover:text-brand-primary rounded-xl cursor-pointer"
-              >
-                <MdClose className="w-5 h-5" />
+      {/* TAB CONTENT: SEPARATE CARDS PER SECTION */}
+
+      {/* 1. NEONATUS */}
+      {activeTab === "neonatus" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Pelayanan Neonatus</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Neonatus
               </button>
             </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-base-text-secondary">
+              {["h06", "kn1", "kn2", "kn3"].map((key) => (
+                <div key={key} className="bg-base-bg/15 p-4 rounded-2xl space-y-2">
+                  <span className="font-bold text-xs uppercase text-brand-primary">{key.toUpperCase()}</span>
+                  <input type="text" placeholder="Menyusu / ASI" value={neonatus[key].breast || ""} onChange={(e) => setNeonatus({ ...neonatus, [key]: { ...neonatus[key], breast: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-lg p-2" />
+                  <input type="text" placeholder="Tali Pusat" value={neonatus[key].cord || ""} onChange={(e) => setNeonatus({ ...neonatus, [key]: { ...neonatus[key], cord: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-lg p-2" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
-            {/* Form Fields */}
-            {editingSection === "neonatus" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                {["h06", "kn1", "kn2", "kn3"].map((key) => (
-                  <div key={key} className="p-4 bg-base-bg/10 rounded-2xl space-y-2">
-                    <span className="font-bold text-xs capitalize text-brand-primary">{key}</span>
-                    <div className="grid grid-cols-2 gap-2">
-                      <input 
-                        type="text" placeholder="Menyusu / ASI"
-                        value={neonatus[key].breast || ""}
-                        onChange={(e) => setNeonatus({ ...neonatus, [key]: { ...neonatus[key], breast: e.target.value } })}
-                        className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                      />
-                      <input 
-                        type="text" placeholder="Tali Pusat"
-                        value={neonatus[key].cord || ""}
-                        onChange={(e) => setNeonatus({ ...neonatus, [key]: { ...neonatus[key], cord: e.target.value } })}
-                        className="bg-base-white border border-base-border/40 rounded-xl p-2 text-xs"
-                      />
-                    </div>
-                  </div>
-                ))}
+      {/* 2. SDIDTK */}
+      {activeTab === "sdidtk" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Skrining SDIDTK (Bulan ke-{selectedMonth})</h3>
+              <div className="flex items-center gap-4">
+                <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))} className="bg-base-bg border border-base-border/40 rounded-xl p-1.5 font-bold text-brand-primary text-xs cursor-pointer">
+                  {Array.from({ length: 60 }, (_, i) => (<option key={i} value={i + 1}>Bulan {i + 1}</option>))}
+                </select>
+                <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                  <MdSave className="w-4 h-4" /> Simpan SDIDTK
+                </button>
               </div>
-            )}
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">BB/U Status</label>
+                <select value={sdidtkList[selectedMonth - 1]?.weight_status} onChange={(e) => {
+                  const list = [...sdidtkList];
+                  list[selectedMonth - 1].weight_status = e.target.value;
+                  setSdidtkList(list);
+                }} className="w-full bg-base-white border border-base-border/40 rounded-xl p-2.5">
+                  <option value="SK">Sangat Kurang</option><option value="K">Kurang</option><option value="N">Normal</option><option value="RBL">Risiko Lebih</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">KPSP</label>
+                <select value={sdidtkList[selectedMonth - 1]?.kpsp} onChange={(e) => {
+                  const list = [...sdidtkList];
+                  list[selectedMonth - 1].kpsp = e.target.value;
+                  setSdidtkList(list);
+                }} className="w-full bg-base-white border border-base-border/40 rounded-xl p-2.5">
+                  <option value="Sesuai">Sesuai</option><option value="Meragukan">Meragukan</option><option value="Penyimpangan">Penyimpangan</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-            {editingSection === "sdidtk" && (
-              <div className="space-y-4 text-xs">
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-base-text-secondary">Pilih Umur Bulan:</span>
-                  <select 
-                    value={selectedMonth} 
-                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                    className="bg-base-bg border border-base-border/40 rounded-xl p-2 font-bold text-brand-primary"
-                  >
-                    {Array.from({ length: 60 }, (_, i) => (
-                      <option key={i} value={i + 1}>Bulan ke-{i + 1}</option>
-                    ))}
+      {/* 3. KESEHATAN GIGI */}
+      {activeTab === "gigi" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Kesehatan Gigi Anak</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Gigi
+              </button>
+            </div>
+            
+            <div className="space-y-2 text-xs">
+              {gigiList.map((item, idx) => (
+                <div key={idx} className="grid grid-cols-4 gap-4 items-center bg-base-bg/10 p-3 rounded-xl">
+                  <span className="font-bold text-base-text-primary">{item.month} Bulan</span>
+                  <input type="number" placeholder="Jumlah Gigi" value={item.count} onChange={(e) => {
+                    const list = [...gigiList];
+                    list[idx].count = e.target.value;
+                    setGigiList(list);
+                  }} className="bg-base-white border border-base-border/40 rounded-lg p-1.5" />
+                  <input type="number" placeholder="Gigi Berlubang" value={item.cavities} onChange={(e) => {
+                    const list = [...gigiList];
+                    list[idx].cavities = e.target.value;
+                    setGigiList(list);
+                  }} className="bg-base-white border border-base-border/40 rounded-lg p-1.5" />
+                  <select value={item.plaque} onChange={(e) => {
+                    const list = [...gigiList];
+                    list[idx].plaque = e.target.value;
+                    setGigiList(list);
+                  }} className="bg-base-white border border-base-border/40 rounded-lg p-1.5">
+                    <option value="Bersih">Bersih</option><option value="Kotor">Kotor</option>
                   </select>
                 </div>
-                <div className="grid grid-cols-2 gap-4 bg-base-bg/15 p-4 rounded-2xl">
-                  <div>
-                    <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">BB/U</label>
-                    <select 
-                      value={sdidtkList[selectedMonth - 1]?.weight_status} 
-                      onChange={(e) => {
-                        const list = [...sdidtkList];
-                        list[selectedMonth - 1].weight_status = e.target.value;
-                        setSdidtkList(list);
-                      }}
-                      className="w-full bg-base-white border border-base-border/40 rounded-xl p-2"
-                    >
-                      <option value="SK">Sangat Kurang</option>
-                      <option value="K">Kurang</option>
-                      <option value="N">Normal</option>
-                      <option value="RBL">Risiko Lebih</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-base-text-secondary uppercase mb-1">KPSP</label>
-                    <select 
-                      value={sdidtkList[selectedMonth - 1]?.kpsp} 
-                      onChange={(e) => {
-                        const list = [...sdidtkList];
-                        list[selectedMonth - 1].kpsp = e.target.value;
-                        setSdidtkList(list);
-                      }}
-                      className="w-full bg-base-white border border-base-border/40 rounded-xl p-2 font-semibold text-brand-primary"
-                    >
-                      <option value="Sesuai">Sesuai</option>
-                      <option value="Meragukan">Meragukan</option>
-                      <option value="Penyimpangan">Penyimpangan</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
-            {editingSection === "gigi" && (
-              <div className="space-y-4 text-xs">
-                {gigiList.map((item, idx) => (
-                  <div key={idx} className="grid grid-cols-4 gap-2 items-center bg-base-bg/10 p-3 rounded-xl">
-                    <span className="font-bold text-base-text-primary">{item.month} Bulan</span>
-                    <input 
-                      type="number" placeholder="Gigi Ada"
-                      value={item.count}
-                      onChange={(e) => {
-                        const list = [...gigiList];
-                        list[idx].count = e.target.value;
-                        setGigiList(list);
-                      }}
-                      className="bg-base-white border border-base-border/40 rounded-lg p-1.5"
-                    />
-                    <input 
-                      type="number" placeholder="Gigi Lubang"
-                      value={item.cavities}
-                      onChange={(e) => {
-                        const list = [...gigiList];
-                        list[idx].cavities = e.target.value;
-                        setGigiList(list);
-                      }}
-                      className="bg-base-white border border-base-border/40 rounded-lg p-1.5"
-                    />
-                    <select 
-                      value={item.plaque}
-                      onChange={(e) => {
-                        const list = [...gigiList];
-                        list[idx].plaque = e.target.value;
-                        setGigiList(list);
-                      }}
-                      className="bg-base-white border border-base-border/40 rounded-lg p-1.5"
-                    >
-                      <option value="Bersih">Bersih</option>
-                      <option value="Kotor">Kotor</option>
-                    </select>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3 pt-3 border-t">
-              <button 
-                onClick={() => setEditingSection(null)}
-                className="px-4 py-2 border border-base-border/50 text-base-text-secondary rounded-xl hover:bg-base-bg font-bold cursor-pointer text-xs"
-              >
-                Batal
-              </button>
-              <button 
-                onClick={handleSaveSection}
-                className="flex items-center gap-1.5 bg-brand-primary text-base-white px-5 py-2 rounded-xl font-bold hover:bg-brand-dark transition shadow-md cursor-pointer text-xs"
-              >
-                <MdSave className="w-4 h-4" /> Simpan Bagian
+      {/* 4. PMBA & GIZI */}
+      {activeTab === "gizi_pmba" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">PMBA &amp; Pelayanan Gizi</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Gizi
               </button>
             </div>
+            
+            <div className="space-y-2 text-xs">
+              {giziPmba.months.map((item: any, idx: number) => (
+                <div key={idx} className="grid grid-cols-4 gap-4 items-center bg-base-bg/10 p-3 rounded-xl font-semibold">
+                  <span className="font-bold text-base-text-primary">Fase {item.age_label} Bulan</span>
+                  <input type="text" placeholder="ASI Freq" value={item.asi_freq} onChange={(e) => {
+                    const list = [...giziPmba.months];
+                    list[idx].asi_freq = e.target.value;
+                    setGiziPmba({ ...giziPmba, months: list });
+                  }} className="bg-base-white border border-base-border/40 rounded-lg p-1.5" />
+                  <input type="text" placeholder="Tekstur" value={item.texture} onChange={(e) => {
+                    const list = [...giziPmba.months];
+                    list[idx].texture = e.target.value;
+                    setGiziPmba({ ...giziPmba, months: list });
+                  }} className="bg-base-white border border-base-border/40 rounded-lg p-1.5" />
+                  <input type="text" placeholder="Jumlah" value={item.amount} onChange={(e) => {
+                    const list = [...giziPmba.months];
+                    list[idx].amount = e.target.value;
+                    setGiziPmba({ ...giziPmba, months: list });
+                  }} className="bg-base-white border border-base-border/40 rounded-lg p-1.5" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* 5. IMUNISASI */}
+      {activeTab === "imunisasi" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Riwayat Imunisasi</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan Imunisasi
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-xs font-semibold">
+              {Object.keys(imunisasi).map((key) => (
+                <div key={key} className="p-3 bg-base-bg/15 rounded-xl space-y-1">
+                  <span className="font-bold text-[9px] uppercase text-brand-primary block">{key.replace(/_/g, " ")}</span>
+                  <input type="date" value={imunisasi[key].date} onChange={(e) => setImunisasi({ ...imunisasi, [key]: { ...imunisasi[key], date: e.target.value } })} className="w-full bg-base-white border border-base-border/40 rounded-lg p-1 text-[10px]" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6. LILA */}
+      {activeTab === "lila" && (
+        <div className="space-y-6">
+          <div className="bg-base-white border border-base-border/30 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="font-extrabold text-sm text-brand-primary uppercase">Pengukuran LiLA Anak</h3>
+              <button onClick={handleSave} className="flex items-center gap-1.5 bg-brand-primary text-base-white px-4 py-1.5 rounded-xl font-bold hover:bg-brand-dark transition shadow-xs text-[10px] cursor-pointer">
+                <MdSave className="w-4 h-4" /> Simpan LiLA
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 text-xs font-semibold">
+              {Object.keys(lila).map((m) => (
+                <div key={m} className="bg-base-bg/15 p-3 rounded-xl space-y-1">
+                  <span className="font-bold text-[10px] uppercase text-brand-primary block">{m.replace("m", "Bulan ")}</span>
+                  <input type="number" step="0.1" value={lila[m]} onChange={(e) => setLila({ ...lila, [m]: e.target.value })} className="w-full bg-base-white border border-base-border/40 rounded-lg p-1" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
