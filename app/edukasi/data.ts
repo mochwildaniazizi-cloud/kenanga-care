@@ -311,6 +311,15 @@ export const mockArticles: Article[] = [
   },
   {
     id: "L33",
+    title: "Panduan Kesiapsiagaan Situasi Darurat Bencana & Manajemen Penyusunan Kit Ransel Bencana Keluarga",
+    categories: ["Informasi Umum"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L33.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L34",
     title: "Nomor Telepon Penting & Kumpulan Link Rujukan Kesehatan Resmi Kemenkes",
     categories: ["Informasi Umum"],
     type: "Artikel",

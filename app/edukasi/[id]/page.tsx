@@ -467,6 +467,8 @@ export default function ArticleDetailPage() {
               <L32ArticleContent />
             ) : id === "L33" ? (
               <L33ArticleContent />
+            ) : id === "L34" ? (
+              <L34ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -3417,7 +3419,7 @@ function L28ArticleContent() {
   );
 }
 
-function L33ArticleContent() {
+function L34ArticleContent() {
   const links = [
     { label: "Website Ayo Sehat", desc: "Portal informasi resmi promosi kesehatan Kemenkes RI", url: "https://ayosehat.kemkes.go.id" },
     { label: "Chatbot Edukasi Ayo Sehat", desc: "Layanan konsultasi & tanya jawab otomatis via WhatsApp", url: "https://wa.me/6281277889912?text=ayosehat" },
@@ -3688,6 +3690,93 @@ function L32ArticleContent() {
           <li>Anak dengan gangguan berbicara: melatih pelafalan huruf, vokal, konsonan, dan kalimat secara bertahap.</li>
         </ol>
       </div>
+    </div>
+  );
+}
+
+function L33ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      
+      {/* SECTION 1: KERAWANAN & RISIKO PSIKOLOGIS */}
+      <div className="bg-brand-soft/10 border-l-4 border-brand-primary p-4 rounded-r-2xl space-y-2">
+        <h3 className="text-base font-extrabold text-brand-primary">Kesiapsiagaan Dalam Situasi Bencana</h3>
+        <p className="font-medium text-base-text-secondary">
+          Indonesia merupakan negara yang terletak di wilayah yang rawan bencana, bencana alam yang sering terjadi di Indonesia antara lain gempa bumi, erupsi gunung berapi, kebakaran hutan/lahan longsor, banjir, tsunami, di samping bencana non alam seperti pandemi virus atau situasi konflik.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-4.5 shadow-xs">
+          <h4 className="font-bold text-status-red-solid text-xs mb-2">🚨 Kerentanan Kelompok Risiko Tinggi</h4>
+          <p className="font-medium">
+            Kelompok yang paling rentan terdampak bencana diantaranya adalah ibu hamil, ibu nifas, bayi dan balita. Kondisi pengungsian yang padat dan tidak memadai, dengan hygiene dan sanitasi yang buruk, berisiko tinggi menimbulkan berbagai penyakit, termasuk risiko terinfeksi penyakit menular dan peningkatan kasus gizi kurang. Disamping itu juga berisiko terhadap pelecehan, kekerasan, dan trauma. Selain risiko kesakitan, kecacatan dan kematian, anak dan balita juga memiliki risiko terpisah dari orang tua.
+          </p>
+        </div>
+
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-4.5 shadow-xs">
+          <h4 className="font-bold text-status-blue-solid text-xs mb-2">🧠 Dampak Suasana Kejiwaan &amp; Trauma</h4>
+          <p className="font-medium">
+            Reaksi bayi dan anak berumur 1-2 tahun sangat dipengaruhi oleh suasana kejiwaan orangtuanya dalam menghadapi bencana. Bila orang tua panik dan cemas, maka anak-anak tersebut akan gelisah, rewel dan mudah terkena penyakit. Anak usia prasekolah mudah merasa tidak berdaya dan terus mengingat trauma psikis yang dialami akibat bencana. Hal ini mengakibatkan gangguan tidur dan anak lebih banyak berdiam diri. Bimbingan untuk bermain dapat mengurangi masalah tersebut.
+          </p>
+        </div>
+      </div>
+
+      {/* SECTION 2: RENCANA DARURAT KELUARGA */}
+      <div className="p-5 bg-base-bg/30 border border-base-border/30 rounded-2xl space-y-3">
+        <h4 className="font-bold text-base-text-primary text-xs uppercase tracking-wider">📋 Rencana Darurat Kesiapsiagaan Keluarga</h4>
+        <p className="font-medium">
+          Dalam situasi normal, ibu hamil, ibu bersalin, bayi, dan balita terutama yang tinggal di daerah rawan bencana berkewajiban untuk mempersiapkan kesiapsiagaan menghadapi bencana dengan langkah berikut:
+        </p>
+        
+        <ul className="list-disc pl-4 space-y-2 font-medium">
+          <li>
+            <strong>Membuat rencana darurat keluarga:</strong>
+            <ul className="list-circle pl-4 space-y-1 mt-1 text-[11px]">
+              <li>Kenali ancaman bencana.</li>
+              <li>Nomor kontak penting (keluarga, fasilitas pelayanan kesehatan/rumah sakit/puskesmas/rumah bersalin/klinik, dan lain-lain).</li>
+              <li>Identifikasi lokasi untuk mematikan air, gas, dan listrik.</li>
+              <li>Identifikasi titik kumpul dan titik aman di dalam bangunan atau rumah.</li>
+              <li>Ketahui rute evakuasi.</li>
+              <li>Identifikasi anggota keluarga yang rentan (bayi, balita, ibu hamil, ibu bersalin nifas, lanjut usia, dan penyandang disabilitas).</li>
+            </ul>
+          </li>
+          <li><strong>Menyimak informasi resmi:</strong> Menyimak informasi dari radio/televisi media online/informasi resmi dari BPBD, BNPB. Apabila sudah terbentuk posko informasi lanjutan akan diberikan oleh posko setempat.</li>
+          <li><strong>Menyiapkan kit bencana:</strong> Mengemas tas darurat yang berisi kebutuhan esensial pertahanan hidup seluruh anggota keluarga.</li>
+        </ul>
+      </div>
+
+      {/* SECTION 3: ISI KIT BENCANA (12 ITEM GRID) */}
+      <div className="space-y-3 pt-2">
+        <h2 className="text-sm font-extrabold text-base-text-primary border-b pb-2">🎒 Manajemen Persiapan Isi Kit Ransel Bencana</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          
+          {[
+            { title: "Buku KIA", desc: "Buku pedoman untuk ibu hamil/bersalin/nifas dan pedoman bayi dan balita.", icon: "📚" },
+            { title: "Obat-obatan", desc: "Obat sehari-hari dan obat-obatan rutin, vitamin, serta perlengkapan pendukungnya.", icon: "💊" },
+            { title: "Kalung Tanda Pengenal", desc: "Tanda pengenal berisi informasi nama, nama orang tua, no. telepon orang tua, dan alamat.", icon: "🪪" },
+            { title: "Peralatan Elektronik", desc: "Handphone, powerbank, kabel charger, radio walkie-talkie, baterai.", icon: "🔋" },
+            { title: "Benda Khusus Bayi & Balita", desc: "Pakaian, selimut, popok, topi, kaos kaki, dan mainan secukupnya.", icon: "🍼" },
+            { title: "Peralatan Bertahan Hidup", desc: "Pisau, gunting, peluit, pisau serba guna, senter, korek/pemantik api.", icon: "🔦" },
+            { title: "Benda Khusus Ibu", desc: "Kain panjang, pakaian lengkap dan perlengkapan lain secukupnya.", icon: "👚" },
+            { title: "Makanan & Minuman", desc: "Makanan instan, air mineral, roti, dan makanan praktis untuk dibawa di dalam tas.", icon: "🍞" },
+            { title: "Persih Higienis", desc: "Tisu basah dan tisu kering, hand sanitizer, perlengkapan mandi.", icon: "🧼" },
+            { title: "Uang & Dokumen Penting", desc: "Uang tunai, KTP/Paspor, kartu ATM, dan dokumen penting lainnya.", icon: "💵" },
+            { title: "Perlengkapan Keselamatan", desc: "Jaket, sepatu, sarung tangan, masker, helm, jas hujan/ponco ringan.", icon: "⛑️" },
+            { title: "Tas Ransel", desc: "Tas untuk membawa semua perlengkapan persiapan kit bencana.", icon: "🎒" }
+          ].map((item, idx) => (
+            <div key={idx} className="bg-base-white border border-base-border/30 rounded-xl p-3 flex flex-col justify-between shadow-xs">
+              <div>
+                <span className="text-xl block mb-1">{item.icon}</span>
+                <h5 className="font-bold text-[11px] text-base-text-primary leading-tight mb-1">{item.title}</h5>
+                <p className="text-[10px] text-base-text-secondary leading-normal font-medium">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+
+        </div>
+      </div>
+
     </div>
   );
 }
