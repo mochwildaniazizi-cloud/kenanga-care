@@ -459,6 +459,14 @@ export default function ArticleDetailPage() {
               <L28ArticleContent />
             ) : id === "L29" ? (
               <L29ArticleContent />
+            ) : id === "L30" ? (
+              <L30ArticleContent />
+            ) : id === "L31" ? (
+              <L31ArticleContent />
+            ) : id === "L32" ? (
+              <L32ArticleContent />
+            ) : id === "L33" ? (
+              <L33ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -3477,6 +3485,209 @@ function L29ArticleContent() {
         </div>
       </div>
 
+    </div>
+  );
+}
+
+function L29ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Menjaga kebersihan diri dan lingkungan anak merupakan hal yang harus dilakukan untuk anak di semua rentang usia. Membiasakan perilaku hidup bersih dan sehat (PHBS) sejak dini terbukti efektif memutus rantai penularan kuman penyakit.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="p-4 bg-brand-soft/20 border border-brand-primary/10 rounded-2xl space-y-2">
+          <h4 className="font-bold text-brand-primary text-xs">🧼 Kapan Saja Harus Mencuci Tangan?</h4>
+          <ol className="list-decimal pl-4 font-medium space-y-1">
+            <li>Setelah buang air.</li>
+            <li>Sebelum memegang dan menyusui bayi.</li>
+            <li>Setelah menceboki bayi atau anak.</li>
+            <li>Sebelum makan dan menyuapi anak.</li>
+            <li>Sebelum memegang makanan dan setelah makan.</li>
+            <li>Setelah bersin/batuk.</li>
+            <li>Setiap kali tangan kotor (mengetik, pegang uang, hewan, berkebun).</li>
+          </ol>
+        </div>
+
+        <div className="p-4 bg-status-blue-light/10 border border-status-blue-solid/10 rounded-2xl space-y-2">
+          <h4 className="font-bold text-status-blue-solid text-xs">💡 Pentingnya Mencuci Tangan Dengan Sabun:</h4>
+          <ul className="list-disc pl-4 font-medium space-y-1">
+            <li>Kuman penyakit sangat mudah ditularkan melalui tangan. Pada saat makan kuman dengan cepat masuk ke dalam tubuh.</li>
+            <li>Tangan kadang terlihat bersih secara kasat mata namun tetap mengandung kuman.</li>
+            <li>Sabun dapat membersihkan kotoran dan merontokkan kuman. Tanpa sabun, kotoran dan kuman tertinggal di tangan.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-3">
+        <h4 className="font-bold text-status-green-solid text-xs">🧼 7 Langkah Cara Cuci Tangan Yang Benar (Air Mengalir):</h4>
+        <p className="font-medium">Biasakan cuci tangan pakai sabun dengan air mengalir mengikuti urutan standar medis berikut:</p>
+        <ol className="list-decimal pl-4 font-medium space-y-1.5">
+          <li>Basahi seluruh tangan dengan air bersih mengalir.</li>
+          <li>Gosok sabun secara merata pada area telapak tangan.</li>
+          <li>Gosok sabun ke telapak punggung, dan sela-sela jari tangan.</li>
+          <li>Gosok telapak kanan di atas tangan kiri dan telapak kiri di atas punggung tangan kanan.</li>
+          <li>Bersihkan bagian bawah kuku secara menyeluruh.</li>
+          <li>Bilas tangan dengan air bersih mengalir sampai busa hilang.</li>
+          <li>Keringkan tangan dengan handuk/tisue atau keringkan dengan diangin-anginkan.</li>
+        </ol>
+        <p className="text-[10px] text-base-text-secondary italic pt-2 border-t border-dashed border-base-border/10">
+          * Catatan Tambahan: Jauhkan anak dari paparan asap rokok dan lain-lain. Serta pastikan orang tua/keluarga mengikuti Kelas Ibu Balita setiap bulan.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function L30ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Melakukan perawatan kesehatan gigi dan mulut anak harus dibiasakan sejak dini, bahkan sebelum gigi susu pertama si kecil mulai tumbuh ke permukaan gusi.
+      </p>
+
+      <div className="p-4 bg-status-red-light/10 border border-status-red-solid/10 rounded-2xl space-y-2">
+        <h4 className="font-bold text-status-red-solid text-xs">🛑 Faktor Risiko Utama Gigi Berlubang:</h4>
+        <ul className="list-disc pl-4 font-medium space-y-1">
+          <li>Meminum susu botol saat tidur malam.</li>
+          <li>Mengemil makanan manis di antara waktu makan aturan waktu makan.</li>
+          <li>Tidak menyikat gigi sebelum tidur.</li>
+          <li>Mengemut makanan.</li>
+        </ul>
+      </div>
+
+      <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-3">
+        <h4 className="font-bold text-brand-primary text-xs">🪥 Panduan Cara Membersihkan Gigi Anak Berdasarkan Kategori Usia:</h4>
+        
+        <div className="space-y-4">
+          <div className="p-3.5 bg-base-bg/30 rounded-xl space-y-1">
+            <span className="font-bold text-base-text-primary block">👶 1. Anak Usia 0 - 4 Bulan:</span>
+            <ol className="list-decimal pl-4 font-medium space-y-0.5">
+              <li>Gendong atau pangku anak dengan satu tangan.</li>
+              <li>Bersihkan gusi anak secara perlahan dengan kain atau lap basah yang dilingkarkan pada jari telunjuk ibu.</li>
+            </ol>
+          </div>
+
+          <div className="p-3.5 bg-base-bg/30 rounded-xl space-y-1">
+            <span className="font-bold text-base-text-primary block">🦷 2. Anak Usia 6 - 12 Bulan:</span>
+            <ol className="list-decimal pl-4 font-medium space-y-1">
+              <li>Bersihkan gusi anak setelah diberi makan menggunakan kain atau lap basah.</li>
+              <li>Bila gigi susu mulai muncul, bersihkan giginya dengan sikat gigi anak berbulu halus tanpa pasta gigi atau dengan pasta gigi selapis tipis pada permukaan bulu sikat.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L31ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Setiap orang tua pasti khawatir jika anaknya jatuh sakit. Namun, Ibu harus tetap tenang dan memastikan kebutuhan gizi si kecil tetap tercukupi selama sakit. Saat anak sakit, daya tahan tubuhnya akan melemah, sehingga ia membutuhkan lebih banyak zat gizi untuk memperbaiki sel-sel tubuh yang rusak, serta memulihkan energinya.
+      </p>
+
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-4 space-y-2">
+        <h4 className="font-bold text-brand-primary text-xs">🩺 Panduan Merawat Anak Yang Sedang Sakit:</h4>
+        <ul className="list-disc pl-4 space-y-1.5 font-medium">
+          <li><strong>Memberi asupan gizi lebih banyak:</strong> Caranya bisa dengan menambah porsi ASI atau makanan minuman yang diberikan, atau menambah variasi makanan untuk menambah asupan gizinya.</li>
+          <li><strong>Memberi asupan gizi lebih sering:</strong> Caranya dengan memberi makan lebih sering dari biasanya. Misalnya, jika anak biasa makan 3-4 kali dalam sehari, tambahkan 1-2 kali lagi, namun dengan porsi yang tidak membuat anak terlalu kenyang.</li>
+        </ul>
+      </div>
+
+      <div className="space-y-4">
+        {/* Demam */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-2">
+          <h4 className="font-bold text-status-orange-solid text-xs">🤒 1. Perawatan Saat Anak Demam</h4>
+          <ul className="list-disc pl-4 font-medium space-y-1">
+            <li>Jika masih menyusu, berikan ASI lebih sering.</li>
+            <li>Beri minum lebih sering dan lebih banyak.</li>
+            <li>Jangan diselimuti atau diberi baju tebal.</li>
+            <li>Kompres dengan air biasa atau air hangat. Jangan air dingin karena anak bisa menggigil.</li>
+            <li>Jika demam tinggi, beri obat penurun panas sesuai dosis.</li>
+            <li>Daerah endemis malaria: balita tidur di kelambu anti nyamuk (mengandung insektisida).</li>
+          </ul>
+          <div className="p-2.5 bg-status-red-light/10 text-status-red-solid rounded-xl font-bold text-[10px]">
+            🚨 SEGERA KE FASKES JIKA: Demam disertai kejang; Demam tidak turun dalam 2 hari; Demam disertai bintik merah, mimisan, atau BAB hitam.
+          </div>
+        </div>
+
+        {/* Batuk */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-2">
+          <h4 className="font-bold text-status-blue-solid text-xs">😮💨 2. Perawatan Saat Anak Batuk</h4>
+          <ul className="list-disc pl-4 font-medium space-y-1">
+            <li>Berikan ASI lebih sering, beri air matang lebih banyak.</li>
+            <li>Jika umur &gt; 1 tahun, beri kecap manis atau madu dicampur air jeruk nipis.</li>
+            <li>Jauhkan dari asap rokok, asap dapur, asap sampah, polusi dan debu.</li>
+          </ul>
+          <div className="p-2.5 bg-status-red-light/10 text-status-red-solid rounded-xl font-bold text-[10px]">
+            🚨 SEGERA KE FASKES JIKA: Batuk tidak sembuh dalam 2 hari; Anak sesak napas; Demam.
+          </div>
+        </div>
+
+        {/* Diare */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-2">
+          <h4 className="font-bold text-status-red-solid text-xs">💩 3. Perawatan Saat Anak Diare / Mencret</h4>
+          <ul className="list-disc pl-4 font-medium space-y-1">
+            <li>ASI sesering mungkin. Berikan 1/2 - 1 gelas cairan oralit setiap buang air besar.</li>
+            <li>Jika tidak ada oralit, beri air matang, kuah sayur bening, atau air tajin.</li>
+            <li>Pemberian zinc selama 10 hari berturut-turut: anak &lt;6 bulan 1/2 tablet; anak 6 bulan - 5 tahun 1 tablet.</li>
+            <li>Beri MP-ASI atau makan seperti biasa. Jangan beri obat lain tanpa resep petugas medis.</li>
+          </ul>
+          <div className="p-2.5 bg-status-red-light/10 text-status-red-solid rounded-xl font-bold text-[10px]">
+            🚨 SEGERA KE FASKES JIKA: Timbul demam; Ada darah dalam tinja; Muntah terus; Sangat haus; Diare makin parah/berulang-ulang.
+          </div>
+        </div>
+
+        {/* Luka */}
+        <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-2">
+          <h4 className="font-bold text-gray-700 text-xs">🩹 4. Perawatan Luka dan Koreng</h4>
+          <ul className="list-disc pl-4 font-medium space-y-1">
+            <li>Luka: Cuci bersih luka dengan air bersih mengalir.</li>
+            <li>Koreng: Periksakan ke Puskesmas.</li>
+          </ul>
+          <div className="p-2.5 bg-status-red-light/10 text-status-red-solid rounded-xl font-bold text-[10px]">
+            🚨 SEGERA KE FASKES JIKA: Luka bernanah atau berbau.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L32ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Setiap anak berhak dilindungi dari berbagai bentuk kekerasan, pelecehan, dan penelantaran. Pendampingan yang tepat dan peka sangat diperlukan bagi anak dengan disabilitas.
+      </p>
+
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 space-y-2">
+        <h4 className="font-bold text-brand-primary text-xs">🛡️ I. Perlindungan Anak dari Kekerasan &amp; Pelecehan</h4>
+        <p className="font-semibold text-base-text-primary">Lindungi Anak dari Kekerasan Fisik, Psikis, Seksual, dan Penelantaran.</p>
+        <ul className="list-disc pl-4 space-y-1 font-medium">
+          <li>Mencubit, memukul (kekerasan fisik).</li>
+          <li>Mengejek, mengancam (kekerasan psikis).</li>
+          <li>Melakukan perbuatan cabul terhadap anak, mempertontonkan aktivitas seksual terhadap anak (kekerasan seksual).</li>
+          <li>Tidak memenuhi kebutuhan gizi, kesehatan, pendidikan (penelantaran).</li>
+        </ul>
+        <p className="text-[10px] text-status-red-solid font-bold">🚨 Awas! Banyak pelaku kekerasan fisik dan kejahatan seksual dilakukan oleh orang yang dikenal anak.</p>
+      </div>
+
+      <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-3">
+        <h4 className="font-bold text-status-blue-solid text-xs">♿ II. Pendampingan Anak Dengan Disabilitas</h4>
+        <p className="font-medium">Keluarga membantu Anak dengan Disabilitas dalam menjalankan aktivitas sehari-hari:</p>
+        <ol className="list-decimal pl-4 font-medium space-y-1.5">
+          <li>Penguatan mental untuk bisa menerima kondisi anak dengan segala kekurangannya.</li>
+          <li>Melindungi dan memberi rasa aman pada anak dengan memberikan kasih sayang, semangat dan motivasi secara terbaik.</li>
+          <li>Ajari anak dengan sabar melatih kemandirian anak dalam melakukan aktivitas sehari-hari.</li>
+          <li>Menyediakan makanan bergizi seimbang dan memeriksakan kesehatan anak secara teratur serta memantau tumbuh kembang anak.</li>
+          <li>Kontrol teratur untuk terapi, status gizi, kemajuan perkembangan, serta melengkapi status imunisasi di Puskesmas.</li>
+          <li>Anak dengan gangguan berbicara: melatih pelafalan huruf, vokal, konsonan, dan kalimat secara bertahap.</li>
+        </ol>
+      </div>
     </div>
   );
 }

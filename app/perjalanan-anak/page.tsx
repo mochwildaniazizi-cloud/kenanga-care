@@ -192,6 +192,27 @@ function PerjalananAnakContent() {
     }
   };
 
+  const [answersLingkungan, setAnswersLingkungan] = useState<Record<string, any>>({});
+
+  const handleEnvAnswerChange = (qId: string, value: any, isCheckbox: boolean = false) => {
+    setAnswersLingkungan(prev => {
+      let nextVal = value;
+      if (isCheckbox) {
+        const current = prev[qId] || [];
+        if (current.includes(value)) {
+          nextVal = current.filter((x: string) => x !== value);
+        } else {
+          nextVal = [...current, value];
+        }
+      }
+      const next = { ...prev, [qId]: nextVal };
+      if (selectedChildId) {
+        localStorage.setItem(`env_answers_${selectedChildId}`, JSON.stringify(next));
+      }
+      return next;
+    });
+  };
+
   // Load mother's children if role === "ibu"
   useEffect(() => {
     async function loadMotherChildren() {
@@ -389,6 +410,17 @@ function PerjalananAnakContent() {
         };
       });
       setGejala26y(updatedGejala);
+
+      const savedEnv = localStorage.getItem(`env_answers_${selectedChildId}`);
+      if (savedEnv) {
+        try {
+          setAnswersLingkungan(JSON.parse(savedEnv));
+        } catch (e) {
+          console.error("Failed to parse cached environment answers:", e);
+        }
+      } else {
+        setAnswersLingkungan({});
+      }
 
       if (!navigator.onLine) {
         return;
@@ -706,6 +738,29 @@ function PerjalananAnakContent() {
                 </div>
               </div>
 
+              {/* Card 6: Kesehatan Lingkungan */}
+              <div onClick={() => router.push("?section=kesehatan_lingkungan")} className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group">
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#1E9D5D] rounded-full"></span> LINGKUNGAN</span>
+                  <span>Sanitasi</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#1E9D5D] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">KESEHATAN LINGKUNGAN</div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Evaluasi Sanitasi Rumah</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Pemantauan sarana sanitasi rumah tangga, perilaku cuci tangan, sampah, dan air bersih.</p>
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="w-6 h-6 rounded-full bg-[#E6F8ED] text-[#1E9D5D] flex items-center justify-center text-[10px] font-bold border border-base-white">🏡</div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-green-50 text-[#1E9D5D]">{Object.keys(answersLingkungan).length} Dijawab</span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <span>♻️ Evaluasi Rumah</span>
+                    <span>Buka Lembar</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -724,6 +779,7 @@ function PerjalananAnakContent() {
               {activeSection === "riwayat" && "Riwayat Kunjungan Posyandu"}
               {activeSection === "milestone" && "Penanda Perkembangan (Milestone)"}
               {activeSection === "pemantauan_gejala" && "Pemantauan Gejala Bulanan"}
+              {activeSection === "kesehatan_lingkungan" && "Kesehatan Lingkungan"}
             </span>
             <span className="text-[10px] bg-brand-soft text-brand-primary font-bold px-2.5 py-0.5 rounded-full border border-brand-primary/20">{child.name}</span>
           </div>
@@ -1037,6 +1093,202 @@ function PerjalananAnakContent() {
               )}
             </div>
           )}
+
+          {activeSection === "kesehatan_lingkungan" && (() => {
+            const sections = [
+              {
+                title: "I. Sarana Sanitasi (pilih salah satu)",
+                questions: [
+                  {
+                    id: "sanitasi_1",
+                    text: "1. Di mana ibu dan keluarga buang air besar?",
+                    type: "radio",
+                    options: [
+                      "Sembarangan (di kebun, sungai dll)",
+                      "Jamban milik sendiri"
+                    ]
+                  },
+                  {
+                    id: "sanitasi_2",
+                    text: "2. Bila jamban milik sendiri, bagian bawahnya/bak penampung tinja berupa apa?",
+                    type: "radio",
+                    options: [
+                      "Tangki septik disedot setiap 3-5 tahun terakhir atau disalurkan ke sistem pengolahan",
+                      "Cubluk/lubang tanah",
+                      "Dibuang langsung ke drainase/kolam/sawah/sungai/danau/laut dan pantai/tanah lapang/kebun"
+                    ]
+                  },
+                  {
+                    id: "sanitasi_3",
+                    text: "3. Bagaimana bentuk kloset jambannya?",
+                    type: "radio",
+                    options: [
+                      "Kloset leher angsa/lainnya yang mencegah binatang pembawa penyakit masuk",
+                      "Kolam",
+                      "Irigasi"
+                    ]
+                  }
+                ]
+              },
+              {
+                title: "II. Cuci Tangan Pakai Sabun",
+                questions: [
+                  {
+                    id: "ctps_1",
+                    text: "1. Seperti apa jenis sarana cuci tangan di rumah ibu? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Memiliki sarana/tempat",
+                      "Memiliki air mengalir",
+                      "Memiliki sabun"
+                    ]
+                  },
+                  {
+                    id: "ctps_2",
+                    text: "2. Apakah ibu melakukan cuci tangan pakai sabun (lihat halaman 86)?",
+                    type: "radio",
+                    options: [
+                      "Ya",
+                      "Tidak"
+                    ]
+                  },
+                  {
+                    id: "ctps_3",
+                    text: "3. Apakah ibu mengetahui waktu-waktu kritis cuci tangan pakai sabun? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Sebelum makan",
+                      "Sebelum mengolah dan menghidangkan makanan",
+                      "Sebelum menyusui anak, sebelum memberi makan bayi/balita",
+                      "Setelah buang air besar/kecil"
+                    ]
+                  }
+                ]
+              },
+              {
+                title: "III. Pengelolaan Makanan dan Air Minum",
+                questions: [
+                  {
+                    id: "air_1",
+                    text: "1. Apa sumber air minum di rumah ibu? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Pipa",
+                      "Kran umum",
+                      "Sumur bor/pompa/sumur gali yang terlindungi",
+                      "Mata air terlindungi",
+                      "Sungai/mata air tidak terlindungi",
+                      "Danau/kolam/sumur gali tidak terlindungi",
+                      "Air hujan",
+                      "Waduk"
+                    ]
+                  },
+                  {
+                    id: "air_2",
+                    text: "2. Bagaimana ibu mengelola air minum di rumah tangga? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Melalui proses pengolahan (misal: merebus)",
+                      "Jika air keruh dilakukan pengolahan, seperti: pengendapan atau penyaringan",
+                      "Menyimpan air minum di dalam wadah yang tertutup rapat, kuat dan diambil dengan cara yang aman (tidak tersentuh tangan atau mulut)"
+                    ]
+                  },
+                  {
+                    id: "makanan_1",
+                    text: "3. Bagaimana ibu mengelola makanan di dalam keluarga? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Makanan tertutup baik dengan penutup yang bersih",
+                      "Makanan tidak berdekatan dengan bahan berbahaya dan beracun (deterjen, pestisida, cairan obat nyamuk, dan sejenisnya)",
+                      "Mengelola makanan dengan baik dan benar yaitu menjaga kebersihan, memisah makanan mentah dan matang, memasak sampai matang, tidak membiarkan makanan matang di luar lebih dari 4 jam serta menggunakan air yang aman."
+                    ]
+                  }
+                ]
+              },
+              {
+                title: "IV. Pengelolaan Sampah",
+                questions: [
+                  {
+                    id: "sampah_1",
+                    text: "Bagaimana ibu mengelola sampah di lingkungan rumah? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Tidak ada sampah berserakan di lingkungan sekitar rumah",
+                      "Ada tempat sampah yang tertutup, kuat dan mudah dibersihkan",
+                      "Telah melakukan pemilahan sampah",
+                      "Tidak dibakar",
+                      "Tidak dibuang ke sungai/kebun/saluran drainase/tempat terbuka"
+                    ]
+                  }
+                ]
+              },
+              {
+                title: "V. Pengelolaan Limbah Cair (Air bekas cuain baju, piring, mandi)",
+                questions: [
+                  {
+                    id: "limbah_1",
+                    text: "Bagaimana ibu mengelola limbah cair di rumah? (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Tidak terlihat genangan air di sekitar rumah",
+                      "Ada saluran pembuangan limbah cair rumah tangga (non kakus) yang kedap dan tertutup",
+                      "Terhubung dengan sumur resapan dan atau sistem pengolahan limbah"
+                    ]
+                  }
+                ]
+              }
+            ];
+
+            return (
+              <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-6 animate-in fade-in duration-300">
+                <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                  <span className="text-xl">🏡</span>
+                  <div>
+                    <h2 className="font-bold text-base-text-primary text-base leading-tight">Evaluasi Sanitasi &amp; Kesehatan Lingkungan</h2>
+                    <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Baca dan pahami hal-hal di bawah ini. Jika ada yang tidak dimengerti, silakan tanyakan pada kader posyandu.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6 max-h-[600px] overflow-y-auto pr-1">
+                  {sections.map((sec, sIdx) => (
+                    <div key={sIdx} className="space-y-4 border-b border-base-border/10 pb-4 last:border-b-0 last:pb-0">
+                      <h3 className="font-bold text-brand-primary text-xs tracking-wide uppercase">{sec.title}</h3>
+                      <div className="space-y-3.5">
+                        {sec.questions.map((q) => {
+                          const value = answersLingkungan[q.id];
+                          return (
+                            <div key={q.id} className="space-y-2 bg-base-bg/10 p-4 rounded-2xl">
+                              <span className="font-bold text-xs text-base-text-primary leading-normal block">{q.text}</span>
+                              <div className="flex flex-col gap-2 pl-1.5 mt-2">
+                                {q.options.map((opt, oIdx) => {
+                                  const isChecked = q.type === "checkbox" 
+                                    ? (value || []).includes(opt)
+                                    : value === opt;
+
+                                  return (
+                                    <label key={oIdx} className="flex items-start gap-2.5 cursor-pointer text-xs font-semibold text-base-text-secondary hover:text-base-text-primary select-none py-0.5">
+                                      <input 
+                                        type={q.type} 
+                                        name={q.id}
+                                        checked={isChecked}
+                                        onChange={() => handleEnvAnswerChange(q.id, opt, q.type === "checkbox")}
+                                        className="accent-brand-primary w-4.5 h-4.5 cursor-pointer shrink-0 mt-0.5"
+                                      />
+                                      <span className="leading-relaxed">{opt}</span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

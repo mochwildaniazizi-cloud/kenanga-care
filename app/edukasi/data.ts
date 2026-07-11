@@ -275,6 +275,42 @@ export const mockArticles: Article[] = [
   },
   {
     id: "L29",
+    title: "Panduan Dasar Perilaku Hidup Bersih Sehat (PHBS) & Protokol Cuci Tangan Pakai Sabun",
+    categories: ["Informasi Umum"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L24.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L30",
+    title: "Faktor Risiko Gigi Berlubang & Manajemen Kebersihan Mulut Balita Usia 0-12 Bulan",
+    categories: ["0 - 6 Bulan", "6 - 12 Bulan"],
+    type: "Artikel",
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L22.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L31",
+    title: "Panduan Lengkap Perawatan & Manajemen Gizi Saat Anak Sakit: Demam, Batuk, Diare, Serta Luka Koreng",
+    categories: ["0 - 6 Bulan", "6 - 12 Bulan", "12 - 24 Bulan", "2 - 6 Tahun"],
+    type: "Artikel",
+    duration: "10 Menit",
+    imageUrl: "/cover-article/L20.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L32",
+    title: "Protokol Perlindungan Anak & Pola Pendampingan Balita dengan Disabilitas",
+    categories: ["Informasi Umum"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "/cover-article/L23.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L33",
     title: "Nomor Telepon Penting & Kumpulan Link Rujukan Kesehatan Resmi Kemenkes",
     categories: ["Informasi Umum"],
     type: "Artikel",
