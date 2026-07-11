@@ -82,16 +82,16 @@ export default function PemeriksaanKlinisIbuPage() {
       if (data) {
         setMother(data);
         // Pre-fill some default fields if empty
-        setFormData(prev => ({
+        setFormData((prev: any) => ({
           ...prev,
           rencana_persalinan: {
             ...prev.rencana_persalinan,
-            client_name: data.mother_name || "",
+            client_name: data.name || "",
             client_address: data.address || ""
           },
           skl: {
             ...prev.skl,
-            mother_name: data.mother_name || "",
+            mother_name: data.name || "",
             mother_nik: data.national_id || "",
             father_name: data.husband_name || "",
             address: data.address || ""
@@ -148,7 +148,7 @@ export default function PemeriksaanKlinisIbuPage() {
           <div>
             <h1 className="text-xl font-bold text-brand-primary uppercase tracking-wider">Rekam Medis Klinis Ibu Hamil &amp; Nifas</h1>
             <p className="text-xs text-base-text-secondary font-medium">
-              Nama Ibu: <span className="font-bold text-base-text-primary">{mother?.mother_name || "-"}</span> &bull; NIK: <span className="font-semibold text-base-text-primary">{mother?.national_id || "-"}</span>
+              Nama Ibu: <span className="font-bold text-base-text-primary">{mother?.name || "-"}</span> &bull; NIK: <span className="font-semibold text-base-text-primary">{mother?.national_id || "-"}</span>
             </p>
           </div>
         </div>

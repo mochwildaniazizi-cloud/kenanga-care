@@ -167,7 +167,7 @@ export default function PemeriksaanKlinisAnakPage() {
   const currentSdidtk = sdidtkList.find(item => item.month === selectedMonth) || sdidtkList[0];
 
   const updateCurrentSdidtk = (field: string, value: any) => {
-    setSdidtkList(prev => prev.map(item => item.month === selectedMonth ? { ...item, [field]: value } : item));
+    setSdidtkList((prev: any[]) => prev.map(item => item.month === selectedMonth ? { ...item, [field]: value } : item));
   };
 
   return (
