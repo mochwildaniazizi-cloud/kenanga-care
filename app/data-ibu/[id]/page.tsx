@@ -1357,52 +1357,6 @@ export default function MotherDetailPage() {
 
             </div>
           </div>
-
-          {/* Quick visits list at bottom of main page too */}
-          <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-base-border/10 pb-3">
-              <div className="flex items-center gap-2">
-                <FaHeartbeat className="w-5 h-5 text-status-red-solid" />
-                <h2 className="font-bold text-base-text-primary text-base">Riwayat Kunjungan &amp; Pemeriksaan Ibu Hamil</h2>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[1000px] text-xs">
-                <thead>
-                  <tr className="border-b border-gray-100 font-bold text-base-text-secondary uppercase tracking-wider">
-                    <th className="py-3 px-4">Tanggal Periksa</th>
-                    <th className="py-3 px-4 text-center">BB (kg)</th>
-                    <th className="py-3 px-4 text-center">TD (Tensi)</th>
-                    <th className="py-3 px-4 text-center">Lila (cm)</th>
-                    <th className="py-3 px-4 text-center">Fundus (cm)</th>
-                    <th className="py-3 px-4 text-center">DJJ (Janin)</th>
-                    <th className="py-3 px-4 text-center">Tablet Fe</th>
-                    <th className="py-3 px-4">Catatan Posyandu</th>
-                  </tr>
-                </thead>
-                <tbody className="text-xs font-semibold">
-                  {mother.maternal_records.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="py-8 text-center text-base-text-secondary">Belum ada riwayat pemeriksaan kehamilan.</td>
-                    </tr>
-                  ) : (
-                    mother.maternal_records.map((r: any, idx: number) => (
-                      <tr key={idx} className="border-b border-gray-50 hover:bg-base-bg/30 transition-colors">
-                        <td className="py-3 px-4 font-bold text-base-text-primary whitespace-nowrap">{r.date}</td>
-                        <td className="py-3 px-4 text-center text-brand-primary">{r.weight > 0 ? `${r.weight} kg` : "-"}</td>
-                        <td className="py-3 px-4 text-center text-base-text-primary">{r.blood_pressure}</td>
-                        <td className="py-3 px-4 text-center text-base-text-primary">{r.muac > 0 ? `${r.muac} cm` : "-"}</td>
-                        <td className="py-3 px-4 text-center text-base-text-secondary">{r.fundal_height > 0 ? `${r.fundal_height} cm` : "-"}</td>
-                        <td className="py-3 px-4 text-center text-base-text-secondary">{r.fetal_heart_rate > 0 ? `${r.fetal_heart_rate} x/mnt` : "-"}</td>
-                        <td className="py-3 px-4 text-center text-base-text-secondary">{r.iron_pills_given > 0 ? `${r.iron_pills_given} butir` : "-"}</td>
-                        <td className="py-3 px-4 text-base-text-secondary italic">{r.cadre_notes}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       )}
 
