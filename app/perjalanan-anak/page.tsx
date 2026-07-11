@@ -66,6 +66,29 @@ function PerjalananAnakContent() {
     { id: 9, text: "Apakah bayi bermain tepuk tangan / Cilukba?", status: null },
     { id: 10, text: "Apakah bayi bergembira dengan melempar benda?", status: null },
   ]);
+  const [milestoneAgeTab, setMilestoneAgeTab] = useState<"29d3m" | "36m" | "69m">("69m");
+  const [milestones29d3m, setMilestones29d3m] = useState<any[]>([
+    { id: 1, text: "Bayi bisa mengangkat kepala mandiri hingga 45 derajat?", status: null },
+    { id: 2, text: "Bayi menggunakan kepala dan lengan ke depan saat diletakkan tengkurap?", status: null },
+    { id: 3, text: "Bayi bisa melihat dan menoleh ke arah wajah Anda?", status: null },
+    { id: 4, text: "Bayi bisa melepas genggaman atau meraih dan menggenggam benda kecil?", status: null },
+    { id: 5, text: "Bayi suka tertawa keras?", status: null },
+    { id: 6, text: "Bayi bereaksi terhadap suara keras (terkejut atau menoleh)?", status: null },
+    { id: 7, text: "Bayi membalas tersenyum ketika diajak bicara atau tersenyum padanya?", status: null },
+    { id: 8, text: "Bayi menyerap perhatian Anda dengan penglihatan, pendengaran, dan sentuhan?", status: null }
+  ]);
+  const [milestones36m, setMilestones36m] = useState<any[]>([
+    { id: 1, text: "Bayi berguling dari posisi telungkup ke telentang?", status: null },
+    { id: 2, text: "Bayi mengangkat kepala secara mandiri hingga tegak 90°?", status: null },
+    { id: 3, text: "Bayi bisa mempertahankan posisi kepala tetap tegak dan stabil?", status: null },
+    { id: 4, text: "Bayi menggenggam mainan kecil atau benda berbentuk dengan tangannya?", status: null },
+    { id: 5, text: "Bayi bisa melihat dan meraih benda yang ada dalam jangkauannya?", status: null },
+    { id: 6, text: "Bayi bisa menggerakkan benda atau mainan yang ada di tangannya sendiri?", status: null },
+    { id: 7, text: "Bayi berusaha memperluas pandangannya untuk mengamati lingkungan?", status: null },
+    { id: 8, text: "Bayi menghasilkan suara berceloteh atau bergumam (mengoceh)?", status: null },
+    { id: 9, text: "Bayi mengeluarkan suara tawa atau bereaksi gembira saat diajak bermain?", status: null },
+    { id: 10, text: "Bayi tersenyum ketika melihat wajah orang yang dikenal atau saat bermain sendiri?", status: null }
+  ]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -74,10 +97,16 @@ function PerjalananAnakContent() {
     }
   }, [role, isLoggedIn, router]);
 
-  const handleMilestoneRadioChange = (id: number, value: boolean) => {
-    setMilestones69(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+  const handleMilestoneRadioChange = (ageGroup: "29d3m" | "36m" | "69m", id: number, value: boolean) => {
+    if (ageGroup === "29d3m") {
+      setMilestones29d3m(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    } else if (ageGroup === "36m") {
+      setMilestones36m(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    } else {
+      setMilestones69(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    }
     if (selectedChildId) {
-      localStorage.setItem(`milestone_69_${selectedChildId}_${id}`, value ? 'true' : 'false');
+      localStorage.setItem(`milestone_${ageGroup}_${selectedChildId}_${id}`, value ? 'true' : 'false');
     }
   };
 
@@ -207,6 +236,24 @@ function PerjalananAnakContent() {
       }
 
       // Load milestones status from localStorage
+      const updated29d3m = milestones29d3m.map(m => {
+        const saved = localStorage.getItem(`milestone_29d3m_${selectedChildId}_${m.id}`);
+        return {
+          ...m,
+          status: saved === 'true' ? true : saved === 'false' ? false : null
+        };
+      });
+      setMilestones29d3m(updated29d3m);
+
+      const updated36m = milestones36m.map(m => {
+        const saved = localStorage.getItem(`milestone_36m_${selectedChildId}_${m.id}`);
+        return {
+          ...m,
+          status: saved === 'true' ? true : saved === 'false' ? false : null
+        };
+      });
+      setMilestones36m(updated36m);
+
       const updatedMilestones = milestones69.map(m => {
         const saved = localStorage.getItem(`milestone_69_${selectedChildId}_${m.id}`);
         return {
@@ -659,28 +706,90 @@ function PerjalananAnakContent() {
           )}
 
           {/* SECTION: Milestone */}
-          {activeSection === "milestone" && (
-            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 animate-in fade-in duration-300">
-              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3"><span className="text-xl">📋</span><div><h2 className="font-bold text-base-text-primary text-base leading-tight">Lembar Penanda Perkembangan Anak</h2><p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Evaluasi mandiri berkala Buku KIA 2024 Halaman 62 - Usia 6 s.d 9 Bulan.</p></div></div>
-              <div className="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
-                {milestones69.map((item) => (
-                  <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-base-bg/20 rounded-xl gap-2.5 text-xs">
-                    <span className="font-medium text-base-text-primary leading-relaxed">{item.id}. {item.text}</span>
-                    <div className="flex gap-4 shrink-0 select-none font-semibold">
-                      <label className="flex items-center gap-1.5 cursor-pointer text-status-green-solid text-[11px]"><input type="radio" name={`milestone-q-${item.id}`} checked={item.status === true} onChange={() => handleMilestoneRadioChange(item.id, true)} className="accent-status-green-solid w-4 h-4 cursor-pointer" /> Ya</label>
-                      <label className="flex items-center gap-1.5 cursor-pointer text-status-red-solid text-[11px]"><input type="radio" name={`milestone-q-${item.id}`} checked={item.status === false} onChange={() => handleMilestoneRadioChange(item.id, false)} className="accent-status-red-solid w-4 h-4 cursor-pointer" /> Tidak</label>
+          {activeSection === "milestone" && (() => {
+            const currentList = 
+              milestoneAgeTab === "29d3m" ? milestones29d3m :
+              milestoneAgeTab === "36m" ? milestones36m :
+              milestones69;
+              
+            const pageDescription = 
+              milestoneAgeTab === "29d3m" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 53 - Usia 29 Hari s.d 3 Bulan." :
+              milestoneAgeTab === "36m" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 55 - Usia 3 s.d 6 Bulan." :
+              "Evaluasi mandiri berkala Buku KIA 2024 Halaman 62 - Usia 6 s.d 9 Bulan.";
+
+            return (
+              <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 animate-in fade-in duration-300">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/10 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">📋</span>
+                    <div>
+                      <h2 className="font-bold text-base-text-primary text-base leading-tight">Lembar Penanda Perkembangan Anak</h2>
+                      <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">{pageDescription}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-              {milestones69.some(item => item.status === false) && (
-                <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start shadow-xs animate-in shake duration-300">
-                  <span className="text-base mt-0.5">⚠️</span>
-                  <p className="font-semibold text-status-red-solid"><strong>PENTING:</strong> Jika anak BELUM bisa melakukan salah satu indikator di atas, mohon segera bawa balita ke dokter anak atau Puskesmas terdekat untuk pemeriksaan dini tumbuh kembang!</p>
+                  
+                  {/* Age selector tabs */}
+                  <div className="flex bg-base-bg p-1 rounded-xl self-start sm:self-auto gap-1 text-[11px] font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("29d3m")}
+                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${milestoneAgeTab === "29d3m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      29 Hri - 3 Bln
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("36m")}
+                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${milestoneAgeTab === "36m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      3 - 6 Bulan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("69m")}
+                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${milestoneAgeTab === "69m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      6 - 9 Bulan
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
+
+                <div className="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
+                  {currentList.map((item) => (
+                    <div key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-base-bg/20 rounded-xl gap-2.5 text-xs">
+                      <span className="font-medium text-base-text-primary leading-relaxed">{item.id}. {item.text}</span>
+                      <div className="flex gap-4 shrink-0 select-none font-semibold">
+                        <label className="flex items-center gap-1.5 cursor-pointer text-status-green-solid text-[11px]">
+                          <input 
+                            type="radio" 
+                            name={`milestone-${milestoneAgeTab}-q-${item.id}`} 
+                            checked={item.status === true} 
+                            onChange={() => handleMilestoneRadioChange(milestoneAgeTab, item.id, true)} 
+                            className="accent-status-green-solid w-4 h-4 cursor-pointer" 
+                          /> Ya
+                        </label>
+                        <label className="flex items-center gap-1.5 cursor-pointer text-status-red-solid text-[11px]">
+                          <input 
+                            type="radio" 
+                            name={`milestone-${milestoneAgeTab}-q-${item.id}`} 
+                            checked={item.status === false} 
+                            onChange={() => handleMilestoneRadioChange(milestoneAgeTab, item.id, false)} 
+                            className="accent-status-red-solid w-4 h-4 cursor-pointer" 
+                          /> Tidak
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {currentList.some(item => item.status === false) && (
+                  <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start shadow-xs animate-in shake duration-300">
+                    <span className="text-base mt-0.5">⚠️</span>
+                    <p className="font-semibold text-status-red-solid"><strong>PENTING:</strong> Jika anak BELUM bisa melakukan salah satu indikator di atas, mohon segera bawa balita ke dokter anak atau Puskesmas terdekat untuk pemeriksaan dini tumbuh kembang!</p>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

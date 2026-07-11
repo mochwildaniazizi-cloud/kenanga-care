@@ -24,6 +24,7 @@ export default function EdukasiPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewedHistory, setViewedHistory] = useState<string[]>([]);
   const [historyPageIndex, setHistoryPageIndex] = useState<number>(0);
+  const [journeyFilter, setJourneyFilter] = useState<"Semua" | "Ibu" | "Anak">("Semua");
  
   useEffect(() => {
     const loadData = () => {
@@ -251,56 +252,106 @@ export default function EdukasiPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+          {/* Main Filter Kategori (Ibu / Anak) */}
+          <div className="flex items-center gap-1.5 bg-base-bg p-1 rounded-xl w-fit text-[11px] font-bold shadow-sm select-none border border-base-border/20">
+            <button
+              type="button"
+              onClick={() => {
+                setJourneyFilter("Semua");
+                setActiveTab("Semua");
+              }}
+              className={`px-4.5 py-2 rounded-lg transition cursor-pointer ${
+                journeyFilter === "Semua" 
+                  ? "bg-brand-primary text-base-white shadow-sm" 
+                  : "text-base-text-secondary hover:text-base-text-primary"
+              }`}
+            >
+              Semua Artikel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setJourneyFilter("Ibu");
+                setActiveTab("Semua");
+              }}
+              className={`px-4.5 py-2 rounded-lg transition cursor-pointer ${
+                journeyFilter === "Ibu" 
+                  ? "bg-[#EA2986] text-base-white shadow-sm" 
+                  : "text-base-text-secondary hover:text-[#EA2986]"
+              }`}
+            >
+              Kategori Ibu
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setJourneyFilter("Anak");
+                setActiveTab("Semua");
+              }}
+              className={`px-4.5 py-2 rounded-lg transition cursor-pointer ${
+                journeyFilter === "Anak" 
+                  ? "bg-[#9333EA] text-base-white shadow-sm" 
+                  : "text-base-text-secondary hover:text-[#9333EA]"
+              }`}
+            >
+              Kategori Anak
+            </button>
+          </div>
+
+          <div className={`grid grid-cols-1 ${journeyFilter === "Semua" ? "md:grid-cols-2" : ""} gap-4 pt-1`}>
             {/* PERJALANAN IBU */}
-            <div className="space-y-2.5">
-              <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Ibu</span>
-              <div className="grid grid-cols-2 gap-2">
-                {PERJALANAN_IBU_TABS.map(tab => {
-                  const isActive = activeTab === tab.id;
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
-                        isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
-                      }`}
-                    >
-                      <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? "bg-base-white/20" : "bg-base-bg/50"}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <span className="truncate">{tab.label}</span>
-                    </button>
-                  );
-                })}
+            {(journeyFilter === "Semua" || journeyFilter === "Ibu") && (
+              <div className="space-y-2.5 animate-in fade-in duration-200">
+                <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Ibu</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {PERJALANAN_IBU_TABS.map(tab => {
+                    const isActive = activeTab === tab.id;
+                    const Icon = tab.icon;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
+                          isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                        }`}
+                      >
+                        <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? "bg-base-white/20" : "bg-base-bg/50"}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="truncate">{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* PERJALANAN ANAK */}
-            <div className="space-y-2.5">
-              <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Anak</span>
-              <div className="grid grid-cols-2 gap-2">
-                {PERJALANAN_ANAK_TABS.map(tab => {
-                  const isActive = activeTab === tab.id;
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
-                        isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
-                      }`}
-                    >
-                      <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? "bg-base-white/20" : "bg-base-bg/50"}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <span className="truncate">{tab.label}</span>
-                    </button>
-                  );
-                })}
+            {(journeyFilter === "Semua" || journeyFilter === "Anak") && (
+              <div className="space-y-2.5 animate-in fade-in duration-200">
+                <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Anak</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {PERJALANAN_ANAK_TABS.map(tab => {
+                    const isActive = activeTab === tab.id;
+                    const Icon = tab.icon;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center gap-2.5 p-3 rounded-xl text-xs font-bold transition-all border text-left cursor-pointer ${
+                          isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                        }`}
+                      >
+                        <div className={`p-1.5 rounded-lg shrink-0 ${isActive ? "bg-base-white/20" : "bg-base-bg/50"}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="truncate">{tab.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between border-t border-base-border/10 pt-3 text-[11px] font-semibold text-base-text-secondary">
@@ -473,11 +524,12 @@ export default function EdukasiPage() {
               )}
 
               {/* PERJALANAN IBU */}
-              <div className="space-y-6 pt-6 border-t border-base-border/20">
-                <div className="flex items-center gap-2.5">
-                  <MdPregnantWoman className="w-6 h-6 text-[#EA2986]" />
-                  <h2 className="text-xl font-black text-[#EA2986] tracking-wide uppercase">Perjalanan Ibu</h2>
-                </div>
+              {(journeyFilter === "Semua" || journeyFilter === "Ibu") && (
+                <div className="space-y-6 pt-6 border-t border-base-border/20 animate-in fade-in duration-300">
+                  <div className="flex items-center gap-2.5">
+                    <MdPregnantWoman className="w-6 h-6 text-[#EA2986]" />
+                    <h2 className="text-xl font-black text-[#EA2986] tracking-wide uppercase">Perjalanan Ibu</h2>
+                  </div>
                 
                 {/* Kehamilan */}
                 <div>
@@ -559,9 +611,11 @@ export default function EdukasiPage() {
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* PERJALANAN ANAK */}
-              <div className="space-y-6 pt-6 border-t border-base-border/20">
+            {/* PERJALANAN ANAK */}
+            {(journeyFilter === "Semua" || journeyFilter === "Anak") && (
+              <div className="space-y-6 pt-6 border-t border-base-border/20 animate-in fade-in duration-300">
                 <div className="flex items-center gap-2.5">
                   <MdChildCare className="w-6 h-6 text-[#9333EA]" />
                   <h2 className="text-xl font-black text-[#9333EA] tracking-wide uppercase">Perjalanan Anak</h2>
@@ -647,8 +701,9 @@ export default function EdukasiPage() {
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* INFORMASI UMUM */}
+            {/* INFORMASI UMUM */}
               <div className="space-y-6 pt-6 border-t border-base-border/20">
                 <div>
                   <div className="flex items-center justify-between mb-4">
