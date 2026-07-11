@@ -1455,6 +1455,72 @@ export default function MotherDetailPage() {
                   <p className="text-sm font-bold text-base-text-primary">{mother.address || "-"}</p>
                 )}
               </div>
+
+              {/* Faskes and Cohort details for mother */}
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">Fasilitas Kesehatan TK1</span>
+                {isEditing ? (
+                  <input type="text" name="faskes_1" value={editForm.faskes_1} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.faskes_1 || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">Fasilitas Kesehatan Rujukan</span>
+                {isEditing ? (
+                  <input type="text" name="faskes_referral" value={editForm.faskes_referral} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.faskes_referral || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">Puskesmas Domisili</span>
+                {isEditing ? (
+                  <input type="text" name="puskesmas_domicile" value={editForm.puskesmas_domicile} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.puskesmas_domicile || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">No. Reg. Kohort Ibu</span>
+                {isEditing ? (
+                  <input type="text" name="cohort_register_number" value={editForm.cohort_register_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.cohort_register_number || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">No. Catatan Medik RS</span>
+                {isEditing ? (
+                  <input type="text" name="medical_record_number" value={editForm.medical_record_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.medical_record_number || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">Asuransi Lain</span>
+                {isEditing ? (
+                  <input type="text" name="insurance_other" value={editForm.insurance_other} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.insurance_other || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">Nomor Asuransi Lain</span>
+                {isEditing ? (
+                  <input type="text" name="insurance_number" value={editForm.insurance_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.insurance_number || "-"}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi</span>
+                {isEditing ? (
+                  <input type="date" name="insurance_validity" value={editForm.insurance_validity} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                ) : (
+                  <p className="text-sm font-bold text-base-text-primary">{mother.insurance_validity || "-"}</p>
+                )}
+              </div>
             </div>
 
             {/* Husband details inside biodata page */}
@@ -1491,6 +1557,112 @@ export default function MotherDetailPage() {
                     <input type="text" name="husband_phone_number" value={editForm.husband_phone_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
                   ) : (
                     <p className="text-sm font-bold text-base-text-primary">{mother.husband_phone_number || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Tempat Lahir Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_birth_place" value={editForm.husband_birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_birth_place || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Tanggal Lahir Suami</span>
+                  {isEditing ? (
+                    <input type="date" name="husband_birth_date" value={editForm.husband_birth_date} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_birth_date || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Pendidikan Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_education" value={editForm.husband_education} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_education || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Pekerjaan Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_occupation" value={editForm.husband_occupation} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_occupation || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Alamat Rumah Suami</span>
+                  {isEditing ? (
+                    <textarea name="husband_address" value={editForm.husband_address} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs resize-none bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_address || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Golongan Darah Suami</span>
+                  {isEditing ? (
+                    <select name="husband_blood_type" value={editForm.husband_blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white cursor-pointer text-base-text-primary">
+                      <option value="-">-</option><option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option>
+                    </select>
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_blood_type || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Fasilitas Kesehatan TK1 Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_faskes_1" value={editForm.husband_faskes_1} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_faskes_1 || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Fasilitas Kesehatan Rujukan Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_faskes_referral" value={editForm.husband_faskes_referral} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_faskes_referral || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Puskesmas Domisili Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_faskes_primary" value={editForm.husband_faskes_primary} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_faskes_primary || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">No. Catatan Medik RS Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_faskes_secondary" value={editForm.husband_faskes_secondary} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_faskes_secondary || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Asuransi Lain Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_insurance_other" value={editForm.husband_insurance_other} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_insurance_other || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Nomor Asuransi Lain Suami</span>
+                  {isEditing ? (
+                    <input type="text" name="husband_insurance_number" value={editForm.husband_insurance_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_insurance_number || "-"}</p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <span className="text-base-text-secondary block">Tanggal Berlaku Asuransi Suami</span>
+                  {isEditing ? (
+                    <input type="date" name="husband_insurance_validity" value={editForm.husband_insurance_validity} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg focus:outline-none focus:border-brand-primary text-xs bg-base-white text-base-text-primary" />
+                  ) : (
+                    <p className="text-sm font-bold text-base-text-primary">{mother.husband_insurance_validity || "-"}</p>
                   )}
                 </div>
               </div>
@@ -1540,55 +1712,6 @@ export default function MotherDetailPage() {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Buku KIA standard Identitas matrix table */}
-          <div className="lg:col-span-12 bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-            <div className="border-b border-base-border/10 pb-3">
-              <h3 className="font-bold text-sm text-base-text-primary flex items-center gap-2">
-                📋 Matriks Standar Identitas Buku KIA (Halaman 66)
-              </h3>
-              <p className="text-[11px] text-base-text-secondary">Rincian data per baris berdasarkan siapa yang harus memiliki isian data tersebut (Y = Ya, T = Tidak/Abu-abu).</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-[11px] font-semibold text-base-text-secondary">
-                <thead>
-                  <tr className="border-b border-base-border/30 text-[10px] uppercase text-base-text-primary font-bold">
-                    <th className="py-2 px-2">Nama Item Data</th>
-                    <th className="py-2 px-2 text-center">Ibu</th>
-                    <th className="py-2 px-2 text-center">Suami / Keluarga</th>
-                    <th className="py-2 px-2 text-center">Anak</th>
-                    <th className="py-2 px-2">Teks Asli pada Berkas</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Nama</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Nama</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">NIK</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">NIK</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">No. JKN</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">No. JKN</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Fasilitas Kesehatan TK1</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Fasilitas Kesehatan TK1</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Fasilitas Kesehatan Rujukan</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Fasilitas Kesehatan Rujukan</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Tempat/Tanggal Lahir</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Tempat/Tanggal Lahir</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Pendidikan</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-gray-300">Tidak</td><td className="py-2 px-2">Pendidikan</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Pekerjaan</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-gray-300">Tidak</td><td className="py-2 px-2">Pekerjaan</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Alamat Rumah</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Alamat Rumah</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Telepon</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Telepon</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Anak ke-</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Anak ke-</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Nomor Akta Kelahiran</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Nomor Akta Kelahiran</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Golongan Darah</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Golongan Darah</td></tr>
-                  <tr className="border-b border-base-border/10 bg-base-bg/30 font-extrabold"><td colSpan={5} className="py-1 px-2 text-brand-primary uppercase text-[9px]">Pembiayaan Lain</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Asuransi Lain</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Asuransi Lain</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Nomor</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Nomor</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Tanggal Berlaku</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Tanggal Berlaku</td></tr>
-                  <tr className="border-b border-base-border/10 bg-base-bg/30 font-extrabold"><td colSpan={5} className="py-1 px-2 text-brand-primary uppercase text-[9px]">Fasilitas Pelayanan Kesehatan - Primer</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">Puskesmas Domisili</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">Puskesmas Domisili</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">No. Reg. Kohort Ibu</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-gray-300">Tidak</td><td className="py-2 px-2">No. Reg. Kohort Ibu</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">No. Reg. Kohort Bayi</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">No. Reg. Kohort Bayi</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">No. Reg. Kohort Balita</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-gray-300">Tidak</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">No. Reg. Kohort Balita dan anak Pra-Sekolah</td></tr>
-                  <tr className="border-b border-base-border/10 bg-base-bg/30 font-extrabold"><td colSpan={5} className="py-1 px-2 text-brand-primary uppercase text-[9px]">Fasilitas Pelayanan Kesehatan - Sekunder</td></tr>
-                  <tr className="border-b border-base-border/10"><td className="py-2 px-2 font-bold text-base-text-primary">No. Catatan Medik RS</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="text-center text-status-green-solid">Ya</td><td className="py-2 px-2">No. Catatan Medik RS</td></tr>
-                </tbody>
-              </table>
-            </div>
           </div>
 
         </div>
