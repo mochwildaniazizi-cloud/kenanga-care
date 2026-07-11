@@ -3417,7 +3417,7 @@ function L28ArticleContent() {
   );
 }
 
-function L29ArticleContent() {
+function L33ArticleContent() {
   const links = [
     { label: "Website Ayo Sehat", desc: "Portal informasi resmi promosi kesehatan Kemenkes RI", url: "https://ayosehat.kemkes.go.id" },
     { label: "Chatbot Edukasi Ayo Sehat", desc: "Layanan konsultasi & tanya jawab otomatis via WhatsApp", url: "https://wa.me/6281277889912?text=ayosehat" },

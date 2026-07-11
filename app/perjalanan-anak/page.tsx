@@ -741,21 +741,21 @@ function PerjalananAnakContent() {
               {/* Card 6: Kesehatan Lingkungan */}
               <div onClick={() => router.push("?section=kesehatan_lingkungan")} className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group">
                 <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
-                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#1E9D5D] rounded-full"></span> LINGKUNGAN</span>
-                  <span>Sanitasi</span>
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#1E9D5D] rounded-full"></span> LINGKUNGAN &amp; SAFETY</span>
+                  <span>Sanitasi &amp; Aman</span>
                 </div>
                 <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
-                  <div className="bg-[#1E9D5D] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">KESEHATAN LINGKUNGAN</div>
+                  <div className="bg-[#1E9D5D] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">KESEHATAN &amp; KESELAMATAN LINGKUNGAN</div>
                   <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
-                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Evaluasi Sanitasi Rumah</h3>
-                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Pemantauan sarana sanitasi rumah tangga, perilaku cuci tangan, sampah, dan air bersih.</p>
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Evaluasi Sanitasi &amp; Keselamatan</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Pemantauan sarana sanitasi rumah tangga, perilaku cuci tangan, serta perlindungan fisik &amp; keselamatan balita.</p>
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="w-6 h-6 rounded-full bg-[#E6F8ED] text-[#1E9D5D] flex items-center justify-center text-[10px] font-bold border border-base-white">🏡</div>
                       <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-green-50 text-[#1E9D5D]">{Object.keys(answersLingkungan).length} Dijawab</span>
                     </div>
                   </div>
                   <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
-                    <span>♻️ Evaluasi Rumah</span>
+                    <span>♻️ Evaluasi Rumah &amp; Anak</span>
                     <span>Buka Lembar</span>
                   </div>
                 </div>
@@ -1223,7 +1223,7 @@ function PerjalananAnakContent() {
                 ]
               },
               {
-                title: "V. Pengelolaan Limbah Cair (Air bekas cuain baju, piring, mandi)",
+                title: "V. Pengelolaan Limbah Cair (Air bekas cuci baju, piring, mandi)",
                 questions: [
                   {
                     id: "limbah_1",
@@ -1236,6 +1236,57 @@ function PerjalananAnakContent() {
                     ]
                   }
                 ]
+              },
+              {
+                title: "VI. Keselamatan Lingkungan (Diisi oleh Keluarga)",
+                questions: [
+                  {
+                    id: "safety_jatuh",
+                    text: "1. Upaya menghindarkan anak dari risiko jatuh (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Televisi, meja, lemari, rak tidak cukup kuat dipanjat diikat/menempel di dinding & perabot sudut tajam diberi bantalan",
+                      "Tidak menyarankan penggunaan Baby walker karena menghambat langkah anak dan rentan membuat jatuh",
+                      "Jendela berjarak paling sedikit 1 meter dari lantai untuk mencegah dipanjat oleh bayi",
+                      "Sering memeriksa gerbang pagar rumah untuk mencegah bayi memanjat keluar",
+                      "Tidak meninggalkan bayi sendirian di tempat-tempat yang tinggi",
+                      "Tangga dan balkon dipasang pagar pengaman dengan jarak antar pagar tidak lebih dari 9 cm",
+                      "Memasang pengaman di sekitar tempat tidur anak untuk mencegah jatuh saat tidur"
+                    ]
+                  },
+                  {
+                    id: "safety_luka_bakar",
+                    text: "2. Upaya menghindarkan anak dari luka bakar dan bahaya listrik (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Menjauhkan anak dari kabel listrik aktif dan wadah panci yang panas",
+                      "Soket listrik dipasang jauh dari jangkauan anak atau dipasangi perangkat penutup lubang soket",
+                      "Tidak memegang barang/cairan panas ketika sedang memegang atau memangku bayi"
+                    ]
+                  },
+                  {
+                    id: "safety_napas",
+                    text: "3. Upaya mencegah bayi kekurangan napas / tersedak / tercekik (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Tidak memberikan makanan anak yang bertekstur keras dan sulit dikunyah",
+                      "Tidak membiarkan anak bermain benda berisiko terjerat/tercekik/tidak bisa nafas (tali panjang, kantong plastik, mainan kecil)",
+                      "Menghindari menidurkan bayi dalam posisi telungkup tanpa pengawasan intensif"
+                    ]
+                  },
+                  {
+                    id: "safety_tenggelam",
+                    text: "4. Upaya menghindarkan anak dari bahaya tenggelam (Bisa pilih lebih dari satu)",
+                    type: "checkbox",
+                    options: [
+                      "Tidak membiarkan anak sendirian di dalam bak mandi atau dekat ember berisi air",
+                      "Memberi pembatas aman agar anak tidak leluasa menjangkau sumber air (dan tidak membiarkan main di tepi kolam tanpa pengawasan)",
+                      "Anak usia 1 tahun 6 bulan mulai diajari secara perlahan tentang bahaya air",
+                      "Anak usia 2 tahun mulai diajari cara melayang ketika jatuh di air dan berenang jarak pendek",
+                      "Anak usia 6 tahun dipastikan bisa berenang dengan keterampilan bertahan di air"
+                    ]
+                  }
+                ]
               }
             ];
 
@@ -1244,7 +1295,7 @@ function PerjalananAnakContent() {
                 <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
                   <span className="text-xl">🏡</span>
                   <div>
-                    <h2 className="font-bold text-base-text-primary text-base leading-tight">Evaluasi Sanitasi &amp; Kesehatan Lingkungan</h2>
+                    <h2 className="font-bold text-base-text-primary text-base leading-tight">Evaluasi Kesehatan &amp; Keselamatan Lingkungan</h2>
                     <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Baca dan pahami hal-hal di bawah ini. Jika ada yang tidak dimengerti, silakan tanyakan pada kader posyandu.</p>
                   </div>
                 </div>
