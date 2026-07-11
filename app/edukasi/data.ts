@@ -221,7 +221,7 @@ export const mockArticles: Article[] = [
   },
   {
     id: "L23",
-    title: "Panduan Tumbuh Kembang, Golden Age & Pola Asuh Anak Usia 2 - 6 Tahun",
+    title: "Panduan Karakteristik Tumbuh Kembang & Milestone Emas Anak Usia 2-6 Tahun",
     categories: ["2 - 6 Tahun"],
     type: "Artikel",
     duration: "7 Menit",
@@ -230,8 +230,8 @@ export const mockArticles: Article[] = [
   },
   {
     id: "L24",
-    title: "Manajemen Gizi Seimbang & Tindakan Pencegahan Diare Dehidrasi Balita",
-    categories: ["Informasi Umum"],
+    title: "Strategi Pencegahan Diare dan Penanganan Dehidrasi Akut pada Balita",
+    categories: ["12 - 24 Bulan", "Informasi Umum"],
     type: "Artikel",
     duration: "6 Menit",
     imageUrl: "/cover-article/L24.jpg",
@@ -239,6 +239,42 @@ export const mockArticles: Article[] = [
   },
   {
     id: "L25",
+    title: "Panduan Pola Asuh Ideal & Manajemen Batasan Gawai Anak Usia 1,5 - 3 Tahun",
+    categories: ["12 - 24 Bulan"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L22.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L26",
+    title: "Pemenuhan Gizi Bervariasi Makanan Keluarga & Perawatan Gigi Anak Usia 2-5 Tahun",
+    categories: ["2 - 6 Tahun"],
+    type: "Artikel",
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L20.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L27",
+    title: "Konsep Pencontohan Peran, Manajemen Emosi & Regulasi Gawai Anak Usia 3-6 Tahun",
+    categories: ["2 - 6 Tahun"],
+    type: "Artikel",
+    duration: "8 Menit",
+    imageUrl: "/cover-article/L23.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L28",
+    title: "Kesehatan Mental Orang Tua, Manajemen Stres Pengasuhan & Regulasi Emosi Keluarga",
+    categories: ["Informasi Umum"],
+    type: "Artikel",
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L13.jpg",
+    isNativeKIA: true
+  },
+  {
+    id: "L29",
     title: "Nomor Telepon Penting & Kumpulan Link Rujukan Kesehatan Resmi Kemenkes",
     categories: ["Informasi Umum"],
     type: "Artikel",

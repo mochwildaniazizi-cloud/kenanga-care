@@ -66,7 +66,7 @@ function PerjalananAnakContent() {
     { id: 9, text: "Apakah bayi bermain tepuk tangan / Cilukba?", status: null },
     { id: 10, text: "Apakah bayi bergembira dengan melempar benda?", status: null },
   ]);
-  const [milestoneAgeTab, setMilestoneAgeTab] = useState<"29d3m" | "36m" | "69m">("69m");
+  const [milestoneAgeTab, setMilestoneAgeTab] = useState<"29d3m" | "36m" | "69m" | "23y" | "34y" | "45y" | "56y">("69m");
   const [milestones29d3m, setMilestones29d3m] = useState<any[]>([
     { id: 1, text: "Bayi bisa mengangkat kepala mandiri hingga 45 derajat?", status: null },
     { id: 2, text: "Bayi menggunakan kepala dan lengan ke depan saat diletakkan tengkurap?", status: null },
@@ -89,6 +89,76 @@ function PerjalananAnakContent() {
     { id: 9, text: "Bayi mengeluarkan suara tawa atau bereaksi gembira saat diajak bermain?", status: null },
     { id: 10, text: "Bayi tersenyum ketika melihat wajah orang yang dikenal atau saat bermain sendiri?", status: null }
   ]);
+  const [milestones23y, setMilestones23y] = useState<any[]>([
+    { id: 1, text: "Anak bisa jalan naik tangga sendiri?", status: null },
+    { id: 2, text: "Anak bisa bermain dan menendang bola kecil?", status: null },
+    { id: 3, text: "Anak bisa mencoret-coret pensil pada kertas?", status: null },
+    { id: 4, text: "Anak bisa bicara dengan baik, menggunakan minimal 2 kata?", status: null },
+    { id: 5, text: "Anak bisa menunjuk 1 atau lebih bagian tubuhnya ketika diminta?", status: null },
+    { id: 6, text: "Anak bisa melihat gambar dan dapat menyebut dengan benar nama 2 benda atau lebih?", status: null },
+    { id: 7, text: "Anak bisa membantu memungut mainannya sendiri atau membantu mengangkat piring jika diminta?", status: null },
+    { id: 8, text: "Anak bisa makan nasi sendiri tanpa banyak tumpah?", status: null },
+    { id: 9, text: "Anak bisa melepas pakaiannya sendiri?", status: null }
+  ]);
+  const [milestones34y, setMilestones34y] = useState<any[]>([
+    { id: 1, text: "Anak bisa berdiri 1 kaki selama 2 detik?", status: null },
+    { id: 2, text: "Anak bisa melompat dengan kedua kaki diangkat bersamaan?", status: null },
+    { id: 3, text: "Anak bisa mengayuh sepeda roda tiga?", status: null },
+    { id: 4, text: "Anak bisa menggambar garis lurus?", status: null },
+    { id: 5, text: "Anak bisa menumpuk 8 buah kubus?", status: null },
+    { id: 6, text: "Anak bisa mengenal 2 - 4 warna?", status: null },
+    { id: 7, text: "Anak bisa menyebut nama, umur, dan tempat tinggal?", status: null },
+    { id: 8, text: "Anak bisa mengerti arti kata di atas, di bawah, dan di depan?", status: null },
+    { id: 9, text: "Anak bisa mendengarkan cerita dengan tenang?", status: null },
+    { id: 10, text: "Anak bisa mencuci dan mengeringkan tangan sendiri?", status: null },
+    { id: 11, text: "Anak bermain bersama teman secara interaktif, mengikuti aturan permainan?", status: null },
+    { id: 12, text: "Anak bisa mengenakan sepatu sendiri?", status: null },
+    { id: 13, text: "Anak bisa mengenakan celana panjang, kemeja, atau baju sendiri?", status: null }
+  ]);
+  const [milestones45y, setMilestones45y] = useState<any[]>([
+    { id: 1, text: "Anak bisa berdiri 1 kaki selama 6 detik?", status: null },
+    { id: 2, text: "Anak bisa melompat-lompat menggunakan 1 kaki?", status: null },
+    { id: 3, text: "Anak bisa menari mengikuti irama?", status: null },
+    { id: 4, text: "Anak bisa menggambar tanda silang?", status: null },
+    { id: 5, text: "Anak bisa menggambar bentuk lingkaran?", status: null },
+    { id: 6, text: "Anak bisa menggambar orang dengan minimal 3 bagian tubuh?", status: null },
+    { id: 7, text: "Anak bisa mengancingkan baju sendiri atau pakaian boneka?", status: null },
+    { id: 8, text: "Anak bisa menyebut nama lengkap dirinya tanpa dibantu?", status: null },
+    { id: 9, text: "Anak tampak senang menyebut kata-kata baru?", status: null },
+    { id: 10, text: "Anak tampak senang bertanya tentang sesuatu di sekitarnya?", status: null },
+    { id: 11, text: "Anak bisa menjawab pertanyaan dengan susunan kata-kata yang benar?", status: null },
+    { id: 12, text: "Anak bisa bicara dengan artikulasi yang mudah dimengerti?", status: null },
+    { id: 13, text: "Anak bisa membandingkan atau membedakan sesuatu dilihat dari ukuran dan bentuknya?", status: null },
+    { id: 14, text: "Anak bisa menyebut angka dan menghitung jari tangannya sendiri?", status: null }
+  ]);
+  const [milestones56y, setMilestones56y] = useState<any[]>([
+    { id: 1, text: "Anak bisa berjalan lurus ke depan?", status: null },
+    { id: 2, text: "Anak bisa berdiri dengan 1 kaki selama 11 detik?", status: null },
+    { id: 3, text: "Anak bisa menggambar dengan 6 bagian, menggambar sosok orang secara lengkap?", status: null },
+    { id: 4, text: "Anak bisa menangkap objek bola kecil menggunakan kedua tangan?", status: null },
+    { id: 5, text: "Anak bisa menggambar bentuk segi empat?", status: null },
+    { id: 6, text: "Anak bisa mengerti arti dari lawan kata?", status: null },
+    { id: 7, text: "Anak bisa mengerti pembicaraan kompleks yang menggunakan 7 kata atau lebih?", status: null },
+    { id: 8, text: "Anak bisa menjawab pertanyaan tentang materi benda terbuat dari apa beserta kegunaannya?", status: null },
+    { id: 9, text: "Anak bisa mengenal angka, serta bisa menghitung jumlah angka 5 - 10?", status: null },
+    { id: 10, text: "Anak bisa mengenal berbagai macam warna-warni?", status: null },
+    { id: 11, text: "Anak bisa mengungkapkan rasa simpati kepada orang lain?", status: null },
+    { id: 12, text: "Anak bisa mematuhi dan mengikuti aturan permainan bersama teman?", status: null },
+    { id: 13, text: "Anak bisa berpakaian sendiri secara mandiri tanpa dibantu sama sekali?", status: null }
+  ]);
+
+  // Lembar Pemantauan Gejala Bulanan Anak (2-6 Tahun)
+  const [gejala26y, setGejala26y] = useState<any[]>([
+    { id: 1, text: "Sesak napas / cuping hidung kembang kempis / dada tertarik ke dalam?", checked: false },
+    { id: 2, text: "Batuk dengan bunyi grok-grok atau mengi?", checked: false },
+    { id: 3, text: "Suhu tubuh panas tinggi > 38.5°C atau ada tanda perdarahan (mimisan, gusi berdarah, dll)?", checked: false },
+    { id: 4, text: "Buang air besar (BAB) lebih encer/sering (diare) disertai mata cekung, sangat haus, atau tinja berdarah?", checked: false },
+    { id: 5, text: "Tidak kencing selama 6 jam, kencing sangat sedikit, atau warna kuning pekat/kecoklatan?", checked: false },
+    { id: 6, text: "Warna kulit anak tampak biru atau muncul memar abnormal di mulut, tangan, atau kaki?", checked: false },
+    { id: 7, text: "Aktivitas anak tampak lemah, tidak aktif bergerak, menangis terus, atau merintih?", checked: false },
+    { id: 8, text: "Hisapan bayi lemah/tidak bergerak, anak muntah susu/cairan hijau, kencing < 6x sehari?", checked: false },
+    { id: 9, text: "Anak tidak mau makan/minum sama sekali, serta berat badan anak tidak naik?", checked: false },
+  ]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -97,16 +167,28 @@ function PerjalananAnakContent() {
     }
   }, [role, isLoggedIn, router]);
 
-  const handleMilestoneRadioChange = (ageGroup: "29d3m" | "36m" | "69m", id: number, value: boolean) => {
+  const handleMilestoneRadioChange = (ageGroup: "29d3m" | "36m" | "69m" | "23y" | "34y" | "45y" | "56y", id: number, value: boolean) => {
     if (ageGroup === "29d3m") {
       setMilestones29d3m(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
     } else if (ageGroup === "36m") {
       setMilestones36m(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    } else if (ageGroup === "23y") {
+      setMilestones23y(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    } else if (ageGroup === "34y") {
+      setMilestones34y(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    } else if (ageGroup === "45y") {
+      setMilestones45y(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
+    } else if (ageGroup === "56y") {
+      setMilestones56y(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
     } else {
       setMilestones69(prev => prev.map(item => item.id === id ? { ...item, status: value } : item));
     }
+  };
+
+  const handleGejalaChange = (id: number, checked: boolean) => {
+    setGejala26y(prev => prev.map(g => g.id === id ? { ...g, checked } : g));
     if (selectedChildId) {
-      localStorage.setItem(`milestone_${ageGroup}_${selectedChildId}_${id}`, value ? 'true' : 'false');
+      localStorage.setItem(`gejala_${selectedChildId}_${id}`, checked ? 'true' : 'false');
     }
   };
 
@@ -262,6 +344,51 @@ function PerjalananAnakContent() {
         };
       });
       setMilestones69(updatedMilestones);
+
+      const updated23y = milestones23y.map(m => {
+        const saved = localStorage.getItem(`milestone_23y_${selectedChildId}_${m.id}`);
+        return {
+          ...m,
+          status: saved === 'true' ? true : saved === 'false' ? false : null
+        };
+      });
+      setMilestones23y(updated23y);
+
+      const updated34y = milestones34y.map(m => {
+        const saved = localStorage.getItem(`milestone_34y_${selectedChildId}_${m.id}`);
+        return {
+          ...m,
+          status: saved === 'true' ? true : saved === 'false' ? false : null
+        };
+      });
+      setMilestones34y(updated34y);
+
+      const updated45y = milestones45y.map(m => {
+        const saved = localStorage.getItem(`milestone_45y_${selectedChildId}_${m.id}`);
+        return {
+          ...m,
+          status: saved === 'true' ? true : saved === 'false' ? false : null
+        };
+      });
+      setMilestones45y(updated45y);
+
+      const updated56y = milestones56y.map(m => {
+        const saved = localStorage.getItem(`milestone_56y_${selectedChildId}_${m.id}`);
+        return {
+          ...m,
+          status: saved === 'true' ? true : saved === 'false' ? false : null
+        };
+      });
+      setMilestones56y(updated56y);
+
+      const updatedGejala = gejala26y.map(g => {
+        const saved = localStorage.getItem(`gejala_${selectedChildId}_${g.id}`);
+        return {
+          ...g,
+          checked: saved === 'true'
+        };
+      });
+      setGejala26y(updatedGejala);
 
       if (!navigator.onLine) {
         return;
@@ -555,6 +682,30 @@ function PerjalananAnakContent() {
                   </div>
                 </div>
               </div>
+
+              {/* Card 5: Pemantauan Gejala */}
+              <div onClick={() => router.push("?section=pemantauan_gejala")} className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group">
+                <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">
+                  <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-[#EA580C] rounded-full"></span> GEJALA BULANAN</span>
+                  <span>Skrining</span>
+                </div>
+                <div className="bg-base-white rounded-[20px] shadow-sm border border-base-border/10 overflow-hidden flex flex-col">
+                  <div className="bg-[#EA580C] h-6 flex items-center px-4 text-[9px] font-extrabold uppercase text-base-white">PEMANTAUAN GEJALA</div>
+                  <div className="border border-dashed border-base-border/30 rounded-2xl p-4 m-3 mt-2 bg-base-white space-y-3">
+                    <h3 className="text-sm font-bold text-base-text-primary group-hover:text-brand-primary transition-colors">Gejala Bahaya Anak (2-6 Thn)</h3>
+                    <p className="text-[11px] text-base-text-secondary leading-relaxed font-medium">Evaluasi mandiri gejala bahaya atau kondisi darurat medis pada anak balita usia 2 s.d 6 tahun.</p>
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
+                      <div className="w-6 h-6 rounded-full bg-status-orange-light text-status-orange-solid flex items-center justify-center text-[10px] font-bold border border-base-white">🤒</div>
+                      <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-orange-50 text-[#EA580C]">{gejala26y.filter(g => g.checked).length} Terdeteksi</span>
+                    </div>
+                  </div>
+                  <div className="border-t border-base-border/10 px-4 py-2.5 flex items-center justify-between text-[10px] font-semibold text-base-text-secondary">
+                    <span>📋 Skrining Bulanan</span>
+                    <span>Buka Lembar</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -572,6 +723,7 @@ function PerjalananAnakContent() {
               {activeSection === "tumbuh_kembang" && "Grafik Tumbuh Kembang & Z-Score"}
               {activeSection === "riwayat" && "Riwayat Kunjungan Posyandu"}
               {activeSection === "milestone" && "Penanda Perkembangan (Milestone)"}
+              {activeSection === "pemantauan_gejala" && "Pemantauan Gejala Bulanan"}
             </span>
             <span className="text-[10px] bg-brand-soft text-brand-primary font-bold px-2.5 py-0.5 rounded-full border border-brand-primary/20">{child.name}</span>
           </div>
@@ -710,16 +862,35 @@ function PerjalananAnakContent() {
             const currentList = 
               milestoneAgeTab === "29d3m" ? milestones29d3m :
               milestoneAgeTab === "36m" ? milestones36m :
+              milestoneAgeTab === "23y" ? milestones23y :
+              milestoneAgeTab === "34y" ? milestones34y :
+              milestoneAgeTab === "45y" ? milestones45y :
+              milestoneAgeTab === "56y" ? milestones56y :
               milestones69;
               
             const pageDescription = 
               milestoneAgeTab === "29d3m" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 53 - Usia 29 Hari s.d 3 Bulan." :
               milestoneAgeTab === "36m" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 55 - Usia 3 s.d 6 Bulan." :
-              "Evaluasi mandiri berkala Buku KIA 2024 Halaman 62 - Usia 6 s.d 9 Bulan.";
+              milestoneAgeTab === "69m" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 62 - Usia 6 s.d 9 Bulan." :
+              milestoneAgeTab === "23y" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 79 - Usia 2 s.d 3 Tahun." :
+              milestoneAgeTab === "34y" ? "Evaluasi mandiri berkala Buku KIA 2024 Halaman 81 - Usia 3 s.d 4 Tahun." :
+              milestoneAgeTab === "45y" ? "Evaluasi mandiri berkala Buku KIA Halaman 82 - Usia 4 s.d 5 Tahun." :
+              "Evaluasi mandiri berkala Buku KIA Halaman 83 - Usia 5 s.d 6 Tahun.";
+
+            const infoMap: any = {
+              "29d3m": { cairan: "Sesuai ASI Eksklusif", stimulasi: "Sering diajak bicara, ditatap matanya, distimulasi pendengaran suara lembut." },
+              "36m": { cairan: "Sesuai ASI Eksklusif", stimulasi: "Latih berguling, tengkurap, meraih mainan, diajak tertawa." },
+              "69m": { cairan: "Sesuai ASI/MPASI", stimulasi: "Latih duduk mandiri, bersuara ma-ma ba-ba, bermain Cilukba." },
+              "23y": { cairan: "Sekitar 1.300 mL/hari (± 5 Gelas Belimbing)", stimulasi: "Sebutkan nama benda, sifat, guna benda; Bacakan cerita, tanya jawab; Menggambar, menempel, merapikan mainan; Berlari, melompat, memanjat." },
+              "34y": { cairan: "Sekitar 1.700 mL/hari (± 7 Gelas Belimbing)", stimulasi: "Menyebut nama benda, sifat, guna benda; Menonton TV didampingi maks 1 jam; Menyusun balok/puzzle; Berlari, memanjat, melompat." },
+              "45y": { cairan: "Sekitar 1.700 mL/hari (± 7 Gelas Belimbing)", stimulasi: "Bermain bola, lompat tali; Latih ikuti aturan permainan; Kenalkan nama-nama hari; Latih sikat gigi sendiri dan berpakaian sendiri." },
+              "56y": { cairan: "Sekitar 1.700 mL/hari (± 7 Gelas Belimbing)", stimulasi: "Mengenal nama & fungsi benda; Membaca buku bersama; Menggunting & menempel; Mengenal angka, huruf, jam, hari, tanggal; Sepeda roda tiga." },
+            };
+            const currentInfo = infoMap[milestoneAgeTab] || { cairan: "-", stimulasi: "-" };
 
             return (
               <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 animate-in fade-in duration-300">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base-border/10 pb-3">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-base-border/10 pb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">📋</span>
                     <div>
@@ -729,28 +900,68 @@ function PerjalananAnakContent() {
                   </div>
                   
                   {/* Age selector tabs */}
-                  <div className="flex bg-base-bg p-1 rounded-xl self-start sm:self-auto gap-1 text-[11px] font-bold">
+                  <div className="flex bg-base-bg p-1 rounded-xl gap-1 text-[10px] font-bold overflow-x-auto max-w-full no-scrollbar shrink-0">
                     <button
                       type="button"
                       onClick={() => setMilestoneAgeTab("29d3m")}
-                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${milestoneAgeTab === "29d3m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "29d3m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
                     >
                       29 Hri - 3 Bln
                     </button>
                     <button
                       type="button"
                       onClick={() => setMilestoneAgeTab("36m")}
-                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${milestoneAgeTab === "36m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "36m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
                     >
-                      3 - 6 Bulan
+                      3 - 6 Bln
                     </button>
                     <button
                       type="button"
                       onClick={() => setMilestoneAgeTab("69m")}
-                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${milestoneAgeTab === "69m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "69m" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
                     >
-                      6 - 9 Bulan
+                      6 - 9 Bln
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("23y")}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "23y" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      2 - 3 Thn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("34y")}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "34y" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      3 - 4 Thn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("45y")}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "45y" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      4 - 5 Thn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMilestoneAgeTab("56y")}
+                      className={`px-2.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${milestoneAgeTab === "56y" ? "bg-brand-primary text-base-white shadow-sm" : "text-base-text-secondary hover:text-base-text-primary"}`}
+                    >
+                      5 - 6 Thn
+                    </button>
+                  </div>
+                </div>
+
+                {/* Info Box: Kebutuhan Cairan & Stimulasi */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-brand-soft/10 border border-brand-primary/10 rounded-xl p-3.5 text-xs">
+                  <div className="space-y-0.5">
+                    <span className="font-bold text-brand-primary text-[10px] uppercase tracking-wider block">💧 Kebutuhan Cairan Dasar</span>
+                    <p className="font-semibold text-base-text-primary">{currentInfo.cairan}</p>
+                  </div>
+                  <div className="md:col-span-2 space-y-0.5 border-t md:border-t-0 md:border-l border-base-border/10 pt-2 md:pt-0 md:pl-3.5">
+                    <span className="font-bold text-brand-primary text-[10px] uppercase tracking-wider block">💡 Stimulasi Harian Yang Dianjurkan</span>
+                    <p className="font-medium text-base-text-secondary leading-relaxed">{currentInfo.stimulasi}</p>
                   </div>
                 </div>
 
@@ -790,6 +1001,42 @@ function PerjalananAnakContent() {
               </div>
             );
           })()}
+
+          {activeSection === "pemantauan_gejala" && (
+            <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4 animate-in fade-in duration-300">
+              <div className="flex items-center gap-2 border-b border-base-border/10 pb-3">
+                <span className="text-xl">🤒</span>
+                <div>
+                  <h2 className="font-bold text-base-text-primary text-base leading-tight">Lembar Pemantauan Gejala Bulanan Anak (2-6 Tahun)</h2>
+                  <p className="text-[11px] text-base-text-secondary font-medium mt-0.5">Silakan centang kondisi atau gejala bahaya jika dialami oleh anak saat ini.</p>
+                </div>
+              </div>
+
+              <div className="space-y-2.5 max-h-[450px] overflow-y-auto pr-1">
+                {gejala26y.map((item) => (
+                  <div key={item.id} className="flex items-start gap-3 p-3.5 bg-base-bg/20 rounded-xl text-xs hover:bg-base-bg/40 transition-colors">
+                    <input 
+                      type="checkbox" 
+                      id={`gejala-chk-${item.id}`}
+                      checked={item.checked} 
+                      onChange={(e) => handleGejalaChange(item.id, e.target.checked)} 
+                      className="accent-brand-primary w-4.5 h-4.5 cursor-pointer shrink-0 mt-0.5" 
+                    />
+                    <label htmlFor={`gejala-chk-${item.id}`} className="font-medium text-base-text-primary leading-relaxed cursor-pointer flex-1">
+                      {item.id}. {item.text}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              {gejala26y.some(item => item.checked) && (
+                <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start shadow-xs animate-in shake duration-300">
+                  <span className="text-lg mt-0.5">🚨</span>
+                  <p className="font-bold text-status-red-solid"><strong>RUJUKAN DARURAT:</strong> Anak terdeteksi mengalami gejala bahaya! Segera ke Puskesmas atau hubungi fasilitas pelayanan kesehatan terdekat untuk periksa!</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

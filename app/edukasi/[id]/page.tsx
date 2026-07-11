@@ -453,6 +453,12 @@ export default function ArticleDetailPage() {
               <L25ArticleContent />
             ) : id === "L26" ? (
               <L26ArticleContent />
+            ) : id === "L27" ? (
+              <L27ArticleContent />
+            ) : id === "L28" ? (
+              <L28ArticleContent />
+            ) : id === "L29" ? (
+              <L29ArticleContent />
             ) : (
               <div
                 className="article-content"
@@ -3280,6 +3286,130 @@ function L25ArticleContent() {
 }
 
 function L26ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Memasuki usia 2 tahun ke atas, menu makanan anak sudah harus sepenuhnya beradaptasi dengan variasi menu makanan keluarga seimbang dengan kandungan nutrisi makro harian yang lengkap.
+      </p>
+
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 space-y-2">
+        <h4 className="font-bold text-brand-primary text-xs">🍽️ Pola Pemenuhan Gizi Balita 2-5 Tahun:</h4>
+        <ul className="list-disc pl-4 space-y-1.5 font-medium">
+          <li>Biasakan anak makan secara teratur 3 kali sehari (pagi, siang, dan malam) bersama dengan anggota keluarga.</li>
+          <li>Penuhi gizi anak dengan makanan kaya protein esensial seperti ikan, telur, tempe, susu, dan tahu.</li>
+          <li>Penuhi gizi anak dengan mengonsumsi sayuran segar dan buah-buahan setiap hari.</li>
+          <li>Batasi anak mengonsumsi makanan selingan atau kudapan jajan yang terlalu manis, terlalu asin, dan terlalu berlemak.</li>
+          <li>Pastikan anak meminum air putih yang cukup sesuai dengan kebutuhan harian tubuhnya.</li>
+          <li>Biasakan bermain aktif bersama anak and melakukan aktivitas fisik di luar ruangan setiap hari.</li>
+        </ul>
+      </div>
+
+      <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-2">
+        <h4 className="font-bold text-status-blue-solid text-xs">🪥 Panduan Perawatan Gigi &amp; Pencegahan Gigi Berlubang:</h4>
+        <ul className="list-disc pl-4 space-y-1.5 font-medium">
+          <li>Mulai ajari anak menyikat gigi di depan cermin secara teratur selama 2 menit. Dampingi anak menggosok gigi secara intensif sampai anak menginjak usia 8 tahun.</li>
+          <li>Untuk anak usia 2-6 tahun, gunakan takaran pasta gigi yang mengandung fluoride seukuran 1 biji kacang polong.</li>
+          <li>Jangan biasakan anak minum susu dengan botol dot sambil tiduran menjelang tidur malam.</li>
+          <li>Jangan membiarkan anak melakukan kebiasaan menghisap ibu jari tangan atau menghisap dot (mengempeng).</li>
+          <li>Hindari memberikan anak makanan manis yang bersifat lengket di antara waktu jam makan utama.</li>
+          <li>Disiplinkan anak untuk selalu teratur menyikat gigi sebelum tidur malam.</li>
+        </ul>
+      </div>
+
+      <div className="p-4 bg-status-green-light/10 border border-status-green-solid/15 rounded-2xl space-y-1">
+        <h4 className="font-bold text-status-green-solid text-xs">🧼 Kebersihan Diri &amp; Perawatan Fisik:</h4>
+        <ul className="list-disc pl-4 space-y-1 font-medium">
+          <li>Biasakan untuk mencuci tangan dan kaki anak dengan air bersih yang mengalir dan sabun setiap kali habis bermain.</li>
+          <li>Gunting kuku tangan dan kuku kaki anak secara teratur demi menjaga kebersihan dari kuman penyakit.</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function L27ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Fase usia 3 hingga 6 tahun ditandai dengan kemampuan kognitif tingkat tinggi, kemampuan berbahasa kompleks, serta proses pencontohan perilaku (role modeling) dari orang tua kandung.
+      </p>
+
+      <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 space-y-2">
+        <h4 className="font-bold text-brand-primary text-xs">💞 Pola Asuh &amp; Pencontohan Peran Psikologis:</h4>
+        <ul className="list-disc pl-4 space-y-1.5 font-medium">
+          <li>Harus ada kerjasama erat antara ayah dan ibu serta seluruh anggota keluarga dalam membantu anak menjalani tahap usia dini. Pada tahap ini terjadi proses mencontoh peran, yaitu anak laki-laki mencontoh peran ayah, sedangkan anak perempuan mencontoh peran ibu. Ajari anak konsep perbedaan jenis kelamin laki-laki dan perempuan sejak dini.</li>
+          <li>Mengajari anak untuk menjaga ketat bagian pribadinya yang tertutup pakaian (alat kelamin, paha, dada, pantat dan kaki) untuk menghindari tindakan pelecehan seksual pada anak.</li>
+          <li>Orang tua berkewajiban aktif membantu anak mengucapkan kata-kata dengan artikulasi yang benar.</li>
+          <li>Memenuhi seluruh kebutuhan dasar anak, baik yang bersifat materi maupun non-materi (kasih sayang).</li>
+          <li>Beri kepercayaan penuh pada anak untuk melakukan hal-hal tertentu secara mandiri sesuai batas kemampuan fisiknya.</li>
+          <li>Memberi kesempatan pada anak untuk belajar mengurusi diri sendiri dengan tetap di bawah pengawasan orang tua.</li>
+          <li>Ketika anak mengekspresikan ketakutan, dekaplah dia agar merasa aman, bicarakan ketakutannya dengan tenang, buat anak menjadi nyaman dan merasa dimengerti oleh kita.</li>
+          <li>Anak usia 3-5 tahun memerlukan waktu tidur selama 10-13 jam sehari (termasuk porsi tidur siang).</li>
+        </ul>
+      </div>
+
+      <div className="bg-base-white border border-base-border/30 rounded-2xl p-5 shadow-xs space-y-2">
+        <h4 className="font-bold text-status-orange-solid text-xs">🚫 Regulasi Ketat Penggunaan Gawai (Anak Berusia di Atas 24 Bulan):</h4>
+        <ul className="list-disc pl-4 space-y-1.5 font-medium">
+          <li>Batasi waktu penggunaan gawai (screen time) tidak lebih dari 1 jam per hari.</li>
+          <li>Hanya memilih konten program edukasi yang berkualitas tinggi untuk rentang umur anak.</li>
+          <li>Gawai hendaknya dimainkan bersama dengan orang tua (wajib didampingi) untuk meningkatkan proses belajar anak, memperbanyak interaksi dua arah, dan mengatur pembatasan waktu penggunaan gawai.</li>
+          <li>Dilarang keras menggunakan gawai selama proses makan sedang berlangsung, dan pada rentang waktu 1 jam sebelum waktu tidur malam anak.</li>
+          <li>Matikan semua perangkat TV dan gawai media visual lainnya apabila sedang tidak digunakan di dalam rumah.</li>
+          <li>Jangan pernah menggunakan gawai dengan tujuan instan untuk menenangkan perilaku tantrum atau rewelnya anak.</li>
+          <li>Berupaya memastikan area kamar tidur, waktu saat makan bersama, dan waktu bermain dengan anak, semuanya terbebas dari penggunaan gawai (device-free zones).</li>
+          <li>Mempunyai berbagai alternatif aktivitas fisik lain dalam rangka membatasi waktu penggunaan gawai, belajar memecahkan masalah, dan untuk menenangkan perilaku emosional anak.</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function L28ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      <p className="text-sm font-medium">
+        Orang tua memiliki peran utama dalam membentuk lingkungan yang sangat dibutuhkan anak untuk tumbuh kembang sehat. Untuk itu, orang tua harus memiliki kemampuan mengelola kesehatan fisik dan mentalnya sendiri secara seimbang harian.
+      </p>
+      <p className="font-semibold text-base-text-primary">
+        Orang tua yang sehat mental mampu mengatasi stres pengasuhan, memberikan aturan yang tegas dan jelas pada anak, paham kebutuhan psikologis anak, serta mau memperbaiki hubungan emosional kembali setelah melepas luapan emosi yang berlebihan. Anak yang dibesarkan oleh orang tua yang sehat mental akan jauh lebih mudah untuk fokus belajar di sekolah dan berteman dengan baik di lingkungannya.
+      </p>
+
+      <div className="space-y-4">
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-4 space-y-1.5">
+          <h4 className="font-bold text-status-purple-solid text-xs">🤝 1. Bekerja Sama dalam Pengasuhan Positif</h4>
+          <p className="font-medium">Ayah dan ibu wajib bekerja sama dalam menerapkan pola pengasuhan yang tegas namun penuh dengan limpahan kasih sayang harian.</p>
+          <ul className="list-disc pl-4 font-medium text-[11px]">
+            <li>Orang tua harus saling berkomunikasi dan menyepakati aturan disiplin yang diterapkan pada anak.</li>
+            <li>Tidak saling menyalahkan satu sama lain di depan anak saat menghadapi masalah dalam pengasuhan.</li>
+          </ul>
+        </div>
+
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-4 space-y-1.5">
+          <h4 className="font-bold text-status-purple-solid text-xs">🧘 2. Mengenali dan Mengelola Emosi dalam Pengasuhan</h4>
+          <p className="font-medium">Mengasuh anak tentunya memunculkan banyak tantangan yang dapat mempengaruhi kondisi emosi orang tua. Oleh karena itu, orang tua perlu mengelola emosinya dengan baik:</p>
+          <ul className="list-disc pl-4 font-medium text-[11px] space-y-1">
+            <li><strong>Kenali Diri Sendiri:</strong> Cari tahu apa yang membuat saya marah? Apa yang bisa saya lakukan untuk membuat diri merasa tenang dan lebih baik?</li>
+            <li><strong>Atur Harapan dan Prioritas:</strong> Misalnya, ketika anak sedang sakit dan orang tua kelelahan ekstrem. Jangan memaksakan diri untuk menyelesaikan semua pekerjaan domestik, seperti mencuci atau menyetrika baju secara bersamaan.</li>
+            <li>Bekerja sama secara adil dengan pasangan untuk meringankan beban tugas harian rumah tangga.</li>
+            <li>Tetap luangkan waktu untuk melakukan hobi pribadi demi menjaga stabilitas rasa bahagia di dalam diri.</li>
+          </ul>
+        </div>
+
+        <div className="bg-[#FBF7F9] border border-status-purple-solid/15 rounded-xl p-4 space-y-1.5">
+          <h4 className="font-bold text-status-purple-solid text-xs">🌱 3. Memahami dan Mengelola Stres Pengasuhan</h4>
+          <p className="font-medium">Ketika orang tua merasa tidak mampu menghadapi tantangan saat mengasuh anak, seperti ketika anak sulit makan, berat badan anak kurang dari kurva, atau perilaku anak tidak sesuai harapan, maka akan timbul stres pengasuhan.</p>
+          <ul className="list-disc pl-4 font-medium text-[11px]">
+            <li>Kelola stres dengan baik, misalnya dengan melakukan latihan relaksasi napas atau meditasi.</li>
+            <li>Segera cari bantuan profesional ke tenaga kesehatan di Puskesmas, jika tekanan stres sudah mulai mengganggu fungsi kehidupan sehari-hari.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function L29ArticleContent() {
   const links = [
     { label: "Website Ayo Sehat", desc: "Portal informasi resmi promosi kesehatan Kemenkes RI", url: "https://ayosehat.kemkes.go.id" },
     { label: "Chatbot Edukasi Ayo Sehat", desc: "Layanan konsultasi & tanya jawab otomatis via WhatsApp", url: "https://wa.me/6281277889912?text=ayosehat" },
