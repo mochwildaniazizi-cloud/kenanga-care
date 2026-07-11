@@ -42,10 +42,10 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
   };
 
   return (
-    <div className="bg-base-white rounded-2xl border border-base-border/50 overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
+    <div className="bg-base-white rounded-2xl border border-base-border/50 overflow-hidden flex flex-row sm:flex-col group hover:shadow-lg transition-all duration-300 w-full">
       
       {/* Thumbnail Container */}
-      <div className="relative h-44 w-full overflow-hidden bg-gray-100">
+      <div className="relative h-28 w-28 sm:h-44 sm:w-full shrink-0 overflow-hidden bg-gray-100">
         <Link 
           href={`/edukasi/${article.id}`} 
           className="block w-full h-full"
@@ -56,62 +56,62 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
             alt={article.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 112px, (max-width: 768px) 100vw, 33vw"
           />
         </Link>
-
+ 
         {/* Bookmark Button */}
         <button 
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleSave?.(); }}
-          className="absolute top-3 right-3 w-8 h-8 bg-base-white rounded-lg flex items-center justify-center shadow-sm text-base-text-secondary hover:text-brand-primary transition-colors z-10"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 bg-base-white/95 rounded-lg flex items-center justify-center shadow-sm text-base-text-secondary hover:text-brand-primary transition-colors z-10"
         >
-          {isSaved ? <MdBookmark className="w-5 h-5 text-brand-primary" /> : <MdBookmarkBorder className="w-5 h-5 text-brand-primary" />}
+          {isSaved ? <MdBookmark className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" /> : <MdBookmarkBorder className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />}
         </button>
-
+ 
         {/* Video Overlay Indicator */}
         {article.type === "Video" && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center pl-1 shadow-lg">
-              <MdPlayCircleOutline className="w-8 h-8 text-white" />
+            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center pl-0.5 sm:pl-1 shadow-lg">
+              <MdPlayCircleOutline className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
             </div>
           </div>
         )}
       </div>
-
+ 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-3 sm:p-4 flex flex-col flex-1 min-w-0 justify-between">
         <Link 
           href={`/edukasi/${article.id}`} 
-          className="flex-1 flex flex-col"
+          className="flex-1 flex flex-col min-w-0"
           onClick={handleRecordHistory}
         >
           {/* Badges */}
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-1 mb-1.5 sm:mb-3">
             {article.categories.map((cat, idx) => (
-              <span key={idx} className={`${getCategoryColor(cat)} px-2.5 py-0.5 rounded-full text-[10px] font-bold`}>
+              <span key={idx} className={`${getCategoryColor(cat)} px-2 py-0.5 rounded-full text-[9px] font-bold`}>
                 {cat}
               </span>
             ))}
           </div>
           
           {/* Title */}
-          <h3 className="font-bold text-sm text-base-text-primary leading-snug mb-4 line-clamp-2 flex-1 group-hover:text-brand-primary transition-colors">
+          <h3 className="font-bold text-xs sm:text-sm text-base-text-primary leading-snug mb-2 sm:mb-4 line-clamp-2 flex-1 group-hover:text-brand-primary transition-colors">
             {article.title}
           </h3>
         </Link>
         
         {/* Footer info */}
-        <div className="flex items-center justify-between text-xs font-semibold text-base-text-secondary mt-auto pt-2">
+        <div className="flex items-center justify-between text-[10px] sm:text-xs font-semibold text-base-text-secondary mt-auto pt-1 sm:pt-2 border-t border-gray-50">
           <div className="flex items-center gap-1.5">
             {article.type === "Video" ? (
-              <MdPlayCircleOutline className="w-4 h-4" />
+              <MdPlayCircleOutline className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             ) : (
-              <MdMenuBook className="w-4 h-4" />
+              <MdMenuBook className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             )}
             <span>{article.type} • {article.duration}</span>
           </div>
-          <button className="text-base-text-secondary hover:text-brand-primary transition-colors">
-            <MdShare className="w-4 h-4" />
+          <button className="text-base-text-secondary hover:text-brand-primary transition-colors p-1 rounded-lg hover:bg-base-bg">
+            <MdShare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>

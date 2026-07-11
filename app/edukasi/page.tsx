@@ -14,7 +14,7 @@ import { mockArticles } from "./data";
 import type { CategoryType } from "./data";
 import { useUserRole } from "@/context/UserRoleContext";
  
-type TabType = CategoryType | "Semua" | "Tersimpan";
+type TabType = CategoryType | "Semua" | "Ibu" | "Anak" | "Tersimpan";
  
 export default function EdukasiPage() {
   const { role } = useUserRole();
@@ -24,7 +24,6 @@ export default function EdukasiPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewedHistory, setViewedHistory] = useState<string[]>([]);
   const [historyPageIndex, setHistoryPageIndex] = useState<number>(0);
-  const [journeyFilter, setJourneyFilter] = useState<"Semua" | "Ibu" | "Anak">("Semua");
  
   useEffect(() => {
     const loadData = () => {
@@ -112,6 +111,21 @@ export default function EdukasiPage() {
       id: "Semua" as TabType, label: "Semua", icon: MdDashboard, 
       colorStyle: "border-base-text-secondary/30 text-base-text-secondary hover:bg-base-text-secondary/5", 
       activeStyle: "bg-base-text-secondary text-base-white border-base-text-secondary", 
+    },
+    { 
+      id: "Ibu" as TabType, label: "Kategori Ibu", icon: MdPregnantWoman, 
+      colorStyle: "border-[#EA2986]/30 text-[#EA2986] hover:bg-[#FCE8F0]/30", 
+      activeStyle: "bg-[#EA2986] text-base-white border-[#EA2986]" 
+    },
+    { 
+      id: "Anak" as TabType, label: "Kategori Anak", icon: MdChildCare, 
+      colorStyle: "border-[#9333EA]/30 text-[#9333EA] hover:bg-[#F3E8FF]/30", 
+      activeStyle: "bg-[#9333EA] text-base-white border-[#9333EA]" 
+    },
+    { 
+      id: "Informasi Umum" as TabType, label: "Informasi Umum", icon: MdInfo, 
+      colorStyle: "border-gray-400/40 text-gray-700 hover:bg-gray-100/30", 
+      activeStyle: "bg-gray-700 text-base-white border-gray-700" 
     },
     { 
       id: "Tersimpan" as TabType, label: "Tersimpan", icon: MdBookmark, 
@@ -252,55 +266,9 @@ export default function EdukasiPage() {
             </div>
           </div>
 
-          {/* Main Filter Kategori (Ibu / Anak) */}
-          <div className="flex items-center gap-1.5 bg-base-bg p-1 rounded-xl w-fit text-[11px] font-bold shadow-sm select-none border border-base-border/20">
-            <button
-              type="button"
-              onClick={() => {
-                setJourneyFilter("Semua");
-                setActiveTab("Semua");
-              }}
-              className={`px-4.5 py-2 rounded-lg transition cursor-pointer ${
-                journeyFilter === "Semua" 
-                  ? "bg-brand-primary text-base-white shadow-sm" 
-                  : "text-base-text-secondary hover:text-base-text-primary"
-              }`}
-            >
-              Semua Artikel
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setJourneyFilter("Ibu");
-                setActiveTab("Semua");
-              }}
-              className={`px-4.5 py-2 rounded-lg transition cursor-pointer ${
-                journeyFilter === "Ibu" 
-                  ? "bg-[#EA2986] text-base-white shadow-sm" 
-                  : "text-base-text-secondary hover:text-[#EA2986]"
-              }`}
-            >
-              Kategori Ibu
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setJourneyFilter("Anak");
-                setActiveTab("Semua");
-              }}
-              className={`px-4.5 py-2 rounded-lg transition cursor-pointer ${
-                journeyFilter === "Anak" 
-                  ? "bg-[#9333EA] text-base-white shadow-sm" 
-                  : "text-base-text-secondary hover:text-[#9333EA]"
-              }`}
-            >
-              Kategori Anak
-            </button>
-          </div>
-
-          <div className={`grid grid-cols-1 ${journeyFilter === "Semua" ? "md:grid-cols-2" : ""} gap-4 pt-1`}>
+          <div className={`grid grid-cols-1 ${(activeTab === "Semua" || activeTab === "Tersimpan") ? "md:grid-cols-2" : ""} gap-4 pt-1`}>
             {/* PERJALANAN IBU */}
-            {(journeyFilter === "Semua" || journeyFilter === "Ibu") && (
+            {(activeTab === "Semua" || activeTab === "Ibu" || activeTab === "Tersimpan") && (
               <div className="space-y-2.5 animate-in fade-in duration-200">
                 <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Ibu</span>
                 <div className="grid grid-cols-2 gap-2">
@@ -327,7 +295,7 @@ export default function EdukasiPage() {
             )}
 
             {/* PERJALANAN ANAK */}
-            {(journeyFilter === "Semua" || journeyFilter === "Anak") && (
+            {(activeTab === "Semua" || activeTab === "Anak" || activeTab === "Tersimpan") && (
               <div className="space-y-2.5 animate-in fade-in duration-200">
                 <span className="text-[10px] font-black tracking-widest text-base-text-secondary uppercase block pl-1">Perjalanan Anak</span>
                 <div className="grid grid-cols-2 gap-2">
@@ -354,27 +322,29 @@ export default function EdukasiPage() {
             )}
           </div>
 
-          <div className="flex items-center justify-between border-t border-base-border/10 pt-3 text-[11px] font-semibold text-base-text-secondary">
-            <span>Menyesuaikan halaman dan sub-bab Buku KIA Resmi Kementerian Kesehatan</span>
-            <div className="flex items-center gap-2">
-              {INFORMASI_UMUM_TABS.map(tab => {
-                const isActive = activeTab === tab.id;
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition ${
-                      isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {tab.label}
-                  </button>
-                );
-              })}
+          {(activeTab === "Semua" || activeTab === "Informasi Umum" || activeTab === "Tersimpan") && (
+            <div className="flex items-center justify-between border-t border-base-border/10 pt-3 text-[11px] font-semibold text-base-text-secondary animate-in fade-in duration-200">
+              <span>Menyesuaikan halaman dan sub-bab Buku KIA Resmi Kementerian Kesehatan</span>
+              <div className="flex items-center gap-2">
+                {INFORMASI_UMUM_TABS.map(tab => {
+                  const isActive = activeTab === tab.id;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition ${
+                        isActive ? tab.activeStyle : `bg-base-white ${tab.colorStyle}`
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -422,7 +392,7 @@ export default function EdukasiPage() {
             </div>
           )}
         </div>
-      ) : activeTab === "Semua" ? (
+      ) : (activeTab === "Semua" || activeTab === "Ibu" || activeTab === "Anak" || activeTab === "Informasi Umum") ? (
         // --- SEMUA VIEW ---
         articles.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center space-y-5 bg-base-white border border-base-border/30 rounded-2xl p-8 max-w-xl mx-auto shadow-sm animate-in fade-in duration-300">
@@ -524,7 +494,7 @@ export default function EdukasiPage() {
               )}
 
               {/* PERJALANAN IBU */}
-              {(journeyFilter === "Semua" || journeyFilter === "Ibu") && (
+              {(activeTab === "Semua" || activeTab === "Ibu") && (
                 <div className="space-y-6 pt-6 border-t border-base-border/20 animate-in fade-in duration-300">
                   <div className="flex items-center gap-2.5">
                     <MdPregnantWoman className="w-6 h-6 text-[#EA2986]" />
@@ -614,7 +584,7 @@ export default function EdukasiPage() {
             )}
 
             {/* PERJALANAN ANAK */}
-            {(journeyFilter === "Semua" || journeyFilter === "Anak") && (
+            {(activeTab === "Semua" || activeTab === "Anak") && (
               <div className="space-y-6 pt-6 border-t border-base-border/20 animate-in fade-in duration-300">
                 <div className="flex items-center gap-2.5">
                   <MdChildCare className="w-6 h-6 text-[#9333EA]" />
@@ -704,7 +674,8 @@ export default function EdukasiPage() {
             )}
 
             {/* INFORMASI UMUM */}
-              <div className="space-y-6 pt-6 border-t border-base-border/20">
+            {(activeTab === "Semua" || activeTab === "Informasi Umum") && (
+              <div className="space-y-6 pt-6 border-t border-base-border/20 animate-in fade-in duration-300">
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-base-text-primary flex items-center gap-2">
@@ -724,6 +695,7 @@ export default function EdukasiPage() {
                   </div>
                 </div>
               </div>
+            )}
 
             </div>
           );
