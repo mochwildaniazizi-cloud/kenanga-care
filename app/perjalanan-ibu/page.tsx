@@ -204,10 +204,16 @@ function PerjalananIbuContent() {
       try {
         const res = await getTtdLogs(motherId, currentYear, currentMonth);
         if (res && res.success) {
-          const logs = res.logs;
+          const rawLogs = res.logs || [];
+          const logs = rawLogs
+            .filter((l: any) => l.taken)
+            .map((l: any) => {
+              const dayPart = l.intake_date.split("-")[2];
+              return parseInt(dayPart, 10);
+            });
           setTtdLogs(logs);
           
-          const latestLog = logs.find((l: any) => l.companion);
+          const latestLog = rawLogs.find((l: any) => l.companion);
           const companion = latestLog?.companion || localStorage.getItem(`ttd_companion_${motherId}`) || "";
           const relationship = latestLog?.relationship || localStorage.getItem(`ttd_relationship_${motherId}`) || "Suami";
           
@@ -268,6 +274,13 @@ function PerjalananIbuContent() {
     const motherId = motherDetail.mother_id;
     const hasLog = ttdLogs.includes(day);
     
+    // Confirmation alert pop up
+    const message = hasLog 
+      ? `Apakah Anda yakin ingin membatalkan catatan meminum TTD pada tanggal ${day}?`
+      : `Apakah Anda yakin ingin mencatat telah meminum TTD pada tanggal ${day}?`;
+      
+    if (!confirm(message)) return;
+
     // Toggle
     let updatedLogs: number[];
     if (hasLog) {
@@ -860,10 +873,11 @@ function PerjalananIbuContent() {
         <div className="space-y-6 animate-in fade-in duration-200">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => router.push("?")}
-              className="p-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center justify-center bg-base-white shadow-sm"
+              onClick={() => router.push("/perjalanan-ibu")}
+              className="px-3 py-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center gap-1.5 bg-base-white shadow-sm font-bold text-xs"
             >
               <MdArrowBack className="w-4 h-4" />
+              <span>Kembali</span>
             </button>
             <h2 className="text-lg font-black text-base-text-primary font-bold">Identitas Lengkap Ibu &amp; Keluarga</h2>
           </div>
@@ -1020,10 +1034,11 @@ function PerjalananIbuContent() {
         <div className="space-y-6 animate-in fade-in duration-200">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => router.push("?")}
-              className="p-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center justify-center bg-base-white shadow-sm"
+              onClick={() => router.push("/perjalanan-ibu")}
+              className="px-3 py-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center gap-1.5 bg-base-white shadow-sm font-bold text-xs"
             >
               <MdArrowBack className="w-4 h-4" />
+              <span>Kembali</span>
             </button>
             <h2 className="text-lg font-black text-base-text-primary font-bold">Riwayat Medis Kehamilan Ibu</h2>
           </div>
@@ -1115,10 +1130,11 @@ function PerjalananIbuContent() {
         <div className="space-y-6 animate-in fade-in duration-200">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => router.push("?")}
-              className="p-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center justify-center bg-base-white shadow-sm"
+              onClick={() => router.push("/perjalanan-ibu")}
+              className="px-3 py-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center gap-1.5 bg-base-white shadow-sm font-bold text-xs"
             >
               <MdArrowBack className="w-4 h-4" />
+              <span>Kembali</span>
             </button>
             <h2 className="text-lg font-black text-base-text-primary font-bold">
               {activeSection === "ttd" && "Tablet Tambah Darah (TTD)"}
