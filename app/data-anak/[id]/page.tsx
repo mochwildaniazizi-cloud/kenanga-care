@@ -802,13 +802,22 @@ export default function ChildDetailPage() {
             
             <div className="flex items-center gap-3">
               {role !== "ibu" && (
-                <button 
-                  type="button"
-                  onClick={() => router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`)}
-                  className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
-                >
-                  <MdEdit className="w-4 h-4" /> Edit Data Balita
-                </button>
+                <>
+                  <button 
+                    type="button"
+                    onClick={() => router.push(`/data-anak/${id}/pemeriksaan-klinis`)}
+                    className="px-4 py-2 bg-brand-primary text-base-white hover:bg-brand-dark rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  >
+                    <MdChildCare className="w-4 h-4" /> Input Rekam Medis (EHR)
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`)}
+                    className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                  >
+                    <MdEdit className="w-4 h-4" /> Edit Data Balita
+                  </button>
+                </>
               )}
             </div>
           </div>

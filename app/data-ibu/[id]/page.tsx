@@ -958,13 +958,22 @@ export default function MotherDetailPage() {
             </div>
           ) : (
             role !== "ibu" && (
-              <button 
-                type="button"
-                onClick={handleStartEdit}
-                className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
-              >
-                <MdEdit className="w-4 h-4" /> Edit Data Ibu
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  type="button"
+                  onClick={() => router.push(`/data-ibu/${id}/pemeriksaan-klinis`)}
+                  className="px-4 py-2 bg-brand-primary text-base-white hover:bg-brand-dark rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+                >
+                  <FaFileMedical className="w-4 h-4" /> Input Rekam Medis (EHR)
+                </button>
+                <button 
+                  type="button"
+                  onClick={handleStartEdit}
+                  className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-soft/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                >
+                  <MdEdit className="w-4 h-4" /> Edit Data Ibu
+                </button>
+              </div>
             )
           )}
         </div>
