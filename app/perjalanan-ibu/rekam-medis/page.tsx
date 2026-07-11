@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MdArrowBack, MdPregnantWoman, MdMedicalServices, MdShield, MdBabyChangingStation, MdHome, MdInfo } from "react-icons/md";
+import { MdArrowBack, MdPregnantWoman, MdMedicalServices, MdShield, MdBabyChangingStation, MdHome, MdInfo, MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { getLoggedInMotherDetail } from "@/app/actions/mothers";
 import { useUserRole } from "@/context/UserRoleContext";
 
@@ -11,7 +11,7 @@ export default function RekamMedisIbuPage() {
   const router = useRouter();
   const { username } = useUserRole();
   const [mother, setMother] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"anc" | "usg_fisik" | "preeklampsia_dmg" | "persalinan" | "nifas">("anc");
+  const [activeTab, setActiveTab] = useState<"anc" | "usg_fisik" | "preeklampsia_dmg" | "rencana_persalinan" | "skl" | "nifas">("anc");
   
   // Default structure
   const [formData, setFormData] = useState<any>({
@@ -19,27 +19,29 @@ export default function RekamMedisIbuPage() {
       t1: {}, t2_1: {}, t2_2: {}, t3_1: {}, t3_2: {}, t3_3: {}
     },
     usg_fisik: {
-      imt: "Normal",
-      vagina: "",
-      fluksus: "Tidak",
-      fluor: "Tidak",
-      disease_history: {},
-      prev_pregnancy: [],
-      usg: {}
+      imt: "Normal", vagina: "", uretra: "", vulva: "", porsio: "", fluksus: "Tidak", fluor: "Tidak",
+      disease_history: {}, risk_behavior: {}, family_disease: {},
+      prev_pregnancy: [], usg_t1: {}, usg_t3: {}
     },
     preeklampsia_dmg: {
-      risiko_sedang: {},
-      risiko_tinggi: {},
-      sistole: "",
-      diastole: "",
-      urin_celup: "Negatif",
-      dmg: {}
+      risiko_sedang: {}, risiko_tinggi: {}, sistole: "", diastole: "", urin_celup: "Negatif", dmg: {}
     },
-    persalinan: {
-      mother_details: {}, father_details: {}
+    rencana_persalinan: {
+      client_name: "", client_address: "", helper_name: "", est_month: "", est_year: "",
+      faskes1: "", faskes2: "", finance: "JKN",
+      ambulance_driver1: "", ambulance_phone1: "", ambulance_driver2: "", ambulance_phone2: "",
+      kb_chosen: "", donor_name1: "", donor_phone1: "", donor_name2: "", donor_phone2: "",
+      delivery_date: "", delivery_time: "", gestation_age: "", order: "", penolong: "Bidan", cara: "Normal", keadaan_ibu: "Sehat", kb_postpartum: "",
+      baby_gender: "Laki-laki", baby_weight: "", baby_height: "", baby_head: "", baby_status: "Segera menangis", baby_asuhan: {}
+    },
+    skl: {
+      no_skl: "", day: "", date: "", time: "", gender: "Laki-laki", type: "Tunggal", order: "", gestation: "", weight: "", height: "", head: "", place: "Puskesmas", place_address: "", baby_name: "",
+      mother_name: "", mother_age: "", mother_nik: "", father_name: "", father_age: "", father_nik: "", father_job: "",
+      address: "", rtrw: "", kec: "", kota: "", saksi1: "", saksi2: "", penolong_nakes: ""
     },
     nifas: {
       kf1: {}, kf2: {}, kf3: {}, kf4: {},
+      checks_kf1: {}, checks_kf2: {}, checks_kf3: {}, checks_kf4: {},
       final_status: {}
     }
   });
@@ -60,7 +62,7 @@ export default function RekamMedisIbuPage() {
         }
       }
     });
-  }, []);
+  }, [username]);
 
   // MAP Calculation
   const getMAP = () => {
@@ -72,7 +74,9 @@ export default function RekamMedisIbuPage() {
 
   const mapValue = getMAP();
   const urinCelup = formData.preeklampsia_dmg.urin_celup;
-  const isReferralNeeded = (mapValue !== null && mapValue > 90) || urinCelup === "+1" || urinCelup === "+2" || urinCelup === "+3" || urinCelup === "+4";
+  const countSedang = Object.values(formData.preeklampsia_dmg.risiko_sedang || {}).filter(Boolean).length;
+  const countTinggi = Object.values(formData.preeklampsia_dmg.risiko_tinggi || {}).filter(Boolean).length;
+  const isReferralNeeded = countSedang >= 2 || countTinggi >= 1 || (mapValue !== null && mapValue > 90) || urinCelup !== "Negatif";
 
   return (
     <div className="min-h-screen bg-base-bg text-base-text-primary p-4 sm:p-6 lg:p-8 space-y-6">
@@ -94,9 +98,10 @@ export default function RekamMedisIbuPage() {
       <div className="flex bg-base-white border border-base-border/30 p-1 rounded-2xl gap-1 text-[11px] font-bold overflow-x-auto no-scrollbar shadow-xs">
         {[
           { id: "anc", label: "ANC Trimester 1-3", icon: <MdPregnantWoman className="w-4 h-4" /> },
-          { id: "usg_fisik", label: "USG & Pemeriksaan Fisik", icon: <MdMedicalServices className="w-4 h-4" /> },
+          { id: "usg_fisik", label: "Pemeriksaan Fisik & USG", icon: <MdMedicalServices className="w-4 h-4" /> },
           { id: "preeklampsia_dmg", label: "Skrining Preeklampsia & DMG", icon: <MdShield className="w-4 h-4" /> },
-          { id: "persalinan", label: "Persalinan & Keterangan Lahir", icon: <MdBabyChangingStation className="w-4 h-4" /> },
+          { id: "rencana_persalinan", label: "Rencana & Ringkasan Persalinan", icon: <MdBabyChangingStation className="w-4 h-4" /> },
+          { id: "skl", label: "Surat Keterangan Lahir (SKL)", icon: <MdOutlineAssignmentTurnedIn className="w-4 h-4" /> },
           { id: "nifas", label: "Pelayanan Nifas (KF)", icon: <MdHome className="w-4 h-4" /> }
         ].map((tab) => (
           <button
@@ -133,15 +138,15 @@ export default function RekamMedisIbuPage() {
                       <p>📅 Tanggal: <span className="font-bold text-base-text-primary">{data.date || "-"}</span></p>
                       <p>📍 Tempat: <span className="font-bold text-base-text-primary">{data.place || "-"}</span></p>
                       <p>⚖️ Berat Badan: <span className="font-bold text-base-text-primary">{data.weight ? `${data.weight} kg` : "-"}</span></p>
-                      <p>📏 Tinggi Badan: <span className="font-bold text-base-text-primary">{data.height ? `${data.height} cm` : "-"}</span></p>
-                      <p>💪 LiLA: <span className="font-bold text-base-text-primary">{data.lila ? `${data.lila} cm` : "-"}</span></p>
+                      {data.height && <p>📏 Tinggi Badan: <span className="font-bold text-base-text-primary">{data.height} cm</span></p>}
+                      {data.lila && <p>💪 LiLA: <span className="font-bold text-base-text-primary">{data.lila} cm</span></p>}
                       <p>🩺 Tensi: <span className="font-bold text-brand-primary">{data.bp || "-"} mmHg</span></p>
-                      <p>👶 TFU / DJJ: <span className="font-bold text-base-text-primary">{data.tfu ? `${data.tfu} cm` : "-"} / {data.djj ? `${data.djj} x/mnt` : "-"}</span></p>
+                      <p>👶 TFU / DJJ: <span className="font-bold text-base-text-primary">{data.tfu ? `${data.tfu} cm` : "-"} / {data.djj || "-"}</span></p>
                       <p>💉 Imunisasi TT: <span className="font-bold text-base-text-primary">{data.tt || "Belum"}</span></p>
                       <p>💊 Pil TTD: <span className="font-bold text-base-text-primary">{data.pills || "-"}</span></p>
-                      <p>🧬 Lab (Hb): <span className="font-bold text-base-text-primary">{data.hb ? `${data.hb} g/dL` : "-"}</span></p>
-                      <p>🧪 Protein Urin: <span className="font-bold text-base-text-primary">{data.protein || "-"}</span></p>
-                      <p>🍬 Gula Darah: <span className="font-bold text-base-text-primary">{data.sugar ? `${data.sugar} mg/dL` : "-"}</span></p>
+                      {data.hb && <p>🧬 Lab (Hb): <span className="font-bold text-base-text-primary">{data.hb} g/dL</span></p>}
+                      {data.protein && <p>🧪 Protein Urin: <span className="font-bold text-base-text-primary">{data.protein}</span></p>}
+                      {data.sugar && <p>🍬 Gula Darah: <span className="font-bold text-base-text-primary">{data.sugar} mg/dL</span></p>}
                       <p>📋 Rujukan/Tatalaksana: <span className="font-bold text-base-text-primary italic">{data.management || "-"}</span></p>
                     </div>
                   </div>
@@ -151,7 +156,7 @@ export default function RekamMedisIbuPage() {
           </div>
         )}
 
-        {/* TAB 2: USG & PEMERIKSAAN FISIK */}
+        {/* TAB 2: FISIK & USG */}
         {activeTab === "usg_fisik" && (
           <div className="space-y-6">
             <h2 className="text-sm font-extrabold text-brand-primary border-b pb-2">Evaluasi Pemeriksaan Fisik &amp; Obstetrik</h2>
@@ -160,23 +165,22 @@ export default function RekamMedisIbuPage() {
               <div className="bg-base-bg/20 p-4 rounded-2xl space-y-2">
                 <span className="text-[10px] text-base-text-secondary uppercase">Status Fisik</span>
                 <p className="text-sm font-bold">IMT: <span className="text-brand-primary">{formData.usg_fisik.imt || "Normal"}</span></p>
-                <p>Inspeksi Vagina/Porsio: <span className="text-base-text-primary">{formData.usg_fisik.vagina || "-"}</span></p>
+                <p>Porsio &amp; Uretra: <span className="text-base-text-primary">{formData.usg_fisik.porsio || "Normal"} / {formData.usg_fisik.uretra || "Normal"}</span></p>
+                <p>Vulva &amp; Vagina: <span className="text-base-text-primary">{formData.usg_fisik.vulva || "Normal"} / {formData.usg_fisik.vagina || "Normal"}</span></p>
                 <p>Fluksus / Fluor: <span className="text-base-text-primary">{formData.usg_fisik.fluksus || "Tidak"} / {formData.usg_fisik.fluor || "Tidak"}</span></p>
               </div>
 
               <div className="bg-base-bg/20 p-4 rounded-2xl space-y-2">
-                <span className="text-[10px] text-base-text-secondary uppercase">Skrining Jiwa &amp; Persalinan</span>
+                <span className="text-[10px] text-base-text-secondary uppercase">Skrining &amp; Persalinan</span>
                 <p>Skrining Jiwa Nakes: <span className="text-base-text-primary italic">{formData.usg_fisik.mental_screening || "-"}</span></p>
                 <p>Rencana Persalinan: <span className="text-brand-primary">{formData.usg_fisik.delivery_plan || "Normal"}</span></p>
               </div>
 
               <div className="bg-base-bg/20 p-4 rounded-2xl space-y-2">
                 <span className="text-[10px] text-base-text-secondary uppercase">Riwayat Keluarga &amp; Penyakit</span>
-                <div className="flex flex-wrap gap-1.5 mt-1">
+                <div className="flex flex-wrap gap-1 mt-1">
                   {Object.keys(formData.usg_fisik.disease_history || {}).filter(k => formData.usg_fisik.disease_history[k]).map(k => (
-                    <span key={k} className="px-2.5 py-1 bg-status-red-light text-status-red-solid border border-status-red-solid/20 rounded-full text-[10px] capitalize">
-                      {k}
-                    </span>
+                    <span key={k} className="px-2 py-0.5 bg-status-red-light text-status-red-solid border border-status-red-solid/20 rounded-full text-[9px] capitalize">{k.replace(/_/g, " ")}</span>
                   ))}
                   {Object.keys(formData.usg_fisik.disease_history || {}).filter(k => formData.usg_fisik.disease_history[k]).length === 0 && (
                     <span className="text-status-green-solid">Tidak ada riwayat penyakit</span>
@@ -185,50 +189,26 @@ export default function RekamMedisIbuPage() {
               </div>
             </div>
 
-            {/* USG Biometri */}
+            {/* USG Trimester 1 */}
             <div className="p-5 border border-base-border/30 rounded-2xl space-y-4">
-              <span className="font-bold text-[10px] uppercase text-brand-primary block">Hasil USG Obstetrik</span>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                <div className="bg-brand-soft/10 p-3 rounded-xl">
-                  <span className="text-base-text-secondary text-[10px] block">Kantung GS / Letak</span>
-                  <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg.gs || "Tunggal"} ({formData.usg_fisik.usg.location || "Intrauterin"})</span>
-                </div>
-                <div className="bg-brand-soft/10 p-3 rounded-xl">
-                  <span className="text-base-text-secondary text-[10px] block">GS Diameter / CRL</span>
-                  <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg.gs_diameter ? `${formData.usg_fisik.usg.gs_diameter} mm` : "-"} / {formData.usg_fisik.usg.crl ? `${formData.usg_fisik.usg.crl} mm` : "-"}</span>
-                </div>
-                <div className="bg-brand-soft/10 p-3 rounded-xl">
-                  <span className="text-base-text-secondary text-[10px] block">Pulsasi Jantung Janin</span>
-                  <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg.heart_pulsation || "Ya"}</span>
-                </div>
-                <div className="bg-brand-soft/10 p-3 rounded-xl">
-                  <span className="text-base-text-secondary text-[10px] block">Biometri (BPD/HC/AC/FL)</span>
-                  <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg.bpd || "-"}/{formData.usg_fisik.usg.hc || "-"}/{formData.usg_fisik.usg.ac || "-"}/{formData.usg_fisik.usg.fl || "-"} mm</span>
-                </div>
-                <div className="bg-brand-soft/10 p-3 rounded-xl">
-                  <span className="text-base-text-secondary text-[10px] block">Estimasi Berat Janin (EFW)</span>
-                  <span className="font-bold text-brand-primary">{formData.usg_fisik.usg.efw ? `${formData.usg_fisik.usg.efw} gram` : "-"}</span>
-                </div>
-                <div className="bg-brand-soft/10 p-3 rounded-xl">
-                  <span className="text-base-text-secondary text-[10px] block">Air Ketuban (SDP)</span>
-                  <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg.amnion ? `${formData.usg_fisik.usg.amnion} cm` : "-"}</span>
-                </div>
+              <span className="font-bold text-[10px] uppercase text-brand-primary block">Hasil USG Trimester I</span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-medium">
+                <p>Kantung GS: <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg_t1.gs || "Tunggal"} ({formData.usg_fisik.usg_t1.location || "Intrauterin"})</span></p>
+                <p>Diameter GS: <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg_t1.gs_diameter || "-"} cm</span></p>
+                <p>CRL: <span className="font-bold text-base-text-primary">{formData.usg_fisik.usg_t1.crl || "-"} cm</span></p>
+                <p>Pulsasi Jantung: <span className="font-bold text-status-green-solid">{formData.usg_fisik.usg_t1.heart_pulsation || "Ya"}</span></p>
               </div>
             </div>
 
-            {/* Riwayat Kehamilan */}
-            {formData.usg_fisik.prev_pregnancy && formData.usg_fisik.prev_pregnancy.length > 0 && (
-              <div className="p-5 border border-base-border/30 rounded-2xl space-y-3">
-                <span className="font-bold text-[10px] uppercase text-base-text-secondary block">Riwayat Kehamilan Terdahulu</span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                  {formData.usg_fisik.prev_pregnancy.map((p: any, idx: number) => (
-                    <div key={idx} className="bg-base-bg/15 p-3.5 rounded-xl font-medium space-y-1">
-                      <p>Tahun: <span className="font-bold text-base-text-primary">{p.year || "-"}</span></p>
-                      <p>Berat lahir: <span className="font-semibold text-base-text-primary">{p.weight ? `${p.weight} kg` : "-"}</span></p>
-                      <p>Proses: <span className="font-semibold text-base-text-primary">{p.process || "-"}</span></p>
-                      <p>Penolong / Masalah: <span className="font-semibold text-base-text-primary">{p.helper || "-"} / {p.problem || "-"}</span></p>
-                    </div>
-                  ))}
+            {/* USG Trimester 3 */}
+            {formData.usg_fisik.usg_t3.done === "Ya" && (
+              <div className="p-5 border border-base-border/30 rounded-2xl space-y-4">
+                <span className="font-bold text-[10px] uppercase text-brand-primary block">Hasil USG Trimester III</span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold">
+                  <p>Presentasi / Letak: <span className="text-base-text-primary">{formData.usg_fisik.usg_t3.presentation || "Kepala"} / {formData.usg_fisik.usg_t3.location || "Intrauterin"}</span></p>
+                  <p>Jumlah Fetus: <span className="text-base-text-primary">{formData.usg_fisik.usg_t3.count || "Tunggal"} ({formData.usg_fisik.usg_t3.status || "Hidup"})</span></p>
+                  <p>Air Ketuban (SDP): <span className="text-base-text-primary">{formData.usg_fisik.usg_t3.amnion_sdp || "-"} cm ({formData.usg_fisik.usg_t3.amnion_status || "Cukup"})</span></p>
+                  <p>Estimasi Berat (EFW): <span className="text-brand-primary">{formData.usg_fisik.usg_t3.efw || "-"} gram</span></p>
                 </div>
               </div>
             )}
@@ -245,8 +225,8 @@ export default function RekamMedisIbuPage() {
               <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start shadow-xs">
                 <span className="text-lg">🚨</span>
                 <div>
-                  <h5 className="font-black text-status-red-solid text-xs">REKOMENDASI RUJUK KE FKRTL:</h5>
-                  <p className="font-semibold text-status-red-solid/90 mt-0.5">Hasil MAP ({mapValue} mmHg) &gt; 90 atau Protein Urin ({urinCelup}) positif terdeteksi. Silakan kunjungi Fasilitas Kesehatan Rujukan Tingkat Lanjut (FKRTL) segera!</p>
+                  <h5 className="font-black text-status-red-solid text-xs">REKOMENDASI RUJUK KE RS/FKRTL (Halaman 102):</h5>
+                  <p className="font-semibold text-status-red-solid/90 mt-0.5">Memenuhi faktor risiko preeklampsia atau urin protein positif. Segera konsultasikan ke RS untuk melahirkan.</p>
                 </div>
               </div>
             )}
@@ -264,54 +244,54 @@ export default function RekamMedisIbuPage() {
                 <p>Gula Darah Puasa (GDP): <span className="text-base-text-primary">{formData.preeklampsia_dmg.dmg.gdp ? `${formData.preeklampsia_dmg.dmg.gdp} mg/dL` : "-"}</span></p>
                 <p>GD 2 Jam Post Prandial: <span className="text-base-text-primary">{formData.preeklampsia_dmg.dmg.gd2jpp ? `${formData.preeklampsia_dmg.dmg.gd2jpp} mg/dL` : "-"}</span></p>
               </div>
-
-              <div className="bg-base-bg/20 p-4 rounded-2xl space-y-2">
-                <span className="text-[10px] text-base-text-secondary uppercase">Faktor Risiko Terdeteksi</span>
-                <div className="flex flex-wrap gap-1 mt-1">
-                  {Object.keys(formData.preeklampsia_dmg.risiko_sedang || {}).filter(k => formData.preeklampsia_dmg.risiko_sedang[k]).map(k => (
-                    <span key={k} className="px-2 py-0.5 bg-status-orange-light text-status-orange-solid border border-status-orange-solid/20 rounded-full text-[9px] capitalize">{k.replace(/_/g, " ")}</span>
-                  ))}
-                  {Object.keys(formData.preeklampsia_dmg.risiko_tinggi || {}).filter(k => formData.preeklampsia_dmg.risiko_tinggi[k]).map(k => (
-                    <span key={k} className="px-2 py-0.5 bg-status-red-light text-status-red-solid border border-status-red-solid/20 rounded-full text-[9px] capitalize">{k.replace(/_/g, " ")}</span>
-                  ))}
-                  {Object.keys(formData.preeklampsia_dmg.risiko_sedang || {}).filter(k => formData.preeklampsia_dmg.risiko_sedang[k]).length === 0 && 
-                   Object.keys(formData.preeklampsia_dmg.risiko_tinggi || {}).filter(k => formData.preeklampsia_dmg.risiko_tinggi[k]).length === 0 && (
-                    <span className="text-status-green-solid">Tidak ada faktor risiko</span>
-                  )}
-                </div>
-              </div>
             </div>
 
           </div>
         )}
 
         {/* TAB 4: PERSALINAN */}
-        {activeTab === "persalinan" && (
+        {activeTab === "rencana_persalinan" && (
           <div className="space-y-6">
-            <h2 className="text-sm font-extrabold text-brand-primary border-b pb-2">Keterangan Lahir &amp; Persalinan</h2>
+            <h2 className="text-sm font-extrabold text-brand-primary border-b pb-2">Rencana &amp; Ringkasan Proses Melahirkan</h2>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
               <div className="bg-base-bg/15 p-4 rounded-2xl space-y-2">
-                <span className="text-[10px] text-base-text-secondary uppercase block">Data Kelahiran Bayi</span>
-                <p>No. Keterangan Lahir: <span className="text-base-text-primary">{formData.persalinan.birth_cert_no || "-"}</span></p>
-                <p>Waktu Lahir: <span className="text-base-text-primary">{formData.persalinan.birth_time || "-"}</span></p>
-                <p>Usia Gestasi / Anak Ke-: <span className="text-base-text-primary">{formData.persalinan.gestation_age || "-"} Minggu / {formData.persalinan.child_order || "-"}</span></p>
-                <p>Antropometri: <span className="text-brand-primary">{formData.persalinan.baby_weight || "-"} g &bull; {formData.persalinan.baby_height || "-"} cm &bull; LK {formData.persalinan.head_circ || "-"} cm</span></p>
+                <span className="text-[10px] text-base-text-secondary uppercase block">Rencana Awal</span>
+                <p>Fasyankes Utama: <span className="text-base-text-primary">{formData.rencana_persalinan.faskes1 || "-"}</span></p>
+                <p>Pembiayaan: <span className="text-base-text-primary">{formData.rencana_persalinan.finance || "-"}</span></p>
+                <p>KB pasca melahirkan dipilih: <span className="text-base-text-primary">{formData.rencana_persalinan.kb_chosen || "-"}</span></p>
               </div>
 
               <div className="bg-base-bg/15 p-4 rounded-2xl space-y-2">
-                <span className="text-[10px] text-base-text-secondary uppercase block">Metode &amp; Penolong</span>
-                <p>Metode Persalinan: <span className="text-base-text-primary">{formData.persalinan.delivery_method || "-"}</span></p>
-                <p>Penolong Persalinan: <span className="text-base-text-primary">{formData.persalinan.helper || "-"}</span></p>
-                <p>Inisiasi Menyusu Dini (IMD): <span className="text-status-green-solid font-black">{formData.persalinan.imd || "Ya"}</span></p>
+                <span className="text-[10px] text-base-text-secondary uppercase block">Ringkasan Persalinan (Realisasi)</span>
+                <p>Waktu Melahirkan: <span className="text-base-text-primary">{formData.rencana_persalinan.delivery_date || "-"} {formData.rencana_persalinan.delivery_time || ""}</span></p>
+                <p>Penolong / Cara: <span className="text-base-text-primary">{formData.rencana_persalinan.penolong || "-"} / {formData.rencana_persalinan.cara || "-"}</span></p>
+                <p>Keadaan Ibu / Bayi: <span className="text-status-green-solid">{formData.rencana_persalinan.keadaan_ibu || "-"}</span> / <span className="text-base-text-primary">{formData.rencana_persalinan.baby_gender || "-"} ({formData.rencana_persalinan.baby_weight || "-"} g)</span></p>
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 5: NIFAS */}
+        {/* TAB 5: SKL */}
+        {activeTab === "skl" && (
+          <div className="space-y-6">
+            <h2 className="text-sm font-extrabold text-brand-primary border-b pb-2">Surat Keterangan Lahir (SKL) Resmi</h2>
+            <div className="p-5 border border-base-border/30 rounded-2xl space-y-4 text-xs font-semibold">
+              <p className="text-brand-primary font-bold">No. SKL: {formData.skl.no_skl || "Belum Diterbitkan"}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <p>Nama Lengkap Bayi: <span className="text-base-text-primary">{formData.skl.baby_name || "-"}</span></p>
+                <p>Jenis Kelamin / Lahir: <span className="text-base-text-primary">{formData.skl.gender || "-"} / {formData.skl.type || "-"}</span></p>
+                <p>Antropometri Lahir: <span className="text-base-text-primary">{formData.skl.weight || "-"} g, {formData.skl.height || "-"} cm, LK {formData.skl.head || "-"} cm</span></p>
+                <p>Tempat Lahir: <span className="text-base-text-primary">{formData.skl.place || "-"}</span></p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: NIFAS */}
         {activeTab === "nifas" && (
           <div className="space-y-6">
-            <h2 className="text-sm font-extrabold text-brand-primary border-b pb-2">Ringkasan Pelayanan Masa Nifas (KF 1 - 4)</h2>
+            <h2 className="text-sm font-extrabold text-brand-primary border-b pb-2">Ringkasan Pelayanan Nifas (KF 1 - KF 4)</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
               {[
                 { key: "kf1", title: "KF 1 (6 - 48 Jam)" },
@@ -323,24 +303,13 @@ export default function RekamMedisIbuPage() {
                 return (
                   <div key={kf.key} className="bg-base-bg/10 p-4 rounded-2xl space-y-1.5">
                     <span className="font-bold text-brand-primary block">{kf.title}</span>
-                    <p>📅 Tanggal: <span className="text-base-text-primary">{data.date || "-"}</span></p>
-                    <p>🍼 Payudara: <span className="text-base-text-primary">{data.breast || "-"}</span></p>
-                    <p>🩸 Perdarahan: <span className="text-base-text-primary">{data.bleeding || "-"}</span></p>
-                    <p>🩹 Jalan Lahir: <span className="text-base-text-primary">{data.tear || "-"}</span></p>
+                    <p>📅 Periksa: <span className="text-base-text-primary">{data.date || "-"} ({data.place || "-"})</span></p>
+                    <p>🍼 Payudara / ASI: <span className="text-base-text-primary">{data.breast || "-"}</span></p>
+                    <p>🩸 Perdarahan / Jalan Lahir: <span className="text-base-text-primary">{data.bleeding || "-"} / {data.tear || "-"}</span></p>
                     <p>💊 Vit A / KB: <span className="text-base-text-primary">{data.vit_a ? "Diberikan" : "Tidak"} / {data.kb ? "Diberikan" : "Tidak"}</span></p>
-                    <p>🧠 Skrining Jiwa: <span className="text-base-text-primary italic">{data.mental || "-"}</span></p>
                   </div>
                 );
               })}
-            </div>
-            
-            <div className="p-4 bg-brand-soft/10 border border-brand-primary/10 rounded-2xl text-xs font-semibold">
-              <span className="text-[10px] text-brand-primary uppercase">Status Akhir Masa Nifas</span>
-              <div className="grid grid-cols-3 gap-2 mt-1.5">
-                <p>Status Ibu: <span className="text-base-text-primary">{formData.nifas.final_status.mother || "Sehat"}</span></p>
-                <p>Status Bayi: <span className="text-base-text-primary">{formData.nifas.final_status.baby || "Sehat"}</span></p>
-                <p>Masalah: <span className="text-status-red-solid">{formData.nifas.final_status.problems || "Tidak Ada"}</span></p>
-              </div>
             </div>
           </div>
         )}
