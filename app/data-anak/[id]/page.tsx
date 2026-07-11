@@ -1126,143 +1126,156 @@ export default function ChildDetailPage() {
             <>
               <div className="flex flex-col gap-6">
                 {/* Profile card & editing form */}
+                <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    {/* Left side: Avatar */}
+                    <div className="flex-shrink-0">
+                      {isEditing || searchParams.get("edit") === "true" ? (
+                        <div 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="relative w-24 h-24 rounded-full overflow-hidden border border-brand-primary shadow-sm flex items-center justify-center cursor-pointer group bg-status-yellow-light text-status-yellow-solid"
+                        >
+                          {editForm.avatarUrl ? (
+                            <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                          ) : (
+                            editForm.gender === "M" ? <MdMale className="w-12 h-12 text-status-blue-solid" /> : <MdFemale className="w-12 h-12 text-brand-primary" />
+                          )}
+                          <div className="absolute inset-0 bg-base-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <MdCameraAlt className="w-6 h-6 text-base-white" />
+                          </div>
+                          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                        </div>
+                      ) : (
+                        <div className={`w-24 h-24 rounded-full overflow-hidden border border-base-border/30 shadow-sm flex items-center justify-center ${
+                          displayGender === "M" ? "bg-gender-male-bg text-gender-male-solid" : "bg-gender-female-bg text-gender-female-solid"
+                        }`}>
+                          {child.avatarUrl ? (
+                            <img src={child.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                          ) : (
+                            displayGender === "M" ? <MdMale className="w-12 h-12" /> : <MdFemale className="w-12 h-12" />
+                          )}
+                        </div>
+                      )}
+                      <div className="text-center mt-2">
+                        <span className="text-[9px] text-base-text-secondary font-bold uppercase tracking-wider block">ID: {child.child_id}</span>
+                      </div>
+                    </div>
+
+                    {/* Right side: Information grid */}
+                    <div className="flex-grow w-full">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs font-semibold text-base-text-secondary">
+                        <div className="space-y-1 col-span-2 md:col-span-1">
+                          <span className="text-[10px] text-base-text-secondary uppercase">Nama Lengkap Anak</span>
+                          {isEditing || searchParams.get("edit") === "true" ? (
+                            <input type="text" name="child_name" value={editForm.child_name} onChange={handleInputChange} className="w-full px-2 py-1.5 border border-brand-primary/30 rounded-lg text-xs" required />
+                          ) : (
+                            <p className="text-sm font-bold text-base-text-primary">{displayName}</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-base-text-secondary uppercase">NIK Anak</span>
+                          {isEditing || searchParams.get("edit") === "true" ? (
+                            <input type="text" name="national_id" value={editForm.national_id} onChange={handleInputChange} className="w-full px-2 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                          ) : (
+                            <p className="text-sm font-bold text-base-text-primary">{child.national_id || "-"}</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-base-text-secondary uppercase">Tempat Lahir</span>
+                          {isEditing || searchParams.get("edit") === "true" ? (
+                            <input type="text" name="birth_place" value={editForm.birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
+                          ) : (
+                            <p className="text-sm font-bold text-base-text-primary">{child.birth_place || "-"}</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-base-text-secondary uppercase">Tanggal Lahir</span>
+                          {isEditing || searchParams.get("edit") === "true" ? (
+                            <div className="relative overflow-visible z-50">
+                              <CustomDatePicker value={editForm.birth_date} onChange={(val) => setEditForm((prev: any) => ({ ...prev, birth_date: val }))} outputFormat="iso" />
+                            </div>
+                          ) : (
+                            <p className="text-sm font-bold text-base-text-primary">{child.dob}</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-base-text-secondary uppercase">Anak Ke-</span>
+                          {isEditing || searchParams.get("edit") === "true" ? (
+                            <select name="birth_order" value={editForm.birth_order} onChange={handleInputChange} className="w-full px-2 py-1.5 border rounded-lg text-xs bg-base-white cursor-pointer text-base-text-primary">
+                              {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                                <option key={num} value={num}>{num}</option>
+                              ))}
+                            </select>
+                          ) : (
+                            <p className="text-sm font-bold text-base-text-primary">{child.birth_order || "-"}</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-base-text-secondary uppercase">Golongan Darah</span>
+                          {isEditing || searchParams.get("edit") === "true" ? (
+                            <select name="blood_type" value={editForm.blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-base-white cursor-pointer text-base-text-primary">
+                              <option value="-">-</option>
+                              <option value="A">A</option>
+                              <option value="B">B</option>
+                              <option value="AB">AB</option>
+                              <option value="O">O</option>
+                            </select>
+                          ) : (
+                            <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{child.blood_type || "-"}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Identity Details Form */}
                 <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
-                <div className="flex flex-col items-center text-center space-y-3">
-                  {isEditing || searchParams.get("edit") === "true" ? (
-                    <div 
-                      onClick={() => fileInputRef.current?.click()}
-                      className="relative w-28 h-28 rounded-full overflow-hidden border border-brand-primary shadow-sm flex items-center justify-center cursor-pointer group bg-status-yellow-light text-status-yellow-solid"
-                    >
-                      {editForm.avatarUrl ? (
-                        <img src={editForm.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-                      ) : (
-                        editForm.gender === "M" ? <MdMale className="w-14 h-14 text-status-blue-solid" /> : <MdFemale className="w-14 h-14 text-brand-primary" />
-                      )}
-                      <div className="absolute inset-0 bg-base-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <MdCameraAlt className="w-8 h-8 text-base-white" />
-                      </div>
-                      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                  <div className="flex justify-between items-center border-b pb-2">
+                    <h3 className="font-bold text-sm text-base-text-primary">Detail Identitas Anak</h3>
+                    {!(isEditing || searchParams.get("edit") === "true") && role !== "ibu" && (
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          handleStartEdit();
+                          router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`);
+                        }}
+                        className="text-xs font-bold text-brand-primary flex items-center gap-1 hover:underline cursor-pointer"
+                      >
+                        <MdEdit className="w-3.5 h-3.5" /> Ubah Profil
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-xs font-medium">
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Lahir Prematur</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.special_conditions?.includes("Lahir Prematur") ? "Ya" : "Tidak"}</p>
                     </div>
-                  ) : (
-                    <div className={`w-28 h-28 rounded-full overflow-hidden border border-base-border/30 shadow-sm flex items-center justify-center ${
-                      displayGender === "M" ? "bg-gender-male-bg text-gender-male-solid" : "bg-gender-female-bg text-gender-female-solid"
-                    }`}>
-                      {child.avatarUrl ? (
-                        <img src={child.avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Berat Lahir</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.birth_weight || "-"} kg</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">Panjang Lahir</span>
+                      <p className="text-sm font-bold text-base-text-primary">{child.birth_length || "-"} cm</p>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-base-text-secondary block">No. Akta Kelahiran</span>
+                      {isEditing || searchParams.get("edit") === "true" ? (
+                        <input type="text" name="birth_certificate_number" value={editForm.birth_certificate_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
                       ) : (
-                        displayGender === "M" ? <MdMale className="w-14 h-14" /> : <MdFemale className="w-14 h-14" />
+                        <p className="text-sm font-bold text-base-text-primary">{child.birth_certificate_number || "-"}</p>
                       )}
                     </div>
-                  )}
-
-                  <div className="space-y-1">
-                    <h3 className="font-bold text-lg text-base-text-primary">{displayName}</h3>
-                    <span className="text-[10px] text-base-text-secondary font-bold uppercase tracking-wider block">ID: {child.child_id}</span>
-                  </div>
-                </div>
-
-                <div className="border-t pt-4 space-y-3 text-xs font-semibold text-base-text-secondary">
-                  <div className="flex justify-between"><span>Lahir Prematur</span><span className="text-base-text-primary">{child.special_conditions?.includes("Lahir Prematur") ? "Ya" : "Tidak"}</span></div>
-                  <div className="flex justify-between"><span>Berat Lahir</span><span className="text-base-text-primary">{child.birth_weight || "-"} kg</span></div>
-                  <div className="flex justify-between"><span>Panjang Lahir</span><span className="text-base-text-primary">{child.birth_length || "-"} cm</span></div>
-                </div>
-              </div>
-
-              {/* Identity Details Form */}
-              <div className="bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <h3 className="font-bold text-sm text-base-text-primary">Detail Identitas Anak</h3>
-                  {!(isEditing || searchParams.get("edit") === "true") && role !== "ibu" && (
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        handleStartEdit();
-                        router.push(`/data-anak/${child.child_id}?section=biodata&edit=true`);
-                      }}
-                      className="text-xs font-bold text-brand-primary flex items-center gap-1 hover:underline cursor-pointer"
-                    >
-                      <MdEdit className="w-3.5 h-3.5" /> Ubah Profil
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 text-xs font-medium">
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Nama Lengkap Anak</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <input type="text" name="child_name" value={editForm.child_name} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" required />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.name}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">NIK Anak</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <input type="text" name="national_id" value={editForm.national_id} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.national_id || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Tempat Lahir</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <input type="text" name="birth_place" value={editForm.birth_place} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.birth_place || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Tanggal Lahir</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <div className="relative overflow-visible z-50">
-                        <CustomDatePicker value={editForm.birth_date} onChange={(val) => setEditForm((prev: any) => ({ ...prev, birth_date: val }))} outputFormat="iso" />
-                      </div>
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.dob}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Anak Ke-</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <select name="birth_order" value={editForm.birth_order} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-base-white cursor-pointer">
-                        {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                          <option key={num} value={num}>{num}</option>
-                        ))}
-                      </select>
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.birth_order || "-"}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-base-text-secondary block">Golongan Darah</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <select name="blood_type" value={editForm.blood_type} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border rounded-lg text-xs bg-base-white cursor-pointer">
-                        <option value="-">-</option>
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="AB">AB</option>
-                        <option value="O">O</option>
-                      </select>
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary bg-base-bg/30 px-3 py-1.5 rounded-lg inline-block">{child.blood_type || "-"}</p>
-                    )}
-                  </div>
-                  <div className="col-span-2 space-y-1">
-                    <span className="text-base-text-secondary block">No. Akta Kelahiran</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <input type="text" name="birth_certificate_number" value={editForm.birth_certificate_number} onChange={handleInputChange} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.birth_certificate_number || "-"}</p>
-                    )}
-                  </div>
-                  <div className="col-span-2 space-y-1">
-                    <span className="text-base-text-secondary block">Alamat Rumah</span>
-                    {isEditing || searchParams.get("edit") === "true" ? (
-                      <textarea name="address" value={editForm.address} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs resize-none" />
-                    ) : (
-                      <p className="text-sm font-bold text-base-text-primary">{child.address || "-"}</p>
-                    )}
-                  </div>
+                    <div className="col-span-2 space-y-1">
+                      <span className="text-base-text-secondary block">Alamat Rumah</span>
+                      {isEditing || searchParams.get("edit") === "true" ? (
+                        <textarea name="address" value={editForm.address} onChange={handleInputChange} rows={2} className="w-full px-2.5 py-1.5 border border-brand-primary/30 rounded-lg text-xs resize-none" />
+                      ) : (
+                        <p className="text-sm font-bold text-base-text-primary">{child.address || "-"}</p>
+                      )}
+                    </div>
                   <div className="space-y-1">
                     <span className="text-base-text-secondary block">No. JKN</span>
                     {isEditing || searchParams.get("edit") === "true" ? (
