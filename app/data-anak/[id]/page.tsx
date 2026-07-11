@@ -1123,8 +1123,9 @@ export default function ChildDetailPage() {
           </div>
 
           {activeSection === "biodata" && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Profile card & editing form */}
+            <>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Profile card & editing form */}
               <div className="lg:col-span-1 bg-base-white rounded-bento-lg border border-base-border/30 p-6 shadow-sm space-y-4">
                 <div className="flex flex-col items-center text-center space-y-3">
                   {isEditing || searchParams.get("edit") === "true" ? (
@@ -1396,7 +1397,7 @@ export default function ChildDetailPage() {
                 </table>
               </div>
             </div>
-
+            </>
           )}
 
           {activeSection === "health_service" && (
