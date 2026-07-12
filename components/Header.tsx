@@ -580,15 +580,7 @@ export default function Header() {
         </div>
       </div>
       
-      {/* 2. Search Bar */}
-      <div className="relative flex-1 mx-4 max-w-xs md:max-w-md hidden md:block">
-        <input 
-          type="search" 
-          placeholder="Cari data anak, ibu hamil, atau jadwal..." 
-          className="w-full bg-base-bg border border-base-border/55 rounded-full py-2.5 px-6 pl-12 text-sm outline-none focus:border-brand-primary transition-colors text-base-text-primary" 
-        />
-        <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-base-text-secondary" />
-      </div>
+
 
       {/* 3. Aksi Sisi Kanan (Status Sync, Notifikasi, & Profil) */}
       <div className="flex items-center gap-3 sm:gap-6">

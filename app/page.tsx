@@ -631,6 +631,32 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-10">
 
+      {/* Welcome Jumbotron Card */}
+      <div className="bg-gradient-to-br from-brand-soft/70 via-brand-soft/30 to-base-white rounded-bento-lg p-6 md:p-8 border border-brand-primary/10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-1.5">
+          <span className="text-[10px] font-bold bg-brand-primary/10 text-brand-primary border border-brand-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
+            Portal Kader & Tenaga Kesehatan
+          </span>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-base-text-primary tracking-tight mt-1">
+            Selamat Datang, Kader Posyandu!
+          </h1>
+          <p className="text-xs md:text-sm text-base-text-secondary max-w-2xl">
+            Kelola pendaftaran ibu & anak, lakukan pencatatan rekam medis klinis secara terstruktur, dan kelola agenda kegiatan posyandu.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2.5 shrink-0">
+          <Link href="/data-ibu/tambah" className="px-4 py-2.5 rounded-xl bg-brand-primary text-base-white text-xs font-bold hover:bg-status-pink-dark transition shadow-md shadow-brand-primary/10 cursor-pointer">
+            + Ibu Hamil
+          </Link>
+          <Link href="/data-anak/tambah" className="px-4 py-2.5 rounded-xl bg-status-blue-solid text-base-white text-xs font-bold hover:bg-status-blue-solid/90 transition shadow-md shadow-status-blue-solid/10 cursor-pointer">
+            + Balita Baru
+          </Link>
+          <Link href="/jadwal" className="px-4 py-2.5 rounded-xl bg-base-white border border-base-border/55 text-base-text-secondary text-xs font-bold hover:bg-base-bg transition cursor-pointer">
+            Kelola Jadwal
+          </Link>
+        </div>
+      </div>
+
       {/* PWA Installation Banner */}
       <PWAInstallBanner />
 

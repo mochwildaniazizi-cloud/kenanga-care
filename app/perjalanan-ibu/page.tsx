@@ -17,6 +17,25 @@ import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/week
 import { useUserRole } from "@/context/UserRoleContext";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
+// Week matrix based on KIA book p10-13
+const TRIMESTER_WEEKS = [
+  { label: "Trimester 1", color: "#EA2986", weeks: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13] },
+  { label: "Trimester 2", color: "#AC1959", weeks: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] },
+  { label: "Trimester 3", color: "#7A5AF8", weeks: [29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42] },
+];
+
+const GEJALA_FIELDS = [
+  { key: "fever", label: "Demam lebih dari 2 hari", icon: "🤒" },
+  { key: "headache", label: "Pusing/sakit kepala berat", icon: "😵" },
+  { key: "insomnia", label: "Sulit tidur / cemas berlebih", icon: "😰" },
+  { key: "cough", label: "Batuk lebih dari 2 minggu / Risiko TB", icon: "🫁" },
+  { key: "fetal_movement", label: "Gerakan bayi: < 10x dalam 12 jam (setelah Mg 24)", icon: "👶", lockedBefore: 24 },
+  { key: "stomach_pain", label: "Nyeri perut hebat", icon: "😣" },
+  { key: "fluid_discharge", label: "Keluar cairan banyak / berbau dari jalan lahir", icon: "💧" },
+  { key: "urination_pain", label: "Sakit saat kencing / keputihan gatal", icon: "🔴" },
+  { key: "diarrhea", label: "Diare berulang", icon: "⚠️" },
+];
+
 function PerjalananIbuContent() {
   const { role, username, isLoggedIn } = useUserRole();
   const router = useRouter();
@@ -82,13 +101,33 @@ function PerjalananIbuContent() {
   );
   const [kbAnswers, setKbAnswers] = useState<boolean[]>(new Array(3).fill(false));
   const [kbConsent, setKbConsent] = useState<boolean>(false);
-
+  const [mentalScreening, setMentalScreening] = useState([false, false, false, false]);
+  const [mentalScreeningSubmitted, setMentalScreeningSubmitted] = useState(false);
   useEffect(() => {
     if (!isLoggedIn) return;
     if (role && role !== "ibu") {
       router.replace("/data-ibu");
     }
   }, [role, isLoggedIn, router]);
+
+  useEffect(() => {
+    if (!motherDetail) return;
+    const motherId = motherDetail.mother_id;
+    const cachedScreening = localStorage.getItem(`screening_mental_${motherId}`);
+    if (cachedScreening) {
+      try { setMentalScreening(JSON.parse(cachedScreening)); } catch (e) {}
+    }
+  }, [motherDetail]);
+
+  const updateMentalScreening = (idx: number, val: boolean) => {
+    const next = [...mentalScreening];
+    next[idx] = val;
+    setMentalScreening(next);
+    if (motherDetail) {
+      localStorage.setItem(`screening_mental_${motherDetail.mother_id}`, JSON.stringify(next));
+    }
+  };
+
 
   useEffect(() => {
     if (!motherDetail) return;
@@ -152,8 +191,8 @@ function PerjalananIbuContent() {
   }, [motherDetail]);
 
   const today = new Date();
-  const currentYear = today.getFullYear();
-  const currentMonth = today.getMonth() + 1;
+  const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(today.getMonth() + 1);
 
   const [ttdLogs, setTtdLogs] = useState<any[]>([]);
   const [ttdCompanion, setTtdCompanion] = useState("");
@@ -161,9 +200,20 @@ function PerjalananIbuContent() {
   const [isSavingTtd, setIsSavingTtd] = useState(false);
   const [isEditingCompanion, setIsEditingCompanion] = useState(false);
 
+  useEffect(() => {
+    if (ttdRelationship === "Suami" && motherDetail?.husband_name && ttdCompanion !== motherDetail.husband_name) {
+      setTtdCompanion(motherDetail.husband_name);
+    }
+  }, [ttdRelationship, motherDetail, ttdCompanion]);
+
   // Weekly self monitoring states
   const [weeklyLogs, setWeeklyLogs] = useState<any[]>([]);
   const [weeklyTrimesterFilter, setWeeklyTrimesterFilter] = useState<1 | 2 | 3>(1);
+  const [expandedWeeks, setExpandedWeeks] = useState<Record<number, boolean>>({});
+  const [dangerModal, setDangerModal] = useState({ show: false, week: 0 });
+  const [weeklyTrimFilter, setWeeklyTrimFilter] = useState(1);
+  const [tempWeeklyRecord, setTempWeeklyRecord] = useState<any>(null);
+  const [isSavingWeekly, setIsSavingWeekly] = useState(false);
 
   useEffect(() => {
     async function loadMotherDetail() {
@@ -259,6 +309,34 @@ function PerjalananIbuContent() {
       setActivePemantauanTab(activeSection as any);
     }
   }, [activeSection]);
+
+  // Handle initialization of temp record when entering weekly-detail
+  const queryWeek = searchParams?.get("week");
+  useEffect(() => {
+    if (activeSection === "weekly-detail" && queryWeek) {
+      const weekNum = parseInt(queryWeek, 10);
+      const existing = weeklyLogs.find(l => l.week_number === weekNum);
+      if (existing) {
+        setTempWeeklyRecord({ ...existing });
+      } else {
+        setTempWeeklyRecord({
+          mother_id: motherDetail?.mother_id,
+          week_number: weekNum,
+          check_pregnancy: false,
+          check_class: false,
+          fever: false,
+          headache: false,
+          insomnia: false,
+          cough: false,
+          fetal_movement: false,
+          stomach_pain: false,
+          fluid_discharge: false,
+          urination_pain: false,
+          diarrhea: false
+        });
+      }
+    }
+  }, [activeSection, queryWeek, weeklyLogs, motherDetail]);
 
   // Load weekly logs
   useEffect(() => {
@@ -410,6 +488,56 @@ function PerjalananIbuContent() {
       );
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleSaveWeeklyRecord = async () => {
+    if (!motherDetail || !tempWeeklyRecord) return;
+    const motherId = motherDetail.mother_id;
+    const week = tempWeeklyRecord.week_number;
+    
+    setIsSavingWeekly(true);
+    try {
+      // Toggle local state
+      const updated = [...weeklyLogs];
+      let recordIndex = updated.findIndex(l => l.week_number === week);
+      
+      if (recordIndex === -1) {
+        updated.push(tempWeeklyRecord);
+      } else {
+        updated[recordIndex] = tempWeeklyRecord;
+      }
+      setWeeklyLogs(updated);
+
+      // Save offline
+      localStorage.setItem(`offline_weekly_logs_${motherId}`, JSON.stringify(updated));
+
+      // Check for danger signs (Gejala)
+      const hasDanger = GEJALA_FIELDS.some(f => tempWeeklyRecord[f.key]);
+      if (hasDanger) {
+        setDangerModal({ show: true, week });
+      }
+
+      if (navigator.onLine) {
+        await upsertWeeklyMonitoring(
+          motherId,
+          week,
+          tempWeeklyRecord
+        );
+      } else {
+        // Simple offline queueing for the whole record
+        const syncQueue = JSON.parse(localStorage.getItem("pending_weekly_full_syncs") || "[]");
+        syncQueue.push({ motherId, week, record: tempWeeklyRecord });
+        localStorage.setItem("pending_weekly_full_syncs", JSON.stringify(syncQueue));
+      }
+      
+      // Navigate back to list
+      router.push("?section=weekly");
+    } catch (err) {
+      console.error("Failed to save weekly record:", err);
+      alert("Gagal menyimpan data. Silakan coba lagi.");
+    } finally {
+      setIsSavingWeekly(false);
     }
   };
 
@@ -1179,6 +1307,135 @@ function PerjalananIbuContent() {
         </div>
       )}
 
+      {/* SECTION: Weekly Detail (Dedicated Page) */}
+      {activeSection === "weekly-detail" && tempWeeklyRecord && (
+        <div className="space-y-6 animate-in fade-in duration-200 pb-20">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => router.push("?section=weekly")}
+                className="px-3 py-2 border border-base-border/50 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary rounded-xl transition cursor-pointer flex items-center gap-1.5 bg-base-white shadow-sm font-bold text-xs"
+              >
+                <MdArrowBack className="w-4 h-4" />
+                <span>Batal</span>
+              </button>
+              <h2 className="text-lg font-black text-base-text-primary font-bold">Checklist Minggu ke-{tempWeeklyRecord.week_number}</h2>
+            </div>
+            <button 
+              onClick={handleSaveWeeklyRecord}
+              disabled={isSavingWeekly}
+              className="px-6 py-2.5 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl flex items-center gap-2 shadow-md shadow-brand-primary/20 transition cursor-pointer text-sm disabled:opacity-50"
+            >
+              {isSavingWeekly ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <MdSave className="w-4 h-4" />
+              )}
+              <span>Simpan Checklist</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-7 space-y-6">
+              {/* Card: Pelayanan (Service) */}
+              <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-5">
+                <div className="border-b pb-3 border-base-border/10">
+                  <h3 className="font-bold text-base-text-primary text-sm uppercase">Pemeriksaan & Pelayanan</h3>
+                  <p className="text-[10px] text-base-text-secondary font-medium mt-0.5">Beri tanda centang jika Ibu mendapatkan pelayanan ini di minggu ini.</p>
+                </div>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-4 p-4 border border-base-border/30 rounded-2xl hover:bg-base-bg/20 transition cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={tempWeeklyRecord.check_pregnancy}
+                      onChange={(e) => setTempWeeklyRecord({...tempWeeklyRecord, check_pregnancy: e.target.checked})}
+                      className="w-5 h-5 rounded text-brand-primary border-base-border/50 focus:ring-brand-primary cursor-pointer"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-base-text-primary">Sudah periksa kehamilan oleh Dokter/Bidan</p>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-4 p-4 border border-base-border/30 rounded-2xl hover:bg-base-bg/20 transition cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={tempWeeklyRecord.check_class}
+                      onChange={(e) => setTempWeeklyRecord({...tempWeeklyRecord, check_class: e.target.checked})}
+                      className="w-5 h-5 rounded text-brand-primary border-base-border/50 focus:ring-brand-primary cursor-pointer"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-base-text-primary">Sudah mengikuti Kelas Ibu Hamil</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Card: Gejala Bahaya (Danger Signs) */}
+              <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-5">
+                <div className="border-b pb-3 border-base-border/10">
+                  <h3 className="font-bold text-status-red-solid text-sm uppercase">Tanda Bahaya & Gejala</h3>
+                  <p className="text-[10px] text-base-text-secondary font-medium mt-0.5">⚠️ Segera lapor ke Nakes/Puskesmas jika mengalami salah satu kondisi di bawah ini!</p>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
+                  {GEJALA_FIELDS.map(f => {
+                    const isLocked = !!(f.lockedBefore && tempWeeklyRecord.week_number < f.lockedBefore);
+                    return (
+                      <label 
+                        key={f.key}
+                        className={`flex items-start gap-4 p-4 border rounded-2xl transition ${isLocked ? 'bg-gray-100 opacity-60 cursor-not-allowed border-gray-200' : 'border-base-border/30 hover:bg-status-red-light/10 cursor-pointer'}`}
+                      >
+                        <input 
+                          type="checkbox" 
+                          disabled={isLocked}
+                          checked={tempWeeklyRecord[f.key] || false}
+                          onChange={(e) => setTempWeeklyRecord({...tempWeeklyRecord, [f.key]: e.target.checked})}
+                          className={`w-5 h-5 rounded mt-0.5 cursor-pointer ${isLocked ? 'bg-gray-300 border-gray-300' : 'text-status-red-solid border-base-border/50 focus:ring-status-red-solid'}`}
+                        />
+                        <div className="space-y-0.5">
+                          <p className={`text-xs font-bold ${isLocked ? 'text-gray-400' : tempWeeklyRecord[f.key] ? 'text-status-red-solid' : 'text-base-text-primary'}`}>
+                            {f.icon} {f.label}
+                          </p>
+                          {isLocked && <p className="text-[9px] text-gray-400">Tersedia mulai Minggu ke-{f.lockedBefore}</p>}
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-amber-50 border border-amber-300/50 rounded-2xl p-6 space-y-4">
+                <h4 className="font-black text-sm text-amber-800 uppercase">💡 Informasi Penting</h4>
+                <p className="text-xs text-amber-800 leading-relaxed font-medium">
+                  &ldquo;Pemantauan mandiri ini sangat krusial untuk mendeteksi dini komplikasi kehamilan. Jangan menunda untuk mencari bantuan medis jika Anda merasa ada sesuatu yang tidak biasa pada tubuh Anda atau pergerakan janin.&rdquo;
+                </p>
+                <div className="pt-2 text-[10px] text-amber-700 italic font-bold">
+                  * Data yang Anda simpan akan tersinkronisasi otomatis saat online dan dapat dilihat oleh Bidan/Kader Posyandu.
+                </div>
+              </div>
+
+              <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm">
+                <h4 className="font-bold text-base-text-primary text-xs uppercase mb-4">Ringkasan Minggu Ini</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-base-text-secondary">Status Pelayanan:</span>
+                    <span className="font-bold text-base-text-primary">
+                      { (tempWeeklyRecord.check_pregnancy || tempWeeklyRecord.check_class) ? "Sudah Terlayani" : "Belum Ada" }
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-base-text-secondary">Gejala Bahaya:</span>
+                    <span className={`font-extrabold ${GEJALA_FIELDS.some(f => tempWeeklyRecord[f.key]) ? 'text-status-red-solid' : 'text-status-green-solid'}`}>
+                      { GEJALA_FIELDS.some(f => tempWeeklyRecord[f.key]) ? "Terdeteksi!" : "Tidak Ada" }
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* SECTION: Control cards / monitoring */}
       {(activeSection === "ttd" || activeSection === "weekly" || activeSection === "attendance" || activeSection === "birth_prep" || activeSection === "postpartum" || activeSection === "breastfeeding") && (
         <div className="space-y-6 animate-in fade-in duration-200">
@@ -1212,40 +1469,55 @@ function PerjalananIbuContent() {
 
             return (
               <div className="space-y-5 animate-in fade-in duration-200 text-xs">
-                <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-xl p-4 space-y-2 bg-base-white shadow-sm">
-                  <h4 className="font-bold text-sm text-brand-primary flex items-center gap-1.5">
-                    <MdVaccines className="w-4 h-4" /> Kartu Minum Tablet Tambah Darah (TTD/MMS)
-                  </h4>
-                  <p className="text-base-text-secondary text-[11px] leading-relaxed font-semibold">
-                    Sesuai panduan Buku KIA 2024 Halaman 7. Ibu hamil wajib meminum paling sedikit 90 tablet tambah darah selama kehamilan untuk mencegah anemia dan mendukung perkembangan janin.
-                  </p>
+                
+                {/* Yellow Box Authority Label */}
+                <div className="p-3.5 bg-status-yellow-light/30 border border-status-yellow-solid/30 rounded-2xl text-center text-xs font-black text-status-yellow-solid uppercase tracking-wide shadow-xs">
+                  ⭐ Diisi oleh Ibu/Pendamping
                 </div>
 
+                {/* Verbatim Edukasi & Panduan Buku KIA */}
+                <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 space-y-3 bg-base-white shadow-sm">
+                  <h4 className="font-black text-sm text-brand-primary flex items-center gap-1.5 uppercase tracking-wide">
+                    💊 Jangan Lupa Minum TTD/MMS
+                  </h4>
+                  <p className="text-base-text-primary text-xs leading-relaxed font-medium">
+                    &ldquo;Untuk mencegah kekurangan darah, TTD/MMS harus diminum setiap hari selama kehamilan. Sebaiknya pada malam hari sebelum tidur untuk mengurangi rasa mual. Agar zat besi diserap lebih baik dalam tubuh, TTD/MMS sebaiknya dikonsumsi bersama makanan atau minuman yang mengandung vitamin C seperti buah-buahan. Hindari minum TTD/MMS bersama teh, kopi, susu dan obat maag yang dapat menghambat penyerapan zat besi.&rdquo;
+                  </p>
+                  <div className="border-t border-brand-primary/10 pt-2.5 text-[10px] text-base-text-secondary italic font-semibold">
+                    Cara Mengisi Tabel TTD/MMS: Pendamping menuliskan bulan dan tahun, serta berikan tanda centang pada kotak sesuai tanggal Anda minum.
+                  </div>
+                </div>
+
+                {/* Pendamping Info Form */}
                 <div className="bg-base-white p-6 rounded-bento-lg border border-base-border/30 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-base-text-secondary uppercase">Nama Pendamping Minum TTD</span>
+                      <span className="text-[10px] font-black text-base-text-secondary uppercase tracking-wider">Nama Pendamping Minum TTD</span>
                       {isEditingCompanion ? (
                         <input 
                           type="text" 
                           placeholder="Nama suami, orang tua, atau kader..."
                           value={ttdCompanion}
-                          onChange={(e) => {
-                            setTtdCompanion(e.target.value);
-                          }}
-                          className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs font-bold text-base-text-primary"
+                          onChange={(e) => setTtdCompanion(e.target.value)}
+                          className="w-full px-3 py-2.5 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary text-xs font-bold text-base-text-primary bg-base-white shadow-xs"
                         />
                       ) : (
                         <p className="text-sm font-black text-base-text-primary">{ttdCompanion || "Belum ditentukan"}</p>
                       )}
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-base-text-secondary uppercase">Hubungan Keluarga</span>
+                      <span className="text-[10px] font-black text-base-text-secondary uppercase tracking-wider">Hubungan Keluarga</span>
                       {isEditingCompanion ? (
                         <select 
                           value={ttdRelationship} 
-                          onChange={(e) => setTtdRelationship(e.target.value)}
-                          className="w-full px-3 py-2 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary cursor-pointer"
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setTtdRelationship(val);
+                            if (val === "Suami" && motherDetail?.husband_name) {
+                              setTtdCompanion(motherDetail.husband_name);
+                            }
+                          }}
+                          className="w-full px-3 py-2.5 border border-base-border/50 rounded-xl focus:outline-none focus:border-brand-primary bg-base-white text-xs font-bold text-base-text-primary cursor-pointer shadow-xs"
                         >
                           <option value="Suami">Suami</option>
                           <option value="Orang Tua">Orang Tua</option>
@@ -1261,14 +1533,14 @@ function PerjalananIbuContent() {
                     {isEditingCompanion ? (
                       <button 
                         onClick={handleSaveCompanion}
-                        className="px-5 py-2.5 bg-status-green-solid hover:bg-status-green-solid/90 text-base-white font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                        className="px-5 py-2.5 bg-status-green-solid hover:bg-status-green-solid/90 text-base-white font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer text-xs uppercase tracking-wider"
                       >
                         <MdSave className="w-4 h-4" /> Simpan
                       </button>
                     ) : (
                       <button 
                         onClick={() => setIsEditingCompanion(true)}
-                        className="px-5 py-2.5 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer"
+                        className="px-5 py-2.5 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition cursor-pointer text-xs uppercase tracking-wider"
                       >
                         <MdEdit className="w-4 h-4" /> Atur Pendamping
                       </button>
@@ -1276,10 +1548,31 @@ function PerjalananIbuContent() {
                   </div>
                 </div>
 
+                {/* Kalender / Tabel Grid Log Minum */}
                 <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between border-b pb-3 border-base-border/10">
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-base-text-primary text-sm uppercase">Bulan: {monthName} {currentYear}</span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3 border-base-border/10">
+                    <div className="flex items-center gap-3">
+                      <span className="font-extrabold text-base-text-primary text-sm uppercase tracking-wider">Pilih Bulan &amp; Tahun:</span>
+                      <div className="flex items-center gap-2">
+                        <select 
+                          value={currentMonth}
+                          onChange={(e) => setCurrentMonth(parseInt(e.target.value, 10))}
+                          className="px-3 py-1.5 border border-base-border/40 bg-base-white text-xs font-bold text-base-text-primary rounded-xl focus:outline-none cursor-pointer shadow-xs hover:border-brand-primary transition"
+                        >
+                          {monthsIndonesian.map((m, idx) => (
+                            <option key={idx} value={idx + 1}>{m}</option>
+                          ))}
+                        </select>
+                        <select 
+                          value={currentYear}
+                          onChange={(e) => setCurrentYear(parseInt(e.target.value, 10))}
+                          className="px-3 py-1.5 border border-base-border/40 bg-base-white text-xs font-bold text-base-text-primary rounded-xl focus:outline-none cursor-pointer shadow-xs hover:border-brand-primary transition"
+                        >
+                          {[2025, 2026, 2027].map(y => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </select>
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
@@ -1295,7 +1588,7 @@ function PerjalananIbuContent() {
                         <MdNotifications className="w-4 h-4" />
                       </button>
                     </div>
-                    <span className="text-[10px] font-bold text-brand-primary bg-brand-soft border border-brand-primary/20 px-3 py-1 rounded-full">
+                    <span className="text-[10px] font-bold text-brand-primary bg-brand-soft border border-brand-primary/20 px-3 py-1 rounded-full uppercase tracking-wider">
                       {ttdLogs.length} Hari Diminum
                     </span>
                   </div>
@@ -1326,107 +1619,135 @@ function PerjalananIbuContent() {
             );
           })()}
 
-          {/* Subtab: Weekly */}
+          {/* Subtab: Weekly — Lembar Pemantauan Mingguan Ibu Hamil (Hal. 10-13) */}
           {activePemantauanTab === 'weekly' && (() => {
-            const weeks = Array.from({ length: 42 }, (_, i) => i + 1);
+            const filteredGroups = TRIMESTER_WEEKS.filter((_, i) => i + 1 === weeklyTrimFilter);
+
             return (
               <div className="space-y-5 animate-in fade-in duration-200 text-xs">
-                <div className="bg-base-white p-4 rounded-xl border border-base-border/30 shadow-sm flex items-center justify-between gap-4">
-                  <div className="space-y-1">
-                    <h4 className="font-bold text-sm text-base-text-primary">Pemantauan Mandiri Mingguan Ibu Hamil</h4>
-                    <p className="text-base-text-secondary text-[11px] leading-relaxed font-semibold">
-                      Laporkan segera ke bidan jika Anda merasakan tanda-tanda bahaya di bawah.
-                    </p>
+                {/* Danger Modal — Glassmorphism */}
+                {dangerModal.show && (
+                  <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+                    <div
+                      className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                      onClick={() => setDangerModal({ show: false, week: 0 })}
+                    />
+                    <div className="relative z-10 bg-base-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#AC1959]/20 max-w-sm w-full p-6 space-y-4 animate-in zoom-in duration-200">
+                      <div className="flex flex-col items-center text-center space-y-3">
+                        <div className="w-16 h-16 rounded-full bg-[#AC1959]/10 border-2 border-[#AC1959]/30 flex items-center justify-center text-3xl animate-pulse">
+                          🚨
+                        </div>
+                        <h3 className="text-base font-black text-[#AC1959] leading-tight">
+                          Tanda Bahaya Terdeteksi!
+                        </h3>
+                        <p className="text-xs text-base-text-secondary leading-relaxed font-semibold">
+                          Sistem mendeteksi tanda bahaya kehamilan pada Minggu ke-{dangerModal.week}. Segera periksa ke Puskesmas/Rumah Sakit terdekat demi keselamatan Ibu dan buah hati!
+                        </p>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setDangerModal({ show: false, week: 0 })}
+                          className="flex-1 py-2.5 border border-base-border/50 text-base-text-secondary font-bold rounded-xl text-xs hover:bg-base-bg transition cursor-pointer"
+                        >
+                          Tutup
+                        </button>
+                        <button
+                          onClick={() => setDangerModal({ show: false, week: 0 })}
+                          className="flex-1 py-2.5 bg-[#AC1959] text-base-white font-bold rounded-xl text-xs hover:bg-[#8B1247] transition cursor-pointer"
+                        >
+                          Mengerti, Segera Periksa
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex gap-1.5 shrink-0 select-none">
-                    <button 
-                      onClick={() => setWeeklyTrimesterFilter(1)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold cursor-pointer border ${weeklyTrimesterFilter === 1 ? 'bg-[#EA2986] text-white border-[#EA2986]' : 'bg-base-white border-base-border/30 text-base-text-secondary hover:text-[#EA2986]'}`}
-                    >
-                      Trimester 1 (Mg 1-13)
-                    </button>
-                    <button 
-                      onClick={() => setWeeklyTrimesterFilter(2)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold cursor-pointer border ${weeklyTrimesterFilter === 2 ? 'bg-[#EA2986] text-white border-[#EA2986]' : 'bg-base-white border-base-border/30 text-base-text-secondary hover:text-[#EA2986]'}`}
-                    >
-                      Trimester 2 (Mg 14-27)
-                    </button>
-                    <button 
-                      onClick={() => setWeeklyTrimesterFilter(3)}
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold cursor-pointer border ${weeklyTrimesterFilter === 3 ? 'bg-[#EA2986] text-white border-[#EA2986]' : 'bg-base-white border-base-border/30 text-base-text-secondary hover:text-[#EA2986]'}`}
-                    >
-                      Trimester 3 (Mg 28-42)
-                    </button>
-                  </div>
+                )}
+
+                {/* Yellow Authority Banner */}
+                <div className="p-4 bg-amber-50 border border-amber-300/60 rounded-2xl space-y-1.5 shadow-xs">
+                  <p className="text-[11px] font-bold text-amber-800 leading-relaxed">
+                    ⭐ <strong>Diisi oleh Ibu/Pendamping</strong> — Beri tanda (✓) centang setiap periksa ke dokter dan cek kondisi mingguan ibu. Jika mengalami kondisi di bawah ini, segera periksa ke Puskesmas/Rumah Sakit.
+                  </p>
+                  <p className="text-[10px] text-amber-700 leading-relaxed font-medium">
+                    Cek kondisi mingguan ibu dan beri tanda (✓) centang jika mengalami kondisi dalam di bawah ini, segera periksa ke Puskesmas/Rumah Sakit.
+                  </p>
                 </div>
 
-                <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[900px] text-xs">
-                    <thead>
-                      <tr className="border-b border-gray-100 font-bold text-base-text-secondary uppercase tracking-wider">
-                        <th className="py-3 px-4">Minggu Ke-</th>
-                        <th className="py-3 px-4 text-center">Gerakan Janin Aktif (&ge;10x/12 jam)</th>
-                        <th className="py-3 px-4 text-center">Kaki/Tangan/Wajah Bengkak</th>
-                        <th className="py-3 px-4 text-center">Demam / Panas Tinggi</th>
-                        <th className="py-3 px-4 text-center">Perdarahan Jalan Lahir</th>
-                        <th className="py-3 px-4 text-center">Keluar Cairan Ketuban Sebelum Waktunya</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-xs font-semibold">
-                      {weeks.filter(w => {
-                        if (weeklyTrimesterFilter === 1) return w >= 1 && w <= 13;
-                        if (weeklyTrimesterFilter === 2) return w >= 14 && w <= 27;
-                        return w >= 28 && w <= 42;
-                      }).map((w) => {
-                        const rec = weeklyLogs.find(l => l.week_number === w) || {};
+                {/* Trimester Filter */}
+                <div className="flex gap-2 flex-wrap">
+                  {TRIMESTER_WEEKS.map((t, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setWeeklyTrimFilter(i + 1)}
+                      style={weeklyTrimFilter === i + 1 ? { backgroundColor: t.color, borderColor: t.color } : {}}
+                      className={`px-4 py-2 rounded-full text-[11px] font-extrabold border transition cursor-pointer ${
+                        weeklyTrimFilter === i + 1
+                          ? "text-base-white shadow-sm"
+                          : "bg-base-white border-base-border/30 text-base-text-secondary hover:border-[#AC1959] hover:text-[#AC1959]"
+                      }`}
+                    >
+                      {t.label} (Mg {t.weeks[0]}–{t.weeks[t.weeks.length - 1]})
+                    </button>
+                  ))}
+                </div>
+
+                {/* Week Cards — Accordion Bento */}
+                {filteredGroups.map(group => (
+                  <div key={group.label} className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-5 rounded-full" style={{ backgroundColor: group.color }} />
+                      <h3 className="text-xs font-black uppercase tracking-widest text-base-text-primary">{group.label}</h3>
+                      <span className="text-[10px] font-bold text-base-text-secondary">Minggu {group.weeks[0]}–{group.weeks[group.weeks.length - 1]}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {group.weeks.map(week => {
+                        const rec = weeklyLogs.find((l: any) => l.week_number === week) || {} as any;
+                        const activeDangerCount = GEJALA_FIELDS.filter(f => rec[f.key]).length;
+                        const hasDanger = activeDangerCount > 0;
+                        const isFilled = rec.check_pregnancy || rec.check_class || hasDanger;
+
                         return (
-                          <tr key={w} className="border-b border-gray-50 hover:bg-base-bg/30 transition-colors">
-                            <td className="py-3 px-4 font-bold text-base-text-primary">Minggu {w}</td>
-                            <td className="py-3 px-4 text-center">
-                              <input 
-                                type="checkbox" 
-                                checked={rec.fetal_movement || false}
-                                onChange={() => handleWeeklyCheck(w, "fetal_movement")}
-                                className="rounded text-brand-primary border-base-border/50 focus:ring-brand-primary h-4 w-4 cursor-pointer"
-                              />
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              <input 
-                                type="checkbox" 
-                                checked={rec.swollen_feet || false}
-                                onChange={() => handleWeeklyCheck(w, "swollen_feet")}
-                                className="rounded text-brand-primary border-base-border/50 focus:ring-brand-primary h-4 w-4 cursor-pointer"
-                              />
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              <input 
-                                type="checkbox" 
-                                checked={rec.fever || false}
-                                onChange={() => handleWeeklyCheck(w, "fever")}
-                                className="rounded text-brand-primary border-base-border/50 focus:ring-brand-primary h-4 w-4 cursor-pointer"
-                              />
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              <input 
-                                type="checkbox" 
-                                checked={rec.bleeding || false}
-                                onChange={() => handleWeeklyCheck(w, "bleeding")}
-                                className="rounded text-brand-primary border-base-border/50 focus:ring-brand-primary h-4 w-4 cursor-pointer"
-                              />
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              <input 
-                                type="checkbox" 
-                                checked={rec.premature_fluid || false}
-                                onChange={() => handleWeeklyCheck(w, "premature_fluid")}
-                                className="rounded text-brand-primary border-base-border/50 focus:ring-brand-primary h-4 w-4 cursor-pointer"
-                              />
-                            </td>
-                          </tr>
+                          <div
+                            key={week}
+                            className={`bg-base-white rounded-2xl border shadow-xs overflow-hidden transition-all duration-200 ${
+                              hasDanger ? "border-[#AC1959]/40 shadow-[#AC1959]/10" : "border-base-border/30"
+                            }`}
+                          >
+                            <button
+                              onClick={() => router.push(`?section=weekly-detail&week=${week}`)}
+                              className="w-full flex items-center justify-between px-4 py-4 gap-3 cursor-pointer group hover:bg-base-bg/30 transition"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black text-base-white shrink-0"
+                                  style={{ backgroundColor: hasDanger ? "#AC1959" : group.color }}
+                                >
+                                  {week}
+                                </div>
+                                <div className="text-left">
+                                  <p className="font-bold text-base-text-primary text-sm leading-tight">Minggu ke-{week}</p>
+                                  {hasDanger ? (
+                                    <p className="text-[10px] font-bold text-[#AC1959] mt-0.5">⚠️ {activeDangerCount} gejala terdeteksi</p>
+                                  ) : isFilled ? (
+                                    <p className="text-[10px] font-bold text-status-green-solid mt-0.5">✓ Sudah diisi</p>
+                                  ) : (
+                                    <p className="text-[10px] text-base-text-secondary font-medium mt-0.5">Ketuk untuk isi checklist</p>
+                                  )}
+                                </div>
+                              </div>
+                              <MdEdit className="text-base-text-secondary group-hover:text-brand-primary transition-colors" />
+                            </button>
+                          </div>
                         );
                       })}
-                    </tbody>
-                  </table>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Legend */}
+                <div className="flex flex-wrap gap-3 pt-2 text-[10px] font-bold text-base-text-secondary">
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#AC1959]"></span> Gejala Bahaya Terdeteksi</span>
+                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-300"></span> Kolom Terkunci (Gerakan Bayi &lt; Minggu 24)</span>
                 </div>
               </div>
             );
@@ -1554,6 +1875,59 @@ function PerjalananIbuContent() {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Skrining Mandiri Kesehatan Jiwa */}
+              <div className="bg-base-white p-6 rounded-bento-lg border border-base-border/30 shadow-sm space-y-4">
+                <div className="border-b pb-3 border-base-border/10">
+                  <h3 className="font-bold text-base-text-primary text-sm uppercase flex items-center gap-2">
+                    🧠 Skrining Mandiri Kesehatan Jiwa Ibu Hamil
+                  </h3>
+                  <p className="text-base-text-secondary text-[11px] leading-relaxed mt-1 font-semibold">
+                    Kehamilan bukan hanya tentang kesehatan fisik, melainkan juga kesehatan mental. Deteksi dini rasa cemas atau sedih berlebih secara mandiri di bawah ini.
+                  </p>
+                </div>
+
+                <div className="bg-brand-soft/5 border border-brand-primary/10 rounded-2xl p-5 shadow-xs">
+                  <h4 className="font-extrabold text-xs text-brand-primary mb-3">Kuesioner Kesehatan Emosional Bunda</h4>
+                  <div className="space-y-3.5 text-xs font-semibold text-base-text-primary">
+                    {["Merasa cemas, tegang, atau gelisah berlebih dalam 2 minggu terakhir.",
+                      "Kehilangan minat atau kesenangan dalam aktivitas sehari-hari.",
+                      "Merasa murung, sedih, atau putus asa.",
+                      "Mengalami gangguan tidur akibat pikiran cemas."].map((q, idx) => (
+                      <label key={idx} className="flex items-start gap-3 cursor-pointer select-none">
+                        <input 
+                          type="checkbox" 
+                          checked={mentalScreening[idx] || false} 
+                          onChange={(e) => { 
+                            updateMentalScreening(idx, e.target.checked); 
+                            setMentalScreeningSubmitted(false); 
+                          }} 
+                          className="mt-0.5 rounded text-brand-primary w-4.5 h-4.5 cursor-pointer border-base-border/50 focus:ring-brand-primary" 
+                        />
+                        <span>{q}</span>
+                      </label>
+                    ))}
+                  </div>
+
+                  {mentalScreeningSubmitted && (
+                    <div className="mt-4 p-4 bg-brand-soft/20 border border-brand-primary/25 rounded-xl text-xs leading-relaxed font-bold text-brand-primary">
+                      <strong>Hasil Evaluasi Mandiri:</strong> {(() => {
+                        const count = mentalScreening.filter(Boolean).length;
+                        if (count === 0) return "Kondisi emosi Ibu tampak sehat dan stabil! Tetap pertahankan pikiran positif.";
+                        if (count <= 2) return "Ibu mengalami tingkat cemas ringan. Perbanyak relaksasi, meditasi ringan, dan latihan napas.";
+                        return "Ibu mengalami gejala depresi sedang/berat. Disarankan segera menceritakan keluhan ke suami/keluarga terdekat serta konsultasikan ke dokter atau psikolog Puskesmas.";
+                      })()}
+                    </div>
+                  )}
+
+                  <button 
+                    onClick={() => setMentalScreeningSubmitted(true)} 
+                    className="mt-4 w-full py-2.5 bg-brand-primary hover:bg-status-pink-dark text-base-white font-bold rounded-xl text-xs transition shadow-md shadow-brand-primary/10 cursor-pointer"
+                  >
+                    Cek Hasil Skrining
+                  </button>
                 </div>
               </div>
             </div>
