@@ -227,14 +227,6 @@ export default function EdukasiPage() {
               </button>
             )}
           </div>
-          {role !== "ibu" && (
-            <Link 
-              href="/edukasi/tambah" 
-              className="flex items-center gap-2 px-5 py-2.5 bg-brand-primary text-base-white rounded-xl text-xs font-bold hover:bg-status-pink-dark transition shadow-md shadow-brand-primary/10 cursor-pointer shrink-0"
-            >
-              <MdAdd className="w-4.5 h-4.5" /> Tulis Artikel
-            </Link>
-          )}
         </div>
       </div>
 
@@ -402,17 +394,9 @@ export default function EdukasiPage() {
             <div className="space-y-1.5">
               <p className="text-base font-bold text-base-text-primary">Edukasi KIA Masih Kosong</p>
               <p className="text-xs text-base-text-secondary leading-relaxed max-w-xs mx-auto">
-                Semua artikel demo telah dibersihkan. Sebagai Kader, Anda dapat menambahkan materi edukasi baru satu per satu sesuai panduan buku KIA fisik.
+                Semua artikel demo telah dibersihkan. Silakan buka tab perjalanan KIA untuk menjelajahi artikel resmi.
               </p>
             </div>
-            {role !== "ibu" && (
-              <Link
-                href="/edukasi/tambah"
-                className="px-6 py-2.5 bg-brand-primary text-base-white font-bold text-xs rounded-xl hover:bg-brand-primary/95 transition shadow-md shadow-brand-primary/10 cursor-pointer inline-block"
-              >
-                Tambah Artikel Pertama
-              </Link>
-            )}
           </div>
         ) : (() => {
           // Resolve viewed history articles
@@ -745,18 +729,7 @@ export default function EdukasiPage() {
             Kumpulan Materi {activeTab}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Add New Article Card */}
-            {role !== "ibu" && (
-              <Link 
-                href={`/edukasi/tambah?category=${encodeURIComponent(activeTab)}`}
-                className="border-2 border-dashed border-base-border/60 rounded-2xl flex flex-col items-center justify-center p-6 text-base-text-secondary hover:text-brand-primary hover:border-brand-primary hover:bg-brand-soft/10 transition-all group min-h-[300px]"
-              >
-                <MdAdd className="w-12 h-12 mb-2 text-base-text-secondary group-hover:text-brand-primary transition-colors" />
-                <span className="font-bold text-sm text-base-text-primary group-hover:text-brand-primary">Tulis Artikel Baru</span>
-                <span className="text-xs text-center mt-1">Berbagi Ilmu untuk Kesehatan Ibu dan Anak</span>
-              </Link>
-            )}
+
 
             {/* Articles List */}
             {articles.filter(a => a.categories.includes(activeTab as CategoryType)).map(article => (

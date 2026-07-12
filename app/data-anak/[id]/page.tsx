@@ -1225,6 +1225,25 @@ export default function ChildDetailPage() {
                           )}
                         </div>
                       </div>
+
+                      {/* Sub-row for Premature and birth metrics */}
+                      <div className="border-t border-base-border/10 pt-3 mt-3">
+                        <div className="grid grid-cols-3 gap-4 text-xs font-semibold text-base-text-secondary">
+                          <div className="flex justify-between border-r border-base-border/10 pr-4">
+                            <span>Lahir Prematur</span>
+                            <span className="text-base-text-primary font-bold">{child.special_conditions?.includes("Lahir Prematur") ? "Ya" : "Tidak"}</span>
+                          </div>
+                          <div className="flex justify-between border-r border-base-border/10 pr-4 px-2">
+                            <span>Berat Lahir</span>
+                            <span className="text-base-text-primary font-bold">{child.birth_weight || "-"} kg</span>
+                          </div>
+                          <div className="flex justify-between pl-2">
+                            <span>Panjang Lahir</span>
+                            <span className="text-base-text-primary font-bold">{child.birth_length || "-"} cm</span>
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
