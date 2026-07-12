@@ -47,6 +47,8 @@ const renderContent = (id: string) => {
       return <L11ArticleContent />;
     case "L12":
       return <L12ArticleContent />;
+    case "L13":
+      return <L13ArticleContent />;
     default:
       return (
         <p className="text-xs text-base-text-secondary italic">
@@ -1776,6 +1778,111 @@ function L12ArticleContent() {
   );
 }
 
+// ARTIKEL L13: Panduan Inisiasi Menyusu Dini (IMD)
+function L13ArticleContent() {
+  return (
+    <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
+      
+      {/* HEADER UTAMA HALAMAN */}
+      <div className="border-b pb-4">
+        <span className="font-extrabold text-[10px] bg-[#AC1959]/10 text-[#AC1959] px-2.5 py-1 rounded-full uppercase tracking-wider">Pasca Persalinan / Neonatal</span>
+        <h1 className="text-xl font-black text-base-text-primary mt-2 uppercase tracking-tight">Inisiasi Menyusu Dini (IMD)</h1>
+        <p className="text-xs font-semibold text-base-text-secondary mt-0.5">Panduan Golden Hour Resmi Buku KIA 2024</p>
+      </div>
+
+      {/* PARAGRAF PENGANTAR VERBATIM */}
+      <div className="p-4 bg-brand-soft/10 border border-brand-primary/10 rounded-2xl space-y-2">
+        <p className="font-semibold text-base-text-primary text-[11px] leading-relaxed">
+          Bayi yang baru lahir harus segera mendapatkan Inisiasi Menyusu Dini (IMD) melalui kontak kulit ke kulit dengan ibunya dalam waktu 1 jam setelah kelahiran. Setelah menyusu pada jam pertama, bayi biasanya akan tidur panjang dan menyusu lagi jika lapar.
+        </p>
+      </div>
+
+      {/* MATRIKS MANFAAT KLINIS IMD VERBATIM */}
+      <div className="space-y-3">
+        <h3 className="text-xs font-black text-base-text-primary uppercase tracking-wide border-l-4 border-[#AC1959] pl-2">
+          Manfaat IMD pada ibu dan bayi adalah sebagai berikut:
+        </h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-base-white border border-base-border/30 rounded-xl p-4 shadow-xs space-y-1">
+            <span className="text-sm">🧘‍♀️</span>
+            <h4 className="font-bold text-base-text-primary text-[11px]">Kenyamanan Psikologis</h4>
+            <p className="font-medium text-base-text-secondary leading-normal">Menciptakan rasa tenang dan nyaman pada ibu dan bayi melalui kontak kulit ke kulit.</p>
+          </div>
+
+          <div className="bg-base-white border border-base-border/30 rounded-xl p-4 shadow-xs space-y-1">
+            <span className="text-sm">🛡️</span>
+            <h4 className="font-bold text-base-text-primary text-[11px]">Antibodi &amp; Daya Tahan</h4>
+            <p className="font-medium text-base-text-secondary leading-normal">Kandungan kolostrum dalam ASI mengandung gizi dan antibodi dari ibu, sehingga bisa meningkatkan daya tahan tubuh dan ketahanan hidup bayi.</p>
+          </div>
+
+          <div className="bg-base-white border border-base-border/30 rounded-xl p-4 shadow-xs space-y-1">
+            <span className="text-sm">🦠</span>
+            <h4 className="font-bold text-base-text-primary text-[11px]">Kesehatan Pencernaan</h4>
+            <p className="font-medium text-base-text-secondary leading-normal">Meningkatkan kesehatan sistem pencernaan bayi, sehingga mengurangi risiko diare pada bayi.</p>
+          </div>
+
+          <div className="bg-base-white border border-base-border/30 rounded-xl p-4 shadow-xs space-y-1">
+            <span className="text-sm">🍼</span>
+            <h4 className="font-bold text-base-text-primary text-[11px]">Stimulasi ASI Kontinu</h4>
+            <p className="font-medium text-base-text-secondary leading-normal">Menstimulasi produksi ASI dan meningkatkan durasi menyusui.</p>
+          </div>
+
+          <div className="bg-base-white border border-base-border/30 rounded-xl p-4 shadow-xs space-y-1">
+            <span className="text-sm">🩸</span>
+            <h4 className="font-bold text-base-text-primary text-[11px]">Reduksi Pendarahan Ibu</h4>
+            <p className="font-medium text-base-text-secondary leading-normal">Mengurangi pendarahan karena gerakan bayi di atas perut ibu dapat membantu menstimulasi kontraksi rahim.</p>
+          </div>
+
+          <div className="bg-base-white border border-base-border/30 rounded-xl p-4 shadow-xs space-y-1">
+            <span className="text-sm">🧬</span>
+            <h4 className="font-bold text-base-text-primary text-[11px]">Pelepasan Plasenta</h4>
+            <p className="font-medium text-base-text-secondary leading-normal">Mempercepat proses pelepasan plasenta.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================
+          INFORMASI TAMBAHAN EDUKATIF (ENHANCED/ADDITIONAL INFO)
+         ======================================================== */}
+      <hr className="my-6 border-base-border/40" />
+
+      {/* BENTO BOX 1: TAHAPAN LAHANAN PRAKTIS IMD */}
+      <div className="bg-[#AC1959]/5 border border-[#AC1959]/20 rounded-2xl p-4.5 space-y-3">
+        <h4 className="font-black text-xs text-[#AC1959] uppercase tracking-wide flex items-center gap-1.5">
+          📋 Tahapan Pelaksanaan IMD di Ruang Bersalin (Golden Hour)
+        </h4>
+        <ol className="list-decimal pl-4 space-y-2 font-medium text-base-text-primary">
+          <li><strong className="text-base-text-primary">Keringkan Bayi:</strong> Segera setelah lahir, bayi dikeringkan tubuhnya kecuali kedua telapak tangan (karena bau ketuban pada tangan menuntun bayi ke puting susu).</li>
+          <li><strong className="text-base-text-primary">Skin-to-Skin:</strong> Bayi ditengkurapkan langsung di dada telanjang ibu tanpa pakaian/bedong. Kepala bayi berada di antara payudara ibu dengan posisi lebih rendah dari puting.</li>
+          <li><strong className="text-base-text-primary">Selimuti Bersama:</strong> Bayi dan ibu diselimuti bersama, dan kepala bayi diberi topi agar terhindar dari hipotermia (kedinginan).</li>
+          <li><strong className="text-base-text-primary">Biarkan Merangkak Mandiri:</strong> Biarkan bayi melakukan usaha alami mencari puting susu ibu. Petugas/keluarga dilarang memaksakan atau memasukkan puting ke mulut bayi secara instan.</li>
+        </ol>
+      </div>
+
+      {/* BENTO BOX 2: HUSBAND SUPPORT SYSTEM */}
+      <div className="bg-status-blue-light/10 border border-status-blue-solid/20 rounded-2xl p-4.5 space-y-2">
+        <h4 className="font-black text-xs text-status-blue-solid uppercase tracking-wide flex items-center gap-1.5">
+          👨‍🍼 Peran Suami/Ayah Saat Proses IMD Berlangsung
+        </h4>
+        <ul className="list-disc pl-4 space-y-1.5 font-medium">
+          <li>Mendampingi di sisi tempat tidur ibu dan memberikan motivasi verbal agar ibu tetap rileks.</li>
+          <li>Membantu memastikan selimut dan topi bayi terpasang dengan baik agar kehangatan bayi terjaga.</li>
+          <li>Ikut menjaga posisi bayi agar aman, tidak terjatuh, dan jalan napas (hidung) bayi tidak tertutup oleh payudara atau kain.</li>
+        </ul>
+      </div>
+
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
 function L100ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -2086,7 +2193,7 @@ function L102ArticleContent() {
 
 
 
-function L13ArticleContent() {
+function L111ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}

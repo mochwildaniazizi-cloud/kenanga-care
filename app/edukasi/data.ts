@@ -101,5 +101,12 @@ export const mockArticles: Article[] = [
     categories: ["Melahirkan"],
     duration: "4 Menit",
     imageUrl: "/cover-article/L12.jpg"
+  },
+  {
+    id: "L13",
+    title: "Panduan Inisiasi Menyusu Dini (IMD): Prosedur Golden Hour dan Manfaat Klinis bagi Ibu & Bayi",
+    categories: ["Melahirkan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L13.jpg",
   }
 ];

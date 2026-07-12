@@ -439,7 +439,7 @@ export default function EdukasiPage() {
               {savedBanner}
 
               {/* Lanjutkan Membaca — hidden when saved filter active */}
-              {!showSavedOnly && historyArticles.length > 0 && (
+              {!showSavedOnly && activeTab === "Semua" && historyArticles.length > 0 && (
                 <div className="animate-in fade-in duration-300">
                   <div className="flex items-center justify-between mb-4">
                     <div>
@@ -525,7 +525,7 @@ export default function EdukasiPage() {
                       <h2 className="text-xl font-black text-[#EA2986] tracking-wide uppercase">Perjalanan Ibu</h2>
                     </div>
                     {sections.map(sec => {
-                      const sectionArticles = getFilteredArticles(a => a.categories.includes(sec.cat)).slice(0, 4);
+                      const sectionArticles = getFilteredArticles(a => a.categories.includes(sec.cat));
                       if (sectionArticles.length === 0) return null;
                       return (
                         <div key={sec.cat}>
@@ -567,7 +567,7 @@ export default function EdukasiPage() {
                       <h2 className="text-xl font-black text-[#9333EA] tracking-wide uppercase">Perjalanan Anak</h2>
                     </div>
                     {sections.map(sec => {
-                      const sectionArticles = getFilteredArticles(a => a.categories.includes(sec.cat)).slice(0, 4);
+                      const sectionArticles = getFilteredArticles(a => a.categories.includes(sec.cat));
                       if (sectionArticles.length === 0) return null;
                       return (
                         <div key={sec.cat}>
@@ -594,7 +594,7 @@ export default function EdukasiPage() {
 
               {/* INFORMASI UMUM */}
               {(activeTab === "Semua" || activeTab === "Informasi Umum") && (() => {
-                const infoArticles = getFilteredArticles(a => a.categories.includes("Informasi Umum" as CategoryType)).slice(0, 4);
+                const infoArticles = getFilteredArticles(a => a.categories.includes("Informasi Umum" as CategoryType));
                 if (infoArticles.length === 0) return null;
                 return (
                   <div className="space-y-6 pt-6 border-t border-base-border/20 animate-in fade-in duration-300">
