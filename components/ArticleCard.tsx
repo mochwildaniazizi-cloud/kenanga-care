@@ -1,5 +1,5 @@
 import { Article } from "@/app/edukasi/data";
-import { MdBookmark, MdBookmarkBorder, MdShare, MdMenuBook, MdPlayCircleOutline } from "react-icons/md";
+import { MdBookmark, MdBookmarkBorder, MdShare, MdMenuBook } from "react-icons/md";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -59,7 +59,7 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
             sizes="(max-width: 640px) 112px, (max-width: 768px) 100vw, 33vw"
           />
         </Link>
- 
+
         {/* Bookmark Button */}
         <button 
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleSave?.(); }}
@@ -67,17 +67,8 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
         >
           {isSaved ? <MdBookmark className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" /> : <MdBookmarkBorder className="w-4 h-4 sm:w-5 sm:h-5 text-brand-primary" />}
         </button>
- 
-        {/* Video Overlay Indicator */}
-        {article.type === "Video" && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-black/40 rounded-full flex items-center justify-center pl-0.5 sm:pl-1 shadow-lg">
-              <MdPlayCircleOutline className="w-5 h-5 sm:w-8 sm:h-8 text-white" />
-            </div>
-          </div>
-        )}
       </div>
- 
+
       {/* Content */}
       <div className="p-3 sm:p-4 flex flex-col flex-1 min-w-0 justify-between">
         <Link 
@@ -103,12 +94,8 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
         {/* Footer info */}
         <div className="flex items-center justify-between text-[10px] sm:text-xs font-semibold text-base-text-secondary mt-auto pt-1 sm:pt-2 border-t border-gray-50">
           <div className="flex items-center gap-1.5">
-            {article.type === "Video" ? (
-              <MdPlayCircleOutline className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            ) : (
-              <MdMenuBook className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            )}
-            <span>{article.type} • {article.duration}</span>
+            <MdMenuBook className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Buku KIA • {article.duration}</span>
           </div>
           <button className="text-base-text-secondary hover:text-brand-primary transition-colors p-1 rounded-lg hover:bg-base-bg">
             <MdShare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
