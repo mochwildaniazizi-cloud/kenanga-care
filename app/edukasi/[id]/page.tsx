@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { FiArrowLeft, FiClock, FiTag, FiBookOpen, FiTrash, FiCopy, FiCheck, FiX } from "react-icons/fi";
-import { MdPlayCircleOutline, MdBookmark, MdBookmarkBorder, MdShare, MdEdit } from "react-icons/md";
+import { MdPlayCircleOutline, MdBookmark, MdBookmarkBorder, MdShare, MdEdit, MdEventAvailable, MdInfo, MdCheckCircle, MdWarning, MdCancel, MdShield, MdHealing, MdFavorite, MdPsychology, MdFamilyRestroom, MdPregnantWoman, MdArrowForward, MdChildCare, MdAllInclusive, MdCleanHands, MdKitchen, MdRestaurant, MdLocalCafe, MdWaterDrop } from "react-icons/md";
 import { mockArticles } from "../data";
 import type { Article } from "../data";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -49,6 +49,20 @@ const renderContent = (id: string) => {
       return <L12ArticleContent />;
     case "L13":
       return <L13ArticleContent />;
+    case "L14":
+      return <L14ArticleContent />;
+    case "L15":
+      return <L15ArticleContent />;
+    case "L16":
+      return <L16ArticleContent />;
+    case "L17":
+      return <L17ArticleContent />;
+    case "L18":
+      return <L18ArticleContent />;
+    case "L19":
+      return <L19ArticleContent />;
+    case "L20":
+      return <L20ArticleContent />;
     default:
       return (
         <p className="text-xs text-base-text-secondary italic">
@@ -1876,11 +1890,685 @@ function L13ArticleContent() {
   );
 }
 
+//=====================================================================================================================
+// ARTIKEL L14: Setelah Melahirkan
+function L14ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Intro */}
+      <div className="bg-[#E5E6F2] p-4 rounded-xl border border-[#3E57A3]/20">
+        <p className="text-xs sm:text-sm font-medium text-[#3E57A3] leading-relaxed">
+          Selamat, Ibu sudah melahirkan si kecil! Pada masa nifas ini, ibu, ayah, dan seluruh anggota keluarga perlu memberikan perhatian ekstra terhadap kesehatan fisik serta emosional ibu dan bayi.
+        </p>
+      </div>
 
+      {/* Jadwal Periksa */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold flex items-center gap-2 text-[#3E57A3]">
+          <MdEventAvailable className="w-4 h-4" />
+          Jadwal Pemeriksaan Kesehatan Ibu &amp; Bayi (Minimal 4 Kali)
+        </h4>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center">
+            <span className="text-[10px] font-bold text-base-text-secondary block">KF 1 / Pertama</span>
+            <span className="text-xs font-black text-[#3E57A3]">6 Jam - 2 Hari</span>
+            <span className="text-[9px] text-base-text-secondary block mt-0.5">setelah melahirkan</span>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center">
+            <span className="text-[10px] font-bold text-base-text-secondary block">KF 2 / Kedua</span>
+            <span className="text-xs font-black text-[#3E57A3]">3 - 7 Hari</span>
+            <span className="text-[9px] text-base-text-secondary block mt-0.5">setelah melahirkan</span>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center">
+            <span className="text-[10px] font-bold text-base-text-secondary block">KF 3 / Ketiga</span>
+            <span className="text-xs font-black text-[#3E57A3]">8 - 28 Hari</span>
+            <span className="text-[9px] text-base-text-secondary block mt-0.5">setelah melahirkan</span>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center">
+            <span className="text-[10px] font-bold text-base-text-secondary block">KF 4 / Keempat</span>
+            <span className="text-xs font-black text-[#3E57A3]">29 - 42 Hari</span>
+            <span className="text-[9px] text-base-text-secondary block mt-0.5">khusus untuk Ibu</span>
+          </div>
+        </div>
+      </div>
 
+      <hr className="border-base-border/30" />
 
+      {/* Dual Column Info */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Yang Akan Dialami */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-bold text-[#3E57A3] flex items-center gap-2">
+            <MdInfo className="w-4 h-4" />
+            Yang Akan Dialami Ibu
+          </h4>
+          <ul className="list-disc list-inside text-xs space-y-2 text-base-text-secondary leading-relaxed pl-1">
+            <li><span className="font-semibold text-base-text-primary">Masa Pemulihan:</span> Ibu akan mengalami fase pemulihan fisik, fluktuasi hormonal, serta adaptasi emosional pasca-persalinan.</li>
+            <li><span className="font-semibold text-base-text-primary">Produksi Kolostrum:</span> Air Susu Ibu (ASI) pertama yang berwarna kekuningan mulai keluar sekitar 5-10 ml pada hari pertama dan akan terus bertambah seiring seringnya bayi menyusu.</li>
+          </ul>
+        </div>
 
+        {/* Yang Harus Dilakukan */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-bold text-[#3E57A3] flex items-center gap-2">
+            <MdCheckCircle className="w-4 h-4" />
+            Yang Harus Dilakukan
+          </h4>
+          <ul className="list-disc list-inside text-xs space-y-2 text-base-text-secondary leading-relaxed pl-1">
+            <li>Melakukan pemeriksaan rutin ke dokter/bidan/perawat minimal 4 kali sesuai jadwal nifas.</li>
+            <li>Mengonsumsi <span className="font-semibold text-base-text-primary">Tablet Tambah Darah (TTD)</span> secara teratur untuk mencegah risiko anemia pasca-melahirkan.</li>
+            <li>Segera periksa ke fasilitas kesehatan jika mendapati tanda bahaya nifas atau merasa sedih/depresi lebih dari 2 minggu (*postpartum depression*).</li>
+            <li>Mengonsumsi makanan bergizi seimbang (makanan pokok, lauk pauk, sayur, buah) dengan porsi lebih banyak untuk mendukung produksi ASI.</li>
+            <li>Ayah dan keluarga berbagi peran dalam pengasuhan bayi serta memijat punggung ibu dengan lembut demi stimulasi ASI.</li>
+          </ul>
+        </div>
+      </div>
 
+      {/* Mengapa Harus Dilakukan */}
+      <div className="p-4 bg-base-bg border border-base-border/60 rounded-xl space-y-2">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-base-text-secondary flex items-center gap-1.5">
+          <MdWarning className="w-3.5 h-3.5 text-[#3E57A3]" />
+          Mengapa Ini Sangat Penting?
+        </h4>
+        <p className="text-xs text-base-text-secondary leading-relaxed">
+          Pemeriksaan rutin penting untuk memantau kesehatan rahim ibu hingga 42 hari pasca-melahirkan, mendeteksi dini adanya infeksi, mencegah perdarahan nifas, serta memastikan pemenuhan gizi ibu terpenuhi dengan baik sehingga pasokan ASI bagi bayi dapat terjaga secara penuh.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ARTIKEL L15: Tanda Bahaya pada Ibu Setelah Melahirkan
+function L15ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Alert Banner */}
+      <div className="bg-status-red-soft/20 p-4 rounded-xl border border-status-red/30 flex items-start gap-3">
+        <MdWarning className="w-5 h-5 text-status-red shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <h5 className="text-xs font-bold uppercase tracking-wider text-status-red">Peringatan Kritis</h5>
+          <p className="text-xs text-base-text-secondary leading-relaxed">
+            Kematian ibu tertinggi rawan terjadi pada masa setelah melahirkan. Jika ibu mengalami salah satu tanda bahaya di bawah ini, segera bawa ke Puskesmas atau Rumah Sakit!
+          </p>
+        </div>
+      </div>
+
+      {/* Grid Tanda Bahaya */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold flex items-center gap-2 text-[#3E57A3]">
+          <MdWarning className="w-4 h-4 text-status-red" />
+          Kenali 6 Tanda Bahaya Masa Nifas
+        </h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40">
+            <span className="font-bold text-base-text-primary block mb-0.5">1. Demam Tinggi</span>
+            <p className="text-base-text-secondary">Suhu tubuh meningkat drastis atau demam bertahan lebih dari 2 hari.</p>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40">
+            <span className="font-bold text-base-text-primary block mb-0.5">2. Depresi Pasca-Melahirkan</span>
+            <p className="text-base-text-secondary">Ibu terlihat sangat sedih, murung, gelisah, dan sering menangis tanpa sebab jelas.</p>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40">
+            <span className="font-bold text-base-text-primary block mb-0.5">3. Cairan Jalan Lahir Berbau</span>
+            <p className="text-base-text-secondary">Keluar cairan atau lokhia yang berbau busuk/menyengat dari jalan lahir.</p>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40">
+            <span className="font-bold text-base-text-primary block mb-0.5">4. Gejala Preeklamsia Nifas</span>
+            <p className="text-base-text-secondary">Nyeri ulu hati, mual muntah berat, sakit kepala hebat, pandangan kabur, atau kejang disertai bengkak pada kaki, tangan, dan wajah.</p>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40">
+            <span className="font-bold text-base-text-primary block mb-0.5">5. Masalah Payudara Akut</span>
+            <p className="text-base-text-secondary">Payudara membengkak, memerah ekstrem, mengeras, disertai rasa sakit atau nyeri hebat (mastitis).</p>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40">
+            <span className="font-bold text-base-text-primary block mb-0.5">6. Perdarahan Nifas</span>
+            <p className="text-base-text-secondary">Keluar darah segar secara terus-menerus lewat jalan lahir pasca-persalinan.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr className="border-base-border/30" />
+
+      {/* Hal yang Dilarang */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold flex items-center gap-2 text-status-red">
+          <MdCancel className="w-4 h-4" />
+          Hal-hal yang Dilarang Selama Pemulihan &amp; Nifas
+        </h4>
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/60">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 text-xs text-base-text-secondary pl-1 list-none">
+            <li className="flex items-start gap-2">
+              <span className="text-status-red font-bold">✕</span>
+              <span><span className="font-semibold text-base-text-primary">Membuang Kolostrum:</span> Dilarang membuang ASI pertama yang keluar karena sangat kaya zat kekebalan tubuh anak.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-status-red font-bold">✕</span>
+              <span><span className="font-semibold text-base-text-primary">Zat Kimia pada Payudara:</span> Dilarang membersihkan payudara dengan alkohol, povidon iodine, obat merah, atau sabun keras karena berisiko terminum bayi.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-status-red font-bold">✕</span>
+              <span><span className="font-semibold text-base-text-primary">Mengikat Perut Ekstrem:</span> Tidak boleh mengikat/bebat perut terlalu kencang karena dapat mengganggu pemulihan organ dalam rahim.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-status-red font-bold">✕</span>
+              <span><span className="font-semibold text-base-text-primary">Posisi Tidur Telungkup:</span> Dilarang melakukan latihan fisik atau posisi tidur telungkup terlalu dini selama pemulihan rahim.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-status-red font-bold">✕</span>
+              <span><span className="font-semibold text-base-text-primary">Daun-daunan di Area Intim:</span> Dilarang menempelkan ramuan atau daun-daunan pada kemaluan karena memicu infeksi bakteri serius.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ARTIKEL L16: Mengenal Depresi Setelah Melahirkan
+function L16ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Intro Banner */}
+      <div className="bg-[#E5E6F2] p-4 rounded-xl border border-[#3E57A3]/20">
+        <p className="text-xs sm:text-sm font-medium text-[#3E57A3] leading-relaxed">
+          Setelah melahirkan, perubahan hormon dan tekanan emosional dapat memicu gangguan kesehatan jiwa pada ibu. Penting bagi keluarga untuk mengenali perbedaan antara kondisi emosional biasa dan depresi klinis agar penanganan tepat bisa segera diberikan.
+        </p>
+      </div>
+
+      {/* Perbedaan Kondisi */}
+      <div className="space-y-4">
+        <h4 className="text-sm font-bold flex items-center gap-2 text-[#3E57A3]">
+          <MdInfo className="w-4 h-4" />
+          Kenali Perbedaan: Baby Blues vs Depresi Pasca-Melahirkan
+        </h4>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Baby Blues */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ECF2FE] text-[#4A85F6]">BABY BLUES</span>
+            <p className="text-xs text-base-text-secondary leading-relaxed">
+              Terjadi segera setelah melahirkan dan biasanya memuncak dalam beberapa hari hingga <span className="font-semibold text-base-text-primary">maksimal 2 minggu</span>.
+            </p>
+            <div className="text-[11px] text-base-text-secondary pt-1 border-t border-gray-100">
+              <span className="font-bold text-base-text-primary block mb-0.5">Gejala Utama:</span>
+              Suasana perasaan tidak stabil, mudah menangis, sulit tidur, mudah cemas, dan mudah tersinggung.
+            </div>
+          </div>
+
+          {/* Postpartum Depression */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-status-red-soft/30 text-status-red">POSTPARTUM DEPRESI</span>
+            <p className="text-xs text-base-text-secondary leading-relaxed">
+              Dapat terjadi dalam <span className="font-semibold text-base-text-primary">2 hingga 4 minggu</span> setelah melahirkan, dengan gejala menetap paling sedikit selama 2 minggu berturut-turut.
+            </p>
+            <div className="text-[11px] text-base-text-secondary pt-1 border-t border-gray-100 space-y-1">
+              <span className="font-bold text-base-text-primary block">Gejala Kritis:</span>
+              <ul className="list-disc list-inside space-y-0.5 pl-0.5">
+                <li>Merasa sangat sedih, tertekan, lelah, dan tidak bergairah.</li>
+                <li>Perubahan perasaan dan perilaku ekstrem yang tidak serasi.</li>
+                <li>Gangguan tidur berat, tidak selera makan (atau terlalu banyak makan).</li>
+                <li>Khawatir berlebih tidak dapat menjadi ibu yang baik.</li>
+                <li><span className="text-status-red font-semibold">Kondisi Berat:</span> Mengalami gangguan halusinasi, waham/delusi, hingga pikiran untuk melukai diri sendiri atau bayinya.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr className="border-base-border/30" />
+
+      {/* Upaya Pencegahan */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold flex items-center gap-2 text-[#3E57A3]">
+          <MdShield className="w-4 h-4" />
+          Langkah Pencegahan Dini
+        </h4>
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/60">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-xs text-base-text-secondary pl-1 list-inside list-disc">
+            <li>Ibu hamil dan keluarga aktif mengenali serta memahami gejala gangguan jiwa.</li>
+            <li>Kontrol kehamilan dan nifas secara teratur ke bidan atau dokter sesuai jadwal.</li>
+            <li>Mendapatkan deteksi dini faktor risiko masalah kesehatan jiwa pasca-melahirkan.</li>
+            <li>Mengonsumsi makanan sehat, bergizi seimbang, serta vitamin pendukung tubuh.</li>
+            <li>Memastikan adanya dukungan emosional penuh dari suami dan keluarga selama masa kehamilan hingga nifas.</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Upaya Penanganan */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold flex items-center gap-2 text-[#3E57A3]">
+          <MdHealing className="w-4 h-4" />
+          Rencana Penanganan Efektif
+        </h4>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center space-y-1">
+            <div className="w-7 h-7 bg-[#E5E6F2] rounded-lg flex items-center justify-center text-[#3E57A3] mx-auto">
+              <MdFavorite className="w-4 h-4" />
+            </div>
+            <span className="font-bold text-base-text-primary block">Dukungan Suami</span>
+            <p className="text-[11px] text-base-text-secondary">Memberi perhatian agar tidak hanya bayinya saja yang dipedulikan, serta berbagi peran mengasuh.</p>
+          </div>
+
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center space-y-1">
+            <div className="w-7 h-7 bg-[#E5E6F2] rounded-lg flex items-center justify-center text-[#3E57A3] mx-auto">
+              <MdPsychology className="w-4 h-4" />
+            </div>
+            <span className="font-bold text-base-text-primary block">Konseling Profesional</span>
+            <p className="text-[11px] text-base-text-secondary">Mengajak ibu bicara mengenai perasaannya dan melakukan sesi konseling dengan tenaga kesehatan.</p>
+          </div>
+
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 text-center space-y-1">
+            <div className="w-7 h-7 bg-status-red-soft/40 rounded-lg flex items-center justify-center text-status-red mx-auto">
+              <MdWarning className="w-4 h-4" />
+            </div>
+            <span className="font-bold text-base-text-primary block">Terapi Medis &amp; Kunjungan</span>
+            <p className="text-[11px] text-base-text-secondary">Mengikuti program kunjungan rumah oleh nakes serta menjalani terapi obat-obatan jika diindikasikan.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ARTIKEL L17: Panduan Program Keluarga Berencana (KB)
+function L17ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Intro Box */}
+      <div className="bg-[#E5E6F2] p-4 rounded-xl border border-[#3E57A3]/20 space-y-2">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-[#3E57A3] flex items-center gap-1.5">
+          <MdFamilyRestroom className="w-4 h-4" />
+          Membangun Keluarga Sehat &amp; Terencana
+        </h4>
+        <p className="text-xs sm:text-sm text-base-text-secondary leading-relaxed">
+          Kehamilan yang sehat adalah kehamilan yang <span className="font-semibold text-base-text-primary">direncanakan, diinginkan, dan dijaga</span> perkembangannya dengan baik. Program Keluarga Berencana (KB) pasca-melahirkan hadir agar ibu dapat memulihkan kondisi fisik sepenuhnya dan memberikan perhatian serta kecukupan gizi yang optimal untuk si kecil.
+        </p>
+      </div>
+
+      {/* Syarat Layak Hamil */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold text-[#3E57A3] flex items-center gap-2">
+          <MdCheckCircle className="w-4 h-4" />
+          Kriteria Kondisi Layak Hamil (Fisik &amp; Mental)
+        </h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 space-y-1">
+            <span className="font-bold text-base-text-primary block">1. Jarak Ideal Kehamilan</span>
+            <p className="text-base-text-secondary leading-relaxed">
+              Usia reproduksi sehat berkisar antara <span className="font-semibold text-base-text-primary">20-35 tahun</span> dengan jarak antar-kehamilan minimal <span className="font-semibold text-[#3E57A3]">2 tahun</span> guna menekan angka kematian ibu dan komplikasi persalinan.
+            </p>
+          </div>
+          <div className="p-3 bg-base-bg rounded-xl border border-base-border/40 space-y-1">
+            <span className="font-bold text-base-text-primary block">2. Batas Kecukupan Gizi &amp; Asuhan</span>
+            <p className="text-base-text-secondary leading-relaxed">
+              Jumlah anak disarankan <span className="font-semibold text-base-text-primary">kurang dari 3</span> untuk memastikan kecukupan gizi, stabilitas ekonomi, serta kualitas perhatian pengasuhan anak yang merata.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Prinsip KB Pasca Melahirkan */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold text-[#3E57A3] flex items-center gap-2">
+          <MdInfo className="w-4 h-4" />
+          Ketentuan KB Pasca Melahirkan (Nifas)
+        </h4>
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/60 text-xs text-base-text-secondary space-y-2 leading-relaxed">
+          <p>
+            Program KB pasca-melahirkan mencakup penggunaan metode kontrasepsi langsung sesudah melahirkan <span className="font-semibold text-base-text-primary">sampai dengan 6 minggu (42 hari)</span> pasca-persalinan.
+          </p>
+          <div className="flex items-start gap-2 bg-base-white p-2.5 rounded-lg border border-base-border/40 text-[11px] text-[#3E57A3]">
+            <span className="font-bold">✦ Prinsip Utama:</span>
+            <span>Metode kontrasepsi yang dipilih wajib <span className="font-semibold underline">tidak mengganggu produksi ASI Eksklusif</span> dan harus disesuaikan secara personal dengan kondisi kesehatan tubuh ibu.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* INTERACTIVE SHORTCUT / CTA LINK BANNER */}
+      <div className="p-4 bg-base-white border-2 border-dashed border-[#3E57A3]/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in duration-300">
+        <div className="flex items-center gap-3 text-center sm:text-left">
+          <div className="w-10 h-10 bg-[#E5E6F2] text-[#3E57A3] rounded-xl flex items-center justify-center shrink-0">
+            <MdPregnantWoman className="w-6 h-6" />
+          </div>
+          <div className="space-y-0.5">
+            <h5 className="text-xs font-bold text-base-text-primary">Pantau Rencana KB Anda Mandiri</h5>
+            <p className="text-[10px] text-base-text-secondary">Isi kuesioner dan catat jenis kontrasepsi pilihan Anda di lembar rekam data Ibu.</p>
+          </div>
+        </div>
+        <Link 
+          href="/perjalanan-ibu?tab=kb" 
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#3E57A3] hover:bg-[#2F4482] text-base-white text-xs font-bold rounded-xl shadow-sm transition-all duration-200 group whitespace-nowrap"
+        >
+          Buka Fitur KB
+          <MdArrowForward className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+//=====================================================================================================================
+// ARTIKEL L18: Panduan Manajemen Menyusui
+function L18ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Intro Highlight */}
+      <div className="bg-[#ECF5E8] p-4 rounded-xl border border-[#58B146]/20">
+        <p className="text-xs sm:text-sm font-semibold text-[#58B146] leading-relaxed">
+          Menyusui bayi secara langsung dapat mempercepat proses pemulihan rahim dan menjaga kesehatan payudara Ibu setelah melahirkan. ASI adalah investasi gizi terbaik demi daya tahan tubuh optimal si kecil.
+        </p>
+      </div>
+
+      {/* Manfaat Ganda */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+          <span className="font-bold text-[#58B146] flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#58B146]"></span>
+            Manfaat untuk Ibu
+          </span>
+          <ul className="list-disc list-inside space-y-1 text-base-text-secondary pl-0.5">
+            <li>Mempercepat rahim kembali ke ukuran semula pasca-melahirkan.</li>
+            <li>Mencegah risiko perdarahan hebat setelah persalinan.</li>
+            <li>Mengurangi stres, rasa cemas, serta menjaga kesehatan mental.</li>
+            <li>Mencegah risiko kanker payudara &amp; menjadi metode KB alami (*Mal*).</li>
+            <li>Membantu mempercepat berat badan kembali ke ukuran semula.</li>
+          </ul>
+        </div>
+
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+          <span className="font-bold text-[#58B146] flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#58B146]"></span>
+            Aturan Pemberian ASI
+          </span>
+          <p className="text-base-text-secondary leading-relaxed">
+            Berikan <span className="font-semibold text-base-text-primary">ASI Eksklusif saja selama 6 bulan pertama</span> tanpa tambahan makanan/minuman lain, kemudian teruskan hingga anak berusia 2 tahun didampingi MPASI yang tepat.
+          </p>
+          <div className="bg-base-white p-2 rounded-lg border border-base-border/30 text-[11px] text-base-text-secondary">
+            <span className="font-bold text-base-text-primary">Tips:</span> Susui bayi sesering mungkin/semau bayi (8-12 kali sehari). Jika bayi tidur lebih dari 3 jam, bangunkan lalu susui.
+          </div>
+        </div>
+      </div>
+
+      <hr className="border-base-border/30" />
+
+      {/* Cara Menyusui & Pelekatan Benar */}
+      <div className="space-y-4">
+        <h4 className="text-sm font-bold text-[#58B146] flex items-center gap-2">
+          <MdChildCare className="w-4 h-4" />
+          Teknik Posisi dan Pelekatan (Latch-On) Terbaik
+        </h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Posisi Badan */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/60 space-y-2">
+            <span className="text-xs font-bold text-base-text-primary flex items-center gap-1">
+              <MdCheckCircle className="text-[#58B146] w-4 h-4" /> Posisi Badan Bayi yang Benar
+            </span>
+            <ul className="list-disc list-inside text-xs text-base-text-secondary space-y-1 pl-0.5">
+              <li>Kepala dan badan bayi membentuk <span className="font-semibold text-base-text-primary">garis lurus</span>.</li>
+              <li>Wajah bayi menghadap payudara, hidung berhadapan dengan puting susu.</li>
+              <li>Badan bayi didekap dekat dengan tubuh ibu secara utuh.</li>
+              <li>Ibu menggendong/memeluk lengan dan seluruh badan bayi secara mantap.</li>
+            </ul>
+          </div>
+
+          {/* Pelekatan Mulut */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/60 space-y-2">
+            <span className="text-xs font-bold text-base-text-primary flex items-center gap-1">
+              <MdCheckCircle className="text-[#58B146] w-4 h-4" /> Pelekatan Mulut Bayi yang Benar
+            </span>
+            <ul className="list-disc list-inside text-xs text-base-text-secondary space-y-1 pl-0.5">
+              <li>Bayi dekat dengan payudara dengan <span className="font-semibold text-base-text-primary">mulut terbuka lebar</span>.</li>
+              <li>Dagu bayi menempel erat menyentuh payudara ibu.</li>
+              <li>Bagian <span className="font-semibold text-base-text-primary">areola payudara atas</span> lebih banyak terlihat dibanding areola bawah.</li>
+              <li>Bibir bawah bayi memutar melengkung keluar (dower).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Pencegahan Mastitis & Bayi Kembar */}
+      <div className="p-4 bg-base-white border border-base-border/50 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1 text-xs">
+          <span className="font-bold text-status-red flex items-center gap-1">
+            <MdCancel className="w-4 h-4" /> Cegah Mastitis (Radang Payudara)
+          </span>
+          <p className="text-base-text-secondary leading-relaxed pl-5">
+            Apabila bayi sudah kenyang tetapi payudara masih terasa penuh atau kencang, **payudara wajib diperah** dan ASI disimpan dengan steril. Hal ini krusial untuk mencegah penyumbatan kelenjar susu (*mastitis*) serta menjaga kontinuitas pasokan ASI.
+          </p>
+        </div>
+
+        <div className="space-y-1 text-xs border-t sm:border-t-0 sm:border-l border-base-border/30 pt-3 sm:pt-0 sm:pl-4">
+          <span className="font-bold text-[#58B146] flex items-center gap-1">
+            <MdAllInclusive className="w-4 h-4" /> Posisi Menyusui Bayi Kembar
+          </span>
+          <p className="text-base-text-secondary leading-relaxed">
+            Ibu dapat menyusui bayi kembar secara bersamaan menggunakan metode **Football Hold (Double Clutch)** atau **Cradle Position**, dengan menyangga kedua tubuh bayi menggunakan bantal menyusui agar posisi kepala tetap lurus menghadap kedua puting susu secara seimbang.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ARTIKEL L19: Manajemen ASI Perah
+function L19ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Intro Box */}
+      <div className="bg-[#ECF5E8] p-4 rounded-xl border border-[#58B146]/20">
+        <p className="text-xs sm:text-sm font-semibold text-[#58B146] leading-relaxed">
+          Memerah dan menyimpan ASI dengan benar sangat penting untuk menjaga kandungan nutrisi alami di dalamnya serta memastikan pasokan ASI tetap steril dan aman dikonsumsi oleh bayi.
+        </p>
+      </div>
+
+      {/* Grid Langkah Memerah */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-3">
+          <span className="font-bold text-[#58B146] flex items-center gap-1.5">
+            <MdCleanHands className="w-4 h-4" />
+            1. Sterilisasi Wadah &amp; Teknik Tangan
+          </span>
+          <ul className="list-disc list-inside space-y-1.5 text-base-text-secondary pl-0.5">
+            <li>Cuci bersih cangkir/gelas kecil penampung dengan sabun.</li>
+            <li>Tuangkan air mendidih ke dalam wadah, diamkan beberapa menit untuk membunuh kuman, lalu buang airnya saat akan digunakan.</li>
+            <li>Letakkan ibu jari di atas puting &amp; areola, jari telunjuk dan tengah di bawahnya (membentuk huruf C).</li>
+            <li>Tekan ke belakang, lalu tekan dan lepaskan dari samping secara berirama selama 20-30 menit bergantian sisi.</li>
+          </ul>
+        </div>
+
+        <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-3">
+          <span className="font-bold text-status-red flex items-center gap-1.5">
+            <MdWarning className="w-4 h-4" />
+            2. Aturan Penting Penyajian ASIP
+          </span>
+          <ul className="list-disc list-inside space-y-1.5 text-base-text-secondary pl-0.5">
+            <li><span className="font-bold text-base-text-primary">Jangan rebus ASI</span> atau memanaskannya dengan microwave karena merusak gizi.</li>
+            <li>Gunakan air hangat untuk mencairkan ASIP beku yang sudah diturunkan ke kulkas bawah sebelumnya.</li>
+            <li>Utamakan memberikan ASI segar pasca-perah (tanpa dibekukan) dalam waktu satu jam jika memungkinkan.</li>
+            <li>Selalu beri label tanggal perah pada setiap wadah penyimpanan.</li>
+          </ul>
+        </div>
+      </div>
+
+      <hr className="border-base-border/30" />
+
+      {/* Tabel Standar Penyimpanan */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold text-[#58B146] flex items-center gap-2">
+          <MdKitchen className="w-4 h-4" />
+          Tabel Standar Suhu &amp; Durasi Penyimpanan ASIP
+        </h4>
+        
+        <div className="overflow-x-auto rounded-xl border border-base-border/60">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-[#ECF5E8] text-[#58B146] border-b border-base-border/60 font-bold">
+                <th className="p-3">Tempat Penyimpanan</th>
+                <th className="p-3">Suhu Ideal</th>
+                <th className="p-3">Lama Aman</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-base-border/40 text-base-text-secondary">
+              <tr className="hover:bg-base-white/40">
+                <td className="p-3 font-semibold text-base-text-primary">Cooler Bag (ASIP Baru)</td>
+                <td className="p-3">15°C</td>
+                <td className="p-3">24 Jam</td>
+              </tr>
+              <tr className="hover:bg-base-white/40">
+                <td className="p-3 font-semibold text-base-text-primary">Dalam Ruangan Terbuka</td>
+                <td className="p-3">27°C s/d 32°C<br />&lt; 25°C</td>
+                <td className="p-3">4 Jam<br />6 - 8 Jam</td>
+              </tr>
+              <tr className="hover:bg-base-white/40">
+                <td className="p-3 font-semibold text-base-text-primary">Kulkas Bawah (Chiller)</td>
+                <td className="p-3">&lt; 4°C</td>
+                <td className="p-3">48 - 72 Jam (2-3 hari)</td>
+              </tr>
+              <tr className="hover:bg-base-white/40">
+                <td className="p-3 font-semibold text-base-text-primary">Freezer (Lemari Es 1 Pintu)</td>
+                <td className="p-3">-15°C s/d 0°C</td>
+                <td className="p-3">2 Minggu</td>
+              </tr>
+              <tr className="hover:bg-base-white/40">
+                <td className="p-3 font-semibold text-base-text-primary">Freezer (Lemari Es 2 Pintu)</td>
+                <td className="p-3">-20°C s/d -18°C</td>
+                <td className="p-3">3 - 6 Bulan</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[10px] text-base-text-secondary italic pl-1">
+          * Catatan: Simpan ASI perah sebanyak 15-60ml per wadah untuk menghindari ASI terbuang habis secara sia-sia setelah dicairkan.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ARTIKEL L20: Nutrisi Ibu Menyusui
+function L20ArticleContent() {
+  return (
+    <div className="space-y-6 text-base-text-primary">
+      {/* Intro Highlight */}
+      <div className="bg-[#ECF5E8] p-4 rounded-xl border border-[#58B146]/20">
+        <p className="text-xs sm:text-sm font-semibold text-[#58B146] leading-relaxed">
+          Kebutuhan gizi ibu menyusui (0-12 bulan) lebih tinggi dibanding masa kehamilan demi mendukung kelancaran produksi ASI berkualitas. Yuk, pantau porsi makan dan minum harian Ibu di bawah ini!
+        </p>
+      </div>
+
+      {/* Grid Porsi Visual */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-bold text-[#58B146] flex items-center gap-2">
+          <MdRestaurant className="w-4 h-4" />
+          Panduan Porsi Makan Harian Ibu Menyusui
+        </h4>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          {/* Makanan Pokok */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-base-text-primary">Makanan Pokok (Nasi/Karbohidrat)</span>
+              <span className="px-2 py-0.5 rounded-md bg-[#ECF5E8] text-[#58B146] font-extrabold text-[11px]">6 Porsi</span>
+            </div>
+            <p className="text-base-text-secondary leading-relaxed">
+              1 porsi setara dengan: 100 g (¾ gelas nasi), 3 buah jagung sedang (125 g), 2 kentang sedang (210 g), atau 2 gelas mie basah (200 g).
+            </p>
+          </div>
+
+          {/* Protein Hewani */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-base-text-primary">Protein Hewani (Ikan, Telur, Ayam)</span>
+              <span className="px-2 py-0.5 rounded-md bg-[#ECF5E8] text-[#58B146] font-extrabold text-[11px]">4 Porsi</span>
+            </div>
+            <p className="text-base-text-secondary leading-relaxed">
+              1 porsi setara dengan: 1 potong sedang ikan segar (50 g) atau 1 butir telur ayam (55 g).
+            </p>
+          </div>
+
+          {/* Protein Nabati */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-base-text-primary">Protein Nabati (Tempe, Tahu)</span>
+              <span className="px-2 py-0.5 rounded-md bg-[#ECF5E8] text-[#58B146] font-extrabold text-[11px]">4 Porsi</span>
+            </div>
+            <p className="text-base-text-secondary leading-relaxed">
+              1 porsi setara dengan: 1 potong sedang tempe (50 g) atau 2 potong sedang tahu bersih (100 g).
+            </p>
+          </div>
+
+          {/* Sayur-sayuran */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-base-text-primary">Sayur-sayuran</span>
+              <span className="px-2 py-0.5 rounded-md bg-[#ECF5E8] text-[#58B146] font-extrabold text-[11px]">4 Porsi</span>
+            </div>
+            <p className="text-base-text-secondary leading-relaxed">
+              1 porsi setara dengan: 100 g atau 1 mangkuk sayur matang segar tanpa kuah.
+            </p>
+          </div>
+
+          {/* Buah-buahan */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-base-text-primary">Buah-buahan</span>
+              <span className="px-2 py-0.5 rounded-md bg-[#ECF5E8] text-[#58B146] font-extrabold text-[11px]">4 Porsi</span>
+            </div>
+            <p className="text-base-text-secondary leading-relaxed">
+              1 porsi setara dengan: 1 potong sedang pisang (100 g) atau 1 potong besar pepaya segar (100-190 g).
+            </p>
+          </div>
+
+          {/* Minyak/Lemak */}
+          <div className="p-4 bg-base-bg rounded-xl border border-base-border/40 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-base-text-primary">Minyak atau Lemak</span>
+              <span className="px-2 py-0.5 rounded-md bg-[#ECF5E8] text-[#58B146] font-extrabold text-[11px]">6 Porsi</span>
+            </div>
+            <p className="text-base-text-secondary leading-relaxed">
+              1 porsi setara dengan: 5 g atau 1 sendok teh dari minyak goreng, tumisan, olahan santan, kemiri, atau mentega.
+            </p>
+          </div>
+        </div>
+
+        {/* Konsumsi Gula Tambahan */}
+        <div className="p-3 bg-base-white border border-base-border/50 rounded-xl flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
+            <MdLocalCafe className="w-4 h-4 text-[#58B146]" />
+            <span><span className="font-bold text-base-text-primary">Batas Konsumsi Gula:</span> Maksimal <span className="font-semibold text-base-text-primary">2 Porsi/Hari</span> (10 g atau 1 sendok makan dari teh manis, kue, dsb).</span>
+          </div>
+        </div>
+      </div>
+
+      <hr className="border-base-border/30" />
+
+      {/* Aturan Hidrasi / Air Putih */}
+      <div className="p-4 bg-base-white border-2 border-dashed border-[#58B146]/40 rounded-2xl space-y-3">
+        <h4 className="text-sm font-bold text-[#58B146] flex items-center gap-2">
+          <MdWaterDrop className="w-4 h-4 text-sky-500 animate-pulse" />
+          Aturan Wajib Hidrasi (Minum Air Putih)
+        </h4>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="p-3 bg-[#ECF5E8]/60 rounded-xl border border-[#58B146]/20">
+            <span className="font-bold text-base-text-primary block mb-0.5">6 Bulan Pertama Pasca-Melahirkan</span>
+            <p className="text-base-text-secondary">Wajib minum minimal <span className="text-[#58B146] font-black text-sm">14 Gelas / Hari</span>.</p>
+          </div>
+          <div className="p-3 bg-[#ECF5E8]/60 rounded-xl border border-[#58B146]/20">
+            <span className="font-bold text-base-text-primary block mb-0.5">6 Bulan Kedua Pasca-Melahirkan</span>
+            <p className="text-base-text-secondary">Wajib minum minimal <span className="text-[#58B146] font-black text-sm">12 Gelas / Hari</span>.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Info */}
+      <div className="flex items-start gap-1.5 text-[10px] text-base-text-secondary italic pl-1">
+        <MdInfo className="w-3.5 h-3.5 text-[#58B146] shrink-0 mt-0.5" />
+        <span>* Catatan Penting: Konsultasikan porsi makan Ibu secara berkala kepada tenaga kesehatan terdekat dengan tetap memperhatikan Indeks Massa Tubuh (IMT).</span>
+      </div>
+    </div>
+  );
+}
 
 
 function L100ArticleContent() {
@@ -2273,7 +2961,7 @@ function L111ArticleContent() {
   );
 }
 
-function L14ArticleContent() {
+function L114ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}
@@ -2381,7 +3069,7 @@ function L14ArticleContent() {
   );
 }
 
-function L15ArticleContent() {
+function L115ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}
@@ -2529,7 +3217,7 @@ function L15ArticleContent() {
   );
 }
 
-function L16ArticleContent() {
+function L116ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}
@@ -2609,7 +3297,7 @@ function L16ArticleContent() {
   );
 }
 
-function L17ArticleContent() {
+function L117ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}
@@ -2726,7 +3414,7 @@ function L17ArticleContent() {
   );
 }
 
-function L18ArticleContent() {
+function L118ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Paragraf Pembuka */}
@@ -2832,7 +3520,7 @@ function L18ArticleContent() {
   );
 }
 
-function L19ArticleContent() {
+function L119ArticleContent() {
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { id: 1, text: "Bayi bisa mengangkat kepala mandiri hingga 45 derajat?", checked: false },
     { id: 2, text: "Bayi menggunakan kepala dan lengan ke depan saat diletakkan tengkurap?", checked: false },
@@ -2991,7 +3679,7 @@ function L19ArticleContent() {
   );
 }
 
-function L20ArticleContent() {
+function L210ArticleContent() {
   const [milestones, setMilestones] = useState<MilestoneItem[]>([
     { id: 1, text: "Bayi berguling dari posisi telungkup ke telentang?", checked: false },
     { id: 2, text: "Bayi mengangkat kepala secara mandiri hingga tegak 90°?", checked: false },
@@ -3065,7 +3753,7 @@ function L20ArticleContent() {
   );
 }
 
-function L21ArticleContent() {
+function L211ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Pengantar */}
@@ -3208,7 +3896,7 @@ function L21ArticleContent() {
   );
 }
 
-function L22ArticleContent() {
+function L212ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       
@@ -3497,7 +4185,7 @@ function L22ArticleContent() {
   );
 }
 
-function L23ArticleContent() {
+function L213ArticleContent() {
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       
@@ -3607,7 +4295,7 @@ function L23ArticleContent() {
   );
 }
 
-function L24ArticleContent() {
+function L214ArticleContent() {
   return (
     <div className="space-y-6 text-xs text-base-text-secondary leading-relaxed animate-in fade-in duration-200">
       <p className="text-sm font-medium">

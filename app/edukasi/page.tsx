@@ -76,8 +76,7 @@ export default function EdukasiPage() {
           console.error(e);
         }
       } else {
-        // Pre-populate if empty
-        historyList = ["L4", "L5", "L11", "L12", "L14", "L15", "L20", "L23"];
+        historyList = [];
         localStorage.setItem("viewed_articles_history", JSON.stringify(historyList));
       }
       setViewedHistory(historyList);

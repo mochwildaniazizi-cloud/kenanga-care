@@ -108,5 +108,54 @@ export const mockArticles: Article[] = [
     categories: ["Melahirkan"],
     duration: "5 Menit",
     imageUrl: "/cover-article/L13.jpg",
-  }
+  },
+  {
+    id: "L14",
+    title: "Perawatan Setelah Melahirkan: Panduan Pemulihan Fisik Masa Nifas & Jadwal Periksa Rutin",
+    categories: ["Setelah Melahirkan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L14.jpg"
+  },
+  {
+    id: "L15",
+    title: "Deteksi Dini Kelahiran Berisiko: Tanda Bahaya pada Ibu Setelah Melahirkan & Larangan Nifas",
+    categories: ["Setelah Melahirkan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L15.jpg"
+  },
+  {
+    id: "L16",
+    title: "Mengenal Depresi Setelah Melahirkan: Perbedaan Baby Blues, Gejala, dan Solusi Penanganannya",
+    categories: ["Setelah Melahirkan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L16.jpg"
+  },
+  {
+    id: "L17",
+    title: "Perencanaan Kehamilan Sehat: Panduan Program Keluarga Berencana (KB) Pasca Melahirkan",
+    categories: ["Setelah Melahirkan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L17.jpg"
+  },
+  {
+    id: "L18",
+    title: "Panduan Manajemen Menyusui: Manfaat Klinis, Teknik Pelekatan Benar, hingga Posisi Bayi Kembar",
+    categories: ["Menyusui"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L18.jpg"
+  },
+  {
+    id: "L19",
+    title: "Manajemen ASI Perah: Panduan Teknik Memerah, Aturan Suhu, dan Cara Penyimpanan Steril",
+    categories: ["Menyusui"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L19.jpg"
+  },
+  {
+    id: "L20",
+    title: "Nutrisi Ibu Menyusui: Panduan Porsi Makan, Kebutuhan Gizi Harian, dan Aturan Hidrasi",
+    categories: ["Menyusui"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L20.jpg"
+  },
 ];
