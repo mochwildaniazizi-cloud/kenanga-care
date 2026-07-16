@@ -2,6 +2,7 @@ import { Article } from "@/app/edukasi/data";
 import { MdBookmark, MdBookmarkBorder, MdShare, MdMenuBook } from "react-icons/md";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 interface ArticleCardProps {
   article: Article;
@@ -10,6 +11,8 @@ interface ArticleCardProps {
 }
 
 export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleCardProps) {
+  const [titleHovered, setTitleHovered] = useState(false);
+
   const handleRecordHistory = () => {
     try {
       const historyJson = localStorage.getItem("viewed_articles_history");
@@ -30,7 +33,7 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
     switch (cat) {
       case "Kehamilan": return "bg-[#FCE8F0] text-[#EA2986] border border-[#EA2986]/25";
       case "Melahirkan": return "bg-[#ECF2FE] text-[#4A85F6] border border-[#4A85F6]/25";
-      case "Setelah Melahirkan": return "bg-[#F5F3FF] text-[#7A5AF8] border border-[#7A5AF8]/25";
+      case "Setelah Melahirkan": return "bg-[#E5E6F2] text-[#3E57A3] border border-[#3E57A3]/25";
       case "Menyusui": return "bg-[#E6F8ED] text-[#1E9D5D] border border-[#1E9D5D]/25";
       case "0 - 6 Bulan": return "bg-[#F3E8FF] text-[#9333EA] border border-[#9333EA]/25";
       case "6 - 12 Bulan": return "bg-[#FFF7ED] text-[#EA580C] border border-[#EA580C]/25";
@@ -40,6 +43,25 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
       default: return "bg-gray-200 text-gray-800";
     }
   };
+
+  // Returns the primary accent hex color for a category
+  const getAccentColor = (cat: string): string => {
+    switch (cat) {
+      case "Kehamilan": return "#EA2986";
+      case "Melahirkan": return "#4A85F6";
+      case "Setelah Melahirkan": return "#3E57A3";
+      case "Menyusui": return "#1E9D5D";
+      case "0 - 6 Bulan": return "#9333EA";
+      case "6 - 12 Bulan": return "#EA580C";
+      case "12 - 24 Bulan": return "#0284C7";
+      case "2 - 6 Tahun": return "#DC2626";
+      case "Informasi Umum": return "#374151";
+      default: return "#AC1959";
+    }
+  };
+
+  // Use the first category as the accent
+  const accentColor = getAccentColor(article.categories[0]);
 
   return (
     <div className="bg-base-white rounded-2xl border border-base-border/50 overflow-hidden flex flex-row sm:flex-col group hover:shadow-lg transition-all duration-300 w-full">
@@ -75,6 +97,8 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
           href={`/edukasi/${article.id}`} 
           className="flex-1 flex flex-col min-w-0"
           onClick={handleRecordHistory}
+          onMouseEnter={() => setTitleHovered(true)}
+          onMouseLeave={() => setTitleHovered(false)}
         >
           {/* Badges */}
           <div className="flex flex-wrap gap-1 mb-1.5 sm:mb-3">
@@ -86,7 +110,10 @@ export default function ArticleCard({ article, isSaved, onToggleSave }: ArticleC
           </div>
           
           {/* Title */}
-          <h3 className="font-bold text-xs sm:text-sm text-base-text-primary leading-snug mb-2 sm:mb-4 line-clamp-2 flex-1 group-hover:text-brand-primary transition-colors">
+          <h3
+            className="font-bold text-xs sm:text-sm leading-snug mb-2 sm:mb-4 line-clamp-2 flex-1 transition-colors duration-200"
+            style={{ color: titleHovered ? accentColor : "" }}
+          >
             {article.title}
           </h3>
         </Link>

@@ -158,4 +158,124 @@ export const mockArticles: Article[] = [
     duration: "6 Menit",
     imageUrl: "/cover-article/L20.jpg"
   },
+  {
+    id: "L21",
+    title: "Panduan Perawatan Bayi Baru Lahir: Tanda Bayi Sehat, Pelayanan Neonatal esensial, & Perawatan Harian",
+    categories: ["0 - 6 Bulan"],
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L21.jpg"
+  },
+  {
+    id: "L22",
+    title: "Tahapan Ukuran Lambung Bayi Baru Lahir & Perilaku Menyusu yang Wajib Dipahami",
+    categories: ["0 - 6 Bulan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L22.jpg"
+  },
+  {
+    id: "L23",
+    title: "Esensi Masa Neonatus (0-28 Hari): Jadwal Kunjungan Medis, Pola Tidur Sehat, dan Skrining Kritis",
+    categories: ["0 - 6 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L23.jpg"
+  },
+  {
+    id: "L24",
+    title: "Deteksi Dini Neonatus: 11 Tanda Bahaya pada Bayi Usia 0-28 Hari & Edukasi Medis Kritis",
+    categories: ["0 - 6 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L24.jpg"
+  },
+  {
+    id: "L25",
+    title: "Panduan Higiene Bayi Baru Lahir: Cara Memandikan, Rawat Tali Pusat, & Metode Kanguru BBLR",
+    categories: ["0 - 6 Bulan"],
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L25.jpg"
+  },
+  {
+    id: "L26",
+    title: "Skrining Warna Tinja Bayi: Deteksi Dini Atresia Bilier & Panduan Pemantauan Usia 0-4 Bulan",
+    categories: ["0 - 6 Bulan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L26.jpg"
+  },
+  {
+    id: "L27",
+    title: "Psikologi Pola Asuh 0-18 Bulan: Stimulasi Motorik, Manajemen Tangisan, dan Regulasi Screen Time Kritis",
+    categories: ["0 - 6 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L27.jpg"
+  },
+  {
+    id: "L28",
+    title: "Skrining Gizi Balita: Panduan Tepat Mengukur Lingkar Lengan Atas (LiLA) & Interpretasi Warna Pita",
+    categories: ["0 - 6 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L28.jpg"
+  },
+  {
+    id: "L29",
+    title: "Mengapa Harus Mengikuti Kelas Ibu Balita? Manfaat Edukasi Kelompok, Imunisasi, dan Sharing Pengalaman",
+    categories: ["0 - 6 Bulan"],
+    duration: "4 Menit",
+    imageUrl: "/cover-article/L29.jpg"
+  },
+  {
+    id: "L30",
+    title: "Deteksi Kegawatdaruratan Balita: 9 Tanda Bahaya pada Anak Usia 29 Hari - 5 Tahun yang Wajib Dirujuk",
+    categories: ["0 - 6 Bulan"],
+    duration: "5 Menit",
+    imageUrl: "/cover-article/L30.jpg"
+  },
+  {
+    id: "L31",
+    title: "Pemantauan Bayi Usia 29 Hari - 3 Bulan: Panduan Stimulasi, Manfaat Imunisasi Dasar, & 8 Milestone Perkembangan",
+    categories: ["0 - 6 Bulan"],
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L31.jpg"
+  },
+  {
+    id: "L32",
+    title: "Pemantauan Bayi Usia 3 - 6 Bulan: Stimulasi Motorik, Perawatan Gusi Pertama, & 10 Indikator Perkembangan",
+    categories: ["0 - 6 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L32.jpg"
+  },
+  // ======= MASUK KATEGORI PERAWATAN BAYI 6-12 BULAN ==========
+  {
+    id: "L33",
+    title: "Panduan Tumbuh Kembang 6-12 Bulan: Cegah Stunting dengan MPASI Protein Hewani & Intervensi Medis Wajib",
+    categories: ["6 - 12 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L33.jpg"
+  },
+  {
+    id: "L34",
+    title: "Panduan Kelompok Bahan MPASI 6-12 Bulan: Strategi Mengenalkan Alergi & Aturan Transisi Tekstur Makanan",
+    categories: ["6 - 12 Bulan"],
+    duration: "6 Menit",
+    imageUrl: "/cover-article/L34.jpg"
+  },
+  {
+    id: "L35",
+    title: "Strategi Pemenuhan Gizi 6-24 Bulan: 4 Syarat MPASI Layak, Aturan Takaran Usia, & Panduan Resep Praktis",
+    categories: ["6 - 12 Bulan"],
+    duration: "8 Menit",
+    imageUrl: "/cover-article/L35.jpg"
+  },
+  {
+    id: "L36",
+    title: "Pemantauan Bayi Usia 6-9 Bulan: Jadwal Imunisasi Campak, Perawatan Gigi Seri, & 11 Milestone Perkembangan",
+    categories: ["6 - 12 Bulan"],
+    duration: "7 Menit",
+    imageUrl: "/cover-article/L36.jpg"
+  },
+  {
+    id: "L37",
+    title: "Pemantauan Bayi Usia 9-12 Bulan: Manfaat Imunisasi JE, Perawatan Gigi Geraham, & 12 Indikator Perkembangan",
+    categories: ["6 - 12 Bulan"],
+    duration: "8 Menit",
+    imageUrl: "/cover-article/L37.jpg"
+  },
 ];

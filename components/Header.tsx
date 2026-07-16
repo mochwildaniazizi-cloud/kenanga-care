@@ -769,8 +769,9 @@ export default function Header() {
                 <ArrowRightOnRectangleIcon className="w-8 h-8 text-status-red-solid transform rotate-180" />
               </div>
               <h3 className="text-xl font-bold text-base-text-primary">Keluar dari Aplikasi?</h3>
+              {/* 💡 DIUBAH MENJADI DINAMIS BERDASARKAN ROLE USER */}
               <p className="text-sm text-base-text-secondary">
-                Apakah Anda yakin ingin keluar dari akun Kader Anda? Anda harus masuk kembali untuk mengakses data.
+                Apakah Anda yakin ingin keluar dari akun {role === "kader" ? "Kader" : "Ibu"} Anda? Anda harus masuk kembali untuk mengakses data.
               </p>
             </div>
             <div className="p-4 bg-base-bg/50 border-t border-base-border/30 flex gap-3">

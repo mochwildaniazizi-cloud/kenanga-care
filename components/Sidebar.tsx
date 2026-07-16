@@ -18,7 +18,7 @@ import { useUserRole } from "@/context/UserRoleContext";
 // NAV CONFIG PER ROLE
 // ──────────────────────────────────────────
 const kaderNavItems = [
-  { href: "/", label: "Beranda", icon: HomeIcon },
+  { href: "/beranda-kader", label: "Beranda", icon: HomeIcon },
   { href: "/data-anak", label: "Data Anak", icon: PiBabyFill },
   { href: "/data-ibu", label: "Data Ibu", icon: MdPregnantWoman },
   { href: "/edukasi", label: "Edukasi", icon: BookOpenIcon },
@@ -27,7 +27,7 @@ const kaderNavItems = [
 ];
 
 const ibuNavItems = [
-  { href: "/", label: "Beranda", icon: HomeIcon },
+  { href: "/beranda-ibu", label: "Beranda", icon: HomeIcon },
   { href: "/perjalanan-anak", label: "Perjalanan Anak", icon: PiBabyFill },
   { href: "/perjalanan-ibu", label: "Perjalanan Ibu", icon: MdFavorite },
   { href: "/edukasi", label: "Artikel & Edukasi", icon: BookOpenIcon },

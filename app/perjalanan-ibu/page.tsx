@@ -768,7 +768,7 @@ function PerjalananIbuContent() {
           {/* Kanban Board Container */}
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-black text-base-text-primary font-bold">Kurikulum Pemantauan Kesehatan Ibu Hamil</h2>
+              <h2 className="text-lg font-black text-base-text-primary">Kurikulum Pemantauan Kesehatan Ibu Hamil</h2>
               <p className="text-xs text-base-text-secondary font-semibold">Pilih modul kartu di bawah untuk mengisi data check-up harian dan melihat perkembangan.</p>
             </div>
 
@@ -1061,7 +1061,7 @@ function PerjalananIbuContent() {
               <MdArrowBack className="w-4 h-4" />
               <span>Kembali</span>
             </button>
-            <h2 className="text-lg font-black text-base-text-primary font-bold">Identitas Lengkap Ibu &amp; Keluarga</h2>
+            <h2 className="text-lg font-black text-base-text-primary">Identitas Lengkap Ibu &amp; Keluarga</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

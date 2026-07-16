@@ -147,8 +147,8 @@ export default function EdukasiPage() {
     },
     { 
       id: "Setelah Melahirkan" as TabType, label: "Setelah Melahirkan", icon: MdBabyChangingStation, 
-      colorStyle: "border-[#7A5AF8]/30 text-[#7A5AF8] hover:bg-[#F5F3FF]/30", 
-      activeStyle: "bg-[#7A5AF8] text-base-white border-[#7A5AF8]" 
+      colorStyle: "border-[#3E57A3]/30 text-[#3E57A3] hover:bg-[#E5E6F2]/30", 
+      activeStyle: "bg-[#3E57A3] text-base-white border-[#3E57A3]" 
     },
     { 
       id: "Menyusui" as TabType, label: "Menyusui", icon: MdChildCare, 
@@ -512,7 +512,7 @@ export default function EdukasiPage() {
                 const sections = [
                   { label: "Kehamilan", color: "#EA2986", cat: "Kehamilan" as CategoryType },
                   { label: "Melahirkan", color: "#4A85F6", cat: "Melahirkan" as CategoryType },
-                  { label: "Setelah Melahirkan", color: "#7A5AF8", cat: "Setelah Melahirkan" as CategoryType },
+                  { label: "Setelah Melahirkan", color: "#3E57A3", cat: "Setelah Melahirkan" as CategoryType },
                   { label: "Menyusui", color: "#1E9D5D", cat: "Menyusui" as CategoryType },
                 ];
                 const hasSections = sections.some(s => getFilteredArticles(a => a.categories.includes(s.cat)).length > 0);

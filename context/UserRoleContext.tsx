@@ -48,7 +48,7 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
     setIsInitialized(true);
   }, []);
 
-  // Client-side Router Guard in useEffect to prevent SSR mismatch
+  // ─── CLIENT-SIDE ROUTER GUARD (MENGGUNAKAN STATE UTAMA: role) ───
   useEffect(() => {
     if (!isInitialized) return;
 
@@ -56,17 +56,18 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
     if (!isLoggedIn && !publicPaths.includes(pathname)) {
       router.replace("/login");
     } else if (isLoggedIn && pathname === "/login") {
-      router.replace("/");
+      // 💡 Menggunakan 'role' yang valid di dalam sekup useEffect ini
+      router.replace(role === "kader" ? "/dashboard-kader" : "/beranda-ibu");
     }
-  }, [isLoggedIn, pathname, isInitialized, router]);
+  }, [isLoggedIn, pathname, isInitialized, role, router]);
 
   const setRole = (newRole: UserRole) => {
     localStorage.setItem("user_role", newRole);
     setRoleState(newRole);
-    // Dispatch event so other components can react
     window.dispatchEvent(new CustomEvent("role-changed", { detail: newRole }));
   };
 
+  // ─── FUNGSI LOGIN (MENGGUNAKAN PARAMETER LOKAL: newRole & userVal) ───
   const login = (newRole: UserRole, userVal: string) => {
     localStorage.setItem("user_role", newRole);
     localStorage.setItem("is_logged_in", "true");
@@ -76,8 +77,14 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(true);
     setUsername(userVal);
 
-    window.dispatchEvent(new CustomEvent("auth-changed", { detail: { isLoggedIn: true, role: newRole, username: userVal } }));
-    router.replace("/");
+    window.dispatchEvent(
+      new CustomEvent("auth-changed", { 
+        detail: { isLoggedIn: true, role: newRole, username: userVal } 
+      })
+    );
+    
+    // 💡 Di sini baru benar menggunakan 'newRole' pasca-proses login sukses
+    router.replace(newRole === "kader" ? "/dashboard-kader" : "/beranda-ibu");
   };
 
   const logout = () => {
