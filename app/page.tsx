@@ -15,8 +15,10 @@ export default function RootPage() {
       router.replace("/login");
     } else {
       // 💡 Diverter: Melempar user ke halaman spesifik sesuai perannya
-      if (role === "kader") {
-        router.replace("/dashboard-kader");
+      if (role === "nakes") {
+        router.replace("/beranda-nakes");
+      } else if (role === "kader") {
+        router.replace("/beranda-kader");
       } else {
         router.replace("/beranda-ibu");
       }

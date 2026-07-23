@@ -179,6 +179,7 @@ export async function getMeasurementHistory() {
         gender: measurement.child?.gender || "M",
         weight: measurement.weight ? Number(measurement.weight) : 0,
         height: measurement.height ? Number(measurement.height) : 0,
+        muac: measurement.muac ? Number(measurement.muac) : null,
         trend,
         status,
         avatarUrl: measurement.child?.child_name.includes("Rafi")
@@ -498,6 +499,7 @@ export async function createChildMeasurement(data: any) {
         visit_date: data.visit_date ? new Date(data.visit_date) : new Date(),
         weight: data.weight ? parseFloat(data.weight) : null,
         height: data.height ? parseFloat(data.height) : null,
+        muac: (data.muac || data.lila) ? parseFloat(data.muac || data.lila) : null,
         head_circumference: data.head_circumference ? parseFloat(data.head_circumference) : null,
         vitamin_a_capsule: data.vitamin_a || "Tidak Diberikan",
         deworming_pill: !!data.deworming,

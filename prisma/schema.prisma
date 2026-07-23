@@ -153,6 +153,7 @@ model ChildMeasurement {
   visit_date            DateTime
   weight                Decimal?  @db.Decimal(5, 2)
   height                Decimal?  @db.Decimal(5, 2)
+  muac                  Decimal?  @db.Decimal(4, 2)
   measurement_method    String?
   head_circumference    Decimal?  @db.Decimal(4, 2)
   vitamin_a_capsule     String?

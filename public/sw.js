@@ -2,12 +2,16 @@ const CACHE_NAME = "kenanga-care-cache-v4";
 const ASSETS_TO_CACHE = [
   "/",
   "/login",
+  "/beranda-ibu",
+  "/beranda-kader", 
   "/data-anak",
   "/data-anak/tambah",
   "/data-anak/input-penimbangan",
   "/data-ibu",
   "/data-ibu/tambah",
   "/data-ibu/input-pemeriksaan",
+  "/perjalanan-ibu",
+  "/perjalanan-anak",
   "/edukasi",
   "/edukasi/tambah",
   "/setting",
@@ -57,7 +61,6 @@ self.addEventListener("fetch", (event) => {
 
   // Skip browser extension requests or internal dev sockets
   if (event.request.url.includes("/_next/") || event.request.url.includes("hot-reloader")) {
-    // Let normal fetch handle Next.js internal files, but fallback to cache if offline
     event.respondWith(
       fetch(event.request)
         .catch(() => caches.match(event.request))
@@ -87,6 +90,21 @@ self.addEventListener("fetch", (event) => {
               if (pathMatch) {
                 return pathMatch;
               }
+
+              // 💡 KUNCI PENYELAMAT SIDANG: Fallback rute dinamis saat offline penuh
+              if (url.pathname.startsWith("/data-anak/")) {
+                return caches.match("/data-anak");
+              }
+              if (url.pathname.startsWith("/data-ibu/")) {
+                return caches.match("/data-ibu");
+              }
+              if (url.pathname.startsWith("/perjalanan-anak/")) {
+                return caches.match("/perjalanan-anak");
+              }
+              if (url.pathname.startsWith("/perjalanan-ibu/")) {
+                return caches.match("/perjalanan-ibu");
+              }
+
               return caches.match("/");
             });
           }

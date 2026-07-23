@@ -657,7 +657,7 @@ export async function deleteMother(id: string) {
   }
 }
 
-export async function updateUserPassword(username: string, currentPass: string, newPass: string, role: "kader" | "ibu") {
+export async function updateUserPassword(username: string, currentPass: string, newPass: string, role: "kader" | "ibu" | "nakes") {
   try {
     const u = username.trim().toLowerCase();
     
@@ -668,22 +668,25 @@ export async function updateUserPassword(username: string, currentPass: string, 
           { phone_number: { equals: u, mode: 'insensitive' } },
           { national_id: { equals: u, mode: 'insensitive' } },
           { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
+          { national_id: { equals: "NAKES-" + u, mode: 'insensitive' } },
           { mother_name: { equals: u, mode: 'insensitive' } }
         ]
       }
     });
 
     if (!mother) {
-      // Special case: default kader main account bypass (not in DB)
-      if (u === "kader") {
-        return { success: false, error: "Akun Kader utama bawaan tidak dapat diubah kata sandinya. Silakan buat akun Kader baru untuk menggunakan fitur ini." };
+      // Special case: default main accounts bypass (not in DB)
+      if (u === "kader" || u === "nakes") {
+        return { success: false, error: "Akun bawaan utama tidak dapat diubah kata sandinya. Silakan buat akun baru untuk menggunakan fitur ini." };
       }
       return { success: false, error: "Pengguna tidak ditemukan." };
     }
 
     // Verify current password
     const dbPassword = mother.password;
-    const defaultPassword = (mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-")) 
+    const defaultPassword = (mother.ui_status === "Tenaga Kesehatan" || mother.national_id.startsWith("NAKES-"))
+      ? "nakes123"
+      : (mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-")) 
       ? "kader123" 
       : "ibu123";
 
@@ -745,24 +748,71 @@ export async function ensureKaderProfileExists(name: string, phone?: string, pas
   }
 }
 
-export async function verifyUserLogin(username: string, pass: string, role: "kader" | "ibu") {
+export async function ensureNakesProfileExists(name: string, phone?: string, password?: string) {
+  try {
+    const existing = await prisma.mother.findFirst({
+      where: { national_id: "NAKES-DEFAULT" }
+    });
+
+    if (existing) {
+      const updated = await prisma.mother.update({
+        where: { mother_id: existing.mother_id },
+        data: {
+          mother_name: name || existing.mother_name,
+          phone_number: phone || existing.phone_number,
+          ...(password ? { password } : {})
+        }
+      });
+      return { mother_id: updated.mother_id, avatarUrl: updated.avatarUrl };
+    }
+
+    const created = await prisma.mother.create({
+      data: {
+        national_id: "NAKES-DEFAULT",
+        mother_name: name || "Bidan Widya, A.Md.Keb",
+        phone_number: phone || "0813-9988-7766",
+        ui_status: "Tenaga Kesehatan",
+        risk_status: "Bidan Puskesmas",
+        husband_name: "Tenaga Kesehatan",
+        password: password || "nakes123",
+        number_of_children: 0
+      }
+    });
+    return { mother_id: created.mother_id, avatarUrl: null };
+  } catch (error: any) {
+    console.error("Error ensuring nakes profile:", error);
+    return null;
+  }
+}
+
+export async function verifyUserLogin(username: string, pass: string, role: "kader" | "ibu" | "nakes") {
   try {
     const u = username.trim().toLowerCase();
     
     // 1. Bypass default kader account — ensure DB record exists
     if (role === "kader" && u === "kader" && pass === "kader123") {
       const kaderProfile = await ensureKaderProfileExists("Kader Siti");
-      // Get current name from existing record
       const kaderName = kaderProfile ? 
         ((await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Siti")
         : "Kader Siti";
-      return { success: true, name: kaderName, avatarUrl: kaderProfile?.avatarUrl ?? null };
+      return { success: true, name: kaderName, role: "kader" as const, avatarUrl: kaderProfile?.avatarUrl ?? null };
+    }
+
+    // 2. Bypass default nakes simulation account — ensure DB record exists
+    if (role === "nakes" && (u === "nakes" || u === "bidan" || u === "bidan.widya" || u === "nakes123") && (pass === "nakes123" || pass === "bidan123")) {
+      const nakesProfile = await ensureNakesProfileExists("Bidan Widya, A.Md.Keb");
+      const nakesName = nakesProfile ? 
+        ((await prisma.mother.findFirst({ where: { national_id: "NAKES-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Bidan Widya, A.Md.Keb")
+        : "Bidan Widya, A.Md.Keb";
+      return { success: true, name: nakesName, role: "nakes" as const, avatarUrl: nakesProfile?.avatarUrl ?? null };
     }
 
     let cleanU = u;
     if (cleanU.startsWith("ibu ")) {
       cleanU = cleanU.substring(4).trim();
     } else if (cleanU.startsWith("kader ")) {
+      cleanU = cleanU.substring(6).trim();
+    } else if (cleanU.startsWith("nakes ") || cleanU.startsWith("bidan ")) {
       cleanU = cleanU.substring(6).trim();
     }
 
@@ -775,6 +825,7 @@ export async function verifyUserLogin(username: string, pass: string, role: "kad
           { phone_number: { contains: digitsOnly && digitsOnly.length > 5 ? digitsOnly : "NONMATCH" } },
           { national_id: { equals: u, mode: 'insensitive' } },
           { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
+          { national_id: { equals: "NAKES-" + u, mode: 'insensitive' } },
           { mother_name: { equals: u, mode: 'insensitive' } },
           { mother_name: { contains: cleanU, mode: 'insensitive' } }
         ]
@@ -787,25 +838,96 @@ export async function verifyUserLogin(username: string, pass: string, role: "kad
 
     // Role check
     const isDbKader = mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-");
+    const isDbNakes = mother.ui_status === "Tenaga Kesehatan" || mother.national_id.startsWith("NAKES-");
+
     if (role === "kader" && !isDbKader) {
-      return { success: false, error: "Identitas ini tidak terdaftar sebagai Kader." };
+      return { success: false, error: "Identitas ini tidak terdaftar sebagai Kader Posyandu." };
     }
-    if (role === "ibu" && isDbKader) {
+    if (role === "nakes" && !isDbNakes && !isDbKader) {
+      return { success: false, error: "Identitas ini tidak terdaftar sebagai Tenaga Kesehatan." };
+    }
+    if (role === "ibu" && (isDbKader || isDbNakes)) {
       return { success: false, error: "Identitas ini tidak terdaftar sebagai Ibu." };
     }
 
     // Verify password
     const dbPassword = mother.password;
-    const defaultPassword = isDbKader ? "kader123" : "ibu123";
+    const defaultPassword = isDbNakes ? "nakes123" : isDbKader ? "kader123" : "ibu123";
     const expectedPassword = dbPassword || defaultPassword;
 
     if (pass !== expectedPassword) {
       return { success: false, error: "Kata sandi salah." };
     }
 
-    return { success: true, name: mother.mother_name, avatarUrl: mother.avatarUrl };
+    return { success: true, name: mother.mother_name, role, avatarUrl: mother.avatarUrl };
   } catch (error: any) {
     console.error("Error in verifyUserLogin:", error);
+    return { success: false, error: error.message || "Gagal melakukan otentikasi." };
+  }
+}
+
+// ─── AUTO LOGIN: deteksi role otomatis dari database, tanpa pilihan role di frontend ───
+export async function verifyUserLoginAuto(username: string, pass: string) {
+  try {
+    const u = username.trim().toLowerCase();
+
+    // 1. Default kader bypass
+    if (u === "kader" && pass === "kader123") {
+      const kaderProfile = await ensureKaderProfileExists("Kader Siti");
+      const kaderName = (await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Siti";
+      return { success: true, name: kaderName, role: "kader" as const, avatarUrl: kaderProfile?.avatarUrl ?? null };
+    }
+
+    // 2. Default nakes bypass
+    if ((u === "nakes" || u === "bidan" || u === "bidan.widya") && (pass === "nakes123" || pass === "bidan123")) {
+      const nakesProfile = await ensureNakesProfileExists("Bidan Widya, A.Md.Keb");
+      const nakesName = (await prisma.mother.findFirst({ where: { national_id: "NAKES-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Bidan Widya, A.Md.Keb";
+      return { success: true, name: nakesName, role: "nakes" as const, avatarUrl: nakesProfile?.avatarUrl ?? null };
+    }
+
+    // 3. Search DB — cari berdasarkan berbagai field
+    let cleanU = u;
+    if (cleanU.startsWith("ibu ")) cleanU = cleanU.substring(4).trim();
+    else if (cleanU.startsWith("kader ")) cleanU = cleanU.substring(6).trim();
+    else if (cleanU.startsWith("nakes ") || cleanU.startsWith("bidan ")) cleanU = cleanU.substring(6).trim();
+
+    const digitsOnly = u.replace(/\D/g, "");
+
+    const mother = await prisma.mother.findFirst({
+      where: {
+        OR: [
+          { phone_number: { equals: u, mode: 'insensitive' } },
+          { phone_number: { contains: digitsOnly && digitsOnly.length > 5 ? digitsOnly : "NONMATCH" } },
+          { national_id: { equals: u, mode: 'insensitive' } },
+          { national_id: { equals: "KADER-" + u, mode: 'insensitive' } },
+          { national_id: { equals: "NAKES-" + u, mode: 'insensitive' } },
+          { mother_name: { equals: u, mode: 'insensitive' } },
+          { mother_name: { contains: cleanU, mode: 'insensitive' } },
+        ]
+      }
+    });
+
+    if (!mother) {
+      return { success: false, error: "Username tidak ditemukan. Periksa kembali username atau nomor WhatsApp Anda." };
+    }
+
+    // 4. Deteksi role dari data DB
+    const isDbNakes = mother.ui_status === "Tenaga Kesehatan" || mother.national_id.startsWith("NAKES-");
+    const isDbKader = mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-");
+    const detectedRole: "kader" | "nakes" | "ibu" = isDbNakes ? "nakes" : isDbKader ? "kader" : "ibu";
+
+    // 5. Verifikasi password
+    const dbPassword = mother.password;
+    const defaultPassword = isDbNakes ? "nakes123" : isDbKader ? "kader123" : "ibu123";
+    const expectedPassword = dbPassword || defaultPassword;
+
+    if (pass !== expectedPassword) {
+      return { success: false, error: "Kata sandi salah." };
+    }
+
+    return { success: true, name: mother.mother_name, role: detectedRole, avatarUrl: mother.avatarUrl };
+  } catch (error: any) {
+    console.error("Error in verifyUserLoginAuto:", error);
     return { success: false, error: error.message || "Gagal melakukan otentikasi." };
   }
 }

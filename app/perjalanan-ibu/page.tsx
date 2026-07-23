@@ -39,6 +39,13 @@ const GEJALA_FIELDS = [
 function PerjalananIbuContent() {
   const { role, username, isLoggedIn } = useUserRole();
   const router = useRouter();
+
+  useEffect(() => {
+    if (role === "nakes") {
+      router.replace("/perjalanan-ibu/rekam-medis");
+    }
+  }, [role, router]);
+
   const searchParams = useSearchParams();
   const activeSection = searchParams?.get("section") || "";
   const [motherDetail, setMotherDetail] = useState<any>(null);

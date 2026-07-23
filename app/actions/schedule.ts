@@ -169,7 +169,7 @@ export async function getScheduleLogs() {
   }
 }
 
-export async function getRealtimeNotifications(role: "kader" | "ibu", username?: string) {
+export async function getRealtimeNotifications(role: "kader" | "ibu" | "nakes", username?: string) {
   try {
     const notifications: any[] = [];
 
@@ -192,8 +192,8 @@ export async function getRealtimeNotifications(role: "kader" | "ibu", username?:
       });
     });
 
-    // 2. Health alert logic for Kader
-    if (role === "kader") {
+    // 2. Health alert logic for Kader & Nakes
+    if (role === "kader" || role === "nakes") {
       const stuntingCount = await prisma.child.count({
         where: {
           OR: [

@@ -48,6 +48,13 @@ function StatusBadge({ status }: { status: string }) {
 function PerjalananAnakContent() {
   const { role, username, isLoggedIn } = useUserRole();
   const router = useRouter();
+
+  useEffect(() => {
+    if (role === "nakes") {
+      router.replace("/perjalanan-anak/rekam-medis");
+    }
+  }, [role, router]);
+
   const searchParams = useSearchParams();
   const activeSection = searchParams?.get("section") || "";
   const [motherChildren, setMotherChildren] = useState<any[]>([]);

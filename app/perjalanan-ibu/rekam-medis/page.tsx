@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useUserRole } from "@/context/UserRoleContext";
+import { getLoggedInMotherDetail, createMaternalRecord, getMotherDetail, getMothersData } from "@/app/actions/mothers";
 import { 
   MdDateRange, MdPlace, MdFitnessCenter, MdStraighten, 
   MdFavorite, MdBloodtype, MdScience, MdMedicalServices,
   MdHelpOutline, MdAssignmentTurnedIn, MdShield, MdPsychology,
   MdFactCheck, MdKeyboardArrowRight, MdCheckCircle,
-  MdLocalHospital, MdPerson, MdCheck
+  MdLocalHospital, MdPerson, MdCheck,
+  MdSearch, MdClose, MdKeyboardArrowDown
 } from "react-icons/md";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from "recharts";
 
@@ -419,6 +423,11 @@ const IMUNISASI_TD_REF = [
 ];
 
 export default function RekamMedisIbuPage() {
+  const { username, role } = useUserRole();
+  const [dbMother, setDbMother] = useState<any>(null);
+  const [dbRecords, setDbRecords] = useState<any[]>([]);
+  const [isLoadingDb, setIsLoadingDb] = useState<boolean>(true);
+
   // Main Tab terbagi menjadi 3 bagian terpisah sesuai permintaanmu
   const [activeMainTab, setActiveMainTab] = useState<"anc" | "evaluasi_kesehatan" | "evaluasi_dokter" | "catatan_pelayanan" | "persalinan" | "nifas">("anc");  const [activeSubTab, setActiveSubTab] = useState<"pemeriksaan_tri1" | "skrining_khusus" | "pemeriksaan_tri3" | "grafik">("pemeriksaan_tri1");
   const [activeKunjungan, setActiveKunjungan] = useState<number>(1);
@@ -432,7 +441,102 @@ export default function RekamMedisIbuPage() {
   // State untuk mengontrol filter fokus garis pada Grafik Berat Badan
   const [focusGarisBB, setFocusGarisBB] = useState<string | null>(null);
 
-  const record = MOCK_DETAILED_RECORDS[0];
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramMotherId = searchParams?.get("mother_id");
+
+  const [allMothersList, setAllMothersList] = useState<any[]>([]);
+  const [motherSearchTerm, setMotherSearchTerm] = useState("");
+  const [isMotherDropdownOpen, setIsMotherDropdownOpen] = useState(false);
+  const motherDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    async function fetchMothersList() {
+      try {
+        const list = await getMothersData();
+        if (list && list.length > 0) {
+          setAllMothersList(list);
+        }
+      } catch (e) {
+        console.error("Failed to load mothers list:", e);
+      }
+    }
+    fetchMothersList();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (motherDropdownRef.current && !motherDropdownRef.current.contains(event.target as Node)) {
+        setIsMotherDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredMothers = allMothersList.filter((m) => {
+    const q = motherSearchTerm.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      (m.name && m.name.toLowerCase().includes(q)) ||
+      (m.national_id && m.national_id.toLowerCase().includes(q)) ||
+      (m.husband_name && m.husband_name.toLowerCase().includes(q))
+    );
+  });
+
+  useEffect(() => {
+    async function loadMotherEhrData() {
+      setIsLoadingDb(true);
+      try {
+        let motherData: any = null;
+        if (paramMotherId) {
+          motherData = await getMotherDetail(paramMotherId);
+        } else if (role === "ibu") {
+          const targetUsername = username || "08123456789";
+          motherData = await getLoggedInMotherDetail(targetUsername);
+        }
+        if (motherData) {
+          setDbMother(motherData);
+          if (motherData.maternal_records && motherData.maternal_records.length > 0) {
+            setDbRecords(motherData.maternal_records);
+          }
+        } else {
+          setDbMother(null);
+        }
+      } catch (err) {
+        console.error("Failed to load mother EHR from DB:", err);
+      } finally {
+        setIsLoadingDb(false);
+      }
+    }
+    loadMotherEhrData();
+  }, [username, paramMotherId, role]);
+
+  const record = (dbRecords.length > 0 && dbRecords[0]) ? {
+    kunjunganKe: 1,
+    trimester: "I" as const,
+    mingguFase: "Catatan Database Terverifikasi",
+    tanggalPeriksa: dbRecords[0].date || "12 Februari 2026",
+    tempatPeriksa: dbMother?.faskes_1 || "Posyandu Kenanga 1",
+    beratBadan: dbRecords[0].weight || 52.5,
+    tinggiBadan: dbMother?.height || 158,
+    lingkarLenganAtas: dbRecords[0].muac || 22.8,
+    tekananDarah: dbRecords[0].blood_pressure || "115/75",
+    tinggiRahim: dbRecords[0].fundal_height || null,
+    letakJanin: "-",
+    djjBayi: dbRecords[0].fetal_heart_rate || null,
+    statusImunisasiTetanus: "T1",
+    konseling: dbRecords[0].cadre_notes || "Edukasi gizi trimester 1 dan pemantauan rutin",
+    skriningDokter: "Dilakukan oleh Nakes Puskesmas (Normal)",
+    tabletTambahDarah: dbRecords[0].iron_pills_given || 30,
+    labHemoglobin: 12.1,
+    golonganDarah: dbMother?.blood_type || "O+",
+    labProteinUrine: "Negatif",
+    labGulaDarah: 95,
+    usg: "Kantung janin terlihat berkembang baik",
+    tripelElimasi: { hiv: "Non Reaktif", sifilis: "Non Reaktif", hepatitisB: "Non Reaktif" },
+    tataLaksanaKasus: "Pemberian suplemen & TTD"
+  } : MOCK_DETAILED_RECORDS[0];
   const evalDoc = MOCK_DOCTOR_EVALUATION;
 
   const checkIsKek = record.lingkarLenganAtas ? record.lingkarLenganAtas < 23.5 : false;
@@ -452,26 +556,180 @@ export default function RekamMedisIbuPage() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto p-4 md:p-6 pb-18 bg-[#FAFAFA] min-h-screen text-gray-800 space-y-6">
+    <div className="max-w-[1600px] mx-auto px-4 py-3 md:px-6 md:py-4 pb-18 bg-[#FAFAFA] min-h-screen text-gray-800 space-y-4">
       
-      {/* ─── BREADCRUMB & HEADER ─── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-gray-400">
-            <Link href="/dashboard" className="hover:text-[#EA2986]">Beranda</Link>
-            <span>/</span>
-            <span className="text-gray-600">Perjalanan Ibu</span>
+      {/* ─── BREADCRUMB & HEADER (NON-NAKES ONLY) ─── */}
+      {role !== "nakes" && (
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-gray-400">
+              <Link href="/" className="hover:text-[#EA2986]">Beranda</Link>
+              <span>/</span>
+              <span className="text-gray-600">Rekam Medis Ibu</span>
+            </div>
+            <h1 className="text-xl font-black text-gray-900 mt-1 tracking-tight">Catatan Kesehatan &amp; Rekam Medis Maternal</h1>
           </div>
-          <h1 className="text-xl font-black text-gray-900 mt-1 tracking-tight">Catatan Kesehatan &amp; Rekam Medis Maternal</h1>
+          <span className="text-[10px] font-extrabold text-[#EA2986] bg-[#EA2986]/10 px-3 py-1.5 rounded-xl uppercase tracking-wider self-start md:self-auto">
+            Buku Kesehatan Ibu dan Anak
+          </span>
         </div>
-        <span className="text-[10px] font-extrabold text-[#EA2986] bg-[#EA2986]/10 px-3 py-1.5 rounded-xl uppercase tracking-wider self-start md:self-auto">
-          Buku Kesehatan Ibu dan Anak
-        </span>
+      )}
+
+      {/* ─── SEARCH & MOTHER INFORMATIONAL CARD (LIGHT MODE) ─── */}
+      <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-4 animate-fadeIn">
+        
+        {/* TOP ROW: SEARCH & DROPDOWN COMBOBOX (DI ATAS NAMA IBU) */}
+        {allMothersList.length > 0 && (
+          <div className="bg-slate-50 p-3.5 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative">
+            <div className="flex items-center gap-2 text-xs font-bold text-gray-700 shrink-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#EA2986] animate-pulse" />
+              <span>Cari &amp; Pilih Pasien Ibu Maternal (EHR):</span>
+            </div>
+
+            {/* SEARCHABLE COMBOBOX CONTAINER */}
+            <div className="relative flex-1 max-w-md w-full" ref={motherDropdownRef}>
+              <div className="relative flex items-center">
+                <MdSearch className="absolute left-3 text-gray-400 text-base pointer-events-none" />
+                
+                <input
+                  type="text"
+                  placeholder="Ketik Nama Ibu / NIK / Nama Suami..."
+                  value={motherSearchTerm}
+                  onFocus={() => setIsMotherDropdownOpen(true)}
+                  onChange={(e) => {
+                    setMotherSearchTerm(e.target.value);
+                    setIsMotherDropdownOpen(true);
+                  }}
+                  className="w-full bg-white text-gray-900 font-extrabold text-xs outline-none py-2.5 pl-9 pr-9 rounded-xl border border-gray-300 focus:border-[#EA2986] focus:ring-2 focus:ring-[#EA2986]/20 transition shadow-2xs"
+                />
+
+                {motherSearchTerm ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMotherSearchTerm("");
+                      setIsMotherDropdownOpen(true);
+                    }}
+                    className="absolute right-2.5 p-1 text-gray-400 hover:text-gray-600 rounded-lg cursor-pointer"
+                  >
+                    <MdClose className="text-sm" />
+                  </button>
+                ) : (
+                  <MdKeyboardArrowDown 
+                    onClick={() => setIsMotherDropdownOpen(!isMotherDropdownOpen)}
+                    className="absolute right-2.5 text-gray-400 text-lg cursor-pointer hover:text-gray-600" 
+                  />
+                )}
+              </div>
+
+              {/* DROPDOWN MENU FLOATING */}
+              {isMotherDropdownOpen && (
+                <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 max-h-64 overflow-y-auto p-1.5 space-y-1 animate-fadeIn">
+                  {filteredMothers.length > 0 ? (
+                    filteredMothers.map((m) => {
+                      const isSelected = dbMother?.mother_id === m.mother_id;
+
+                      return (
+                        <button
+                          key={m.mother_id}
+                          type="button"
+                          onClick={() => {
+                            setMotherSearchTerm(m.name);
+                            setIsMotherDropdownOpen(false);
+                            router.push(`/perjalanan-ibu/rekam-medis?mother_id=${m.mother_id}`);
+                          }}
+                          className={`w-full text-left p-2.5 rounded-xl flex items-center justify-between gap-3 transition cursor-pointer ${
+                            isSelected 
+                              ? "bg-rose-50 border border-rose-200 text-[#EA2986]" 
+                              : "hover:bg-gray-50 text-gray-800"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="w-8 h-8 rounded-lg bg-rose-100 text-[#EA2986] border border-rose-200 flex items-center justify-center text-sm shrink-0">
+                              🤱
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-xs font-black truncate">{m.name}</p>
+                              <p className="text-[10px] text-gray-400 truncate">
+                                Status: {m.status || "Ibu Hamil"} · Suami: {m.husband_name || "-"}
+                              </p>
+                            </div>
+                          </div>
+
+                          {isSelected && (
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-[#EA2986] text-white shrink-0">
+                              Aktif
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <div className="p-3 text-center text-xs text-gray-400 font-semibold">
+                      Tidak ada pasien ibu yang cocok dengan "{motherSearchTerm}"
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* EMPTY STATE IF NO MOTHER SELECTED YET */}
+        {!dbMother && (
+          <div className="bg-slate-50 border-2 border-dashed border-rose-200/80 rounded-2xl p-8 text-center space-y-3 my-2">
+            <div className="w-14 h-14 bg-rose-100 text-[#EA2986] rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-2xs">
+              🤱
+            </div>
+            <div>
+              <h3 className="text-base font-black text-gray-900">Belum Ada Pasien Ibu Dipilih</h3>
+              <p className="text-xs text-gray-500 max-w-md mx-auto mt-1 font-semibold leading-relaxed">
+                Silakan ketik atau pilih nama ibu dari menu pencarian di atas untuk mulai melihat dan mengelola Rekam Medis (EHR) maternal.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* BOTTOM ROW: PROFIL NAMA IBU (LIGHT MODE) */}
+        {dbMother && (
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1">
+            <div className="flex items-center gap-3.5">
+              <div className="w-13 h-13 rounded-2xl bg-rose-50 border border-rose-200 text-[#EA2986] flex items-center justify-center text-2xl font-black shrink-0">
+                🤱
+              </div>
+              
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg font-black tracking-tight text-gray-900">{dbMother.name || dbMother.mother_name}</h2>
+                  <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full border bg-rose-50 text-[#EA2986] border-rose-200">
+                    {dbMother.status || "Ibu Hamil"}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 font-medium mt-1">
+                  NIK: <span className="font-bold text-gray-800">{dbMother.national_id || "-"}</span>
+                  {dbMother.gestational_age && (
+                    <span> • Usia Kehamilan: <span className="font-bold text-gray-800">{dbMother.gestational_age}</span></span>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {dbMother.husband_name && (
+              <div className="text-left md:text-right text-xs bg-gray-50 px-4 py-2.5 rounded-xl border border-gray-200 shrink-0">
+                <span className="text-gray-400 text-[10px] block font-bold uppercase tracking-wider">Suami / Pendamping</span>
+                <span className="font-extrabold text-gray-900 text-xs">{dbMother.husband_name}</span>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
 
-      {/* ─── MAIN TABS NAVIGATION (FULLY RESPONSIVE GRID) ─── */}
-      <div className="bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1.5">
+      {/* ─── MAIN TABS NAVIGATION & EHR CONTENT (ONLY IF MOTHER IS SELECTED) ─── */}
+      {dbMother && (
+        <>
+          <div className="bg-white p-2 rounded-2xl border border-gray-200 shadow-xs">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-1.5">
           <button
             type="button"
             onClick={() => setActiveMainTab("anc")}
@@ -2361,9 +2619,9 @@ export default function RekamMedisIbuPage() {
                       </div>
                     </div>
 
-                    <div className="pt-3 border-t border-gray-100 space-y-1">
+                    <div className="col-span-1 md:col-span-3 pt-3 border-t border-gray-100 space-y-1">
                       <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Kesimpulan Tertulis Nakes:</span>
-                      <p className="text-xs font-bold text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100 leading-relaxed">
+                      <p className="text-xs font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border border-gray-100 leading-relaxed">
                         Masa nifas berjalan dengan normal tanpa adanya penyulit klinis. Seluruh proses involusi uteri (pengerutan rahim) kembali ke bentuk semula secara optimal, pengeluaran cairan lokhia bersih sesuai fasenya, dan tanda vital Ibu stabil dalam batas aman selama 42 hari penuh.
                       </p>
                     </div>
@@ -2554,6 +2812,8 @@ export default function RekamMedisIbuPage() {
           )}
 
         </div>
+      )}
+        </>
       )}
     </div>
   );

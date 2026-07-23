@@ -1071,7 +1071,7 @@ export default function ChildDetailPage() {
 
               {/* Card 6: Rekam Medis Klinis EHR */}
               <div 
-                onClick={() => router.push(`/data-anak/${child.child_id}/pemeriksaan-klinis`)}
+                onClick={() => router.push(`/perjalanan-anak/rekam-medis?child_id=${child.child_id}`)}
                 className="bg-[#F4F5F7] p-4 rounded-[24px] border border-base-border/20 flex flex-col hover:shadow-md transition cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-3 text-xs font-bold text-base-text-secondary px-1">

@@ -26,6 +26,14 @@ const kaderNavItems = [
   { href: "/setting", label: "Pengaturan", icon: Cog6ToothIcon },
 ];
 
+const nakesNavItems = [
+  { href: "/beranda-nakes", label: "Beranda Medis", icon: HomeIcon },
+  { href: "/perjalanan-anak/rekam-medis", label: "Rekam Medis Anak", icon: PiBabyFill },
+  { href: "/perjalanan-ibu/rekam-medis", label: "Rekam Medis Ibu", icon: MdPregnantWoman },
+  { href: "/edukasi", label: "Portal Edukasi", icon: BookOpenIcon },
+  { href: "/setting", label: "Pengaturan", icon: Cog6ToothIcon },
+];
+
 const ibuNavItems = [
   { href: "/beranda-ibu", label: "Beranda", icon: HomeIcon },
   { href: "/perjalanan-anak", label: "Perjalanan Anak", icon: PiBabyFill },
@@ -39,7 +47,7 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const { role, isLoggedIn } = useUserRole();
 
-  const navItems = role === "ibu" ? ibuNavItems : kaderNavItems;
+  const navItems = role === "nakes" ? nakesNavItems : role === "ibu" ? ibuNavItems : kaderNavItems;
 
   useEffect(() => {
     const handleToggle = () => setIsOpen(prev => !prev);

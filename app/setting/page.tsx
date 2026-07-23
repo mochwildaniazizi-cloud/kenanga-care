@@ -422,6 +422,22 @@ function SettingsContent() {
           husband_name: savedHusband,
           national_id: "3273010203040005"
         });
+      } else if (role === "nakes") {
+        const savedName = localStorage.getItem("nakes_name") || "Bidan Widya, A.Md.Keb";
+        const savedPhone = localStorage.getItem("nakes_phone") || "0813-9988-7766";
+        const savedEmail = localStorage.getItem("nakes_email") || "bidan.widya@puskesmas.go.id";
+        const savedAddress = localStorage.getItem("nakes_address") || "Puskesmas Kenanga, Jl. Kesehatan No. 5";
+        
+        setFormData({
+          name: savedName,
+          posyandu: "Bidan Puskesmas & Posyandu",
+          role: "Bidan Puskesmas (Tenaga Kesehatan)",
+          email: savedEmail,
+          phone: savedPhone,
+          address: savedAddress,
+          husband_name: "Tenaga Kesehatan",
+          national_id: "NAKES-327301992"
+        });
       } else {
         const savedName = localStorage.getItem("kader_name") || "Kader Siti";
         const savedPhone = localStorage.getItem("kader_phone") || "0812-3456-7890";

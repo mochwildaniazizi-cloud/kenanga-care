@@ -36,8 +36,10 @@ const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; p
   "/data-ibu": { label: "Data Ibu", icon: MdPregnantWoman },
   "/data-ibu/tambah": { label: "Data Ibu", icon: MdPregnantWoman, parent: "/data-ibu", parentLabel: "Tambah Ibu" },
   "/data-ibu/[id]": { label: "Data Ibu", icon: MdPregnantWoman, parent: "/data-ibu", parentLabel: "Detail Ibu" },
-  "/perjalanan-ibu": { label: "Perjalanan Ibu", icon: MdPregnantWoman },
-  "/perjalanan-anak": { label: "Perjalanan Anak", icon: PiBabyFill },
+  "/perjalanan-ibu": { label: "Rekam Medis Ibu", icon: MdPregnantWoman },
+  "/perjalanan-ibu/rekam-medis": { label: "Rekam Medis Ibu", icon: MdPregnantWoman },
+  "/perjalanan-anak": { label: "Rekam Medis Anak", icon: PiBabyFill },
+  "/perjalanan-anak/rekam-medis": { label: "Rekam Medis Anak", icon: PiBabyFill },
   "/edukasi": { label: "Edukasi", icon: BookOpenIcon },
   "/jadwal": { label: "Jadwal", icon: CalendarDaysIcon },
   "/setting": { label: "Pengaturan", icon: Cog6ToothIcon },
@@ -79,7 +81,10 @@ export default function Header() {
   useEffect(() => {
     const loadProfile = async () => {
       const isIbu = role === "ibu";
-      let name = isIbu 
+      const isNakes = role === "nakes";
+      let name = isNakes
+        ? (localStorage.getItem("nakes_name") || "Bidan Widya, A.Md.Keb")
+        : isIbu 
         ? (localStorage.getItem("ibu_name") || "Siti Aminah")
         : (localStorage.getItem("kader_name") || "Kader Siti");
       
@@ -88,7 +93,7 @@ export default function Header() {
           const dbData = await getLoggedInMotherData(username);
           if (dbData && dbData.mother_name) {
             name = dbData.mother_name;
-            localStorage.setItem(isIbu ? "ibu_name" : "kader_name", dbData.mother_name);
+            localStorage.setItem(isNakes ? "nakes_name" : isIbu ? "ibu_name" : "kader_name", dbData.mother_name);
             if (dbData.avatarUrl) {
               setAvatarUrl(dbData.avatarUrl);
               localStorage.setItem(`user_profile_avatar_${username}`, dbData.avatarUrl);
@@ -102,7 +107,9 @@ export default function Header() {
         }
       }
 
-      const savedPosyandu = isIbu
+      const savedPosyandu = isNakes
+        ? "Bidan Puskesmas & Posyandu"
+        : isIbu
         ? "Posyandu Kenanga 1"
         : (localStorage.getItem("kader_posyandu") || "Posyandu Kenanga 1");
 
@@ -539,6 +546,10 @@ export default function Header() {
   const ActiveIcon = currentBreadcrumb.icon;
 
   const getBreadcrumbLabel = (key: string, defaultLabel: string) => {
+    if (role === "nakes") {
+      if (key === "/perjalanan-ibu" || key === "/perjalanan-ibu/rekam-medis") return "Rekam Medis Ibu";
+      if (key === "/perjalanan-anak" || key === "/perjalanan-anak/rekam-medis") return "Rekam Medis Anak";
+    }
     if (role === "ibu") {
       if (key === "/perjalanan-anak" || key === "/data-anak") return "Perjalanan Anak";
       if (key === "/perjalanan-ibu" || key === "/data-ibu") return "Perjalanan Ibu";

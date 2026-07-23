@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-export type UserRole = "kader" | "ibu";
+export type UserRole = "kader" | "ibu" | "nakes";
 
 interface UserRoleContextType {
   role: UserRole;
@@ -36,7 +36,7 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const savedRole = localStorage.getItem("user_role") as UserRole | null;
-    if (savedRole === "kader" || savedRole === "ibu") {
+    if (savedRole === "kader" || savedRole === "ibu" || savedRole === "nakes") {
       setRoleState(savedRole);
     }
 
@@ -56,8 +56,8 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
     if (!isLoggedIn && !publicPaths.includes(pathname)) {
       router.replace("/login");
     } else if (isLoggedIn && pathname === "/login") {
-      // 💡 Menggunakan 'role' yang valid di dalam sekup useEffect ini
-      router.replace(role === "kader" ? "/dashboard-kader" : "/beranda-ibu");
+      const targetHome = role === "nakes" ? "/beranda-nakes" : role === "ibu" ? "/beranda-ibu" : "/beranda-kader";
+      router.replace(targetHome);
     }
   }, [isLoggedIn, pathname, isInitialized, role, router]);
 
@@ -67,7 +67,7 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
     window.dispatchEvent(new CustomEvent("role-changed", { detail: newRole }));
   };
 
-  // ─── FUNGSI LOGIN (MENGGUNAKAN PARAMETER LOKAL: newRole & userVal) ───
+  // ─── FUNGSI LOGIN ───
   const login = (newRole: UserRole, userVal: string) => {
     localStorage.setItem("user_role", newRole);
     localStorage.setItem("is_logged_in", "true");
@@ -83,8 +83,8 @@ export function UserRoleProvider({ children }: { children: ReactNode }) {
       })
     );
     
-    // 💡 Di sini baru benar menggunakan 'newRole' pasca-proses login sukses
-    router.replace(newRole === "kader" ? "/dashboard-kader" : "/beranda-ibu");
+    const redirectPath = newRole === "nakes" ? "/beranda-nakes" : newRole === "ibu" ? "/beranda-ibu" : "/beranda-kader";
+    router.replace(redirectPath);
   };
 
   const logout = () => {
