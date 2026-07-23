@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -16,7 +16,7 @@ import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/week
 import { FaUserFriends, FaHeartbeat, FaUser, FaUserFriends as FaUserCouple, FaFileMedical } from "react-icons/fa";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
-export default function MotherDetailPage() {
+function MotherDetailContent() {
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -2772,5 +2772,22 @@ export default function MotherDetailPage() {
       )}
 
     </div>
+  );
+}
+
+export default function MotherDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+          <div className="flex items-center gap-3 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <div className="w-6 h-6 border-2 border-[#EA2986] border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-sm font-bold text-gray-700">Memuat Data Ibu...</span>
+          </div>
+        </div>
+      }
+    >
+      <MotherDetailContent />
+    </Suspense>
   );
 }

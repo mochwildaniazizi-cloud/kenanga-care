@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getChildDetail, updateChild } from "@/app/actions/children";
@@ -16,7 +16,7 @@ import { FaBaby, FaNotesMedical, FaFileMedical, FaUser } from "react-icons/fa";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 
-export default function ChildDetailPage() {
+function ChildDetailContent() {
   const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -2186,5 +2186,22 @@ function DevelopmentMonitoringTab({
         ))}
       </div>
     </div>
+  );
+}
+
+export default function ChildDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+          <div className="flex items-center gap-3 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <div className="w-6 h-6 border-2 border-[#EA2986] border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-sm font-bold text-gray-700">Memuat Data Anak...</span>
+          </div>
+        </div>
+      }
+    >
+      <ChildDetailContent />
+    </Suspense>
   );
 }

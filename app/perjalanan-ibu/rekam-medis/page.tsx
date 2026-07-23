@@ -422,7 +422,7 @@ const IMUNISASI_TD_REF = [
   { tt: 5, selangWaktu: "12 bulan", perlindungan: "> 25 tahun" },
 ];
 
-export default function RekamMedisIbuPage() {
+function RekamMedisIbuContent() {
   const { username, role } = useUserRole();
   const [dbMother, setDbMother] = useState<any>(null);
   const [dbRecords, setDbRecords] = useState<any[]>([]);
@@ -2816,5 +2816,22 @@ export default function RekamMedisIbuPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function RekamMedisIbuPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+          <div className="flex items-center gap-3 bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+            <div className="w-6 h-6 border-2 border-[#EA2986] border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-sm font-bold text-gray-700">Memuat Rekam Medis Ibu...</span>
+          </div>
+        </div>
+      }
+    >
+      <RekamMedisIbuContent />
+    </Suspense>
   );
 }
