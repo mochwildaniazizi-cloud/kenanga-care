@@ -111,12 +111,12 @@ export async function getDashboardStats() {
   }
 }
 
-export async function getRecentChildActivity() {
+export async function getRecentChildActivity(limit: number = 5) {
   try {
     const measurements = await prisma.childMeasurement.findMany({
       include: { child: { include: { mother: true } } },
       orderBy: { visit_date: "desc" },
-      take: 5,
+      take: limit,
     });
 
     return measurements.map((m: any) => {
@@ -137,12 +137,12 @@ export async function getRecentChildActivity() {
   }
 }
 
-export async function getRecentMotherActivity() {
+export async function getRecentMotherActivity(limit: number = 5) {
   try {
     const records = await prisma.maternalHealthRecord.findMany({
       include: { mother: true },
       orderBy: { visit_date: "desc" },
-      take: 5,
+      take: limit,
     });
 
     return records.map((r: any) => {
