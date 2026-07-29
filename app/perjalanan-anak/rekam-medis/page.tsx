@@ -1577,7 +1577,7 @@ function RekamMedisAnakContent() {
           const motherDetail = await getLoggedInMotherDetail(targetUser);
           if (motherDetail && motherDetail.children && motherDetail.children.length > 0) {
             setMotherChildren(motherDetail.children);
-            let selectedChild = motherDetail.children[0];
+            let selectedChild: any = motherDetail.children[0];
             if (paramChildId) {
               const matched = motherDetail.children.find((c: any) => c.child_id === paramChildId);
               if (matched) {

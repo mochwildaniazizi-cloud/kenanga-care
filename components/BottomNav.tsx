@@ -32,7 +32,7 @@ export default function BottomNav() {
   const pathname = usePathname();
   const { role, isLoggedIn } = useUserRole();
 
-  if (!isLoggedIn || pathname === "/login") return null;
+  if (!isLoggedIn || pathname === "/login" || pathname === "/wireframe") return null;
 
   const items = role === "ibu" ? ibuItems : kaderItems;
 

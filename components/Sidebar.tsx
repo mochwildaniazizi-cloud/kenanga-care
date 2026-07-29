@@ -74,7 +74,7 @@ export default function Sidebar() {
     return pathname.startsWith(href);
   };
 
-  if (!isLoggedIn || pathname === "/login") return null;
+  if (!isLoggedIn || pathname === "/login" || pathname === "/wireframe") return null;
 
   return (
     <>

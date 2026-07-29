@@ -558,7 +558,7 @@ export default function Header() {
     return defaultLabel;
   };
 
-  if (!isLoggedIn || pathname === "/login") return null;
+  if (!isLoggedIn || pathname === "/login" || pathname === "/wireframe") return null;
 
   return (
     <header className="h-20 bg-base-white border-b border-base-border/40 flex items-center justify-between px-4 sm:px-10 shrink-0 z-40 relative">
