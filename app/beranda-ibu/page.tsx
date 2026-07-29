@@ -28,8 +28,15 @@ interface MotherDetail {
   maternal_records: MaternalRecord[];
 }
 interface ChildDetail {
-  child_id: string; name: string; gender: string;
-  ageInMonths: number; current_weight: number; current_height: number; status: string;
+  child_id: string; 
+  name: string; 
+  gender: string;
+  birth_date?: string | Date;
+  age?: string;
+  ageInMonths?: number; 
+  current_weight: number; 
+  current_height: number; 
+  status: string;
 }
 interface MaternalRecord {
   date: string; blood_pressure: string; weight: number; muac: number; cadre_notes: string;
@@ -41,6 +48,28 @@ const fmtDate = (d: string | Date | null) => {
   if (!d) return "-";
   const dt = new Date(d);
   return `${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()}`;
+};
+
+const calculateChildAgeInMonths = (birthDateInput?: string | Date | null, fallback?: number | string): number => {
+  if (birthDateInput) {
+    const dob = new Date(birthDateInput);
+    if (!isNaN(dob.getTime())) {
+      const now = new Date();
+      let months = (now.getFullYear() - dob.getFullYear()) * 12 + (now.getMonth() - dob.getMonth());
+      if (now.getDate() < dob.getDate()) {
+        months--;
+      }
+      return Math.max(0, months);
+    }
+  }
+  if (typeof fallback === "number" && !isNaN(fallback)) {
+    return fallback;
+  }
+  if (typeof fallback === "string") {
+    const parsed = parseInt(fallback, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return 0;
 };
 
 const getShortDate = (dateStr: string) => {
@@ -164,6 +193,9 @@ function TtdRing({ taken, total }: { taken: number; total: number }) {
 // ─── Growth Card ──────────────────────────────────────────
 function ChildGrowthCard({ child }: { child: ChildDetail }) {
   const isNormal = child.status === "Normal";
+  const displayAgeMonths = calculateChildAgeInMonths(child.birth_date, child.ageInMonths ?? child.age);
+  const isMale = child.gender === "M" || child.gender === "L";
+
   return (
     <Link href="/data-anak"
       className="bg-white border border-gray-200/80 rounded-2xl p-4 hover:border-[#EA2986]/30 hover:shadow-sm transition-all relative overflow-hidden group">
@@ -173,10 +205,10 @@ function ChildGrowthCard({ child }: { child: ChildDetail }) {
           <div>
             <h4 className="font-bold text-sm text-gray-900">{child.name}</h4>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[10px] font-bold text-[#EA2986] bg-[#EA2986]/10 px-2 py-0.5 rounded-full">
-                {child.gender === "M" ? "Laki-laki" : "Perempuan"}
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isMale ? "bg-blue-50 text-blue-600" : "bg-[#EA2986]/10 text-[#EA2986]"}`}>
+                {isMale ? "Laki-laki ♂" : "Perempuan ♀"}
               </span>
-              <span className="text-[10px] text-gray-400 font-medium">{child.ageInMonths} Bulan</span>
+              <span className="text-[10px] text-gray-400 font-medium">{displayAgeMonths} Bulan</span>
             </div>
           </div>
           <span className={`px-2.5 py-1 text-[10px] font-bold rounded-lg ${isNormal ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
@@ -187,7 +219,7 @@ function ChildGrowthCard({ child }: { child: ChildDetail }) {
           {[
             { label: "Berat", value: `${child.current_weight || "-"} kg`, icon: <MdScale className="mx-auto text-gray-500" /> },
             { label: "Tinggi", value: `${child.current_height || "-"} cm`, icon: <MdStraighten className="mx-auto text-gray-500" /> },
-            { label: "Usia", value: `${child.ageInMonths} bln`, icon: <MdCake className="mx-auto text-gray-500" /> },
+            { label: "Usia", value: `${displayAgeMonths} bln`, icon: <MdCake className="mx-auto text-gray-500" /> },
           ].map((d, i) => (
             <div key={i} className="bg-gray-50 rounded-xl p-2 text-center flex flex-col justify-between min-h-[55px]">
               <div className="text-sm text-gray-500 flex justify-center items-center h-4">{d.icon}</div>
@@ -285,8 +317,9 @@ export default function IbuDashboardPage() {
 
     let targetCat = "Kehamilan";
     if (!isHamil && mainChild) {
-      if (mainChild.ageInMonths <= 6) targetCat = "0 - 6 Bulan";
-      else if (mainChild.ageInMonths <= 12) targetCat = "6 - 12 Bulan";
+      const childAgeMonths = calculateChildAgeInMonths(mainChild.birth_date, mainChild.ageInMonths ?? mainChild.age);
+      if (childAgeMonths <= 6) targetCat = "0 - 6 Bulan";
+      else if (childAgeMonths <= 12) targetCat = "6 - 12 Bulan";
       else targetCat = "12 - 24 Bulan";
     }
 

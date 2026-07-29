@@ -486,6 +486,8 @@ export async function getMotherDetail(motherId: string) {
           child_id: c.child_id,
           name: c.child_name,
           gender: c.gender,
+          birth_date: c.birth_date,
+          ageInMonths: Math.max(0, ageInMonths),
           age: ageStr,
           dob: birthDate ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(birthDate) : "-",
           current_weight: c.current_weight ? Number(c.current_weight) : null,

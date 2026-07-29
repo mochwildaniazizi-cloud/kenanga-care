@@ -1314,6 +1314,15 @@ function RekamMedisAnakContent() {
     options: { value: string; label: string }[]
   ) => {
     const isSelected = !!val && val !== "—" && val !== "-";
+    if (role !== "nakes") {
+      return (
+        <td className="p-0.5 border-r border-gray-900 text-center font-black text-[10px]">
+          <span className={isSelected ? "px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold" : "text-gray-400"}>
+            {val || "—"}
+          </span>
+        </td>
+      );
+    }
     return (
       <td className="p-0.5 border-r border-gray-900">
         <select
@@ -2001,7 +2010,7 @@ function RekamMedisAnakContent() {
                       <th className="py-3 px-4 w-1/4 border-r border-gray-700">Tanggal Periksa &amp; Nakes</th>
                       <th className="py-3 px-4 w-2/4 border-r border-gray-700">Keluhan, Hasil Pemeriksaan, Tindakan dan Saran</th>
                       <th className="py-3 px-4 text-center w-1/6 border-r border-gray-700">Tanggal Kembali</th>
-                      <th className="py-3 px-3 text-center w-28">Aksi</th>
+                      {role === "nakes" && <th className="py-3 px-3 text-center w-28">Aksi</th>}
                     </tr>
                   </thead>
                   <tbody className="text-xs bg-white text-gray-700 font-medium divide-y divide-gray-400">
@@ -2019,28 +2028,30 @@ function RekamMedisAnakContent() {
                         <td className="p-4 text-center font-black text-[#EA2986] text-sm align-top border-r border-gray-400">
                           {log.tanggalKembali || "-"}
                         </td>
-                        <td className="p-4 text-center align-top">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => handleEditNakesLog(log)}
-                              className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg border border-amber-200 transition cursor-pointer text-xs font-bold flex items-center gap-1"
-                              title="Edit Catatan"
-                            >
-                              <MdEdit className="text-base" />
-                              <span className="hidden sm:inline">Edit</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteNakesLog(log.id)}
-                              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-lg border border-rose-200 transition cursor-pointer text-xs font-bold flex items-center gap-1"
-                              title="Hapus Catatan"
-                            >
-                              <span>🗑️</span>
-                              <span className="hidden sm:inline">Hapus</span>
-                            </button>
-                          </div>
-                        </td>
+                        {role === "nakes" && (
+                          <td className="p-4 text-center align-top">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleEditNakesLog(log)}
+                                className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg border border-amber-200 transition cursor-pointer text-xs font-bold flex items-center gap-1"
+                                title="Edit Catatan"
+                              >
+                                <MdEdit className="text-base" />
+                                <span className="hidden sm:inline">Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteNakesLog(log.id)}
+                                className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 rounded-lg border border-rose-200 transition cursor-pointer text-xs font-bold flex items-center gap-1"
+                                title="Hapus Catatan"
+                              >
+                                <span>🗑️</span>
+                                <span className="hidden sm:inline">Hapus</span>
+                              </button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -2183,6 +2194,29 @@ function RekamMedisAnakContent() {
                         
                         const status = yellowStatuses[monthNum];
                         
+                        if (role !== "nakes") {
+                          return (
+                            <div
+                              className={`relative w-full h-full py-2 px-1 font-black flex items-center justify-center rounded-sm min-h-[32px] ${
+                                status === "L" 
+                                  ? "bg-emerald-600 text-white font-extrabold"
+                                  : status === "TL"
+                                  ? "bg-rose-600 text-white font-extrabold"
+                                  : "bg-[#FFEDA9] text-gray-900 font-bold"
+                              }`}
+                            >
+                              <span className={`absolute top-0.5 left-1 text-[8px] font-black leading-none ${status ? "text-white/80" : "text-gray-500/70"}`}>
+                                {monthVal}
+                              </span>
+                              {status ? (
+                                <span className="text-[11px] font-black tracking-tight mt-1">{status}</span>
+                              ) : (
+                                <span className="text-xs font-bold text-gray-900 mt-1">{monthVal}</span>
+                              )}
+                            </div>
+                          );
+                        }
+
                         return (
                           <button
                             type="button"
@@ -2236,18 +2270,30 @@ function RekamMedisAnakContent() {
                           
                           {/* Kolom Umur Evaluasi ke-4 (Warna Hijau Buku KIA - Klik untuk Centang ✓) */}
                           <td className="p-0 border-r border-gray-900 bg-[#C7E1AA]">
-                            <button
-                              type="button"
-                              onClick={() => handleToggleGreenCheck(monthNum4)}
-                              title={`Petugas Kesehatan: Ketuk untuk centang ✓ bulan ke-${monthNum4}`}
-                              className={`w-full h-full py-1.5 px-1 font-black transition-all cursor-pointer flex items-center justify-center min-h-[32px] ${
-                                isGreenChecked
-                                  ? "bg-emerald-700 text-white font-extrabold shadow-2xs"
-                                  : "bg-[#C7E1AA] text-gray-950 hover:bg-emerald-300 font-bold"
-                              }`}
-                            >
-                              {isGreenChecked ? `✓ ${row.u4} Bln` : `${row.u4} Bln`}
-                            </button>
+                            {role === "nakes" ? (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleGreenCheck(monthNum4)}
+                                title={`Petugas Kesehatan: Ketuk untuk centang ✓ bulan ke-${monthNum4}`}
+                                className={`w-full h-full py-1.5 px-1 font-black transition-all cursor-pointer flex items-center justify-center min-h-[32px] ${
+                                  isGreenChecked
+                                    ? "bg-emerald-700 text-white font-extrabold shadow-2xs"
+                                    : "bg-[#C7E1AA] text-gray-950 hover:bg-emerald-300 font-bold"
+                                }`}
+                              >
+                                {isGreenChecked ? `✓ ${row.u4} Bln` : `${row.u4} Bln`}
+                              </button>
+                            ) : (
+                              <div
+                                className={`w-full h-full py-1.5 px-1 font-black flex items-center justify-center min-h-[32px] ${
+                                  isGreenChecked
+                                    ? "bg-emerald-700 text-white font-extrabold"
+                                    : "bg-[#C7E1AA] text-gray-950 font-bold"
+                                }`}
+                              >
+                                {isGreenChecked ? `✓ ${row.u4} Bln` : `${row.u4} Bln`}
+                              </div>
+                            )}
                           </td>
                           
                           {/* Data Medis Pertumbuhan Dropdowns */}
@@ -2660,7 +2706,7 @@ function RekamMedisAnakContent() {
                               <th colSpan={4} className="py-1.5 border-b border-gray-800 bg-[#EA2986] text-white text-center uppercase tracking-wider text-xs font-black">
                                 ♀ STANDAR PERTUMBUHAN PEREMPUAN
                               </th>
-                              <th rowSpan={3} className="py-2.5 px-2 border-l border-gray-800 bg-gray-900 w-16 text-white text-center">Aksi</th>
+                              {role === "nakes" && <th rowSpan={3} className="py-2.5 px-2 border-l border-gray-800 bg-gray-900 w-16 text-white text-center">Aksi</th>}
                             </tr>
                             <tr>
                               <th colSpan={2} className="py-1 border-r border-b border-gray-800 bg-pink-900 text-pink-100 text-[10px]">Berat Badan (BB)</th>
@@ -2680,7 +2726,7 @@ function RekamMedisAnakContent() {
                               <th colSpan={4} className="py-1.5 border-b border-gray-800 bg-blue-700 text-white text-center uppercase tracking-wider text-xs font-black">
                                 ♂ STANDAR PERTUMBUHAN LAKI-LAKI
                               </th>
-                              <th rowSpan={3} className="py-2.5 px-2 border-l border-gray-800 bg-gray-900 w-16 text-white text-center">Aksi</th>
+                              {role === "nakes" && <th rowSpan={3} className="py-2.5 px-2 border-l border-gray-800 bg-gray-900 w-16 text-white text-center">Aksi</th>}
                             </tr>
                             <tr>
                               <th colSpan={2} className="py-1 border-r border-b border-gray-800 bg-blue-900 text-blue-100 text-[10px]">Berat Badan (BB)</th>
@@ -2733,20 +2779,22 @@ function RekamMedisAnakContent() {
                               <td className={`p-2 border-r border-gray-300 ${actualPB !== "—" ? "bg-emerald-100 text-emerald-950 font-black" : "text-gray-400 font-normal"}`}>
                                 {actualPB}
                               </td>
-                              <td className="p-1 text-center bg-gray-50 border-l border-gray-300">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenEditKmsRow(row.month, rawBB, rawPB, dbMatch)}
-                                  className={`px-2 py-1 rounded-md text-[10px] font-extrabold transition shadow-2xs cursor-pointer flex items-center justify-center gap-0.5 mx-auto border ${
-                                    hasRowData
-                                      ? "bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-300 hover:border-amber-600"
-                                      : "bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white border-emerald-300 hover:border-emerald-600"
-                                  }`}
-                                  title={hasRowData ? `Edit Data Usia ${row.month} Bulan` : `Tambah Data Usia ${row.month} Bulan`}
-                                >
-                                  {hasRowData ? <><MdEdit /> Edit</> : <><MdAdd /> Tambah</>}
-                                </button>
-                              </td>
+                              {role === "nakes" && (
+                                <td className="p-1 text-center bg-gray-50 border-l border-gray-300">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEditKmsRow(row.month, rawBB, rawPB, dbMatch)}
+                                    className={`px-2 py-1 rounded-md text-[10px] font-extrabold transition shadow-2xs cursor-pointer flex items-center justify-center gap-0.5 mx-auto border ${
+                                      hasRowData
+                                        ? "bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-300 hover:border-amber-600"
+                                        : "bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white border-emerald-300 hover:border-emerald-600"
+                                    }`}
+                                    title={hasRowData ? `Edit Data Usia ${row.month} Bulan` : `Tambah Data Usia ${row.month} Bulan`}
+                                  >
+                                    {hasRowData ? <><MdEdit /> Edit</> : <><MdAdd /> Tambah</>}
+                                  </button>
+                                </td>
+                              )}
                             </tr>
                           );
                         })}
