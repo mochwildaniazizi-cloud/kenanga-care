@@ -103,19 +103,70 @@ export async function getMothersData() {
       }
     });
 
+    // Otomatis bersihkan data dummy lama yang ada di database Supabase/Vercel
+    const oldDummyMothers = mothers.filter((m: any) => {
+      const isOldDummy = 
+        m.mother_id.startsWith("M-") ||
+        m.national_id === "IBU-DEFAULT" ||
+        (m.national_id && (m.national_id.startsWith("3501") || m.national_id.startsWith("3573"))) ||
+        new Date(m.created_at).getTime() < new Date("2026-07-29T23:00:00Z").getTime();
+      return isOldDummy;
+    });
+
+    if (oldDummyMothers.length > 0) {
+      const deleteIds = oldDummyMothers.map((m: any) => m.mother_id);
+      try {
+        const childrenToDelete = await prisma.child.findMany({
+          where: { mother_id: { in: deleteIds } },
+          select: { child_id: true }
+        });
+        const childIds = childrenToDelete.map(c => c.child_id);
+
+        if (childIds.length > 0) {
+          await prisma.childMeasurement.deleteMany({
+            where: { child_id: { in: childIds } }
+          });
+          await prisma.child.deleteMany({
+            where: { child_id: { in: childIds } }
+          });
+        }
+
+        await prisma.maternalHealthRecord.deleteMany({
+          where: { mother_id: { in: deleteIds } }
+        });
+        await (prisma as any).ttdLog.deleteMany({
+          where: { mother_id: { in: deleteIds } }
+        });
+        await (prisma as any).weeklyMonitoring.deleteMany({
+          where: { mother_id: { in: deleteIds } }
+        });
+        await prisma.mother.deleteMany({
+          where: { mother_id: { in: deleteIds } }
+        });
+      } catch (e) {
+        console.error("Auto cleanup of dummy mothers failed:", e);
+      }
+    }
+
+    const validMothers = mothers.filter((m: any) => {
+      const isKaderOrNakes = 
+        m.ui_status === "Kader Posyandu" || 
+        m.ui_status === "Tenaga Kesehatan" || 
+        m.ui_status === "Nakes" || 
+        m.ui_status === "Bidan" || 
+        (m.national_id && (m.national_id.startsWith("KADER-") || m.national_id.startsWith("NAKES-")));
+      const isOldDummy = 
+        m.mother_id.startsWith("M-") ||
+        m.national_id === "IBU-DEFAULT" ||
+        (m.national_id && (m.national_id.startsWith("3501") || m.national_id.startsWith("3573"))) ||
+        new Date(m.created_at).getTime() < new Date("2026-07-29T23:00:00Z").getTime();
+      return !isKaderOrNakes && !isOldDummy;
+    });
+
     const avatars = getCustomAvatars();
     const customMothersAvatars = avatars.mothers || {};
 
-    return mothers
-      .filter((m: any) => {
-        const isKaderOrNakes = 
-          m.ui_status === "Kader Posyandu" || 
-          m.ui_status === "Tenaga Kesehatan" || 
-          m.ui_status === "Nakes" || 
-          m.ui_status === "Bidan" || 
-          (m.national_id && (m.national_id.startsWith("KADER-") || m.national_id.startsWith("NAKES-")));
-        return !isKaderOrNakes;
-      })
+    return validMothers
       .map((mother: any, index: number) => {
         const children = mother.children || [];
         const childrenCount = mother.number_of_children || children.length || 0;
@@ -198,16 +249,33 @@ export async function getMotherMetrics() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
 
+    const filterWhere = {
+      AND: [
+        {
+          OR: [
+            { ui_status: null },
+            { ui_status: { notIn: ["Kader Posyandu", "Tenaga Kesehatan", "Nakes", "Bidan"] } }
+          ]
+        },
+        { NOT: { national_id: { startsWith: "KADER-" } } },
+        { NOT: { national_id: { startsWith: "NAKES-" } } },
+        { NOT: { national_id: "IBU-DEFAULT" } },
+        { NOT: { mother_id: { startsWith: "M-" } } },
+        { created_at: { gte: new Date("2026-07-29T23:00:00Z") } }
+      ]
+    };
+
     const [totalMothers, mothersKek, highRiskPregnancies, dueThisMonth] = await Promise.all([
-      prisma.mother.count(),
+      prisma.mother.count({ where: filterWhere }),
       prisma.mother.count({
-        where: { risk_status: { contains: "KEK" } }
+        where: { ...filterWhere, risk_status: { contains: "KEK" } }
       }),
       prisma.mother.count({
-        where: { risk_status: "Risiko Tinggi" }
+        where: { ...filterWhere, risk_status: "Risiko Tinggi" }
       }),
       prisma.mother.count({
         where: { 
+          ...filterWhere,
           estimated_due_date: {
             gte: startOfMonth,
             lte: endOfMonth
