@@ -653,20 +653,41 @@ export async function updateMother(motherId: string, data: any) {
 export async function getLoggedInMotherData(username: string) {
   try {
     if (!username) return null;
-    // For the default kader account, look up by the reserved NIK
-    if (username.toLowerCase() === "kader") {
+    // For default kader accounts, look up by the reserved NIK
+    const lowerUser = username.toLowerCase();
+    if (lowerUser === "kader" || lowerUser === "kader.umi" || lowerUser === "umi" || lowerUser.startsWith("kader-")) {
+      await ensureKaderProfileExists("Kader Umi");
       const kaderRecord = await prisma.mother.findFirst({
         where: { national_id: "KADER-DEFAULT" },
         include: { children: true }
       });
-      if (!kaderRecord) return null;
-      return {
-        mother_id: kaderRecord.mother_id,
-        mother_name: kaderRecord.mother_name,
-        national_id: kaderRecord.national_id,
-        avatarUrl: kaderRecord.avatarUrl,
-        children: []
-      };
+      if (kaderRecord) {
+        return {
+          mother_id: kaderRecord.mother_id,
+          mother_name: kaderRecord.mother_name,
+          national_id: kaderRecord.national_id,
+          avatarUrl: kaderRecord.avatarUrl,
+          children: []
+        };
+      }
+    }
+
+    // For default nakes accounts, look up by the reserved NIK
+    if (lowerUser === "nakes" || lowerUser === "bidan" || lowerUser === "bidan.widya" || lowerUser.startsWith("nakes-")) {
+      await ensureNakesProfileExists("Bidan Widya, A.Md.Keb");
+      const nakesRecord = await prisma.mother.findFirst({
+        where: { national_id: "NAKES-DEFAULT" },
+        include: { children: true }
+      });
+      if (nakesRecord) {
+        return {
+          mother_id: nakesRecord.mother_id,
+          mother_name: nakesRecord.mother_name,
+          national_id: nakesRecord.national_id,
+          avatarUrl: nakesRecord.avatarUrl,
+          children: []
+        };
+      }
     }
 
     let cleanUsername = username.replace(/\s*\(Demo\)\s*/gi, "").trim();

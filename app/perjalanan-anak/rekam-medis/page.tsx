@@ -511,6 +511,7 @@ function RekamMedisAnakContent() {
   const [dbChildData, setDbChildData] = useState<any>(null);
   const [dbMeasurements, setDbMeasurements] = useState<any[]>([]);
   const [allChildrenList, setAllChildrenList] = useState<any[]>([]);
+  const [motherChildren, setMotherChildren] = useState<any[]>([]);
   const [patientSearchTerm, setPatientSearchTerm] = useState("");
   const [isPatientDropdownOpen, setIsPatientDropdownOpen] = useState(false);
   const patientDropdownRef = useRef<HTMLDivElement>(null);
@@ -1575,7 +1576,19 @@ function RekamMedisAnakContent() {
           const targetUser = username || "08123456789";
           const motherDetail = await getLoggedInMotherDetail(targetUser);
           if (motherDetail && motherDetail.children && motherDetail.children.length > 0) {
-            targetChild = motherDetail.children[0];
+            setMotherChildren(motherDetail.children);
+            let selectedChild = motherDetail.children[0];
+            if (paramChildId) {
+              const matched = motherDetail.children.find((c: any) => c.child_id === paramChildId);
+              if (matched) {
+                const detail = await getChildDetail(matched.child_id);
+                if (detail) selectedChild = detail;
+              }
+            } else {
+              const detail = await getChildDetail(selectedChild.child_id);
+              if (detail) selectedChild = detail;
+            }
+            targetChild = selectedChild;
           }
         } else if (paramChildId) {
           const childDetail = await getChildDetail(paramChildId);

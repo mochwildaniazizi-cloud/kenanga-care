@@ -259,42 +259,6 @@ export default function BerandaNakesPage() {
             </div>
           </Link>
 
-          {/* Action 3 */}
-          <Link
-            href="/perjalanan-anak/rekam-medis"
-            className="bg-white hover:bg-gray-50/80 border border-gray-200/90 rounded-2xl p-4 flex items-center gap-3.5 transition shadow-2xs group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 shrink-0 flex items-center justify-center text-xl">
-              <MdVaccines />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-gray-900 group-hover:text-emerald-600 transition-colors leading-snug">
-                Pelayanan Imunisasi
-              </h3>
-              <p className="text-[11px] text-gray-400 mt-0.5">
-                Catat BCG, Polio, DPT, &amp; Batch
-              </p>
-            </div>
-          </Link>
-
-          {/* Action 4 */}
-          <Link
-            href="/data-anak"
-            className="bg-white hover:bg-gray-50/80 border border-gray-200/90 rounded-2xl p-4 flex items-center gap-3.5 transition shadow-2xs group cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 shrink-0 flex items-center justify-center text-xl">
-              <MdPerson />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
-                Direktori Pasien EHR
-              </h3>
-              <p className="text-[11px] text-gray-400 mt-0.5">
-                Daftar Balita &amp; Ibu Terdaftar
-              </p>
-            </div>
-          </Link>
-
         </div>
       </div>
 

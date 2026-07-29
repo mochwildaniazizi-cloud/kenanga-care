@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother, ensureKaderProfileExists, resetSystemData } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother, ensureKaderProfileExists, ensureNakesProfileExists, resetSystemData } from "@/app/actions/mothers";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
@@ -41,7 +41,7 @@ function SettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tabParam = searchParams.get("tab");
-  const { role, username } = useUserRole();
+  const { role, username, isInitialized } = useUserRole();
 
   const [activeTab, setActiveTab] = useState<string>("profile");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -372,8 +372,8 @@ function SettingsContent() {
     }
   };
 
-  // Load from local storage or database
   useEffect(() => {
+    if (!isInitialized) return;
     async function loadProfileData() {
       setIsProfileLoading(true);
       const startTime = Date.now();
@@ -397,17 +397,19 @@ function SettingsContent() {
               localStorage.removeItem(`user_profile_avatar_${username}`);
             }
             
-            const savedEmail = localStorage.getItem(`${role}_email`) || `${detail.name.toLowerCase().replace(/\s+/g, "")}@gmail.com`;
-            const savedAddress = localStorage.getItem(`${role}_address`) || "Jl. Mawar No. 12, Kel. Kenanga";
+            const savedName = localStorage.getItem(`${role}_name`) || (role === "nakes" ? "Bidan Widya, A.Md.Keb" : detail.name);
+            const savedPhone = localStorage.getItem(`${role}_phone`) || detail.phone_number || (role === "nakes" ? "0813-9988-7766" : "");
+            const savedEmail = localStorage.getItem(`${role}_email`) || (role === "nakes" ? "bidan.widya@puskesmas.go.id" : `${detail.name.toLowerCase().replace(/\s+/g, "")}@gmail.com`);
+            const savedAddress = localStorage.getItem(`${role}_address`) || (role === "nakes" ? "Puskesmas Kenanga, Jl. Kesehatan No. 5" : "Jl. Mawar No. 12, Kel. Kenanga");
             
             setFormData({
-              name: detail.name || "",
-              posyandu: "Posyandu Kenanga 1",
-              role: detail.status || (role === "kader" ? "Kader Posyandu" : "Ibu Balita"),
+              name: savedName || "",
+              posyandu: role === "nakes" ? "Bidan Puskesmas & Posyandu" : "Posyandu Kenanga 1",
+              role: role === "nakes" ? "Bidan Puskesmas (Tenaga Kesehatan)" : (detail.status || (role === "kader" ? "Kader Posyandu" : "Ibu Balita")),
               email: savedEmail,
-              phone: detail.phone_number || "",
+              phone: savedPhone || "",
               address: savedAddress,
-              husband_name: detail.husband_name || "",
+              husband_name: role === "nakes" ? "Tenaga Kesehatan" : (detail.husband_name || ""),
               national_id: detail.national_id || ""
             });
             
@@ -483,7 +485,7 @@ function SettingsContent() {
     }
     
     loadProfileData();
-  }, [role, username]);
+  }, [role, username, isInitialized]);
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -494,6 +496,11 @@ function SettingsContent() {
       localStorage.setItem("ibu_email", formData.email);
       localStorage.setItem("ibu_address", formData.address);
       localStorage.setItem("ibu_husband", formData.husband_name);
+    } else if (role === "nakes") {
+      localStorage.setItem("nakes_name", formData.name);
+      localStorage.setItem("nakes_phone", formData.phone);
+      localStorage.setItem("nakes_email", formData.email);
+      localStorage.setItem("nakes_address", formData.address);
     } else {
       localStorage.setItem("kader_name", formData.name);
       localStorage.setItem("kader_posyandu", formData.posyandu);
@@ -531,6 +538,13 @@ function SettingsContent() {
         await ensureKaderProfileExists(formData.name, formData.phone);
       } catch (err) {
         console.error("Failed to upsert default kader profile to database:", err);
+      }
+    } else if (role === "nakes" && username === "nakes") {
+      // Default nakes account — upsert into Supabase
+      try {
+        await ensureNakesProfileExists(formData.name, formData.phone);
+      } catch (err) {
+        console.error("Failed to upsert default nakes profile to database:", err);
       }
     }
 

@@ -83,17 +83,17 @@ export default function Header() {
       const isIbu = role === "ibu";
       const isNakes = role === "nakes";
       let name = isNakes
-        ? "Bidan Widya, A.Md.Keb"
+        ? (localStorage.getItem("nakes_name") || "Bidan Widya, A.Md.Keb")
         : isIbu 
         ? (localStorage.getItem("ibu_name") || "Ibu Ika")
         : (localStorage.getItem("kader_name") || "Kader Umi");
       
-      if (isLoggedIn && username && !isNakes) {
+      if (isLoggedIn && username) {
         try {
           const dbData = await getLoggedInMotherData(username);
           if (dbData && dbData.mother_name) {
             name = dbData.mother_name;
-            localStorage.setItem(isIbu ? "ibu_name" : "kader_name", dbData.mother_name);
+            localStorage.setItem(isNakes ? "nakes_name" : isIbu ? "ibu_name" : "kader_name", dbData.mother_name);
             if (dbData.avatarUrl) {
               setAvatarUrl(dbData.avatarUrl);
               localStorage.setItem(`user_profile_avatar_${username}`, dbData.avatarUrl);
