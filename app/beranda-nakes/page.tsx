@@ -8,19 +8,19 @@ export default function BerandaNakesPage() {
   const { username } = useUserRole();
 
   return (
-    <div className="mx-auto p-4 md:p-8 pb-24 min-h-screen flex flex-col justify-center select-none">
+    <div className="max-w-4xl mx-auto px-4 py-6 md:py-10 pb-20 select-none space-y-8 animate-fadeIn">
 
       {/* ─── GREETING ─── */}
-      <div className="mb-10 text-center">
-        <div className="inline-flex items-center gap-2 bg-rose-50 text-[#EA2986] border border-rose-200 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-4">
+      <div className="text-center space-y-3">
+        <div className="inline-flex items-center gap-2 bg-rose-50 text-[#EA2986] border border-rose-200 text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
           <MdAssignment className="text-xs" />
-          Portal Medis Nakes
+          Portal Medis Tenaga Kesehatan
         </div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
           Selamat Datang{username ? `, ${username}` : ""} 👋
         </h1>
-        <p className="text-sm text-gray-500 font-medium mt-2">
-          Pilih modul rekam medis untuk memulai.
+        <p className="text-sm text-gray-500 font-semibold max-w-md mx-auto leading-relaxed">
+          Pilih salah satu modul rekam medis di bawah ini untuk melihat dan mengelola data pasien.
         </p>
       </div>
 
