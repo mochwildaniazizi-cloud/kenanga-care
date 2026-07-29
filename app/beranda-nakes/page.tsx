@@ -71,7 +71,7 @@ export default function BerandaNakesPage() {
                 Selamat Datang, Bidan Widya, A.Md.Keb
               </h1>
               <p className="text-xs md:text-sm text-gray-500 font-normal leading-relaxed max-w-3xl mt-2">
-                Bidan Pembina Posyandu Balita &amp; Ibu Kenanga 1 - Kelurahan Wonokromo. Kelola rekam medis klinis (EHR), pencatatan SDIDTK, pemantauan gizi, imunisasi, dan ANC maternal.
+                Bidan Pembina Posyandu Balita &amp; Ibu Kenanga 1 - Kelurahan Wonorejo. Kelola rekam medis klinis (EHR), pencatatan SDIDTK, pemantauan gizi, imunisasi, dan ANC maternal.
               </p>
             </div>
           </div>
