@@ -2,9 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import fs from "fs";
+import path from "path";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
+import { seedDatabaseIfEmpty } from "@/lib/seedHelper";
 
-const AVATAR_FILE_PATH = "c:/Code/kenanga-care/custom_avatars.json";
+const AVATAR_FILE_PATH = path.join(process.cwd(), "custom_avatars.json");
 
 function getCustomAvatars() {
   try {
@@ -82,6 +84,8 @@ function calculateGestationalOrNifasAge(status: string, estimatedDueDate: Date |
 
 export async function getMothersData() {
   try {
+    await seedDatabaseIfEmpty();
+
     const mothers = await prisma.mother.findMany({
       where: {
         AND: [
@@ -103,51 +107,6 @@ export async function getMothersData() {
       }
     });
 
-    // Otomatis bersihkan data dummy lama yang ada di database Supabase/Vercel
-    const oldDummyMothers = mothers.filter((m: any) => {
-      const isOldDummy = 
-        m.mother_id.startsWith("M-") ||
-        m.national_id === "IBU-DEFAULT" ||
-        (m.national_id && (m.national_id.startsWith("3501") || m.national_id.startsWith("3573"))) ||
-        new Date(m.created_at).getTime() < new Date("2026-07-29T23:00:00Z").getTime();
-      return isOldDummy;
-    });
-
-    if (oldDummyMothers.length > 0) {
-      const deleteIds = oldDummyMothers.map((m: any) => m.mother_id);
-      try {
-        const childrenToDelete = await prisma.child.findMany({
-          where: { mother_id: { in: deleteIds } },
-          select: { child_id: true }
-        });
-        const childIds = childrenToDelete.map(c => c.child_id);
-
-        if (childIds.length > 0) {
-          await prisma.childMeasurement.deleteMany({
-            where: { child_id: { in: childIds } }
-          });
-          await prisma.child.deleteMany({
-            where: { child_id: { in: childIds } }
-          });
-        }
-
-        await prisma.maternalHealthRecord.deleteMany({
-          where: { mother_id: { in: deleteIds } }
-        });
-        await (prisma as any).ttdLog.deleteMany({
-          where: { mother_id: { in: deleteIds } }
-        });
-        await (prisma as any).weeklyMonitoring.deleteMany({
-          where: { mother_id: { in: deleteIds } }
-        });
-        await prisma.mother.deleteMany({
-          where: { mother_id: { in: deleteIds } }
-        });
-      } catch (e) {
-        console.error("Auto cleanup of dummy mothers failed:", e);
-      }
-    }
-
     const validMothers = mothers.filter((m: any) => {
       const isKaderOrNakes = 
         m.ui_status === "Kader Posyandu" || 
@@ -155,12 +114,7 @@ export async function getMothersData() {
         m.ui_status === "Nakes" || 
         m.ui_status === "Bidan" || 
         (m.national_id && (m.national_id.startsWith("KADER-") || m.national_id.startsWith("NAKES-")));
-      const isOldDummy = 
-        m.mother_id.startsWith("M-") ||
-        m.national_id === "IBU-DEFAULT" ||
-        (m.national_id && (m.national_id.startsWith("3501") || m.national_id.startsWith("3573"))) ||
-        new Date(m.created_at).getTime() < new Date("2026-07-29T23:00:00Z").getTime();
-      return !isKaderOrNakes && !isOldDummy;
+      return !isKaderOrNakes;
     });
 
     const avatars = getCustomAvatars();
@@ -245,6 +199,8 @@ export async function getMaternalHistory() {
 
 export async function getMotherMetrics() {
   try {
+    await seedDatabaseIfEmpty();
+
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
@@ -258,10 +214,7 @@ export async function getMotherMetrics() {
           ]
         },
         { NOT: { national_id: { startsWith: "KADER-" } } },
-        { NOT: { national_id: { startsWith: "NAKES-" } } },
-        { NOT: { national_id: "IBU-DEFAULT" } },
-        { NOT: { mother_id: { startsWith: "M-" } } },
-        { created_at: { gte: new Date("2026-07-29T23:00:00Z") } }
+        { NOT: { national_id: { startsWith: "NAKES-" } } }
       ]
     };
 

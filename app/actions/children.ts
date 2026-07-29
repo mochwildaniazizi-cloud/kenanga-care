@@ -3,8 +3,10 @@
 import { prisma } from "@/lib/prisma";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 import fs from "fs";
+import path from "path";
+import { seedDatabaseIfEmpty } from "@/lib/seedHelper";
 
-const AVATAR_FILE_PATH = "c:/Code/kenanga-care/custom_avatars.json";
+const AVATAR_FILE_PATH = path.join(process.cwd(), "custom_avatars.json");
 
 function getCustomAvatars() {
   try {
@@ -51,6 +53,8 @@ function formatDateIndonesian(date: Date) {
 
 export async function getChildrenData() {
   try {
+    await seedDatabaseIfEmpty();
+
     const children = await prisma.child.findMany({
       include: {
         mother: true,
