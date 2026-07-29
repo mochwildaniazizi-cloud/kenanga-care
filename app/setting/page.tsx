@@ -442,7 +442,7 @@ function SettingsContent() {
           national_id: "3273010203040005"
         });
       } else if (role === "nakes") {
-        const savedName = localStorage.getItem("nakes_name") || "Bidan Widya, A.Md.Keb";
+        const savedName = "Bidan Widya, A.Md.Keb";
         const savedPhone = localStorage.getItem("nakes_phone") || "0813-9988-7766";
         const savedEmail = localStorage.getItem("nakes_email") || "bidan.widya@puskesmas.go.id";
         const savedAddress = localStorage.getItem("nakes_address") || "Puskesmas Kenanga, Jl. Kesehatan No. 5";

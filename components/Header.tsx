@@ -83,7 +83,7 @@ export default function Header() {
       const isIbu = role === "ibu";
       const isNakes = role === "nakes";
       let name = isNakes
-        ? (localStorage.getItem("nakes_name") || "Bidan Widya, A.Md.Keb")
+        ? "Bidan Widya, A.Md.Keb"
         : isIbu 
         ? (localStorage.getItem("ibu_name") || "Ibu Ika")
         : (localStorage.getItem("kader_name") || "Kader Umi");
