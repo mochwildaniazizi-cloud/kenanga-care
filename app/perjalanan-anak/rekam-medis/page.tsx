@@ -1568,6 +1568,9 @@ function RekamMedisAnakContent() {
     loadIsolatedChildData();
   }, [dbChildData?.child_id]);
 
+  const searchParams = useSearchParams();
+  const paramChildId = searchParams?.get("child_id") || searchParams?.get("id");
+
   useEffect(() => {
     async function loadChildEhrData() {
       try {
@@ -1595,11 +1598,23 @@ function RekamMedisAnakContent() {
           if (childDetail) {
             targetChild = childDetail;
           }
+        } else {
+          const allChildren = await getChildrenData();
+          if (allChildren && allChildren.length > 0) {
+            const defaultId = allChildren[0].child_id;
+            const childDetail = await getChildDetail(defaultId);
+            if (childDetail) {
+              targetChild = childDetail;
+            }
+          }
         }
 
         if (targetChild) {
           setDbChildData(targetChild);
           setKmsGenderFilter(targetChild.gender === "P" || targetChild.gender === "F" ? "P" : "L");
+          if (targetChild.name || targetChild.child_name) {
+            setPatientSearchTerm(targetChild.name || targetChild.child_name);
+          }
           if (targetChild.measurements && targetChild.measurements.length > 0) {
             setDbMeasurements(targetChild.measurements);
           } else {

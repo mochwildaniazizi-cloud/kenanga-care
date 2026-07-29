@@ -443,7 +443,7 @@ function RekamMedisIbuContent() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const paramMotherId = searchParams?.get("mother_id");
+  const paramMotherId = searchParams?.get("mother_id") || searchParams?.get("id");
 
   const [allMothersList, setAllMothersList] = useState<any[]>([]);
   const [motherSearchTerm, setMotherSearchTerm] = useState("");
@@ -502,9 +502,15 @@ function RekamMedisIbuContent() {
           motherData = await getLoggedInMotherDetail(targetUsername);
         } else if (paramMotherId) {
           motherData = await getMotherDetail(paramMotherId);
+        } else {
+          const list = await getMothersData();
+          if (list && list.length > 0) {
+            motherData = await getMotherDetail(list[0].mother_id);
+          }
         }
         if (motherData) {
           setDbMother(motherData);
+          setMotherSearchTerm(motherData.mother_name || "");
           if (motherData.maternal_records && motherData.maternal_records.length > 0) {
             setDbRecords(motherData.maternal_records);
           }

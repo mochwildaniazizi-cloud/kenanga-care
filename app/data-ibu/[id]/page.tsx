@@ -937,7 +937,13 @@ function MotherDetailContent() {
         </div>
         
         {/* Actions Button */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link 
+            href={`/perjalanan-ibu/rekam-medis?mother_id=${mother.mother_id}`}
+            className="px-4 py-2 bg-[#EA2986] text-white hover:bg-[#d41f76] rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🏥 Rekam Medis (EHR)</span>
+          </Link>
           {isEditing ? (
             <div className="flex items-center gap-2">
               <button 
