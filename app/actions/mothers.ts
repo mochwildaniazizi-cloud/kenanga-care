@@ -1044,6 +1044,61 @@ export async function resetSystemData() {
   }
 }
 
+export async function deleteOtherMothersExceptIbuIka() {
+  try {
+    await ensureKaderProfileExists("Kader Umi", "0812-3456-7890", "kader123");
+    await ensureNakesProfileExists("Bidan Widya, A.Md.Keb", "0813-9988-7766", "nakes123");
+    await ensureIbuProfileExists("Ibu Ika", "081234567891", "ibu123");
+
+    const mothersToDelete = await prisma.mother.findMany({
+      where: {
+        AND: [
+          { NOT: { national_id: { in: ["KADER-DEFAULT", "NAKES-DEFAULT", "IBU-DEFAULT"] } } },
+          { NOT: { mother_name: { in: ["Kader Umi", "Bidan Widya, A.Md.Keb", "Ibu Ika"] } } }
+        ]
+      },
+      select: { mother_id: true }
+    });
+
+    const deleteIds = mothersToDelete.map(m => m.mother_id);
+
+    if (deleteIds.length > 0) {
+      const childrenToDelete = await prisma.child.findMany({
+        where: { mother_id: { in: deleteIds } },
+        select: { child_id: true }
+      });
+      const childIds = childrenToDelete.map(c => c.child_id);
+
+      if (childIds.length > 0) {
+        await prisma.childMeasurement.deleteMany({
+          where: { child_id: { in: childIds } }
+        });
+        await prisma.child.deleteMany({
+          where: { child_id: { in: childIds } }
+        });
+      }
+
+      await prisma.maternalHealthRecord.deleteMany({
+        where: { mother_id: { in: deleteIds } }
+      });
+      await prisma.ttdLog.deleteMany({
+        where: { mother_id: { in: deleteIds } }
+      });
+      await prisma.weeklyMonitoring.deleteMany({
+        where: { mother_id: { in: deleteIds } }
+      });
+      await prisma.mother.deleteMany({
+        where: { mother_id: { in: deleteIds } }
+      });
+    }
+
+    return { success: true, message: "Semua data ibu selain Ibu Ika berhasil dihapus dari database." };
+  } catch (error: any) {
+    console.error("Error in deleteOtherMothersExceptIbuIka:", error);
+    return { success: false, error: error.message || "Gagal menghapus data ibu lain." };
+  }
+}
+
 export async function updateUserAvatar(username: string, base64Avatar: string) {
   try {
     const u = username.trim().toLowerCase();
