@@ -506,7 +506,7 @@ function RekamMedisAnakContent() {
   const { username, role } = useUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const paramChildId = searchParams?.get("child_id");
+  const paramChildId = searchParams?.get("child_id") || searchParams?.get("id");
 
   const [dbChildData, setDbChildData] = useState<any>(null);
   const [dbMeasurements, setDbMeasurements] = useState<any[]>([]);
@@ -1567,9 +1567,6 @@ function RekamMedisAnakContent() {
     }
     loadIsolatedChildData();
   }, [dbChildData?.child_id]);
-
-  const searchParams = useSearchParams();
-  const paramChildId = searchParams?.get("child_id") || searchParams?.get("id");
 
   useEffect(() => {
     async function loadChildEhrData() {
