@@ -13,6 +13,7 @@ import {
 import { MdCheckCircleOutline } from "react-icons/md";
 import { FiShare2, FiCopy, FiCheck, FiX, FiRefreshCw } from "react-icons/fi";
 import { useUserRole } from "@/context/UserRoleContext";
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 import { useRouter } from "next/navigation";
 
 const calendarDays = [
@@ -278,7 +279,7 @@ export default function JadwalPage() {
       return;
     }
 
-    const cachedSchedules = localStorage.getItem("offline_schedules");
+    const cachedSchedules = await getCacheItem("offline_schedules");
     if (!cachedSchedules && !forceRefresh) {
       setIsLoading(true);
     }
@@ -295,8 +296,8 @@ export default function JadwalPage() {
       setSchedules(fetchedSchedules);
       setLogs(fetchedLogs);
       
-      localStorage.setItem("offline_schedules", JSON.stringify(fetchedSchedules));
-      localStorage.setItem("offline_schedule_logs", JSON.stringify(fetchedLogs));
+      await setCacheItem("offline_schedules", fetchedSchedules);
+      await setCacheItem("offline_schedule_logs", fetchedLogs);
     } catch (error: any) {
       console.error("Failed to load jadwal", error);
       if (forceRefresh) {
@@ -309,21 +310,24 @@ export default function JadwalPage() {
   };
 
   useEffect(() => {
-    const cachedSchedules = localStorage.getItem("offline_schedules");
-    const cachedLogs = localStorage.getItem("offline_schedule_logs");
+    async function loadCachedData() {
+      const cachedSchedules = await getCacheItem("offline_schedules");
+      const cachedLogs = await getCacheItem("offline_schedule_logs");
 
-    if (cachedSchedules) setSchedules(JSON.parse(cachedSchedules));
-    if (cachedLogs) setLogs(JSON.parse(cachedLogs));
+      if (cachedSchedules) setSchedules(cachedSchedules);
+      if (cachedLogs) setLogs(cachedLogs);
 
-    if (cachedSchedules || cachedLogs) {
-      setIsLoading(false);
+      if (cachedSchedules || cachedLogs) {
+        setIsLoading(false);
+      }
+
+      if (navigator.onLine) {
+        loadData(false);
+      } else {
+        setIsLoading(false);
+      }
     }
-
-    if (navigator.onLine) {
-      loadData(false);
-    } else {
-      setIsLoading(false);
-    }
+    loadCachedData();
   }, []);
 
   useEffect(() => {

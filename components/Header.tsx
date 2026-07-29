@@ -66,7 +66,7 @@ export default function Header() {
     type: "info"
   });
   const [profile, setProfile] = useState({
-    name: "Kader Siti",
+    name: "Kader Umi",
     posyandu: "Posyandu Kenanga 1"
   });
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -85,8 +85,8 @@ export default function Header() {
       let name = isNakes
         ? (localStorage.getItem("nakes_name") || "Bidan Widya, A.Md.Keb")
         : isIbu 
-        ? (localStorage.getItem("ibu_name") || "Siti Aminah")
-        : (localStorage.getItem("kader_name") || "Kader Siti");
+        ? (localStorage.getItem("ibu_name") || "Ibu Ika")
+        : (localStorage.getItem("kader_name") || "Kader Umi");
       
       if (isLoggedIn && username) {
         try {
@@ -551,8 +551,8 @@ export default function Header() {
       if (key === "/perjalanan-anak" || key === "/perjalanan-anak/rekam-medis") return "Rekam Medis Anak";
     }
     if (role === "ibu") {
-      if (key === "/perjalanan-anak" || key === "/data-anak") return "Perjalanan Anak";
-      if (key === "/perjalanan-ibu" || key === "/data-ibu") return "Perjalanan Ibu";
+      if (key === "/perjalanan-anak" || key === "/perjalanan-anak/rekam-medis" || key === "/data-anak") return "Perjalanan Anak";
+      if (key === "/perjalanan-ibu" || key === "/perjalanan-ibu/rekam-medis" || key === "/data-ibu") return "Perjalanan Ibu";
       if (key === "/edukasi") return "Artikel & Edukasi";
     }
     return defaultLabel;

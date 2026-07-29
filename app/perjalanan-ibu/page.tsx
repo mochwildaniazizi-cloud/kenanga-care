@@ -8,13 +8,15 @@ import {
   MdOutlineError, MdPerson, MdCalendarMonth, MdPregnantWoman,
   MdPhone, MdBloodtype, MdMale, MdFemale, MdVaccines, MdEdit,
   MdCheckCircleOutline, MdBabyChangingStation, MdFamilyRestroom,
-  MdArrowBack, MdSave, MdClose, MdScale, MdNotifications
+  MdArrowBack, MdSave, MdClose, MdScale, MdNotifications,
+  MdChildCare, MdWarning, MdInfoOutline
 } from "react-icons/md";
-import { FaHeartbeat, FaHeart, FaUser } from "react-icons/fa";
+import { FaHeartbeat, FaHeart, FaUser, FaPills } from "react-icons/fa";
 import { getMaternalHistory, getMotherMetrics, getLoggedInMotherData, getMotherDetail, getLoggedInMotherDetail } from "@/app/actions/mothers";
 import { getTtdLogs, upsertTtdLog } from "@/app/actions/ttd";
 import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/weekly";
 import { useUserRole } from "@/context/UserRoleContext";
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Week matrix based on KIA book p10-13
@@ -25,15 +27,15 @@ const TRIMESTER_WEEKS = [
 ];
 
 const GEJALA_FIELDS = [
-  { key: "fever", label: "Demam lebih dari 2 hari", icon: "🤒" },
-  { key: "headache", label: "Pusing/sakit kepala berat", icon: "😵" },
-  { key: "insomnia", label: "Sulit tidur / cemas berlebih", icon: "😰" },
-  { key: "cough", label: "Batuk lebih dari 2 minggu / Risiko TB", icon: "🫁" },
-  { key: "fetal_movement", label: "Gerakan bayi: < 10x dalam 12 jam (setelah Mg 24)", icon: "👶", lockedBefore: 24 },
-  { key: "stomach_pain", label: "Nyeri perut hebat", icon: "😣" },
-  { key: "fluid_discharge", label: "Keluar cairan banyak / berbau dari jalan lahir", icon: "💧" },
-  { key: "urination_pain", label: "Sakit saat kencing / keputihan gatal", icon: "🔴" },
-  { key: "diarrhea", label: "Diare berulang", icon: "⚠️" },
+  { key: "fever", label: "Demam lebih dari 2 hari", icon: <MdOutlineError className="inline text-status-red-solid" /> },
+  { key: "headache", label: "Pusing/sakit kepala berat", icon: <MdOutlineError className="inline text-status-red-solid" /> },
+  { key: "insomnia", label: "Sulit tidur / cemas berlebih", icon: <MdOutlineError className="inline text-status-red-solid" /> },
+  { key: "cough", label: "Batuk lebih dari 2 minggu / Risiko TB", icon: <MdOutlineError className="inline text-status-red-solid" /> },
+  { key: "fetal_movement", label: "Gerakan bayi: < 10x dalam 12 jam (setelah Mg 24)", icon: <MdChildCare className="inline text-status-red-solid" />, lockedBefore: 24 },
+  { key: "stomach_pain", label: "Nyeri perut hebat", icon: <MdOutlineError className="inline text-status-red-solid" /> },
+  { key: "fluid_discharge", label: "Keluar cairan banyak / berbau dari jalan lahir", icon: <MdBloodtype className="inline text-status-red-solid" /> },
+  { key: "urination_pain", label: "Sakit saat kencing / keputihan gatal", icon: <MdOutlineError className="inline text-status-red-solid" /> },
+  { key: "diarrhea", label: "Diare berulang", icon: <MdWarning className="inline text-status-red-solid" /> },
 ];
 
 function PerjalananIbuContent() {
@@ -264,13 +266,12 @@ function PerjalananIbuContent() {
       const motherId = motherDetail.mother_id;
       const cacheKey = `offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`;
       
-      const cached = localStorage.getItem(cacheKey);
+      const cached = await getCacheItem(cacheKey);
       if (cached) {
         try {
-          const parsed = JSON.parse(cached);
-          setTtdLogs(parsed.logs || []);
-          setTtdCompanion(parsed.companion || "");
-          setTtdRelationship(parsed.relationship || "Suami");
+          setTtdLogs(cached.logs || []);
+          setTtdCompanion(cached.companion || "");
+          setTtdRelationship(cached.relationship || "Suami");
         } catch (e) {
           console.error("Failed to parse cached TTD data:", e);
         }
@@ -291,17 +292,19 @@ function PerjalananIbuContent() {
           setTtdLogs(logs);
           
           const latestLog = rawLogs.find((l: any) => l.companion);
-          const companion = latestLog?.companion || localStorage.getItem(`ttd_companion_${motherId}`) || "";
-          const relationship = latestLog?.relationship || localStorage.getItem(`ttd_relationship_${motherId}`) || "Suami";
+          const cachedComp = await getCacheItem(`ttd_companion_${motherId}`);
+          const cachedRel = await getCacheItem(`ttd_relationship_${motherId}`);
+          const companion = latestLog?.companion || cachedComp || "";
+          const relationship = latestLog?.relationship || cachedRel || "Suami";
           
           if (companion) setTtdCompanion(companion);
           if (relationship) setTtdRelationship(relationship);
 
-          localStorage.setItem(cacheKey, JSON.stringify({
+          await setCacheItem(cacheKey, {
             logs,
             companion,
             relationship
-          }));
+          });
         }
       } catch (err) {
         console.error(err);
@@ -352,10 +355,10 @@ function PerjalananIbuContent() {
       const motherId = motherDetail.mother_id;
       const cacheKey = `offline_weekly_logs_${motherId}`;
       
-      const cached = localStorage.getItem(cacheKey);
+      const cached = await getCacheItem(cacheKey);
       if (cached) {
         try {
-          setWeeklyLogs(JSON.parse(cached));
+          setWeeklyLogs(cached);
         } catch (e) {}
       }
 
@@ -365,7 +368,7 @@ function PerjalananIbuContent() {
         const res = await getWeeklyMonitorings(motherId);
         if (res && res.success) {
           setWeeklyLogs(res.list || []);
-          localStorage.setItem(cacheKey, JSON.stringify(res.list || []));
+          await setCacheItem(cacheKey, res.list || []);
         }
       } catch (err) {
         console.error(err);
@@ -399,18 +402,17 @@ function PerjalananIbuContent() {
         }
         setTtdLogs(updatedLogs);
 
-        // Save Offline first
         const offlineData = {
           logs: updatedLogs,
           companion: ttdCompanion,
           relationship: ttdRelationship
         };
-        localStorage.setItem(`offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`, JSON.stringify(offlineData));
+        await setCacheItem(`offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`, offlineData);
 
         if (!navigator.onLine) {
-          const syncQueue = JSON.parse(localStorage.getItem("pending_ttd_syncs") || "[]");
+          const syncQueue = (await getCacheItem("pending_ttd_syncs")) || [];
           syncQueue.push({ motherId, day, action: hasLog ? "remove" : "add", year: currentYear, month: currentMonth });
-          localStorage.setItem("pending_ttd_syncs", JSON.stringify(syncQueue));
+          await setCacheItem("pending_ttd_syncs", syncQueue);
           return;
         }
 
@@ -432,13 +434,13 @@ function PerjalananIbuContent() {
 
     // Save offline
     const offlineKey = `offline_ttd_logs_${motherId}_${currentYear}_${currentMonth}`;
-    const cached = JSON.parse(localStorage.getItem(offlineKey) || "{}");
+    const cached = (await getCacheItem(offlineKey)) || {};
     cached.companion = ttdCompanion;
     cached.relationship = ttdRelationship;
-    localStorage.setItem(offlineKey, JSON.stringify(cached));
+    await setCacheItem(offlineKey, cached);
 
     if (!navigator.onLine) {
-      localStorage.setItem(`pending_ttd_companion_${motherId}`, JSON.stringify({ companion: ttdCompanion, relationship: ttdRelationship }));
+      await setCacheItem(`pending_ttd_companion_${motherId}`, { companion: ttdCompanion, relationship: ttdRelationship });
       return;
     }
 
@@ -477,12 +479,12 @@ function PerjalananIbuContent() {
     setWeeklyLogs(updated);
 
     // Save offline
-    localStorage.setItem(`offline_weekly_logs_${motherId}`, JSON.stringify(updated));
+    await setCacheItem(`offline_weekly_logs_${motherId}`, updated);
 
     if (!navigator.onLine) {
-      const syncQueue = JSON.parse(localStorage.getItem("pending_weekly_syncs") || "[]");
+      const syncQueue = (await getCacheItem("pending_weekly_syncs")) || [];
       syncQueue.push({ motherId, week, field, value: updated[recordIndex][field] });
-      localStorage.setItem("pending_weekly_syncs", JSON.stringify(syncQueue));
+      await setCacheItem("pending_weekly_syncs", syncQueue);
       return;
     }
 
@@ -517,7 +519,7 @@ function PerjalananIbuContent() {
       setWeeklyLogs(updated);
 
       // Save offline
-      localStorage.setItem(`offline_weekly_logs_${motherId}`, JSON.stringify(updated));
+      await setCacheItem(`offline_weekly_logs_${motherId}`, updated);
 
       // Check for danger signs (Gejala)
       const hasDanger = GEJALA_FIELDS.some(f => tempWeeklyRecord[f.key]);
@@ -533,9 +535,9 @@ function PerjalananIbuContent() {
         );
       } else {
         // Simple offline queueing for the whole record
-        const syncQueue = JSON.parse(localStorage.getItem("pending_weekly_full_syncs") || "[]");
+        const syncQueue = (await getCacheItem("pending_weekly_full_syncs")) || [];
         syncQueue.push({ motherId, week, record: tempWeeklyRecord });
-        localStorage.setItem("pending_weekly_full_syncs", JSON.stringify(syncQueue));
+        await setCacheItem("pending_weekly_full_syncs", syncQueue);
       }
       
       // Navigate back to list
@@ -548,16 +550,16 @@ function PerjalananIbuContent() {
     }
   };
 
-  const handleAddAttendanceClass = () => {
+  const handleAddAttendanceClass = async () => {
     const updated = [...attendance, { date: "", facilitator: "", note: "" }];
     setAttendance(updated);
     setEditingAttendanceIdx(updated.length - 1);
     if (motherDetail) {
-      localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(updated));
+      await setCacheItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, updated);
     }
   };
 
-  const handleDeleteAttendanceClass = (idx: number) => {
+  const handleDeleteAttendanceClass = async (idx: number) => {
     const updated = attendance.filter((_, i) => i !== idx);
     setAttendance(updated);
     if (editingAttendanceIdx === idx) {
@@ -566,14 +568,14 @@ function PerjalananIbuContent() {
       setEditingAttendanceIdx(editingAttendanceIdx - 1);
     }
     if (motherDetail) {
-      localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(updated));
+      await setCacheItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, updated);
     }
   };
 
-  const handleSaveSingleAttendance = (idx: number) => {
+  const handleSaveSingleAttendance = async (idx: number) => {
     setEditingAttendanceIdx(null);
     if (motherDetail) {
-      localStorage.setItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, JSON.stringify(attendance));
+      await setCacheItem(`attendance_class_ibu_hamil_${motherDetail.mother_id}`, attendance);
     }
   };
 
@@ -586,51 +588,51 @@ function PerjalananIbuContent() {
     setAttendance(updated);
   };
 
-  const handlePrepToggle = (idx: number) => {
+  const handlePrepToggle = async (idx: number) => {
     if (!motherDetail) return;
     const updated = [...prepList];
     updated[idx] = !updated[idx];
     setPrepList(updated);
-    localStorage.setItem(`birth_prep_${idx + 1}_${motherDetail.mother_id}`, updated[idx] ? 'true' : 'false');
+    await setCacheItem(`birth_prep_${idx + 1}_${motherDetail.mother_id}`, updated[idx] ? 'true' : 'false');
   };
 
-  const handleProcessToggle = (idx: number) => {
+  const handleProcessToggle = async (idx: number) => {
     if (!motherDetail) return;
     const updated = [...birthProcessList];
     updated[idx] = !updated[idx];
     setBirthProcessList(updated);
-    localStorage.setItem(`birth_process_${idx + 1}_${motherDetail.mother_id}`, updated[idx] ? 'true' : 'false');
+    await setCacheItem(`birth_process_${idx + 1}_${motherDetail.mother_id}`, updated[idx] ? 'true' : 'false');
   };
 
-  const handlePostpartumToggle = (day: number, field: string) => {
+  const handlePostpartumToggle = async (day: number, field: string) => {
     if (!motherDetail) return;
     const updated = [...postpartumList];
     updated[day - 1][field] = !updated[day - 1][field];
     setPostpartumList(updated);
-    localStorage.setItem(`postpartum_monitoring_${motherDetail.mother_id}`, JSON.stringify(updated));
+    await setCacheItem(`postpartum_monitoring_${motherDetail.mother_id}`, updated);
   };
 
-  const handleKbAnswerToggle = (idx: number) => {
+  const handleKbAnswerToggle = async (idx: number) => {
     if (!motherDetail) return;
     const updated = [...kbAnswers];
     updated[idx] = !updated[idx];
     setKbAnswers(updated);
-    localStorage.setItem(`kb_answers_${motherDetail.mother_id}`, JSON.stringify(updated));
+    await setCacheItem(`kb_answers_${motherDetail.mother_id}`, updated);
   };
 
-  const handleKbConsentToggle = () => {
+  const handleKbConsentToggle = async () => {
     if (!motherDetail) return;
     const nextVal = !kbConsent;
     setKbConsent(nextVal);
-    localStorage.setItem(`kb_consent_${motherDetail.mother_id}`, nextVal ? 'true' : 'false');
+    await setCacheItem(`kb_consent_${motherDetail.mother_id}`, nextVal ? 'true' : 'false');
   };
 
-  const handleBreastfeedingToggle = (idx: number) => {
+  const handleBreastfeedingToggle = async (idx: number) => {
     if (!motherDetail) return;
     const updated = [...breastfeedingAnswers];
     updated[idx] = !updated[idx];
     setBreastfeedingAnswers(updated);
-    localStorage.setItem(`breastfeeding_monitoring_${motherDetail.mother_id}`, JSON.stringify(updated));
+    await setCacheItem(`breastfeeding_monitoring_${motherDetail.mother_id}`, updated);
   };
 
   const getConditionColor = (cond: string) => {
@@ -694,7 +696,7 @@ function PerjalananIbuContent() {
       
       {!navigator.onLine && (
         <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
-          <span className="text-sm">⚠️</span>
+          <MdWarning className="text-sm shrink-0" />
           <span>Mode Offline: Menampilkan data cadangan lokal dari Beranda. Sambungkan ke internet untuk menyinkronkan data pemeriksaan terbaru.</span>
         </div>
       )}
@@ -800,10 +802,10 @@ function PerjalananIbuContent() {
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="flex -space-x-1.5 overflow-hidden">
                         <div className="w-6 h-6 rounded-full bg-status-yellow-light text-status-yellow-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
-                          👩
+                          <MdPregnantWoman />
                         </div>
                         <div className="w-6 h-6 rounded-full bg-status-blue-light text-status-blue-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
-                          👨
+                          <MdPerson />
                         </div>
                       </div>
                       <span className="text-[10px] font-bold text-[#FFCC00] hover:underline">Detail Profil &gt;</span>
@@ -859,7 +861,7 @@ function PerjalananIbuContent() {
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="flex -space-x-1.5 overflow-hidden">
                         <div className="w-6 h-6 rounded-full bg-status-pink-light text-brand-primary flex items-center justify-center text-[10px] font-bold border border-base-white">
-                          💊
+                          <FaPills />
                         </div>
                       </div>
                       <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-pink-50 text-[#FF2D55]">
@@ -890,7 +892,7 @@ function PerjalananIbuContent() {
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="flex -space-x-1.5 overflow-hidden">
                         <div className="w-6 h-6 rounded-full bg-status-blue-light text-status-blue-solid flex items-center justify-center text-[10px] font-bold border border-base-white">
-                          📅
+                          <MdCalendarMonth />
                         </div>
                       </div>
                       <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-[#007AFF]">
@@ -1014,7 +1016,7 @@ function PerjalananIbuContent() {
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="flex -space-x-1.5 overflow-hidden">
                         <div className="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-[10px] font-bold border border-base-white">
-                          👩‍🍼
+                          <MdPregnantWoman />
                         </div>
                       </div>
                       <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-[#50E3C2]">
@@ -1380,7 +1382,7 @@ function PerjalananIbuContent() {
               <div className="bg-base-white rounded-bento-lg p-6 border border-base-border/30 shadow-sm space-y-5">
                 <div className="border-b pb-3 border-base-border/10">
                   <h3 className="font-bold text-status-red-solid text-sm uppercase">Tanda Bahaya & Gejala</h3>
-                  <p className="text-[10px] text-base-text-secondary font-medium mt-0.5">⚠️ Segera lapor ke Nakes/Puskesmas jika mengalami salah satu kondisi di bawah ini!</p>
+                  <p className="text-[10px] text-base-text-secondary font-medium mt-0.5"><MdWarning className="inline mr-1 text-status-red-solid" /> Segera lapor ke Nakes/Puskesmas jika mengalami salah satu kondisi di bawah ini!</p>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {GEJALA_FIELDS.map(f => {
@@ -1412,7 +1414,7 @@ function PerjalananIbuContent() {
 
             <div className="lg:col-span-5 space-y-6">
               <div className="bg-amber-50 border border-amber-300/50 rounded-2xl p-6 space-y-4">
-                <h4 className="font-black text-sm text-amber-800 uppercase">💡 Informasi Penting</h4>
+                <h4 className="font-black text-sm text-amber-800 uppercase flex items-center gap-1.5"><MdInfoOutline className="inline" /> Informasi Penting</h4>
                 <p className="text-xs text-amber-800 leading-relaxed font-medium">
                   &ldquo;Pemantauan mandiri ini sangat krusial untuk mendeteksi dini komplikasi kehamilan. Jangan menunda untuk mencari bantuan medis jika Anda merasa ada sesuatu yang tidak biasa pada tubuh Anda atau pergerakan janin.&rdquo;
                 </p>
@@ -1485,7 +1487,7 @@ function PerjalananIbuContent() {
                 {/* Verbatim Edukasi & Panduan Buku KIA */}
                 <div className="bg-brand-soft/20 border border-brand-primary/10 rounded-2xl p-5 space-y-3 bg-base-white shadow-sm">
                   <h4 className="font-black text-sm text-brand-primary flex items-center gap-1.5 uppercase tracking-wide">
-                    💊 Jangan Lupa Minum TTD/MMS
+                    <FaPills /> Jangan Lupa Minum TTD/MMS
                   </h4>
                   <p className="text-base-text-primary text-xs leading-relaxed font-medium">
                     &ldquo;Untuk mencegah kekurangan darah, TTD/MMS harus diminum setiap hari selama kehamilan. Sebaiknya pada malam hari sebelum tidur untuk mengurangi rasa mual. Agar zat besi diserap lebih baik dalam tubuh, TTD/MMS sebaiknya dikonsumsi bersama makanan atau minuman yang mengandung vitamin C seperti buah-buahan. Hindari minum TTD/MMS bersama teh, kopi, susu dan obat maag yang dapat menghambat penyerapan zat besi.&rdquo;
@@ -1734,9 +1736,9 @@ function PerjalananIbuContent() {
                                 <div className="text-left">
                                   <p className="font-bold text-base-text-primary text-sm leading-tight">Minggu ke-{week}</p>
                                   {hasDanger ? (
-                                    <p className="text-[10px] font-bold text-[#AC1959] mt-0.5">⚠️ {activeDangerCount} gejala terdeteksi</p>
+                                    <p className="text-[10px] font-bold text-[#AC1959] mt-0.5"><MdWarning className="inline mr-0.5" /> {activeDangerCount} gejala terdeteksi</p>
                                   ) : isFilled ? (
-                                    <p className="text-[10px] font-bold text-status-green-solid mt-0.5">✓ Sudah diisi</p>
+                                    <p className="text-[10px] font-bold text-status-green-solid mt-0.5"><MdCheckCircleOutline className="inline mr-0.5" /> Sudah diisi</p>
                                   ) : (
                                     <p className="text-[10px] text-base-text-secondary font-medium mt-0.5">Ketuk untuk isi checklist</p>
                                   )}

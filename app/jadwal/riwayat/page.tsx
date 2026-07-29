@@ -6,6 +6,8 @@ import { getScheduleLogs } from "@/app/actions/schedule";
 import { FiArrowLeft } from "react-icons/fi";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
+
 export default function RiwayatJadwalPage() {
   const router = useRouter();
   const [logs, setLogs] = useState<any[]>([]);
@@ -13,23 +15,26 @@ export default function RiwayatJadwalPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const cached = localStorage.getItem("offline_schedule_logs");
-    if (cached) {
-      setLogs(JSON.parse(cached));
-      setIsLoading(false);
-    }
+    async function loadCachedLogs() {
+      const cached = await getCacheItem("offline_schedule_logs");
+      if (cached) {
+        setLogs(cached);
+        setIsLoading(false);
+      }
 
-    if (navigator.onLine) {
-      getScheduleLogs()
-        .then((data) => {
-          setLogs(data);
-          localStorage.setItem("offline_schedule_logs", JSON.stringify(data));
-        })
-        .catch((err) => console.error(err))
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
+      if (navigator.onLine) {
+        getScheduleLogs()
+          .then(async (data) => {
+            setLogs(data);
+            await setCacheItem("offline_schedule_logs", data);
+          })
+          .catch((err) => console.error(err))
+          .finally(() => setIsLoading(false));
+      } else {
+        setIsLoading(false);
+      }
     }
+    loadCachedLogs();
   }, []);
 
   const filteredLogs = logs.filter((log) => 

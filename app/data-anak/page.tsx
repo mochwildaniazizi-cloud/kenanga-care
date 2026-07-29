@@ -12,6 +12,7 @@ import { FiArrowUp, FiArrowDown, FiMinus, FiRefreshCw } from "react-icons/fi";
 import { FaBaby } from "react-icons/fa";
 import { getChildrenData, getMeasurementHistory, getChildMetrics } from "@/app/actions/children";
 import { useUserRole } from "@/context/UserRoleContext";
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 
 // ==========================================
@@ -195,7 +196,7 @@ export default function DataAnakPage() {
       return;
     }
 
-    const cachedChildren = localStorage.getItem("offline_children_list");
+    const cachedChildren = await getCacheItem("offline_children_list");
     if (!cachedChildren && !forceRefresh) {
       setIsLoading(true);
     }
@@ -214,9 +215,9 @@ export default function DataAnakPage() {
       setHistoryList(history);
       setMetrics(fetchedMetrics);
 
-      localStorage.setItem("offline_children_list", JSON.stringify(children));
-      localStorage.setItem("offline_children_history", JSON.stringify(history));
-      localStorage.setItem("offline_children_metrics", JSON.stringify(fetchedMetrics));
+      await setCacheItem("offline_children_list", children);
+      await setCacheItem("offline_children_history", history);
+      await setCacheItem("offline_children_metrics", fetchedMetrics);
     } catch (error) {
       console.error("Failed to load children data:", error);
     } finally {
@@ -226,23 +227,26 @@ export default function DataAnakPage() {
   };
 
   useEffect(() => {
-    const cachedChildren = localStorage.getItem("offline_children_list");
-    const cachedHistory = localStorage.getItem("offline_children_history");
-    const cachedMetrics = localStorage.getItem("offline_children_metrics");
+    async function loadCachedData() {
+      const cachedChildren = await getCacheItem("offline_children_list");
+      const cachedHistory = await getCacheItem("offline_children_history");
+      const cachedMetrics = await getCacheItem("offline_children_metrics");
 
-    if (cachedChildren) setChildrenList(JSON.parse(cachedChildren));
-    if (cachedHistory) setHistoryList(JSON.parse(cachedHistory));
-    if (cachedMetrics) setMetrics(JSON.parse(cachedMetrics));
+      if (cachedChildren) setChildrenList(cachedChildren);
+      if (cachedHistory) setHistoryList(cachedHistory);
+      if (cachedMetrics) setMetrics(cachedMetrics);
 
-    if (cachedChildren || cachedHistory || cachedMetrics) {
-      setIsLoading(false);
+      if (cachedChildren || cachedHistory || cachedMetrics) {
+        setIsLoading(false);
+      }
+
+      if (navigator.onLine) {
+        loadData(false);
+      } else {
+        setIsLoading(false);
+      }
     }
-
-    if (navigator.onLine) {
-      loadData(false);
-    } else {
-      setIsLoading(false);
-    }
+    loadCachedData();
   }, []);
 
   useEffect(() => {

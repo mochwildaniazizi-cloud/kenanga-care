@@ -400,20 +400,29 @@ export async function getChildDetail(childId: string) {
       medical_record_number: child.medical_record_number || "-",
       address: child.address || "-",
       phone_number: child.phone_number || "-",
-      measurements: child.measurements.map((m: any) => ({
-        measurement_id: m.measurement_id,
-        date: formatDateIndonesian(m.visit_date),
-        dateRaw: m.visit_date.toISOString().split("T")[0],
-        ageAtVisit: child.birth_date ? calculateAgeInMonths(child.birth_date, m.visit_date) : 0,
-        weight: m.weight ? Number(m.weight) : 0,
-        height: m.height ? Number(m.height) : 0,
-        head_circumference: m.head_circumference ? Number(m.head_circumference) : 0,
-        vitamin_a_capsule: m.vitamin_a_capsule || "-",
-        deworming_pill: m.deworming_pill ? "Ya" : "Tidak",
-        immunizations: m.immunizations || "-",
-        supplementary_feeding: m.supplementary_feeding ? "Ya" : "Tidak",
-        cadre_notes: m.cadre_notes || "-",
-      })),
+      measurements: child.measurements.map((m: any) => {
+        const noteMatch = m.cadre_notes ? m.cadre_notes.match(/\[Pengukuran KMS Usia (\d+) Bulan\]/) : null;
+        const explicitAge = noteMatch ? parseInt(noteMatch[1], 10) : null;
+        const computedAge = child.birth_date ? calculateAgeInMonths(child.birth_date, m.visit_date) : 0;
+        const finalAge = explicitAge !== null ? explicitAge : computedAge;
+
+        return {
+          measurement_id: m.measurement_id,
+          date: formatDateIndonesian(m.visit_date),
+          dateRaw: m.visit_date.toISOString().split("T")[0],
+          ageAtVisit: finalAge,
+          rawAge: finalAge,
+          usiaBulan: finalAge,
+          weight: m.weight !== null && m.weight !== undefined ? Number(m.weight) : null,
+          height: m.height !== null && m.height !== undefined ? Number(m.height) : null,
+          head_circumference: m.head_circumference !== null && m.head_circumference !== undefined ? Number(m.head_circumference) : null,
+          vitamin_a_capsule: m.vitamin_a_capsule || "-",
+          deworming_pill: m.deworming_pill ? "Ya" : "Tidak",
+          immunizations: m.immunizations || "-",
+          supplementary_feeding: m.supplementary_feeding ? "Ya" : "Tidak",
+          cadre_notes: m.cadre_notes || "-",
+        };
+      }),
     };
   } catch (error) {
     console.error("Error fetching child detail:", error);
@@ -491,37 +500,139 @@ export async function updateChild(childId: string, data: any) {
   }
 }
 
+function safeParseFloat(val: any): number | null {
+  if (val === undefined || val === null || val === "" || val === "—") return null;
+  const str = String(val).replace(',', '.');
+  const num = typeof val === "number" ? val : parseFloat(str);
+  return isNaN(num) ? null : num;
+}
+
 export async function createChildMeasurement(data: any) {
   try {
-    const measurement = await prisma.childMeasurement.create({
-      data: {
-        child_id: data.child_id,
-        visit_date: data.visit_date ? new Date(data.visit_date) : new Date(),
-        weight: data.weight ? parseFloat(data.weight) : null,
-        height: data.height ? parseFloat(data.height) : null,
-        muac: (data.muac || data.lila) ? parseFloat(data.muac || data.lila) : null,
-        head_circumference: data.head_circumference ? parseFloat(data.head_circumference) : null,
-        vitamin_a_capsule: data.vitamin_a || "Tidak Diberikan",
-        deworming_pill: !!data.deworming,
-        supplementary_feeding: !!data.pmt,
-        immunizations: data.immunization || null,
-        cadre_notes: data.notes || null,
-      }
+    if (!data?.child_id) {
+      return { success: false, error: "ID Balita tidak valid." };
+    }
+
+    const weightVal = safeParseFloat(data.weight);
+    const heightVal = safeParseFloat(data.height);
+    const muacVal = safeParseFloat(data.muac || data.lila);
+    const headCircVal = safeParseFloat(data.head_circumference);
+
+    // Auto-create child record in DB if not found to prevent foreign key failure
+    let existingChild = await prisma.child.findUnique({
+      where: { child_id: data.child_id }
     });
 
-    // Update child current weight and height
-    await prisma.child.update({
-      where: { child_id: data.child_id },
-      data: {
-        current_weight: data.weight ? parseFloat(data.weight) : undefined,
-        current_height: data.height ? parseFloat(data.height) : undefined,
+    if (!existingChild) {
+      let motherId = (await prisma.mother.findFirst({ select: { mother_id: true } }))?.mother_id;
+      if (!motherId) {
+        const demoMother = await prisma.mother.create({
+          data: {
+            national_id: "350000000000" + Math.floor(1000 + Math.random() * 9000),
+            mother_name: "Ibu Kenanga Care",
+            risk_status: "Rendah"
+          }
+        });
+        motherId = demoMother.mother_id;
       }
-    });
+
+      existingChild = await prisma.child.create({
+        data: {
+          child_id: data.child_id,
+          mother_id: motherId,
+          child_name: data.child_name || "Anak Kenanga Care",
+          gender: "L",
+          birth_date: new Date("2024-01-01")
+        }
+      });
+    }
+
+    const noteTagMatch = data.notes ? data.notes.match(/\[Pengukuran KMS Usia (\d+) Bulan\]/) : null;
+    const targetAge = noteTagMatch ? parseInt(noteTagMatch[1], 10) : (data.usiaBulan !== undefined && data.usiaBulan !== null ? Number(data.usiaBulan) : null);
+    let measurement: any = null;
+
+    // 1. Check if explicit measurement_id provided
+    if (data.measurement_id && typeof data.measurement_id === "string" && !data.measurement_id.startsWith("local_")) {
+      const existingById = await prisma.childMeasurement.findUnique({
+        where: { measurement_id: data.measurement_id }
+      });
+      if (existingById) {
+        measurement = await prisma.childMeasurement.update({
+          where: { measurement_id: existingById.measurement_id },
+          data: {
+            weight: weightVal !== null ? weightVal : existingById.weight,
+            height: heightVal !== null ? heightVal : existingById.height,
+            head_circumference: headCircVal !== null ? headCircVal : existingById.head_circumference,
+            cadre_notes: data.notes || existingById.cadre_notes,
+            visit_date: data.visit_date ? new Date(data.visit_date) : existingById.visit_date,
+          }
+        });
+      }
+    }
+
+    // 2. Check if existing measurement matches noteTag or targetAge
+    if (!measurement && targetAge !== null) {
+      const childMeasurements = await prisma.childMeasurement.findMany({
+        where: { child_id: data.child_id }
+      });
+
+      const existingForAge = childMeasurements.find(m => {
+        if (m.cadre_notes && noteTagMatch && m.cadre_notes.includes(noteTagMatch[0])) return true;
+        if (m.cadre_notes && m.cadre_notes.includes(`[Pengukuran KMS Usia ${targetAge} Bulan]`)) return true;
+        if (existingChild?.birth_date && m.visit_date) {
+          const mAge = calculateAgeInMonths(existingChild.birth_date, m.visit_date);
+          if (mAge === targetAge) return true;
+        }
+        return false;
+      });
+
+      if (existingForAge) {
+        measurement = await prisma.childMeasurement.update({
+          where: { measurement_id: existingForAge.measurement_id },
+          data: {
+            weight: weightVal !== null ? weightVal : existingForAge.weight,
+            height: heightVal !== null ? heightVal : existingForAge.height,
+            head_circumference: headCircVal !== null ? headCircVal : existingForAge.head_circumference,
+            cadre_notes: data.notes || existingForAge.cadre_notes,
+            visit_date: data.visit_date ? new Date(data.visit_date) : existingForAge.visit_date,
+          }
+        });
+      }
+    }
+
+    if (!measurement) {
+      measurement = await (prisma.childMeasurement.create as any)({
+        data: {
+          child_id: data.child_id,
+          visit_date: data.visit_date ? new Date(data.visit_date) : new Date(),
+          weight: weightVal,
+          height: heightVal,
+          muac: muacVal,
+          head_circumference: headCircVal,
+          vitamin_a_capsule: data.vitamin_a || "Tidak Diberikan",
+          deworming_pill: !!data.deworming,
+          supplementary_feeding: !!data.pmt,
+          immunizations: data.immunization || null,
+          cadre_notes: data.notes || null,
+        }
+      });
+    }
+
+    // Update child current weight and height if valid
+    if (weightVal !== null || heightVal !== null) {
+      await prisma.child.update({
+        where: { child_id: data.child_id },
+        data: {
+          current_weight: weightVal !== null ? weightVal : undefined,
+          current_height: heightVal !== null ? heightVal : undefined,
+        }
+      });
+    }
 
     return { success: true, id: measurement.measurement_id };
   } catch (error: any) {
     console.error("Error creating child measurement:", error);
-    return { success: false, error: error.message || "Gagal menyimpan data penimbangan." };
+    return { success: false, error: error?.message || "Gagal menyimpan data penimbangan." };
   }
 }
 

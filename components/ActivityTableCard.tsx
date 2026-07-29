@@ -5,7 +5,7 @@ interface ActivityTableCardProps {
   title: string;
   description: string;
   columns: string[];
-  data: { time: string; name: string; detail: string; status: StatusType; avatar: string }[];
+  data: { time: string; name: string; detail: string; status: StatusType; avatar: React.ReactNode }[];
   viewAllHref?: string;
 }
 

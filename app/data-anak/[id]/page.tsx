@@ -9,11 +9,12 @@ import {
   MdOutlineMonitorWeight, MdTrendingUp, MdTrendingDown, MdTrendingFlat,
   MdEdit, MdSave, MdClose, MdCheckCircleOutline,
   MdMale, MdFemale, MdCameraAlt, MdOutlineError, MdChildCare,
-  MdPerson, MdMonitorWeight, MdLocalHospital, MdPhone
+  MdPerson, MdMonitorWeight, MdLocalHospital, MdPhone, MdWarning
 } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
 import { FaBaby, FaNotesMedical, FaFileMedical, FaUser } from "react-icons/fa";
 import CustomDatePicker from "@/components/CustomDatePicker";
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
 
 function ChildDetailContent() {
@@ -341,17 +342,16 @@ function ChildDetailContent() {
       
       const decodedId = decodeURIComponent(id as string);
 
-      // Attempt load full cached detail
-      const cached = localStorage.getItem(`offline_child_detail_${decodedId}`);
+      // Attempt load full cached detail from Dexie.js (IndexedDB)
+      const cached = await getCacheItem(`offline_child_detail_${decodedId}`);
       if (cached) {
-        setChild(JSON.parse(cached));
+        setChild(cached);
         setIsLoading(false);
       } else {
-        // Build basic child fallback from master list cache
-        const cachedList = localStorage.getItem("offline_children_list");
+        // Build basic child fallback from master list cache in Dexie.js
+        const cachedList = await getCacheItem("offline_children_list");
         if (cachedList) {
-          const children = JSON.parse(cachedList);
-          const basicChild = children.find((c: any) => c.child_id === decodedId);
+          const basicChild = cachedList.find((c: any) => c.child_id === decodedId);
           if (basicChild) {
             setChild({
               child_id: basicChild.child_id,
@@ -388,7 +388,7 @@ function ChildDetailContent() {
           setError("Rekam medis balita yang Anda cari tidak terdaftar atau telah dihapus.");
         } else {
           setChild(data);
-          localStorage.setItem(`offline_child_detail_${decodedId}`, JSON.stringify(data));
+          await setCacheItem(`offline_child_detail_${decodedId}`, data);
         }
       } catch (err: any) {
         console.error("Failed to load child detail", err);
@@ -749,7 +749,7 @@ function ChildDetailContent() {
       {/* Offline Warning Banner */}
       {!navigator.onLine && (
         <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
-          <span className="text-sm">⚠️</span>
+          <MdWarning className="text-status-orange-solid text-sm flex-shrink-0" />
           <span>Mode Offline: Menampilkan rekam medis lokal dari memori peramban. Anda tetap bisa mengubah profil anak secara offline.</span>
         </div>
       )}
@@ -2165,7 +2165,10 @@ function DevelopmentMonitoringTab({
       {/* Banner Deteksi Dini Keterlambatan */}
       {hasDanger && (
         <div className="p-3 bg-status-red-light/10 border border-status-red-solid/20 rounded-xl text-[10px] text-status-red-solid font-bold leading-relaxed animate-in shake duration-300">
-          ⚠️ BERI TANDA (✓) PADA KOLOM TIDAK: Jika anak belum bisa melakukan salah satu dari hal di atas, segera bawa anak ke Puskesmas agar dideteksi dini penyimpangan tumbuh kembangnya!
+          <div className="flex items-start gap-2">
+            <MdWarning className="text-status-red-solid flex-shrink-0 mt-0.5" />
+            <span>BERI TANDA (✓) PADA KOLOM TIDAK: Jika anak belum bisa melakukan salah satu dari hal di atas, segera bawa anak ke Puskesmas agar dideteksi dini penyimpangan tumbuh kembangnya!</span>
+          </div>
         </div>
       )}
 

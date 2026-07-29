@@ -153,42 +153,36 @@ export default function BerandaNakesPage() {
     <div className="max-w-[1600px] mx-auto p-4 md:p-6 pb-20 bg-[#FAFAFA] min-h-screen text-gray-800 space-y-6">
       
       {/* ─── HEADER BENNER TENAGA KESEHATAN ─── */}
-      <div className="bg-gradient-to-r from-gray-900 via-slate-800 to-gray-900 text-white rounded-3xl p-6 md:p-8 shadow-md border border-gray-700 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl -z-0 pointer-events-none" />
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-200/80 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#EA2986]/[0.06] rounded-full blur-3xl -z-0 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/[0.04] rounded-full blur-2xl -z-0 pointer-events-none" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="bg-rose-500/20 text-pink-300 border border-rose-400/30 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+              <span className="bg-rose-50 text-[#EA2986] border border-rose-200 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
                 <FaStethoscope className="text-xs shrink-0" /> Portal Medis Tenaga Kesehatan (Nakes)
               </span>
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1">
+              <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1">
                 <MdCheckCircle className="text-xs shrink-0" /> Puskesmas Verified
               </span>
             </div>
 
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
                 <span>Selamat Datang, Bidan Widya, A.Md.Keb</span>
                 <span className="text-xl">🩺</span>
               </h1>
-              <p className="text-xs md:text-sm text-gray-300 font-medium mt-1 leading-relaxed max-w-2xl">
+              <p className="text-xs md:text-sm text-gray-600 font-medium mt-1 leading-relaxed max-w-2xl">
                 Bidan Pembina Posyandu Balita &amp; Ibu Kenanga 1 · Kelurahan Wonokromo. Kelola rekam medis medis klinis (EHR), pencatatan SDIDTK, pemantauan gizi, imunisasi, dan ANC maternal.
               </p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row md:flex-col items-stretch sm:items-center md:items-end justify-between gap-3 shrink-0">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded-2xl text-right">
-              <p className="text-[10px] text-gray-300 font-semibold uppercase tracking-wider">Tanggal Layanan</p>
-              <p className="text-sm font-black text-white flex items-center gap-1.5 justify-end mt-0.5">
-                <MdCalendarMonth className="text-pink-400 text-base" /> {todayStr}
-              </p>
-            </div>
-            
             <Link 
               href="/perjalanan-anak/rekam-medis"
-              className="bg-[#EA2986] hover:bg-[#d41f76] text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+              className="bg-[#EA2986] hover:bg-[#d41f76] text-white text-xs font-black px-4.5 py-2.5 rounded-xl shadow-md shadow-[#EA2986]/20 transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>+ Input Catatan Medis Nakes</span>
             </Link>

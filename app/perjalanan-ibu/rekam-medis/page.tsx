@@ -475,6 +475,14 @@ function RekamMedisIbuContent() {
   }, []);
 
   const filteredMothers = allMothersList.filter((m) => {
+    const isKaderOrNakes = 
+      m.status === "Kader Posyandu" || 
+      m.status === "Tenaga Kesehatan" || 
+      m.status === "Nakes" || 
+      m.status === "Bidan" || 
+      (m.national_id && (m.national_id.startsWith("KADER-") || m.national_id.startsWith("NAKES-")));
+    if (isKaderOrNakes) return false;
+
     const q = motherSearchTerm.toLowerCase().trim();
     if (!q) return true;
     return (
@@ -489,11 +497,11 @@ function RekamMedisIbuContent() {
       setIsLoadingDb(true);
       try {
         let motherData: any = null;
-        if (paramMotherId) {
-          motherData = await getMotherDetail(paramMotherId);
-        } else if (role === "ibu") {
+        if (role === "ibu") {
           const targetUsername = username || "08123456789";
           motherData = await getLoggedInMotherDetail(targetUsername);
+        } else if (paramMotherId) {
+          motherData = await getMotherDetail(paramMotherId);
         }
         if (motherData) {
           setDbMother(motherData);
@@ -565,7 +573,7 @@ function RekamMedisIbuContent() {
             <div className="flex items-center gap-2 text-xs font-semibold text-gray-400">
               <Link href="/" className="hover:text-[#EA2986]">Beranda</Link>
               <span>/</span>
-              <span className="text-gray-600">Rekam Medis Ibu</span>
+              <span className="text-gray-600">{role === "ibu" ? "Perjalanan Ibu" : "Rekam Medis Ibu"}</span>
             </div>
             <h1 className="text-xl font-black text-gray-900 mt-1 tracking-tight">Catatan Kesehatan &amp; Rekam Medis Maternal</h1>
           </div>
@@ -578,8 +586,8 @@ function RekamMedisIbuContent() {
       {/* ─── SEARCH & MOTHER INFORMATIONAL CARD (LIGHT MODE) ─── */}
       <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-4 animate-fadeIn">
         
-        {/* TOP ROW: SEARCH & DROPDOWN COMBOBOX (DI ATAS NAMA IBU) */}
-        {allMothersList.length > 0 && (
+        {/* TOP ROW: SEARCH & DROPDOWN COMBOBOX (DI ATAS NAMA IBU - HANYA UNTUK NAKES/KADER) */}
+        {role !== "ibu" && allMothersList.length > 0 && (
           <div className="bg-slate-50 p-3.5 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative">
             <div className="flex items-center gap-2 text-xs font-bold text-gray-700 shrink-0">
               <span className="w-2.5 h-2.5 rounded-full bg-[#EA2986] animate-pulse" />
@@ -675,8 +683,8 @@ function RekamMedisIbuContent() {
           </div>
         )}
 
-        {/* EMPTY STATE IF NO MOTHER SELECTED YET */}
-        {!dbMother && (
+        {/* EMPTY STATE IF NO MOTHER SELECTED YET (UNTUK NAKES/KADER) */}
+        {!dbMother && role !== "ibu" && (
           <div className="bg-slate-50 border-2 border-dashed border-rose-200/80 rounded-2xl p-8 text-center space-y-3 my-2">
             <div className="w-14 h-14 bg-rose-100 text-[#EA2986] rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-2xs">
               🤱
@@ -881,8 +889,8 @@ function RekamMedisIbuContent() {
                     {[
                       { label: "Berat Badan", val: record.beratBadan ? `${record.beratBadan} kg` : "-", icon: <MdFitnessCenter /> },
                       { label: "Tinggi Badan", val: record.tinggiBadan ? `${record.tinggiBadan} cm` : "Tidak Diukur", disabled: !record.tinggiBadan, icon: <MdStraighten className="rotate-90" /> },
-                      { label: "Lingkar Lengan Atas (LiLA)", val: record.lingkarLenganAtas ? `${record.lingkarLenganAtas} cm` : "-", icon: <MdStraighten />, alert: checkIsKek ? "⚠️ Risiko KEK (<23.5 cm)" : null },
-                      { label: "Tekanan Darah", val: record.tekananDarah || "-", icon: <MdFavorite className="text-rose-500" />, alert: checkIsHipertensi() ? "⚠️ Hipertensi (≥140/90)" : null },
+                      { label: "Lingkar Lengan Atas (LiLA)", val: record.lingkarLenganAtas ? `${record.lingkarLenganAtas} cm` : "-", icon: <MdStraighten />, alert: checkIsKek ? "Risiko KEK (<23.5 cm)" : null },
+                      { label: "Tekanan Darah", val: record.tekananDarah || "-", icon: <MdFavorite className="text-rose-500" />, alert: checkIsHipertensi() ? "Hipertensi (≥140/90)" : null },
                       { label: "Tinggi Fundus Uteri (TFU)", val: record.tinggiRahim ? `${record.tinggiRahim} cm` : "Belum Terukur", disabled: !record.tinggiRahim, icon: <MdStraighten className="rotate-45" /> },
                       { label: "Letak Janin", val: record.letakJanin || "-", icon: <MdHelpOutline /> },
                       { label: "Denyut Jantung Janin (DJJ)", val: record.djjBayi ? `${record.djjBayi} bpm` : "Belum Terdengar", disabled: !record.djjBayi, icon: <MdFavorite className="text-emerald-500 animate-pulse" /> },

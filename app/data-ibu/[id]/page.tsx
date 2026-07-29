@@ -9,12 +9,14 @@ import {
   MdArrowBack, MdPerson, MdCalendarToday, MdPhone, 
   MdPregnantWoman, MdBloodtype, MdOutlineError, MdFemale, MdMale,
   MdEdit, MdSave, MdClose, MdCheckCircleOutline, MdCameraAlt, MdHome, MdInfo,
-  MdVaccines, MdCalendarMonth, MdBabyChangingStation, MdFamilyRestroom, MdScale, MdAdd
+  MdVaccines, MdCalendarMonth, MdBabyChangingStation, MdFamilyRestroom, MdScale, MdAdd,
+  MdWarning, MdMedication
 } from "react-icons/md";
 import { getTtdLogs, upsertTtdLog } from "@/app/actions/ttd";
 import { getWeeklyMonitorings, upsertWeeklyMonitoring } from "@/app/actions/weekly";
 import { FaUserFriends, FaHeartbeat, FaUser, FaUserFriends as FaUserCouple, FaFileMedical } from "react-icons/fa";
 import CustomDatePicker from "@/components/CustomDatePicker";
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 
 function MotherDetailContent() {
   const { id } = useParams();
@@ -291,17 +293,16 @@ function MotherDetailContent() {
       setError(null);
       const decodedId = decodeURIComponent(id as string);
 
-      // Attempt load full cached detail
-      const cached = localStorage.getItem(`offline_mother_detail_${decodedId}`);
+      // Attempt load full cached detail from Dexie.js (IndexedDB)
+      const cached = await getCacheItem(`offline_mother_detail_${decodedId}`);
       if (cached) {
-        setMother(JSON.parse(cached));
+        setMother(cached);
         setIsLoading(false);
       } else {
-        // Build basic mother fallback from master list cache
-        const cachedList = localStorage.getItem("offline_mothers_list");
+        // Build basic mother fallback from master list cache in Dexie.js
+        const cachedList = await getCacheItem("offline_mothers_list");
         if (cachedList) {
-          const mothers = JSON.parse(cachedList);
-          const basicMother = mothers.find((m: any) => m.mother_id === decodedId);
+          const basicMother = cachedList.find((m: any) => m.mother_id === decodedId);
           if (basicMother) {
             setMother({
               mother_id: basicMother.mother_id,
@@ -333,7 +334,7 @@ function MotherDetailContent() {
           setError("Rekam medis ibu yang Anda cari tidak terdaftar atau telah dihapus.");
         } else {
           setMother(data);
-          localStorage.setItem(`offline_mother_detail_${decodedId}`, JSON.stringify(data));
+          await setCacheItem(`offline_mother_detail_${decodedId}`, data);
         }
       } catch (err: any) {
         console.error("Failed to load mother detail", err);
@@ -836,7 +837,7 @@ function MotherDetailContent() {
       {/* Offline Warning Banner */}
       {!navigator.onLine && (
         <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
-          <span className="text-sm">⚠️</span>
+          <MdWarning className="text-status-orange-solid text-sm flex-shrink-0" />
           <span>Mode Offline: Menampilkan rekam medis lokal dari memori peramban. Anda tetap bisa mengubah profil ibu secara offline.</span>
         </div>
       )}
@@ -1138,7 +1139,7 @@ function MotherDetailContent() {
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-base-border/20">
                       <div className="flex -space-x-1.5 overflow-hidden">
                         <div className="w-6 h-6 rounded-full bg-status-pink-light text-brand-primary flex items-center justify-center text-[10px] font-bold border border-base-white">
-                          💊
+                          <MdMedication className="text-brand-primary text-sm" />
                         </div>
                       </div>
                       <span className="text-[9px] font-bold px-2.5 py-1 rounded-lg bg-pink-50 text-[#FF2D55]">
@@ -2110,7 +2111,7 @@ function MotherDetailContent() {
 
             {/* Warning Notice */}
             <div className="bg-status-red-light/10 border border-status-red-solid/15 rounded-xl p-3.5 flex items-start gap-2.5 text-status-red-solid leading-relaxed">
-              <span className="text-sm">⚠️</span>
+              <MdWarning className="text-sm flex-shrink-0 mt-0.5" />
               <p className="font-semibold text-xs">
                 <strong>PENTING:</strong> Jika Ibu hamil mencentang salah satu gejala pada kolom <strong>Pemantauan Gejala / Kondisi</strong>, segeralah berkonsultasi ke bidan posyandu atau periksa ke Puskesmas/Rumah Sakit terdekat untuk penanganan medis dini.
               </p>

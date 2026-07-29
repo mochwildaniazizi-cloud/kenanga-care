@@ -11,6 +11,7 @@ import {
 import { FaUserNurse, FaHeartbeat } from "react-icons/fa";
 import { getMothersData, getMaternalHistory, getMotherMetrics } from "@/app/actions/mothers";
 import { useUserRole } from "@/context/UserRoleContext";
+import { getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 import { FiRefreshCw } from "react-icons/fi";
 
 // ==========================================
@@ -196,7 +197,7 @@ export default function DataIbuPage() {
       return;
     }
     
-    const cachedMothers = localStorage.getItem("offline_mothers_list");
+    const cachedMothers = await getCacheItem("offline_mothers_list");
     if (!cachedMothers && !forceRefresh) {
       setIsLoading(true);
     }
@@ -215,9 +216,9 @@ export default function DataIbuPage() {
       setHistoryList(history);
       setMetrics(fetchedMetrics);
       
-      localStorage.setItem("offline_mothers_list", JSON.stringify(mothers));
-      localStorage.setItem("offline_mothers_history", JSON.stringify(history));
-      localStorage.setItem("offline_mothers_metrics", JSON.stringify(fetchedMetrics));
+      await setCacheItem("offline_mothers_list", mothers);
+      await setCacheItem("offline_mothers_history", history);
+      await setCacheItem("offline_mothers_metrics", fetchedMetrics);
     } catch (error: any) {
       console.error("Failed to load data:", error);
     } finally {
@@ -227,23 +228,21 @@ export default function DataIbuPage() {
   };
 
   useEffect(() => {
-    const cachedMothers = localStorage.getItem("offline_mothers_list");
-    const cachedHistory = localStorage.getItem("offline_mothers_history");
-    const cachedMetrics = localStorage.getItem("offline_mothers_metrics");
+    async function loadCachedData() {
+      const cachedMothers = await getCacheItem("offline_mothers_list");
+      const cachedHistory = await getCacheItem("offline_mothers_history");
+      const cachedMetrics = await getCacheItem("offline_mothers_metrics");
 
-    if (cachedMothers) setMothersList(JSON.parse(cachedMothers));
-    if (cachedHistory) setHistoryList(JSON.parse(cachedHistory));
-    if (cachedMetrics) setMetrics(JSON.parse(cachedMetrics));
-    
-    if (cachedMothers || cachedHistory || cachedMetrics) {
-      setIsLoading(false);
+      if (cachedMothers) setMothersList(cachedMothers);
+      if (cachedHistory) setHistoryList(cachedHistory);
+      if (cachedMetrics) setMetrics(cachedMetrics);
+      
+      if (cachedMothers || cachedHistory || cachedMetrics) {
+        setIsLoading(false);
+      }
+      loadData();
     }
-
-    if (navigator.onLine) {
-      loadData(false);
-    } else {
-      setIsLoading(false);
-    }
+    loadCachedData();
   }, []);
 
   useEffect(() => {

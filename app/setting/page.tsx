@@ -21,7 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { MdOutlineError, MdCheckCircleOutline } from "react-icons/md";
 import { useUserRole } from "@/context/UserRoleContext";
-import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother, ensureKaderProfileExists } from "@/app/actions/mothers";
+import { getLoggedInMotherData, getMotherDetail, getMothersData, createMother, deleteMother, updateUserPassword, updateUserAvatar, updateMother, ensureKaderProfileExists, resetSystemData } from "@/app/actions/mothers";
 import CustomDatePicker from "@/components/CustomDatePicker";
 
 // Component wrapper with Suspense to handle next.js searchParams client-side rendering
@@ -59,7 +59,7 @@ function SettingsContent() {
 
   // Profile Form State
   const [formData, setFormData] = useState({
-    name: "Kader Siti",
+    name: "Kader Umi",
     posyandu: "Posyandu Kenanga 1",
     role: "Ketua Kader",
     email: "siti.posyandu@gmail.com",
@@ -118,7 +118,7 @@ function SettingsContent() {
       const data = await getMothersData();
       
       const defaultKader = {
-        name: "Kader Siti",
+        name: "Kader Umi",
         username: "kader",
         role: "Ketua Kader",
         type: "Kader Posyandu",
@@ -196,6 +196,25 @@ function SettingsContent() {
     } catch (err) {
       console.error(err);
       alert("Terjadi kesalahan sistem saat menghapus.");
+    }
+  };
+
+  const handleResetSystemData = async () => {
+    const confirmReset = window.confirm("PERINGATAN: Apakah Anda yakin ingin menghapus SELURUH data di web (anak, ibu, rekam medis, pengukuran)? System akan dibersihkan dan disiapkan 3 akun pengguna baru untuk presentasi.");
+    if (!confirmReset) return;
+
+    try {
+      const res = await resetSystemData();
+      if (res.success) {
+        setSuccessMessage(res.message || "Seluruh data berhasil dihapus dan 3 akun baru disiapkan.");
+        setShowSuccessModal(true);
+        refreshUsersList();
+      } else {
+        alert(res.error || "Gagal mereset data.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan sistem saat mereset data.");
     }
   };
 
@@ -439,7 +458,7 @@ function SettingsContent() {
           national_id: "NAKES-327301992"
         });
       } else {
-        const savedName = localStorage.getItem("kader_name") || "Kader Siti";
+        const savedName = localStorage.getItem("kader_name") || "Kader Umi";
         const savedPhone = localStorage.getItem("kader_phone") || "0812-3456-7890";
         const savedEmail = localStorage.getItem("kader_email") || "siti.posyandu@gmail.com";
         const savedAddress = localStorage.getItem("kader_address") || "Jl. Mawar No. 12, Kel. Kenanga";
@@ -452,7 +471,7 @@ function SettingsContent() {
           phone: savedPhone,
           address: savedAddress,
           husband_name: "",
-          national_id: "KADER-SITI"
+          national_id: "KADER-DEFAULT"
         });
       }
 
@@ -647,11 +666,11 @@ function SettingsContent() {
       // Save to Supabase DB or default kader upsert
       if (username === "kader" || username.toLowerCase() === "kader") {
         try {
-          const kaderProfile = await ensureKaderProfileExists(formData.name || "Kader Siti", formData.phone || undefined);
+          const kaderProfile = await ensureKaderProfileExists(formData.name || "Kader Umi", formData.phone || undefined);
           if (kaderProfile?.mother_id) {
             await updateMother(kaderProfile.mother_id, { 
               national_id: "KADER-DEFAULT",
-              mother_name: formData.name || "Kader Siti",
+              mother_name: formData.name || "Kader Umi",
               avatarUrl: croppedBase64
             });
           }
@@ -1188,6 +1207,16 @@ function SettingsContent() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.637 10.637Z" />
                     </svg>
                   </div>
+
+                  {/* Reset System Data Button */}
+                  <button
+                    onClick={handleResetSystemData}
+                    className="px-3.5 py-2 rounded-xl border border-status-red-solid/30 bg-status-red-solid/10 text-status-red-solid text-xs font-bold hover:bg-status-red-solid/20 transition flex items-center gap-1.5 shrink-0 cursor-pointer"
+                    title="Kosongkan seluruh data web dan siapkan 3 akun bersih baru"
+                  >
+                    <TrashIcon className="w-3.5 h-3.5" />
+                    <span>Reset Data Web</span>
+                  </button>
 
                   {/* Add User Button */}
                   <button

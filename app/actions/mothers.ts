@@ -83,6 +83,18 @@ function calculateGestationalOrNifasAge(status: string, estimatedDueDate: Date |
 export async function getMothersData() {
   try {
     const mothers = await prisma.mother.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              { ui_status: null },
+              { ui_status: { notIn: ["Kader Posyandu", "Tenaga Kesehatan", "Nakes", "Bidan"] } }
+            ]
+          },
+          { NOT: { national_id: { startsWith: "KADER-" } } },
+          { NOT: { national_id: { startsWith: "NAKES-" } } }
+        ]
+      },
       orderBy: {
         created_at: "desc",
       },
@@ -94,42 +106,52 @@ export async function getMothersData() {
     const avatars = getCustomAvatars();
     const customMothersAvatars = avatars.mothers || {};
 
-    return mothers.map((mother: any, index: number) => {
-      const children = mother.children || [];
-      const childrenCount = mother.number_of_children || children.length || 0;
-      const status = determineMotherStatus(mother.ui_status, childrenCount, children, mother.estimated_due_date);
+    return mothers
+      .filter((m: any) => {
+        const isKaderOrNakes = 
+          m.ui_status === "Kader Posyandu" || 
+          m.ui_status === "Tenaga Kesehatan" || 
+          m.ui_status === "Nakes" || 
+          m.ui_status === "Bidan" || 
+          (m.national_id && (m.national_id.startsWith("KADER-") || m.national_id.startsWith("NAKES-")));
+        return !isKaderOrNakes;
+      })
+      .map((mother: any, index: number) => {
+        const children = mother.children || [];
+        const childrenCount = mother.number_of_children || children.length || 0;
+        const status = determineMotherStatus(mother.ui_status, childrenCount, children, mother.estimated_due_date);
 
-      const gestationalAge = calculateGestationalOrNifasAge(status, mother.estimated_due_date, children);
+        const gestationalAge = calculateGestationalOrNifasAge(status, mother.estimated_due_date, children);
 
-      const hpl = mother.estimated_due_date 
-        ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(mother.estimated_due_date)
-        : "-";
+        const hpl = mother.estimated_due_date 
+          ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(mother.estimated_due_date)
+          : "-";
 
-      return {
-        id: (index + 1).toString().padStart(2, "0"),
-        mother_id: mother.mother_id,
-        national_id: mother.national_id,
-        name: mother.mother_name,
-        password: mother.password,
-        age: mother.age ? `${mother.age} Tahun` : "-",
-        rawAge: mother.age || 0,
-        status,
-        gestationalAge,
-        hpl,
-        rawHpl: mother.estimated_due_date ? mother.estimated_due_date.toISOString() : "",
-        avatarUrl: mother.avatarUrl 
-          || customMothersAvatars[mother.mother_id] 
-          || (mother.mother_name.includes("Dewi") 
-            ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
-            : mother.mother_name.includes("Wulandari")
-            ? "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop"
-            : mother.mother_name.includes("Fitriani")
-            ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop"
-            : null),
-        condition: mother.risk_status || "Normal",
-        phone_number: mother.phone_number || "-"
-      };
-    });
+        return {
+          id: (index + 1).toString().padStart(2, "0"),
+          mother_id: mother.mother_id,
+          national_id: mother.national_id,
+          name: mother.mother_name,
+          password: mother.password,
+          age: mother.age ? `${mother.age} Tahun` : "-",
+          rawAge: mother.age || 0,
+          status,
+          gestationalAge,
+          hpl,
+          rawHpl: mother.estimated_due_date ? mother.estimated_due_date.toISOString() : "",
+          avatarUrl: mother.avatarUrl 
+            || customMothersAvatars[mother.mother_id] 
+            || (mother.mother_name.includes("Dewi") 
+              ? "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop" 
+              : mother.mother_name.includes("Wulandari")
+              ? "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop"
+              : mother.mother_name.includes("Fitriani")
+              ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop"
+              : null),
+          condition: mother.risk_status || "Normal",
+          phone_number: mother.phone_number || "-"
+        };
+      });
   } catch (error) {
     console.error("Error fetching mothers:", error);
     throw error;
@@ -732,7 +754,7 @@ export async function ensureKaderProfileExists(name: string, phone?: string, pas
     const created = await prisma.mother.create({
       data: {
         national_id: "KADER-DEFAULT",
-        mother_name: name || "Kader Siti",
+        mother_name: name || "Kader Umi",
         phone_number: phone || "0812-3456-7890",
         ui_status: "Kader Posyandu",
         risk_status: "Ketua Kader",
@@ -785,16 +807,59 @@ export async function ensureNakesProfileExists(name: string, phone?: string, pas
   }
 }
 
+export async function ensureIbuProfileExists(name: string, phone?: string, password?: string) {
+  try {
+    const existing = await prisma.mother.findFirst({
+      where: {
+        OR: [
+          { national_id: "IBU-DEFAULT" },
+          { mother_name: { equals: name || "Ibu Ika", mode: 'insensitive' } }
+        ]
+      }
+    });
+
+    if (existing) {
+      const updated = await prisma.mother.update({
+        where: { mother_id: existing.mother_id },
+        data: {
+          mother_name: name || existing.mother_name,
+          phone_number: phone || existing.phone_number,
+          ...(password ? { password } : {})
+        }
+      });
+      return { mother_id: updated.mother_id, avatarUrl: updated.avatarUrl };
+    }
+
+    const created = await prisma.mother.create({
+      data: {
+        national_id: "IBU-DEFAULT",
+        mother_name: name || "Ibu Ika",
+        phone_number: phone || "081234567891",
+        ui_status: "Ibu Balita",
+        risk_status: "Normal",
+        husband_name: "Budi Santoso",
+        password: password || "ibu123",
+        number_of_children: 0,
+        address: "Jl. Mawar No. 12, Kel. Kenanga"
+      }
+    });
+    return { mother_id: created.mother_id, avatarUrl: null };
+  } catch (error: any) {
+    console.error("Error ensuring ibu profile:", error);
+    return null;
+  }
+}
+
 export async function verifyUserLogin(username: string, pass: string, role: "kader" | "ibu" | "nakes") {
   try {
     const u = username.trim().toLowerCase();
     
     // 1. Bypass default kader account — ensure DB record exists
     if (role === "kader" && u === "kader" && pass === "kader123") {
-      const kaderProfile = await ensureKaderProfileExists("Kader Siti");
+      const kaderProfile = await ensureKaderProfileExists("Kader Umi");
       const kaderName = kaderProfile ? 
-        ((await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Siti")
-        : "Kader Siti";
+        ((await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Umi")
+        : "Kader Umi";
       return { success: true, name: kaderName, role: "kader" as const, avatarUrl: kaderProfile?.avatarUrl ?? null };
     }
 
@@ -805,6 +870,15 @@ export async function verifyUserLogin(username: string, pass: string, role: "kad
         ((await prisma.mother.findFirst({ where: { national_id: "NAKES-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Bidan Widya, A.Md.Keb")
         : "Bidan Widya, A.Md.Keb";
       return { success: true, name: nakesName, role: "nakes" as const, avatarUrl: nakesProfile?.avatarUrl ?? null };
+    }
+
+    // 3. Bypass default ibu simulation account — ensure DB record exists
+    if (role === "ibu" && (u === "ibu" || u === "ibu.ika" || u === "ibu.ana") && pass === "ibu123") {
+      const ibuProfile = await ensureIbuProfileExists("Ibu Ika");
+      const ibuName = ibuProfile ?
+        ((await prisma.mother.findFirst({ where: { national_id: "IBU-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Ibu Ika")
+        : "Ibu Ika";
+      return { success: true, name: ibuName, role: "ibu" as const, avatarUrl: ibuProfile?.avatarUrl ?? null };
     }
 
     let cleanU = u;
@@ -873,8 +947,8 @@ export async function verifyUserLoginAuto(username: string, pass: string) {
 
     // 1. Default kader bypass
     if (u === "kader" && pass === "kader123") {
-      const kaderProfile = await ensureKaderProfileExists("Kader Siti");
-      const kaderName = (await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Siti";
+      const kaderProfile = await ensureKaderProfileExists("Kader Umi");
+      const kaderName = (await prisma.mother.findFirst({ where: { national_id: "KADER-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Kader Umi";
       return { success: true, name: kaderName, role: "kader" as const, avatarUrl: kaderProfile?.avatarUrl ?? null };
     }
 
@@ -885,7 +959,14 @@ export async function verifyUserLoginAuto(username: string, pass: string) {
       return { success: true, name: nakesName, role: "nakes" as const, avatarUrl: nakesProfile?.avatarUrl ?? null };
     }
 
-    // 3. Search DB — cari berdasarkan berbagai field
+    // 3. Default ibu bypass
+    if ((u === "ibu" || u === "ibu.ika" || u === "ibu.ana") && pass === "ibu123") {
+      const ibuProfile = await ensureIbuProfileExists("Ibu Ika");
+      const ibuName = (await prisma.mother.findFirst({ where: { national_id: "IBU-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Ibu Ika";
+      return { success: true, name: ibuName, role: "ibu" as const, avatarUrl: ibuProfile?.avatarUrl ?? null };
+    }
+
+    // 4. Search DB — cari berdasarkan berbagai field
     let cleanU = u;
     if (cleanU.startsWith("ibu ")) cleanU = cleanU.substring(4).trim();
     else if (cleanU.startsWith("kader ")) cleanU = cleanU.substring(6).trim();
@@ -911,12 +992,12 @@ export async function verifyUserLoginAuto(username: string, pass: string) {
       return { success: false, error: "Username tidak ditemukan. Periksa kembali username atau nomor WhatsApp Anda." };
     }
 
-    // 4. Deteksi role dari data DB
+    // 5. Deteksi role dari data DB
     const isDbNakes = mother.ui_status === "Tenaga Kesehatan" || mother.national_id.startsWith("NAKES-");
     const isDbKader = mother.ui_status === "Kader Posyandu" || mother.national_id.startsWith("KADER-");
     const detectedRole: "kader" | "nakes" | "ibu" = isDbNakes ? "nakes" : isDbKader ? "kader" : "ibu";
 
-    // 5. Verifikasi password
+    // 6. Verifikasi password
     const dbPassword = mother.password;
     const defaultPassword = isDbNakes ? "nakes123" : isDbKader ? "kader123" : "ibu123";
     const expectedPassword = dbPassword || defaultPassword;
@@ -929,6 +1010,37 @@ export async function verifyUserLoginAuto(username: string, pass: string) {
   } catch (error: any) {
     console.error("Error in verifyUserLoginAuto:", error);
     return { success: false, error: error.message || "Gagal melakukan otentikasi." };
+  }
+}
+
+// ─── RESET SYSTEM DATA: Hapus semua data dan siapkan 3 akun awal ───
+export async function resetSystemData() {
+  try {
+    await prisma.childMeasurement.deleteMany({});
+    await prisma.maternalHealthRecord.deleteMany({});
+    await prisma.ttdLog.deleteMany({});
+    await prisma.weeklyMonitoring.deleteMany({});
+    await prisma.scheduleLog.deleteMany({});
+    await prisma.schedule.deleteMany({});
+    await prisma.child.deleteMany({});
+    await prisma.mother.deleteMany({});
+
+    try {
+      if (fs.existsSync(AVATAR_FILE_PATH)) {
+        fs.writeFileSync(AVATAR_FILE_PATH, JSON.stringify({ mothers: {}, children: {} }, null, 2), "utf-8");
+      }
+    } catch (e) {
+      console.warn("Avatar reset error:", e);
+    }
+
+    await ensureKaderProfileExists("Kader Umi", "0812-3456-7890", "kader123");
+    await ensureNakesProfileExists("Bidan Widya, A.Md.Keb", "0813-9988-7766", "nakes123");
+    await ensureIbuProfileExists("Ibu Ika", "081234567891", "ibu123");
+
+    return { success: true, message: "Seluruh data berhasil dihapus dan 3 akun pengguna baru berhasil disiapkan." };
+  } catch (error: any) {
+    console.error("Error in resetSystemData:", error);
+    return { success: false, error: error.message || "Gagal mereset data sistem." };
   }
 }
 

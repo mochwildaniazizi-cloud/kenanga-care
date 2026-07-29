@@ -6,12 +6,14 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useUserRole } from "@/context/UserRoleContext";
 import { getLoggedInMotherDetail } from "@/app/actions/mothers";
 import { getMeasurementHistory, createChildMeasurement, getChildDetail, getChildrenData } from "@/app/actions/children";
-import { saveChildOfflineStateToDexie, getChildOfflineStateFromDexie, saveChildMeasurementToDexie } from "@/lib/db/dexieDb";
+import { saveChildOfflineStateToDexie, getChildOfflineStateFromDexie, saveChildMeasurementToDexie, getCacheItem, setCacheItem } from "@/lib/db/dexieDb";
 import { 
   MdChildCare, MdLocalDining,
   MdShield, MdAssignmentTurnedIn,
   MdCheckCircle, MdShowChart,
-  MdSearch, MdClose, MdKeyboardArrowDown, MdAdd
+  MdSearch, MdClose, MdKeyboardArrowDown, MdAdd,
+  MdEdit, MdWarning, MdCheckCircleOutline, MdWarningAmber,
+  MdMedication, MdCalendarMonth
 } from "react-icons/md";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from "recharts";
 
@@ -425,6 +427,81 @@ const DEFAULT_TAHUNAN_PELAYANAN: Record<string, { visits: { date: string; place:
   }
 };
 
+const DEFAULT_GIZI_PMBA = {
+  asi_frekuensi: { "0": "✓", "1": "✓", "2": "✓", "3": "✓", "4": "✓", "5": "✓", "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  asi_posisi: { "0": "✓", "1": "✓", "2": "✓", "3": "✓", "4": "✓", "5": "✓", "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  asi_perah: { "0": "-", "1": "-", "2": "-", "3": "-", "4": "-", "5": "-", "6_8": "-", "9_11": "-", "12_23": "-", "23_59": "-" },
+  mpasi_ya: { "0": "❌", "1": "❌", "2": "❌", "3": "❌", "4": "❌", "5": "❌", "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  mpasi_tidak: { "0": "✓", "1": "✓", "2": "✓", "3": "✓", "4": "✓", "5": "✓", "6_8": "❌", "9_11": "❌", "12_23": "❌", "23_59": "❌" },
+  variasi_pokok: { "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  variasi_lauk: { "6_8": "✓ (Hewani)", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  variasi_minyak: { "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  variasi_sayur: { "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  variasi_buah: { "6_8": "✓", "9_11": "✓", "12_23": "✓", "23_59": "✓" },
+  variasi_lainnya: { "6_8": "-", "9_11": "-", "12_23": "-", "23_59": "-" },
+  tekstur_saring: { "6_8": "✓ Saring", "9_11": "❌", "12_23": "❌", "23_59": "❌" },
+  tekstur_lumat: { "6_8": "✓ Lumat", "9_11": "❌", "12_23": "❌", "23_59": "❌" },
+  tekstur_cincang: { "6_8": "❌", "9_11": "✓ Cincang", "12_23": "❌", "23_59": "❌" },
+  tekstur_keluarga: { "6_8": "❌", "9_11": "❌", "12_23": "✓ Menu Keluarga", "23_59": "✓ Menu Keluarga" },
+  porsi_1: { "6_8": "✓ Terpenuhi", "9_11": "❌", "12_23": "❌", "23_59": "❌" },
+  porsi_2: { "6_8": "❌", "9_11": "✓ Terpenuhi", "12_23": "❌", "23_59": "❌" },
+  porsi_3: { "6_8": "❌", "9_11": "❌", "12_23": "✓ Terpenuhi", "23_59": "❌" },
+  porsi_4: { "6_8": "❌", "9_11": "❌", "12_23": "❌", "23_59": "✓ Terpenuhi" },
+  frekuensi_utama: { "6_8": "2x Sehari", "9_11": "3x Sehari", "12_23": "3x Sehari", "23_59": "3x Sehari" },
+  frekuensi_selingan: { "6_8": "✓ 1-2x", "9_11": "✓ 2x", "12_23": "✓ 2x", "23_59": "✓ 2x" },
+};
+
+const DEFAULT_VIT_A_CACING = {
+  vitA_biru: { diberikan: true, tanggal: "14/08/2026", batch: "A26-BLU", nakes: "Bidan Widya", status: "Sudah Diberikan" },
+  vitA_merah_th1: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  vitA_merah_th2: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  vitA_merah_th3: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  vitA_merah_th4: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  vitA_merah_th5: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  cacing_th1: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  cacing_th2: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  cacing_th3: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  cacing_th4: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+  cacing_th5: { diberikan: false, tanggal: "", batch: "", nakes: "", status: "Belum" },
+};
+
+const DEFAULT_GIGI_RECORDS = [
+  { bln: "9 M", tgl: "14/06/2026", ada: "2", lubang: "0", bersih: "✓", kotor: "", r: "Rendah" },
+  { bln: "12 M", tgl: "14/09/2026", ada: "4", lubang: "0", bersih: "✓", kotor: "", r: "Rendah" },
+  { bln: "18 M", tgl: "14/03/2027", ada: "8", lubang: "0", bersih: "✓", kotor: "", r: "Rendah" },
+  { bln: "24 M", tgl: "14/09/2027", ada: "12", lubang: "1", bersih: "", kotor: "✓", r: "Sedang" },
+  { bln: "30 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
+  { bln: "36 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
+  { bln: "42 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
+  { bln: "48 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
+  { bln: "54 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
+  { bln: "60 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
+];
+
+const DEFAULT_IMUNISASI_DATA = [
+  { id: "hb0",         nama: "Hepatitis B (<24 Jam)",        target: [0],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [], pink: [], gray: [] },
+  { id: "bcg",         nama: "BCG (Tuberkulosis)",            target: [1],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [2,3,4,5,6,7,8,9,10,11], pink: [], gray: [] },
+  { id: "opv1",        nama: "Polio Tetes 1 (OPV 1)",        target: [1],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [2,3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [] },
+  { id: "dpt1",        nama: "DPT-HB-Hib 1",                 target: [2],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1] },
+  { id: "opv2",        nama: "Polio Tetes 2 (OPV 2)",        target: [2],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1] },
+  { id: "rv1",         nama: "Rotavirus (RV) 1*",             target: [2],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [3,4,5], pink: [], gray: [0,1,6,7,8,9,10,11,12,13,14,15,16] },
+  { id: "pcv1",        nama: "PCV 1 (Pneumokokus)",           target: [2],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1] },
+  { id: "dpt2",        nama: "DPT-HB-Hib 2",                 target: [3],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2] },
+  { id: "opv3",        nama: "Polio Tetes 3 (OPV 3)",        target: [3],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2] },
+  { id: "rv2",         nama: "Rotavirus (RV) 2*",             target: [3],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [4,5], pink: [], gray: [0,1,2,6,7,8,9,10,11,12,13,14,15,16] },
+  { id: "pcv2",        nama: "PCV 2 (Pneumokokus)",           target: [3],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2] },
+  { id: "dpt3",        nama: "DPT-HB-Hib 3",                 target: [4],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2,3] },
+  { id: "opv4",        nama: "Polio Tetes 4 (OPV 4)",        target: [4],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2,3] },
+  { id: "ipv1",        nama: "Polio Suntik (IPV) 1",          target: [4],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2,3] },
+  { id: "rv3",         nama: "Rotavirus (RV) 3*",             target: [4],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [5,6], pink: [], gray: [0,1,2,3,7,8,9,10,11,12,13,14,15,16] },
+  { id: "mr1",         nama: "Campak-Rubella (MR)",           target: [9],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [10,11], pink: [12,13,14,15,16], gray: [0,1,2,3,4,5,6,7,8] },
+  { id: "ipv2",        nama: "Polio Suntik (IPV) 2*",         target: [9],  done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [10,11], pink: [12,13,14,15,16], gray: [0,1,2,3,4,5,6,7,8] },
+  { id: "je",          nama: "*Japanese Encephalitis (JE)",   target: [10], done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [], pink: [11,12,13,14,15,16], gray: [0,1,2,3,4,5,6,7,8,9] },
+  { id: "pcv3",        nama: "PCV 3 Lanjutan",                target: [12], done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [13,14], pink: [15,16], gray: [0,1,2,3,4,5,6,7,8,9,10,11] },
+  { id: "dpt_lanjut",  nama: "DPT-HB-Hib Lanjutan",          target: [13], done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [14], pink: [15,16], gray: [0,1,2,3,4,5,6,7,8,9,10,11,12] },
+  { id: "mr2",         nama: "Campak Rubella Lanjutan",       target: [13], done: "", tgl: "", batch: "", nakes: "", status: "Belum", yellow: [14], pink: [15,16], gray: [0,1,2,3,4,5,6,7,8,9,10,11,12] },
+];
+
 function RekamMedisAnakContent() {
   const { username, role } = useUserRole();
   const router = useRouter();
@@ -488,6 +565,251 @@ function RekamMedisAnakContent() {
   const [neonatusPelayananData, setNeonatusPelayananData] = useState<any>(DEFAULT_NEONATUS_PELAYANAN);
   const [tahunanPelayananData, setTahunanPelayananData] = useState<any>(DEFAULT_TAHUNAN_PELAYANAN);
 
+  // Helper Format Date & Time for HTML5 Pickers
+  const toInputDate = (str?: string) => {
+    if (!str) return new Date().toISOString().split("T")[0];
+    if (str.includes("/")) {
+      const parts = str.split("/");
+      if (parts.length === 3) {
+        const [d, m, y] = parts;
+        if (y.length === 4) return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+      }
+    }
+    if (str.includes("-") && str.length >= 10) return str.split("T")[0];
+    return new Date().toISOString().split("T")[0];
+  };
+
+  const formatDisplayDate = (isoOrDashStr?: string) => {
+    if (!isoOrDashStr) return "-";
+    if (isoOrDashStr.includes("/")) return isoOrDashStr;
+    const parts = isoOrDashStr.split("-");
+    if (parts.length === 3) {
+      const [y, m, d] = parts;
+      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+    }
+    return isoOrDashStr;
+  };
+
+  const toInputTime = (str?: string) => {
+    if (!str) return "08:00";
+    const clean = str.replace("WIB", "").trim();
+    const parts = clean.split(":");
+    if (parts.length >= 2) {
+      return `${parts[0].padStart(2, "0")}:${parts[1].slice(0, 2).padStart(2, "0")}`;
+    }
+    return "08:00";
+  };
+
+  // State Data Per-Fase Neonatus (0-6 Jam, KN1, KN2, KN3)
+  const [neonatusFaseData, setNeonatusFaseData] = useState<any[]>(MOCK_NEONATUS_DATA);
+  const [showEditFaseModal, setShowEditFaseModal] = useState<boolean>(false);
+  const [editFaseForm, setEditFaseForm] = useState<any>({});
+
+  const handleOpenEditFaseNeonatus = (knIndex: number) => {
+    setSelectedKN(knIndex);
+    const faseObj = neonatusFaseData[knIndex] || MOCK_NEONATUS_DATA[knIndex];
+    setEditFaseForm({ ...faseObj });
+    setShowEditFaseModal(true);
+  };
+
+  const handleSaveFaseEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const updated = [...neonatusFaseData];
+    updated[selectedKN] = { ...editFaseForm };
+    setNeonatusFaseData(updated);
+
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`fase_neonatus_child_${childId}`, JSON.stringify(updated));
+      await saveChildOfflineStateToDexie(childId, { faseNeonatus: updated });
+      await setCacheItem(`fase_neonatus_child_${childId}`, updated);
+    }
+
+    showToast("success", "Berhasil Disimpan", `Data Fase ${updated[selectedKN]?.fase || "Neonatus"} berhasil diperbarui!`);
+    setShowEditFaseModal(false);
+  };
+
+  // State & Handler Pelayanan Gizi (PMBA) per-Kolom Usia
+  const [giziPmbaData, setGiziPmbaData] = useState<any>(DEFAULT_GIZI_PMBA);
+  const [showEditGiziPmbaModal, setShowEditGiziPmbaModal] = useState<boolean>(false);
+  const [selectedGiziColKey, setSelectedGiziColKey] = useState<string>("6_8");
+  const [selectedGiziColLabel, setSelectedGiziColLabel] = useState<string>("6-8 Bln");
+  const [editGiziPmbaForm, setEditGiziPmbaForm] = useState<any>({});
+
+  const handleOpenEditGiziCol = (colKey: string, colLabel: string) => {
+    setSelectedGiziColKey(colKey);
+    setSelectedGiziColLabel(colLabel);
+    setEditGiziPmbaForm(JSON.parse(JSON.stringify(giziPmbaData)));
+    setShowEditGiziPmbaModal(true);
+  };
+
+  const handleSaveGiziPmbaEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGiziPmbaData(editGiziPmbaForm);
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`gizi_pmba_child_${childId}`, JSON.stringify(editGiziPmbaForm));
+      await saveChildOfflineStateToDexie(childId, { giziPmba: editGiziPmbaForm });
+      await setCacheItem(`gizi_pmba_child_${childId}`, editGiziPmbaForm);
+    }
+    showToast("success", "Berhasil Disimpan", `Matriks Gizi Usia (${selectedGiziColLabel}) berhasil diperbarui!`);
+    setShowEditGiziPmbaModal(false);
+  };
+
+  // State & Handler Vitamin A & Obat Cacing per-Kolom Usia
+  const [vitAObatCacingData, setVitAObatCacingData] = useState<any>(DEFAULT_VIT_A_CACING);
+  const [showEditVitAModal, setShowEditVitAModal] = useState<boolean>(false);
+  const [selectedVitAColKey, setSelectedVitAColKey] = useState<string>("th1");
+  const [selectedVitAColLabel, setSelectedVitAColLabel] = useState<string>("Tahun 1 - 2");
+  const [editVitAForm, setEditVitAForm] = useState<any>({});
+
+  const handleOpenEditVitACol = (colKey: string, colLabel: string) => {
+    setSelectedVitAColKey(colKey);
+    setSelectedVitAColLabel(colLabel);
+    setEditVitAForm(JSON.parse(JSON.stringify(vitAObatCacingData)));
+    setShowEditVitAModal(true);
+  };
+
+  const handleSaveVitAEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setVitAObatCacingData(editVitAForm);
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`vit_a_cacing_child_${childId}`, JSON.stringify(editVitAForm));
+      await saveChildOfflineStateToDexie(childId, { vitACacing: editVitAForm });
+      await setCacheItem(`vit_a_cacing_child_${childId}`, editVitAForm);
+    }
+    showToast("success", "Berhasil Disimpan", `Data Vitamin A & Cacing (${selectedVitAColLabel}) berhasil diperbarui!`);
+    setShowEditVitAModal(false);
+  };
+
+  // State & Handler Catatan Kesehatan Gigi
+  const [gigiRecordsData, setGigiRecordsData] = useState<any[]>(DEFAULT_GIGI_RECORDS);
+  const [showEditGigiModal, setShowEditGigiModal] = useState<boolean>(false);
+  const [selectedGigiIndex, setSelectedGigiIndex] = useState<number>(0);
+  const [editGigiForm, setEditGigiForm] = useState<any>({});
+
+  const handleOpenEditGigiModal = (rowObj: any, index: number) => {
+    setSelectedGigiIndex(index);
+    setEditGigiForm({ ...rowObj });
+    setShowEditGigiModal(true);
+  };
+
+  const handleSaveGigiEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const updated = [...gigiRecordsData];
+    updated[selectedGigiIndex] = { ...editGigiForm };
+    setGigiRecordsData(updated);
+
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`gigi_records_child_${childId}`, JSON.stringify(updated));
+      await saveChildOfflineStateToDexie(childId, { gigiRecords: updated });
+      await setCacheItem(`gigi_records_child_${childId}`, updated);
+    }
+
+    showToast("success", "Berhasil Disimpan", `Catatan Kesehatan Gigi Usia ${updated[selectedGigiIndex]?.bln} berhasil diperbarui!`);
+    setShowEditGigiModal(false);
+  };
+
+  // ─── State & Handlers: Imunisasi Dasar (Inline Cell Editing) ───
+  const [imunisasiData, setImunisasiData] = useState<any[]>(DEFAULT_IMUNISASI_DATA);
+  // editingImunisasiId: "<rowId>" when a cell is being inline-edited, null otherwise
+  const [editingImunisasiId, setEditingImunisasiId] = useState<string | null>(null);
+  const [inlineImunisasiForm, setInlineImunisasiForm] = useState<{ tgl: string; batch: string; nakes: string; status: string }>({ tgl: "", batch: "", nakes: "", status: "Tepat Jadwal" });
+
+  const handleStartInlineImunisasi = (row: any) => {
+    setEditingImunisasiId(row.id);
+    setInlineImunisasiForm({
+      tgl: row.tgl || row.done || "",
+      batch: row.batch || "",
+      nakes: row.nakes || "",
+      status: (row.status && row.status !== "Belum") ? row.status : "Tepat Jadwal",
+    });
+  };
+
+  const handleCancelInlineImunisasi = () => {
+    setEditingImunisasiId(null);
+  };
+
+  const handleSaveInlineImunisasi = async (rowId: string) => {
+    const idx = imunisasiData.findIndex((r) => r.id === rowId);
+    if (idx === -1) return;
+    const updated = [...imunisasiData];
+    updated[idx] = {
+      ...updated[idx],
+      tgl: inlineImunisasiForm.tgl,
+      done: inlineImunisasiForm.tgl,
+      batch: inlineImunisasiForm.batch,
+      nakes: inlineImunisasiForm.nakes,
+      status: inlineImunisasiForm.tgl ? inlineImunisasiForm.status : "Belum",
+    };
+    setImunisasiData(updated);
+    setEditingImunisasiId(null);
+
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`imunisasi_data_child_${childId}`, JSON.stringify(updated));
+      await saveChildOfflineStateToDexie(childId, { imunisasiData: updated });
+      await setCacheItem(`imunisasi_data_child_${childId}`, updated);
+    }
+    showToast("success", "Berhasil Disimpan", `Imunisasi ${updated[idx]?.nama} berhasil diperbarui!`);
+  };
+
+
+  // Handler Column-based Edit for Pelayanan Neonatus
+
+  const [showEditPelayananNeonatusColModal, setShowEditPelayananNeonatusColModal] = useState<boolean>(false);
+  const [selectedPelayananNeonatusColKey, setSelectedPelayananNeonatusColKey] = useState<string>("k1");
+  const [selectedPelayananNeonatusColLabel, setSelectedPelayananNeonatusColLabel] = useState<string>("0 - 6 Jam");
+  const [editPelayananNeonatusColForm, setEditPelayananNeonatusColForm] = useState<any>({});
+
+  const handleOpenEditPelayananKolomNeonatus = (colKey: string, colLabel: string) => {
+    setSelectedPelayananNeonatusColKey(colKey);
+    setSelectedPelayananNeonatusColLabel(colLabel);
+    setEditPelayananNeonatusColForm(JSON.parse(JSON.stringify(neonatusPelayananData)));
+    setShowEditPelayananNeonatusColModal(true);
+  };
+
+  const handleSavePelayananNeonatusColEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setNeonatusPelayananData(editPelayananNeonatusColForm);
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`pelayanan_neonatus_child_${childId}`, JSON.stringify(editPelayananNeonatusColForm));
+      await saveChildOfflineStateToDexie(childId, { pelayananNeonatus: editPelayananNeonatusColForm });
+      await setCacheItem(`pelayanan_neonatus_child_${childId}`, editPelayananNeonatusColForm);
+    }
+    showToast("success", "Berhasil Disimpan", `Pelayanan ${selectedPelayananNeonatusColLabel} berhasil diperbarui!`);
+    setShowEditPelayananNeonatusColModal(false);
+  };
+
+  // Handler Column-based Edit for Pelayanan Tahunan
+  const [showEditPelayananTahunanColModal, setShowEditPelayananTahunanColModal] = useState<boolean>(false);
+  const [selectedPelayananTahunanIndex, setSelectedPelayananTahunanIndex] = useState<number>(0);
+  const [selectedPelayananTahunanKatUsia, setSelectedPelayananTahunanKatUsia] = useState<string>("bayi_1");
+  const [editPelayananTahunanColForm, setEditPelayananTahunanColForm] = useState<any>({});
+
+  const handleOpenEditPelayananKolomTahunan = (visitIndex: number, katUsia: string) => {
+    setSelectedPelayananTahunanIndex(visitIndex);
+    setSelectedPelayananTahunanKatUsia(katUsia);
+    setEditPelayananTahunanColForm(JSON.parse(JSON.stringify(tahunanPelayananData)));
+    setShowEditPelayananTahunanColModal(true);
+  };
+
+  const handleSavePelayananTahunanColEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTahunanPelayananData(editPelayananTahunanColForm);
+    if (dbChildData?.child_id) {
+      const childId = dbChildData.child_id;
+      localStorage.setItem(`pelayanan_tahunan_child_${childId}`, JSON.stringify(editPelayananTahunanColForm));
+      await saveChildOfflineStateToDexie(childId, { pelayananTahunan: editPelayananTahunanColForm });
+      await setCacheItem(`pelayanan_tahunan_child_${childId}`, editPelayananTahunanColForm);
+    }
+    showToast("success", "Berhasil Disimpan", `Pelayanan Kunjungan ${selectedPelayananTahunanIndex + 1} berhasil diperbarui!`);
+    setShowEditPelayananTahunanColModal(false);
+  };
+
   const [showEditPelayananModal, setShowEditPelayananModal] = useState<boolean>(false);
   const [editPelayananTarget, setEditPelayananTarget] = useState<{
     type: "neonatus" | "tahunan";
@@ -524,7 +846,7 @@ function RekamMedisAnakContent() {
   const handleSavePelayananEdit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!dbChildData?.child_id) {
-      alert("Harap pilih balita terlebih dahulu.");
+      showToast("warning", "Pilihan Pasien", "Harap pilih balita terlebih dahulu.");
       return;
     }
     const childId = dbChildData.child_id;
@@ -569,6 +891,26 @@ function RekamMedisAnakContent() {
     setShowEditPelayananModal(false);
   };
 
+  // Toast Notification State & Handler
+  const [toast, setToast] = useState<{
+    show: boolean;
+    type: "success" | "error" | "info" | "warning";
+    title: string;
+    message: string;
+  }>({
+    show: false,
+    type: "info",
+    title: "",
+    message: ""
+  });
+
+  const showToast = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setToast({ show: true, type, title, message });
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 4500);
+  };
+
   // State Log Catatan Pelayanan Kesehatan Khusus Nakes
   const [nakesLogs, setNakesLogs] = useState<any[]>([]);
 
@@ -594,7 +936,7 @@ function RekamMedisAnakContent() {
   const handleSaveAntropometri = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dbChildData?.child_id) {
-      alert("Harap pilih pasien balita terlebih dahulu.");
+      showToast("warning", "Pilihan Pasien", "Harap pilih pasien balita terlebih dahulu.");
       return;
     }
 
@@ -604,7 +946,7 @@ function RekamMedisAnakContent() {
     const lila = parseFloat(newAntropometriForm.lingkarLengan);
 
     if (isNaN(bb) && isNaN(tb) && isNaN(lk) && isNaN(lila)) {
-      alert("Harap isi setidaknya salah satu nilai pengukuran.");
+      showToast("warning", "Peringatan", "Harap isi setidaknya salah satu nilai pengukuran.");
       return;
     }
 
@@ -620,18 +962,18 @@ function RekamMedisAnakContent() {
       });
 
       if (res.success) {
-        alert("Pengukuran Antropometri berhasil disimpan ke database!");
+        showToast("success", "Berhasil Disimpan", "Pengukuran Antropometri berhasil disimpan ke database!");
         const refreshed = await getChildDetail(dbChildData.child_id);
         if (refreshed) {
           setDbChildData(refreshed);
           if (refreshed.measurements) setDbMeasurements(refreshed.measurements);
         }
       } else {
-        alert("Gagal menyimpan pengukuran: " + res.error);
+        showToast("error", "Gagal Menyimpan", res.error);
       }
     } catch (err) {
       console.error("Error saving measurement:", err);
-      alert("Terjadi kesalahan saat menyimpan data.");
+      showToast("error", "Kesalahan Sistem", "Terjadi kesalahan saat menyimpan data.");
     }
 
     setShowAddAntropometriModal(false);
@@ -643,6 +985,189 @@ function RekamMedisAnakContent() {
       lingkarLengan: "",
       catatan: ""
     });
+  };
+
+  // State Modal Edit Data Pertumbuhan (Tabel BB/PB per Bulan)
+  const [showEditKmsRowModal, setShowEditKmsRowModal] = useState<boolean>(false);
+  const [editKmsRowForm, setEditKmsRowForm] = useState({
+    measurement_id: null as string | null,
+    usiaBulan: 0,
+    tanggalPeriksa: new Date().toISOString().split("T")[0],
+    beratBadan: "",
+    tinggiBadan: "",
+    lingkarKepala: "",
+    catatan: ""
+  });
+
+  const findMeasurementForMonth = (monthNum: number) => {
+    // 1. Check tagged measurement first (highest priority)
+    const tagged = dbMeasurements.find((x: any) =>
+      x.cadre_notes && x.cadre_notes.includes(`[Pengukuran KMS Usia ${monthNum} Bulan]`)
+    );
+
+    if (tagged) {
+      return {
+        measurement_id: tagged.measurement_id || null,
+        weight: tagged.weight !== undefined && tagged.weight !== null ? tagged.weight : null,
+        height: tagged.height !== undefined && tagged.height !== null ? tagged.height : null,
+        head_circumference: tagged.head_circumference || null,
+        cadre_notes: tagged.cadre_notes || tagged.notes || "",
+        visit_date: tagged.visit_date ? tagged.visit_date.split("T")[0] : (tagged.dateRaw || new Date().toISOString().split("T")[0])
+      };
+    }
+
+    if (monthNum === 0 && (dbChildData?.birth_weight || dbChildData?.birth_length)) {
+      const m = dbMeasurements.find((x: any) =>
+        (x.ageAtVisit !== undefined && x.ageAtVisit === 0) ||
+        (x.rawAge !== undefined && x.rawAge === 0) ||
+        (x.usiaBulan !== undefined && x.usiaBulan === 0)
+      );
+      return {
+        measurement_id: m?.measurement_id || null,
+        weight: m?.weight !== undefined && m?.weight !== null ? m.weight : dbChildData?.birth_weight || null,
+        height: m?.height !== undefined && m?.height !== null ? m.height : dbChildData?.birth_length || null,
+        head_circumference: m?.head_circumference || null,
+        cadre_notes: m?.cadre_notes || m?.notes || "",
+        visit_date: m?.visit_date ? m.visit_date.split("T")[0] : new Date().toISOString().split("T")[0]
+      };
+    }
+
+    const m = dbMeasurements.find((x: any) =>
+      (x.ageAtVisit !== undefined && x.ageAtVisit === monthNum) ||
+      (x.rawAge !== undefined && x.rawAge === monthNum) ||
+      (x.usiaBulan !== undefined && x.usiaBulan === monthNum)
+    );
+
+    if (!m) return null;
+
+    return {
+      measurement_id: m.measurement_id || null,
+      weight: m.weight !== undefined && m.weight !== null ? m.weight : null,
+      height: m.height !== undefined && m.height !== null ? m.height : null,
+      head_circumference: m.head_circumference || null,
+      cadre_notes: m.cadre_notes || m.notes || "",
+      visit_date: m.visit_date ? m.visit_date.split("T")[0] : (m.dateRaw || new Date().toISOString().split("T")[0])
+    };
+  };
+
+  const handleSelectMonthInModal = (selectedMonth: number) => {
+    const existing = findMeasurementForMonth(selectedMonth);
+    setEditKmsRowForm({
+      measurement_id: existing?.measurement_id || null,
+      usiaBulan: selectedMonth,
+      tanggalPeriksa: existing?.visit_date || new Date().toISOString().split("T")[0],
+      beratBadan: existing?.weight !== null && existing?.weight !== undefined ? String(existing.weight) : "",
+      tinggiBadan: existing?.height !== null && existing?.height !== undefined ? String(existing.height) : "",
+      lingkarKepala: existing?.head_circumference !== null && existing?.head_circumference !== undefined ? String(existing.head_circumference) : "",
+      catatan: existing?.cadre_notes ? existing.cadre_notes.replace(/\[Pengukuran KMS Usia \d+ Bulan\]/g, "").trim() : ""
+    });
+  };
+
+  const handleOpenEditKmsRow = (monthNum: number, currentBB: number | null, currentPB: number | null, dbMatch?: any) => {
+    handleSelectMonthInModal(monthNum);
+    setShowEditKmsRowModal(true);
+  };
+
+  const handleSaveEditKmsRow = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dbChildData?.child_id) {
+      showToast("warning", "Pilihan Pasien", "Harap pilih balita terlebih dahulu.");
+      return;
+    }
+
+    const parseInput = (val: string) => {
+      if (!val || val.trim() === "" || val.trim() === "—") return NaN;
+      return parseFloat(val.replace(',', '.'));
+    };
+
+    const bb = parseInput(editKmsRowForm.beratBadan);
+    const tb = parseInput(editKmsRowForm.tinggiBadan);
+    const lk = parseInput(editKmsRowForm.lingkarKepala);
+
+    if (isNaN(bb) && isNaN(tb) && isNaN(lk)) {
+      showToast("warning", "Peringatan", "Harap isi setidaknya salah satu nilai pengukuran (Berat/Panjang Badan).");
+      return;
+    }
+
+    try {
+      const noteTag = editKmsRowForm.catatan
+        ? `${editKmsRowForm.catatan} [Pengukuran KMS Usia ${editKmsRowForm.usiaBulan} Bulan]`
+        : `[Pengukuran KMS Usia ${editKmsRowForm.usiaBulan} Bulan]`;
+
+      // 1. Save to Dexie.js (IndexedDB) for offline resilience
+      await saveChildMeasurementToDexie({
+        child_id: dbChildData.child_id,
+        visit_date: editKmsRowForm.tanggalPeriksa,
+        weight_kg: isNaN(bb) ? undefined : bb,
+        height_cm: isNaN(tb) ? undefined : tb,
+        head_circ_cm: isNaN(lk) ? undefined : lk,
+        notes: noteTag
+      });
+
+      // 2. Call Server Action to persist in Supabase / Prisma DB
+      const res = await createChildMeasurement({
+        child_id: dbChildData.child_id,
+        measurement_id: editKmsRowForm.measurement_id || undefined,
+        usiaBulan: editKmsRowForm.usiaBulan,
+        visit_date: editKmsRowForm.tanggalPeriksa,
+        weight: isNaN(bb) ? null : bb,
+        height: isNaN(tb) ? null : tb,
+        head_circumference: isNaN(lk) ? null : lk,
+        notes: noteTag
+      });
+
+      // 3. Construct local measurement object for instant UI update
+      const newMeasurementObj = {
+        measurement_id: res.id || editKmsRowForm.measurement_id || `local_${Date.now()}`,
+        child_id: dbChildData.child_id,
+        visit_date: editKmsRowForm.tanggalPeriksa,
+        weight: isNaN(bb) ? null : bb,
+        height: isNaN(tb) ? null : tb,
+        head_circumference: isNaN(lk) ? null : lk,
+        cadre_notes: noteTag,
+        ageAtVisit: editKmsRowForm.usiaBulan,
+        rawAge: editKmsRowForm.usiaBulan,
+        usiaBulan: editKmsRowForm.usiaBulan,
+      };
+
+      setDbMeasurements(prev => {
+        const filtered = prev.filter(m => {
+          if (m.measurement_id && editKmsRowForm.measurement_id && m.measurement_id === editKmsRowForm.measurement_id) return false;
+          if (m.cadre_notes && m.cadre_notes.includes(`[Pengukuran KMS Usia ${editKmsRowForm.usiaBulan} Bulan]`)) return false;
+          const age = m.ageAtVisit ?? m.rawAge ?? m.usiaBulan;
+          if (age === editKmsRowForm.usiaBulan) return false;
+          return true;
+        });
+        return [newMeasurementObj, ...filtered];
+      });
+
+      showToast("success", "Berhasil Disimpan", `Data Pertumbuhan Usia ${editKmsRowForm.usiaBulan} Bulan berhasil diperbarui!`);
+
+      // 4. Refresh full details from DB if available with safe fallback merge
+      const refreshed = await getChildDetail(dbChildData.child_id);
+      if (refreshed) {
+        setDbChildData(refreshed);
+        if (refreshed.measurements && Array.isArray(refreshed.measurements)) {
+          setDbMeasurements(prev => {
+            const freshList = [...refreshed.measurements];
+            const existsInFresh = freshList.some(x =>
+              (x.cadre_notes && x.cadre_notes.includes(`[Pengukuran KMS Usia ${editKmsRowForm.usiaBulan} Bulan]`)) ||
+              (x.usiaBulan !== undefined && x.usiaBulan === editKmsRowForm.usiaBulan) ||
+              (x.ageAtVisit !== undefined && x.ageAtVisit === editKmsRowForm.usiaBulan)
+            );
+            if (!existsInFresh) {
+              return [newMeasurementObj, ...freshList];
+            }
+            return freshList;
+          });
+        }
+      }
+
+      setShowEditKmsRowModal(false);
+    } catch (err: any) {
+      console.error("Error saving KMS row:", err);
+      showToast("error", "Kesalahan Sistem", "Terjadi kesalahan saat menyimpan data.");
+    }
   };
 
   const [editingNakesLogId, setEditingNakesLogId] = useState<string | null>(null);
@@ -664,12 +1189,12 @@ function RekamMedisAnakContent() {
     setDeleteConfirmLogId(logId);
   };
 
-  const confirmDeleteNakesLog = () => {
+  const confirmDeleteNakesLog = async () => {
     if (!deleteConfirmLogId) return;
     const updated = nakesLogs.filter((l) => l.id !== deleteConfirmLogId);
     setNakesLogs(updated);
     if (dbChildData?.child_id) {
-      localStorage.setItem(`nakes_clinical_logs_child_${dbChildData.child_id}`, JSON.stringify(updated));
+      await setCacheItem(`nakes_clinical_logs_child_${dbChildData.child_id}`, updated);
     }
     setDeleteConfirmLogId(null);
   };
@@ -706,7 +1231,7 @@ function RekamMedisAnakContent() {
       );
       setNakesLogs(updated);
       if (childId) {
-        localStorage.setItem(`nakes_clinical_logs_child_${childId}`, JSON.stringify(updated));
+        await setCacheItem(`nakes_clinical_logs_child_${childId}`, updated);
       }
       setEditingNakesLogId(null);
     } else {
@@ -724,7 +1249,7 @@ function RekamMedisAnakContent() {
       setNakesLogs(updated);
       try {
         if (childId) {
-          localStorage.setItem(`nakes_clinical_logs_child_${childId}`, JSON.stringify(updated));
+          await setCacheItem(`nakes_clinical_logs_child_${childId}`, updated);
           await createChildMeasurement({
             child_id: childId,
             visit_date: newNakesLogForm.tanggalPeriksa,
@@ -749,7 +1274,7 @@ function RekamMedisAnakContent() {
   const [sdidtkMatrixData, setSdidtkMatrixData] = useState<Record<number, any>>({});
   const [sdidtkGreenChecks, setSdidtkGreenChecks] = useState<Record<number, boolean>>({});
 
-  const handleUpdateMatrixCell = (month: number, field: string, value: string) => {
+  const handleUpdateMatrixCell = async (month: number, field: string, value: string) => {
     const updated = {
       ...sdidtkMatrixData,
       [month]: {
@@ -759,7 +1284,7 @@ function RekamMedisAnakContent() {
     };
     setSdidtkMatrixData(updated);
     if (dbChildData?.child_id) {
-      localStorage.setItem(`sdidtk_matrix_data_child_${dbChildData.child_id}`, JSON.stringify(updated));
+      await setCacheItem(`sdidtk_matrix_data_child_${dbChildData.child_id}`, updated);
     }
   };
 
@@ -770,14 +1295,14 @@ function RekamMedisAnakContent() {
     return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
   };
 
-  const handleToggleGreenCheck = (month: number) => {
+  const handleToggleGreenCheck = async (month: number) => {
     const updated = {
       ...sdidtkGreenChecks,
       [month]: !sdidtkGreenChecks[month]
     };
     setSdidtkGreenChecks(updated);
     if (dbChildData?.child_id) {
-      localStorage.setItem(`sdidtk_green_checks_child_${dbChildData.child_id}`, JSON.stringify(updated));
+      await setCacheItem(`sdidtk_green_checks_child_${dbChildData.child_id}`, updated);
     }
   };
 
@@ -864,7 +1389,7 @@ function RekamMedisAnakContent() {
     try {
       const childId = dbChildData?.child_id;
       if (childId) {
-        localStorage.setItem(`lila_records_child_${childId}`, JSON.stringify(updated));
+        await setCacheItem(`lila_records_child_${childId}`, updated);
         await saveChildMeasurementToDexie({
           child_id: childId,
           visit_date: newLilaForm.tanggalPeriksa,
@@ -892,143 +1417,171 @@ function RekamMedisAnakContent() {
     1: "L", 2: "L", 3: "L", 4: "L", 5: "L", 6: "L", 7: "L", 8: "L", 9: "L"
   });
 
-  // Sync child-specific local storage states whenever selected child changes
+  // Sync child-specific Dexie.js (IndexedDB) states whenever selected child changes
   useEffect(() => {
-    if (!dbChildData?.child_id) {
-      setNakesLogs([]);
-      setLilaRecords({});
-      setYellowStatuses({});
-      setSdidtkMatrixData({});
-      setSdidtkGreenChecks({});
-      return;
-    }
+    async function loadIsolatedChildData() {
+      if (!dbChildData?.child_id) {
+        setNakesLogs([]);
+        setLilaRecords({});
+        setYellowStatuses({});
+        setSdidtkMatrixData({});
+        setSdidtkGreenChecks({});
+        return;
+      }
 
-    const childId = dbChildData.child_id;
-    if (dbChildData.name || dbChildData.child_name) {
-      setPatientSearchTerm(dbChildData.name || dbChildData.child_name);
-    }
+      const childId = dbChildData.child_id;
+      if (dbChildData.name || dbChildData.child_name) {
+        setPatientSearchTerm(dbChildData.name || dbChildData.child_name);
+      }
 
-    // 1. Nakes clinical logs
-    try {
-      const savedLogs = localStorage.getItem(`nakes_clinical_logs_child_${childId}`);
-      if (savedLogs) {
-        setNakesLogs(JSON.parse(savedLogs));
-      } else {
-        setNakesLogs([
-          {
-            id: `nakes-log-${childId}-1`,
-            tanggalPeriksa: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-            nakesName: "Bidan Widya, A.Md.Keb",
-            keluhanTindakanSaran: `Pemeriksaan Rutin Rekam Medis Anak (${dbChildData.name || dbChildData.child_name || "Balita"}). Kondisi fisik umum aktif, refleks memuaskan, pertumbuhan terpantau sesuai kurva WHO.`,
-            tanggalKembali: "-"
-          }
+      try {
+        const [savedLogs, savedLila, savedSdidtk, savedMatrix, savedGreen, savedPelayananNeonatus, savedPelayananTahunan, savedFaseNeonatus, savedGiziPmba, savedVitACacing, savedGigiRecords, savedImunisasiData] = await Promise.all([
+          getCacheItem(`nakes_clinical_logs_child_${childId}`),
+          getCacheItem(`lila_records_child_${childId}`),
+          getCacheItem(`sdidtk_records_child_${childId}`),
+          getCacheItem(`sdidtk_matrix_data_child_${childId}`),
+          getCacheItem(`sdidtk_green_checks_child_${childId}`),
+          getCacheItem(`pelayanan_neonatus_child_${childId}`),
+          getCacheItem(`pelayanan_tahunan_child_${childId}`),
+          getCacheItem(`fase_neonatus_child_${childId}`),
+          getCacheItem(`gizi_pmba_child_${childId}`),
+          getCacheItem(`vit_a_cacing_child_${childId}`),
+          getCacheItem(`gigi_records_child_${childId}`),
+          getCacheItem(`imunisasi_data_child_${childId}`)
         ]);
-      }
-    } catch (e) {
-      console.error("Failed to load child nakes logs:", e);
-    }
 
-    // 2. LiLA records
-    try {
-      const savedLila = localStorage.getItem(`lila_records_child_${childId}`);
-      if (savedLila) {
-        setLilaRecords(JSON.parse(savedLila));
-      } else {
-        const syncedLila: Record<number, { val?: number; status?: string }> = {};
-        if (dbChildData.measurements && dbChildData.measurements.length > 0) {
-          dbChildData.measurements.forEach((m: any) => {
-            if (m.muac && (m.ageAtVisit !== undefined || m.rawAge !== undefined)) {
-              const age = m.ageAtVisit ?? m.rawAge;
-              syncedLila[age] = {
-                val: Number(m.muac),
-                status: Number(m.muac) >= 12.5 ? "baik" : Number(m.muac) >= 11.5 ? "kurang" : "buruk"
-              };
+        if (savedLogs) setNakesLogs(savedLogs);
+        else {
+          setNakesLogs([
+            {
+              id: `nakes-log-${childId}-1`,
+              tanggalPeriksa: new Date().toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+              nakesName: "Bidan Widya, A.Md.Keb",
+              keluhanTindakanSaran: `Pemeriksaan Rutin Rekam Medis Anak (${dbChildData.name || dbChildData.child_name || "Balita"}). Kondisi fisik umum aktif, refleks memuaskan, pertumbuhan terpantau sesuai kurva WHO.`,
+              tanggalKembali: "-"
             }
-          });
+          ]);
         }
-        setLilaRecords(syncedLila);
-      }
-    } catch (e) {
-      console.error("Failed to load child LiLA records:", e);
-    }
 
-    // 3. SDIDTK yellow cells records
-    try {
-      const savedSdidtk = localStorage.getItem(`sdidtk_records_child_${childId}`);
-      if (savedSdidtk) {
-        setYellowStatuses(JSON.parse(savedSdidtk));
-      } else {
-        setYellowStatuses({ 1: "L", 2: "L", 3: "L", 6: "L" });
-      }
-    } catch (e) {
-      console.error("Failed to load child SDIDTK records:", e);
-    }
+        if (savedLila) setLilaRecords(savedLila);
+        else {
+          const syncedLila: Record<number, { val?: number; status?: string }> = {};
+          if (dbChildData.measurements && dbChildData.measurements.length > 0) {
+            dbChildData.measurements.forEach((m: any) => {
+              if (m.muac && (m.ageAtVisit !== undefined || m.rawAge !== undefined)) {
+                const age = m.ageAtVisit ?? m.rawAge;
+                syncedLila[age] = {
+                  val: Number(m.muac),
+                  status: Number(m.muac) >= 12.5 ? "baik" : Number(m.muac) >= 11.5 ? "kurang" : "buruk"
+                };
+              }
+            });
+          }
+          setLilaRecords(syncedLila);
+        }
 
-    // 4. SDIDTK Matrix Dropdowns
-    try {
-      const savedMatrix = localStorage.getItem(`sdidtk_matrix_data_child_${childId}`);
-      if (savedMatrix) {
-        setSdidtkMatrixData(JSON.parse(savedMatrix));
-      } else {
-        setSdidtkMatrixData({
+        if (savedSdidtk) setYellowStatuses(savedSdidtk);
+        else setYellowStatuses({ 1: "L", 2: "L", 3: "L", 6: "L" });
+
+        if (savedMatrix) setSdidtkMatrixData(savedMatrix);
+        else setSdidtkMatrixData({
           3: { bbu: "GN", bbtb: "GN", tbu: "N", lku: "N", lila: "N", kpsp: "Ds", tdd: "N", tdl: "N", pkat: "✓", tindak: "Stimulasi di rumah", ulang: "14/10/2026" },
           6: { bbu: "GN", bbtb: "GN", tbu: "N", lku: "N", lila: "N", kpsp: "Ds", tdd: "N", tdl: "N", pkat: "✓", tindak: "Lanjutkan Stimulasi", ulang: "14/01/2027" },
           9: { bbu: "GN", bbtb: "GN", tbu: "N", lku: "N", lila: "N", kpsp: "Ds", tdd: "N", tdl: "N", pkat: "✓", tindak: "KIE Gizi Seimbang", ulang: "14/04/2027" }
         });
-      }
-    } catch (e) {
-      console.error("Failed to load SDIDTK matrix data:", e);
-    }
 
-    // 5. SDIDTK Green Checks
-    try {
-      const savedGreen = localStorage.getItem(`sdidtk_green_checks_child_${childId}`);
-      if (savedGreen) {
-        setSdidtkGreenChecks(JSON.parse(savedGreen));
-      } else {
-        setSdidtkGreenChecks({ 3: true, 6: true, 9: true });
-      }
-    } catch (e) {
-      console.error("Failed to load SDIDTK green checks:", e);
-    }
+        if (savedGreen) setSdidtkGreenChecks(savedGreen);
+        else setSdidtkGreenChecks({ 3: true, 6: true, 9: true });
 
-    // 6. Pelayanan Matrix Data (Neonatus & Tahunan)
-    try {
-      const savedPelayananNeonatus = localStorage.getItem(`pelayanan_neonatus_child_${childId}`);
-      if (savedPelayananNeonatus) {
-        setNeonatusPelayananData(JSON.parse(savedPelayananNeonatus));
-      } else {
-        setNeonatusPelayananData(DEFAULT_NEONATUS_PELAYANAN);
-      }
+        if (savedPelayananNeonatus) setNeonatusPelayananData(savedPelayananNeonatus);
+        else setNeonatusPelayananData(DEFAULT_NEONATUS_PELAYANAN);
 
-      const savedPelayananTahunan = localStorage.getItem(`pelayanan_tahunan_child_${childId}`);
-      if (savedPelayananTahunan) {
-        setTahunanPelayananData(JSON.parse(savedPelayananTahunan));
-      } else {
-        setTahunanPelayananData(DEFAULT_TAHUNAN_PELAYANAN);
+        if (savedPelayananTahunan) setTahunanPelayananData(savedPelayananTahunan);
+        else setTahunanPelayananData(DEFAULT_TAHUNAN_PELAYANAN);
+
+        if (savedFaseNeonatus) {
+          setNeonatusFaseData(savedFaseNeonatus);
+        } else {
+          const localLs = localStorage.getItem(`fase_neonatus_child_${childId}`);
+          if (localLs) {
+            try {
+              setNeonatusFaseData(JSON.parse(localLs));
+            } catch (err) {
+              populateDefaultFaseFromDb();
+            }
+          } else {
+            populateDefaultFaseFromDb();
+          }
+        }
+
+        if (savedGiziPmba) setGiziPmbaData(savedGiziPmba);
+        else {
+          const lsGizi = localStorage.getItem(`gizi_pmba_child_${childId}`);
+          if (lsGizi) {
+            try { setGiziPmbaData(JSON.parse(lsGizi)); } catch (e) { setGiziPmbaData(DEFAULT_GIZI_PMBA); }
+          } else { setGiziPmbaData(DEFAULT_GIZI_PMBA); }
+        }
+
+        if (savedVitACacing) setVitAObatCacingData(savedVitACacing);
+        else {
+          const lsVit = localStorage.getItem(`vit_a_cacing_child_${childId}`);
+          if (lsVit) {
+            try { setVitAObatCacingData(JSON.parse(lsVit)); } catch (e) { setVitAObatCacingData(DEFAULT_VIT_A_CACING); }
+          } else { setVitAObatCacingData(DEFAULT_VIT_A_CACING); }
+        }
+
+        if (savedGigiRecords) setGigiRecordsData(savedGigiRecords);
+        else {
+          const lsGigi = localStorage.getItem(`gigi_records_child_${childId}`);
+          if (lsGigi) {
+            try { setGigiRecordsData(JSON.parse(lsGigi)); } catch (e) { setGigiRecordsData(DEFAULT_GIGI_RECORDS); }
+          } else { setGigiRecordsData(DEFAULT_GIGI_RECORDS); }
+        }
+
+        if (savedImunisasiData) setImunisasiData(savedImunisasiData);
+        else {
+          const lsImunisasi = localStorage.getItem(`imunisasi_data_child_${childId}`);
+          if (lsImunisasi) {
+            try { setImunisasiData(JSON.parse(lsImunisasi)); } catch (e) { setImunisasiData(DEFAULT_IMUNISASI_DATA); }
+          } else { setImunisasiData(DEFAULT_IMUNISASI_DATA); }
+        }
+
+        function populateDefaultFaseFromDb() {
+          const rawW = dbChildData?.birth_weight || dbChildData?.weight;
+          const birthWeight = rawW ? (Number(rawW) < 100 ? Math.round(Number(rawW) * 1000) : Math.round(Number(rawW))) : 3200;
+          const birthLength = dbChildData?.birth_length || dbChildData?.height || 50;
+          const dobRaw = dbChildData?.date_of_birth || dbChildData?.birth_date;
+          const birthDateStr = dobRaw ? new Date(dobRaw).toLocaleDateString("id-ID") : "14/09/2026";
+
+          setNeonatusFaseData([
+            { fase: "0 - 6 Jam", tanggal: birthDateStr, jam: "05:00", batch: "B26-HB0", bb: birthWeight, pb: birthLength, lk: 34, imd: "✓ Ya", vitK: "✓ Ya", salepMata: "✓ Ya", hb0: "✓ Ya", hiv: "Non-Reaktif", sifilis: "Non-Reaktif", hepB: "Non-Reaktif", masalah: "Tidak ada, kondisi stabil", rujukan: "-", nakes: "Bidan Widya" },
+            { fase: "6 - 48 Jam (KN 1)", tanggal: birthDateStr, jam: "10:00", batch: "B26-VITK", bb: Math.round(birthWeight * 0.98), pb: birthLength, lk: 34, menyusu: "✓ Aktif", taliPusat: "✓ Bersih/Normal", vitK: "✓ Ya", salepMata: "✓ Ya", hb0: "✓ Ya", shk: "Dilakukan (Sampel Darah Tumit)", pjbKritis: "Lolos (Saturasi 98%)", hiv: "Non-Reaktif", sifilis: "Non-Reaktif", hepB: "Non-Reaktif", masalah: "Penurunan BB fisiologis normal", rujukan: "-", nakes: "Bidan Widya" },
+            { fase: "3 - 7 Hari (KN 2)", tanggal: birthDateStr, jam: "09:00", batch: "-", bb: Math.round(birthWeight * 1.02), pb: birthLength, lk: 34.2, menyusu: "✓ Kuat", taliPusat: "✓ Kering/Hampir Puput", tandaBahaya: "❌ Tidak Ada", ikterus: "❌ Tidak Kuning", hb0: "✓ Sudah", shk: "Hasil: Normal", hiv: "Non-Reaktif", sifilis: "Non-Reaktif", hepB: "Non-Reaktif", masalah: "Tidak ada", rujukan: "-", nakes: "Bidan Widya" },
+            { fase: "8 - 28 Hari (KN 3)", tanggal: birthDateStr, jam: "11:00", batch: "-", bb: Math.round(birthWeight * 1.18), pb: Number(birthLength) + 2, lk: 35.5, menyusu: "✓ Sangat Kuat", taliPusat: "✓ Sembuh Sempurna", tandaBahaya: "❌ Tidak Ada", ikterus: "❌ Tidak Kuning", shk: "Terverifikasi", hiv: "Non-Reaktif", sifilis: "Non-Reaktif", hepB: "Non-Reaktif", masalah: "Pertumbuhan optimal", rujukan: "-", nakes: "Dr. Rian Syarif, Sp.A" }
+          ]);
+        }
+      } catch (e) {
+        console.error("Failed to load Dexie offline child data:", e);
       }
-    } catch (e) {
-      console.error("Failed to load Pelayanan matrix data:", e);
     }
+    loadIsolatedChildData();
   }, [dbChildData?.child_id]);
 
   useEffect(() => {
     async function loadChildEhrData() {
       try {
         let targetChild: any = null;
-        if (paramChildId) {
-          const childDetail = await getChildDetail(paramChildId);
-          if (childDetail) {
-            targetChild = childDetail;
-          }
-        } else if (role === "ibu") {
+        if (role === "ibu") {
           const targetUser = username || "08123456789";
           const motherDetail = await getLoggedInMotherDetail(targetUser);
           if (motherDetail && motherDetail.children && motherDetail.children.length > 0) {
             targetChild = motherDetail.children[0];
           }
-        } else if (allChildrenList && allChildrenList.length > 0) {
-          targetChild = await getChildDetail(allChildrenList[0].child_id);
+        } else if (paramChildId) {
+          const childDetail = await getChildDetail(paramChildId);
+          if (childDetail) {
+            targetChild = childDetail;
+          }
         }
 
         if (targetChild) {
@@ -1048,9 +1601,9 @@ function RekamMedisAnakContent() {
       }
     }
     loadChildEhrData();
-  }, [paramChildId, username, role, allChildrenList]);
+  }, [paramChildId, username, role]);
 
-  const handleToggleYellowCell = (monthNum: number) => {
+  const handleToggleYellowCell = async (monthNum: number) => {
     const current = yellowStatuses[monthNum];
     let next: "L" | "TL" | null = null;
     if (!current) {
@@ -1066,7 +1619,7 @@ function RekamMedisAnakContent() {
     try {
       const childId = dbChildData?.child_id;
       if (childId) {
-        localStorage.setItem(`sdidtk_records_child_${childId}`, JSON.stringify(updated));
+        await setCacheItem(`sdidtk_records_child_${childId}`, updated);
       }
     } catch (e) {
       console.error("Failed to save yellow status:", e);
@@ -1083,7 +1636,7 @@ function RekamMedisAnakContent() {
             <div className="flex items-center gap-2 text-xs font-semibold text-gray-400">
               <Link href="/" className="hover:text-[#EA2986]">Beranda</Link>
               <span>/</span>
-              <span className="text-gray-600">Rekam Medis Anak</span>
+              <span className="text-gray-600">{role === "ibu" ? "Perjalanan Anak" : "Rekam Medis Anak"}</span>
             </div>
             <h1 className="text-xl font-black text-gray-900 mt-1 tracking-tight">Rekam Medis &amp; Pelayanan Kesehatan Anak</h1>
           </div>
@@ -1096,8 +1649,8 @@ function RekamMedisAnakContent() {
       {/* ─── SEARCH & CHILD INFORMATIONAL CARD (LIGHT MODE) ─── */}
       <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs space-y-4 animate-fadeIn">
         
-        {/* TOP ROW: SEARCH & DROPDOWN COMBOBOX (DI ATAS NAMA ANAK) */}
-        {allChildrenList.length > 0 && (
+        {/* TOP ROW: SEARCH & DROPDOWN COMBOBOX (DI ATAS NAMA ANAK - HANYA UNTUK NAKES/KADER) */}
+        {role !== "ibu" && allChildrenList.length > 0 && (
           <div className="bg-slate-50 p-3.5 rounded-xl border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative">
             <div className="flex items-center gap-2 text-xs font-bold text-gray-700 shrink-0">
               <span className="w-2.5 h-2.5 rounded-full bg-[#EA2986] animate-pulse" />
@@ -1388,7 +1941,7 @@ function RekamMedisAnakContent() {
                 }`}
               >
                 <MdShowChart className="text-sm shrink-0" />
-                <span>KMS &amp; Kurva 0-2 Thn</span>
+                <span>KMS &amp; Kurva Tumbuh Anak</span>
               </button>
             </div>
           </div>
@@ -1449,7 +2002,7 @@ function RekamMedisAnakContent() {
                               className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg border border-amber-200 transition cursor-pointer text-xs font-bold flex items-center gap-1"
                               title="Edit Catatan"
                             >
-                              <span>✏️</span>
+                              <MdEdit className="text-base" />
                               <span className="hidden sm:inline">Edit</span>
                             </button>
                             <button
@@ -1890,7 +2443,7 @@ function RekamMedisAnakContent() {
                                   title={`Edit Data LiLA Bulan ke-${m}`}
                                   className="text-[10px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-2.5 py-1 rounded-md shadow-2xs transition cursor-pointer inline-flex items-center gap-1"
                                 >
-                                  ✏️ Edit
+                                  <MdEdit /> Edit
                                 </button>
                               ) : (
                                 <span className="text-gray-300 font-normal">—</span>
@@ -1957,7 +2510,7 @@ function RekamMedisAnakContent() {
                                   title={`Edit Data LiLA Bulan ke-${mLeft}`}
                                   className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
                                 >
-                                  ✏️ Edit
+                                  <MdEdit /> Edit
                                 </button>
                               ) : (
                                 <span className="text-gray-300 font-normal">—</span>
@@ -1985,7 +2538,7 @@ function RekamMedisAnakContent() {
                                       title={`Edit Data LiLA Bulan ke-${mRight}`}
                                       className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
                                     >
-                                      ✏️ Edit
+                                      <MdEdit /> Edit
                                     </button>
                                   ) : (
                                     <span className="text-gray-300 font-normal">—</span>
@@ -2013,25 +2566,21 @@ function RekamMedisAnakContent() {
               <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="bg-[#EA2986] text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                      Buku KIA Hal 130-131
-                    </span>
-                    <h3 className="text-base font-black text-gray-900">Kartu Menuju Sehat (KMS) &amp; Kurva Pertumbuhan 0-2 Tahun</h3>
+                    <h3 className="text-base font-black text-gray-900">Kartu Menuju Sehat (KMS) &amp; Kurva Pertumbuhan Anak</h3>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
                     Grafik otomatis memplot titik berat badan (BB) hasil penimbangan fisik yang sudah tersimpan di database.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold">
-                  <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"/> Gizi Baik (Green)
-                  </span>
-                  <span className="flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 inline-block"/> Gizi Kurang (Orange)
-                  </span>
-                  <span className="flex items-center gap-1 bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-lg">
-                    <span className="w-2 h-2 rounded-full bg-rose-500 inline-block"/> Gizi Buruk (Red)
-                  </span>
+                  {/* Button Input/Edit Pertumbuhan */}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditKmsRow(0, null, null, null)}
+                    className="bg-[#EA2986] hover:bg-[#d41f76] text-white text-[11px] font-extrabold px-3.5 py-1.5 rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0"
+                  >
+                    <span>Tambah / Edit Data</span>
+                  </button>
                 </div>
               </div>
 
@@ -2042,13 +2591,11 @@ function RekamMedisAnakContent() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 gap-2">
                     <div>
                       <h4 className="text-xs font-black text-gray-900 uppercase tracking-wide">
-                        Tabel Pertumbuhan Anak (Buku KIA Hal 130)
+                        Tabel Pertumbuhan (KMS)
                       </h4>
-                      <p className="text-[10px] text-gray-400">
-                        BB &amp; PB Ideal vs Hasil Penimbangan Aktual dari Database.
-                      </p>
+                      <p className="text-[11px] text-gray-400">Data berat &amp; tinggi badan per bulan</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                    <div className="flex items-center gap-2">
                       {/* Age group toggle */}
                       <div className="flex rounded-lg overflow-hidden border border-gray-300 text-[10px] font-black">
                         <button
@@ -2088,51 +2635,54 @@ function RekamMedisAnakContent() {
                               <th colSpan={4} className="py-1.5 border-b border-gray-800 bg-[#EA2986] text-white text-center uppercase tracking-wider text-xs font-black">
                                 ♀ STANDAR PERTUMBUHAN PEREMPUAN
                               </th>
+                              <th rowSpan={3} className="py-2.5 px-2 border-l border-gray-800 bg-gray-900 w-16 text-white text-center">Aksi</th>
                             </tr>
                             <tr>
-                              <th colSpan={2} className="py-1 border-b border-r border-gray-800 bg-pink-950/90 text-pink-200 text-center font-bold text-[11px]">Berat Badan (kg)</th>
-                              <th colSpan={2} className="py-1 border-b border-gray-800 bg-pink-950/90 text-pink-200 text-center font-bold text-[11px]">{kmsTableAgeGroup === "0_2" ? "Panjang" : "Tinggi"} Badan (cm)</th>
+                              <th colSpan={2} className="py-1 border-r border-b border-gray-800 bg-pink-900 text-pink-100 text-[10px]">Berat Badan (BB)</th>
+                              <th colSpan={2} className="py-1 border-b border-gray-800 bg-pink-800 text-pink-100 text-[10px]">Panjang Badan (PB)</th>
                             </tr>
-                            <tr className="text-[10px]">
-                              <th className="py-1 px-2 border-r border-gray-800 bg-pink-900/80 text-pink-100 font-bold w-1/4">Ideal</th>
-                              <th className="py-1 px-2 border-r border-gray-800 bg-emerald-950 text-emerald-300 font-black w-1/4">Aktual DB</th>
-                              <th className="py-1 px-2 border-r border-gray-800 bg-pink-900/80 text-pink-100 font-bold w-1/4">Ideal</th>
-                              <th className="py-1 px-2 bg-emerald-950 text-emerald-300 font-black w-1/4">Aktual DB</th>
+                            <tr>
+                              <th className="py-1 px-1.5 border-r border-gray-800 bg-pink-950 text-pink-200 text-[9px]">Ideal</th>
+                              <th className="py-1 px-1.5 border-r border-gray-800 bg-emerald-900 text-emerald-200 text-[9px]">Hasil</th>
+                              <th className="py-1 px-1.5 border-r border-gray-800 bg-pink-900 text-pink-200 text-[9px]">Ideal</th>
+                              <th className="py-1 px-1.5 border-gray-800 bg-emerald-900 text-emerald-200 text-[9px]">Hasil</th>
                             </tr>
                           </>
                         ) : (
                           <>
                             <tr>
                               <th rowSpan={3} className="py-2.5 px-2 border-r border-gray-800 bg-gray-900 w-14">Usia<br/>(Bln)</th>
-                              <th colSpan={4} className="py-1.5 border-b border-gray-800 bg-blue-900 text-white text-center uppercase tracking-wider text-xs font-black">
+                              <th colSpan={4} className="py-1.5 border-b border-gray-800 bg-blue-700 text-white text-center uppercase tracking-wider text-xs font-black">
                                 ♂ STANDAR PERTUMBUHAN LAKI-LAKI
                               </th>
+                              <th rowSpan={3} className="py-2.5 px-2 border-l border-gray-800 bg-gray-900 w-16 text-white text-center">Aksi</th>
                             </tr>
                             <tr>
-                              <th colSpan={2} className="py-1 border-b border-r border-gray-800 bg-blue-950/90 text-blue-200 text-center font-bold text-[11px]">Berat Badan (kg)</th>
-                              <th colSpan={2} className="py-1 border-b border-gray-800 bg-blue-950/90 text-blue-200 text-center font-bold text-[11px]">{kmsTableAgeGroup === "0_2" ? "Panjang" : "Tinggi"} Badan (cm)</th>
+                              <th colSpan={2} className="py-1 border-r border-b border-gray-800 bg-blue-900 text-blue-100 text-[10px]">Berat Badan (BB)</th>
+                              <th colSpan={2} className="py-1 border-b border-gray-800 bg-blue-800 text-blue-100 text-[10px]">Panjang Badan (PB)</th>
                             </tr>
-                            <tr className="text-[10px]">
-                              <th className="py-1 px-2 border-r border-gray-800 bg-blue-900/80 text-blue-100 font-bold w-1/4">Ideal</th>
-                              <th className="py-1 px-2 border-r border-gray-800 bg-emerald-950 text-emerald-300 font-black w-1/4">Aktual DB</th>
-                              <th className="py-1 px-2 border-r border-gray-800 bg-blue-900/80 text-blue-100 font-bold w-1/4">Ideal</th>
-                              <th className="py-1 px-2 bg-emerald-950 text-emerald-300 font-black w-1/4">Aktual DB</th>
+                            <tr>
+                              <th className="py-1 px-1.5 border-r border-gray-800 bg-blue-950 text-blue-200 text-[9px]">Ideal</th>
+                              <th className="py-1 px-1.5 border-r border-gray-800 bg-emerald-900 text-emerald-200 text-[9px]">Hasil</th>
+                              <th className="py-1 px-1.5 border-r border-gray-800 bg-blue-900 text-blue-200 text-[9px]">Ideal</th>
+                              <th className="py-1 px-1.5 border-gray-800 bg-emerald-900 text-emerald-200 text-[9px]">Hasil</th>
                             </tr>
                           </>
                         )}
                       </thead>
                       <tbody className="divide-y divide-gray-300 font-bold bg-white text-gray-800">
                         {(kmsTableAgeGroup === "0_2" ? KMS_IDEAL_DATA : KMS_IDEAL_DATA_24_60).map((row) => {
-                          // Match by ageAtVisit (from getChildDetail) or rawAge fallback
                           const dbMatch = dbMeasurements.find((m: any) =>
+                            m.cadre_notes && m.cadre_notes.includes(`[Pengukuran KMS Usia ${row.month} Bulan]`)
+                          ) || dbMeasurements.find((m: any) =>
                             (m.ageAtVisit !== undefined && m.ageAtVisit === row.month) ||
-                            (m.rawAge !== undefined && m.rawAge === row.month)
+                            (m.rawAge !== undefined && m.rawAge === row.month) ||
+                            (m.usiaBulan !== undefined && m.usiaBulan === row.month)
                           );
-                          // For month 0, fallback to birth weight/length
-                          const rawBB = dbMatch?.weight
+                          const rawBB = (dbMatch?.weight !== undefined && dbMatch?.weight !== null)
                             ? Number(dbMatch.weight)
                             : (row.month === 0 && dbChildData?.birth_weight ? Number(dbChildData.birth_weight) : null);
-                          const rawPB = dbMatch?.height
+                          const rawPB = (dbMatch?.height !== undefined && dbMatch?.height !== null)
                             ? Number(dbMatch.height)
                             : (row.month === 0 && dbChildData?.birth_length ? Number(dbChildData.birth_length) : null);
 
@@ -2145,6 +2695,8 @@ function RekamMedisAnakContent() {
                           const idealBB = kmsGenderFilter === "P" ? row.p_bb : row.l_bb;
                           const idealPB = kmsGenderFilter === "P" ? row.p_pb : row.l_pb;
 
+                          const hasRowData = actualBB !== "—" || actualPB !== "—";
+
                           return (
                             <tr key={row.month} className={`${rowColor} transition-colors`}>
                               <td className="p-2 border-r border-gray-400 bg-gray-100 font-black text-gray-900">{row.month} Bln</td>
@@ -2153,8 +2705,22 @@ function RekamMedisAnakContent() {
                                 {actualBB}
                               </td>
                               <td className={`p-2 border-r border-gray-300 ${idealPBColor}`}>{idealPB} cm</td>
-                              <td className={`p-2 ${actualPB !== "—" ? "bg-emerald-100 text-emerald-950 font-black" : "text-gray-400 font-normal"}`}>
+                              <td className={`p-2 border-r border-gray-300 ${actualPB !== "—" ? "bg-emerald-100 text-emerald-950 font-black" : "text-gray-400 font-normal"}`}>
                                 {actualPB}
+                              </td>
+                              <td className="p-1 text-center bg-gray-50 border-l border-gray-300">
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditKmsRow(row.month, rawBB, rawPB, dbMatch)}
+                                  className={`px-2 py-1 rounded-md text-[10px] font-extrabold transition shadow-2xs cursor-pointer flex items-center justify-center gap-0.5 mx-auto border ${
+                                    hasRowData
+                                      ? "bg-amber-50 hover:bg-amber-600 text-amber-900 hover:text-white border-amber-300 hover:border-amber-600"
+                                      : "bg-emerald-50 hover:bg-emerald-600 text-emerald-800 hover:text-white border-emerald-300 hover:border-emerald-600"
+                                  }`}
+                                  title={hasRowData ? `Edit Data Usia ${row.month} Bulan` : `Tambah Data Usia ${row.month} Bulan`}
+                                >
+                                  {hasRowData ? <><MdEdit /> Edit</> : <><MdAdd /> Tambah</>}
+                                </button>
                               </td>
                             </tr>
                           );
@@ -2226,24 +2792,30 @@ function RekamMedisAnakContent() {
                           if (month === 0 && dbChildData?.birth_weight) return Number(dbChildData.birth_weight);
                           const m = dbMeasurements.find((x: any) =>
                             (x.ageAtVisit !== undefined && x.ageAtVisit === month) ||
-                            (x.rawAge !== undefined && x.rawAge === month)
+                            (x.rawAge !== undefined && x.rawAge === month) ||
+                            (x.usiaBulan !== undefined && x.usiaBulan === month) ||
+                            (x.cadre_notes && x.cadre_notes.includes(`[Pengukuran KMS Usia ${month} Bulan]`))
                           );
-                          return m?.weight ? Number(m.weight) : null;
+                          return m?.weight !== undefined && m?.weight !== null ? Number(m.weight) : null;
                         };
                         const getActualHeight = (month: number): number | null => {
                           if (month === 0 && dbChildData?.birth_length) return Number(dbChildData.birth_length);
                           const m = dbMeasurements.find((x: any) =>
                             (x.ageAtVisit !== undefined && x.ageAtVisit === month) ||
-                            (x.rawAge !== undefined && x.rawAge === month)
+                            (x.rawAge !== undefined && x.rawAge === month) ||
+                            (x.usiaBulan !== undefined && x.usiaBulan === month) ||
+                            (x.cadre_notes && x.cadre_notes.includes(`[Pengukuran KMS Usia ${month} Bulan]`))
                           );
-                          return m?.height ? Number(m.height) : null;
+                          return m?.height !== undefined && m?.height !== null ? Number(m.height) : null;
                         };
                         const getActualLK = (month: number): number | null => {
                           const m = dbMeasurements.find((x: any) =>
                             (x.ageAtVisit !== undefined && x.ageAtVisit === month) ||
-                            (x.rawAge !== undefined && x.rawAge === month)
+                            (x.rawAge !== undefined && x.rawAge === month) ||
+                            (x.usiaBulan !== undefined && x.usiaBulan === month) ||
+                            (x.cadre_notes && x.cadre_notes.includes(`[Pengukuran KMS Usia ${month} Bulan]`))
                           );
-                          return m?.head_circumference ? Number(m.head_circumference) : null;
+                          return m?.head_circumference !== undefined && m?.head_circumference !== null ? Number(m.head_circumference) : null;
                         };
 
                         // ── BB/U 0–2 Tahun ──
@@ -2486,11 +3058,28 @@ function RekamMedisAnakContent() {
                   <thead>
                     <tr className="bg-gray-900 text-[10px] font-extrabold text-white uppercase text-center">
                       <th className="py-3 px-4 text-left w-1/4">Bayi 0 - 28 Hari</th>
-                      <th className="py-3 px-4 border-l border-gray-700">0 - 6 Jam</th>
-                      <th className="py-3 px-4 border-l border-gray-700">6 - 48 Jam (KN1)</th>
-                      <th className="py-3 px-4 border-l border-gray-700">3 - 7 Hari (KN2)</th>
-                      <th className="py-3 px-4 border-l border-gray-700">8 - 28 Hari (KN3)</th>
-                      <th className="py-3 px-4 border-l border-gray-700 bg-gray-800">Aksi</th>
+                      {[
+                        { key: "k1", label: "0 - 6 Jam" },
+                        { key: "k2", label: "6 - 48 Jam (KN1)" },
+                        { key: "k3", label: "3 - 7 Hari (KN2)" },
+                        { key: "k4", label: "8 - 28 Hari (KN3)" },
+                      ].map((col) => (
+                        <th key={col.key} className="py-2 px-3 border-l border-gray-700">
+                          <div className="flex flex-col items-center justify-center gap-1">
+                            <span>{col.label}</span>
+                            {role === "nakes" && (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditPelayananKolomNeonatus(col.key, col.label)}
+                                className="text-[9px] font-black text-amber-950 bg-amber-400 hover:bg-amber-300 border border-amber-500 px-2 py-0.5 rounded shadow-2xs transition cursor-pointer flex items-center gap-0.5"
+                                title={`Edit Pelayanan Kolom ${col.label}`}
+                              >
+                                <MdEdit /> Edit
+                              </button>
+                            )}
+                          </div>
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="text-xs bg-white font-medium text-gray-700 divide-y text-center">
@@ -2500,17 +3089,6 @@ function RekamMedisAnakContent() {
                       <td className="p-2.5">{neonatusPelayananData.headerDates?.k2Date || "15/09/2026"}<br/><span className="text-[10px] font-normal text-gray-400">{neonatusPelayananData.headerDates?.k2Place || "Puskesmas"}</span></td>
                       <td className="p-2.5">{neonatusPelayananData.headerDates?.k3Date || "19/09/2026"}<br/><span className="text-[10px] font-normal text-gray-400">{neonatusPelayananData.headerDates?.k3Place || "Puskesmas"}</span></td>
                       <td className="p-2.5">{neonatusPelayananData.headerDates?.k4Date || "12/10/2026"}<br/><span className="text-[10px] font-normal text-gray-400">{neonatusPelayananData.headerDates?.k4Place || "Puskesmas"}</span></td>
-                      <td className="p-1.5 bg-gray-50/80 text-center">
-                        {role === "nakes" && (
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditPelayanan("neonatus", "header_dates", "Tanggal & Tempat Pelayanan Neonatus")}
-                            className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
-                          >
-                            ✏️ Edit Tgl
-                          </button>
-                        )}
-                      </td>
                     </tr>
                     {[
                       { key: "tali_pusat", item: "Perawatan Tali pusat" },
@@ -2529,18 +3107,6 @@ function RekamMedisAnakContent() {
                           <td className="p-2.5 text-emerald-600 font-bold">{rowData.k2 || "-"}</td>
                           <td className="p-2.5 text-emerald-600 font-bold">{rowData.k3 || "-"}</td>
                           <td className="p-2.5 text-emerald-600 font-bold">{rowData.k4 || "-"}</td>
-                          <td className="p-1.5 bg-gray-50/80 text-center">
-                            {role === "nakes" && (
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEditPelayanan("neonatus", key, item)}
-                                title={`Edit ${item}`}
-                                className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
-                              >
-                                ✏️ Edit
-                              </button>
-                            )}
-                          </td>
                         </tr>
                       );
                     })}
@@ -2553,18 +3119,6 @@ function RekamMedisAnakContent() {
                           <span>Sifilis: {neonatusPelayananData.items?.triple?.sifilis || "Non-Reaktif"}</span>
                           <span>Hepatitis B: {neonatusPelayananData.items?.triple?.hepB || "Non-Reaktif"}</span>
                         </div>
-                      </td>
-                      <td className="p-1.5 bg-gray-50/80 text-center">
-                        {role === "nakes" && (
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditPelayanan("neonatus", "triple", "Tripel Eliminasi Neonatus")}
-                            title="Edit Tripel Eliminasi"
-                            className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
-                          >
-                            ✏️ Edit
-                          </button>
-                        )}
                       </td>
                     </tr>
                   </tbody>
@@ -2585,9 +3139,22 @@ function RekamMedisAnakContent() {
                       <tr className="bg-gray-900 text-[10px] font-extrabold text-white uppercase text-center">
                         <th className="py-3 px-4 text-left w-1/5">Indikator Pelayanan</th>
                         {Array.from({ length: 8 }).map((_, i) => (
-                          <th key={i} className="py-3 px-2 border-l border-gray-700 text-[10px]">Kunjungan {i + 1}</th>
+                          <th key={i} className="py-2 px-2 border-l border-gray-700 text-[10px]">
+                            <div className="flex flex-col items-center justify-center gap-1">
+                              <span>Kunjungan {i + 1}</span>
+                              {role === "nakes" && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditPelayananKolomTahunan(i, selectedKategoriUsia)}
+                                  className="text-[9px] font-black text-amber-950 bg-amber-400 hover:bg-amber-300 border border-amber-500 px-2 py-0.5 rounded shadow-2xs transition cursor-pointer flex items-center gap-0.5"
+                                  title={`Edit Pelayanan Kunjungan ${i + 1}`}
+                                >
+                                  <MdEdit /> Edit
+                                </button>
+                              )}
+                            </div>
+                          </th>
                         ))}
-                        <th className="py-3 px-3 border-l border-gray-700 bg-gray-800">Aksi</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs bg-white font-medium text-gray-700 divide-y text-center">
@@ -2605,17 +3172,6 @@ function RekamMedisAnakContent() {
                             )}
                           </td>
                         ))}
-                        <td className="p-1.5 bg-gray-50/80 text-center">
-                          {role === "nakes" && (
-                            <button
-                              type="button"
-                              onClick={() => handleOpenEditPelayanan("tahunan", "header_visits", "Tanggal & Tempat Kunjungan", selectedKategoriUsia)}
-                              className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
-                            >
-                              ✏️ Edit Tgl
-                            </button>
-                          )}
-                        </td>
                       </tr>
                       
                       {[
@@ -2641,18 +3197,6 @@ function RekamMedisAnakContent() {
                                 {v || "-"}
                               </td>
                             ))}
-                            <td className="p-1.5 bg-gray-50/80 text-center">
-                              {role === "nakes" && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenEditPelayanan("tahunan", row.key, row.label, selectedKategoriUsia)}
-                                  title={`Edit ${row.label}`}
-                                  className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
-                                >
-                                  ✏️ Edit
-                                </button>
-                              )}
-                            </td>
                           </tr>
                         );
                       })}
@@ -2662,18 +3206,6 @@ function RekamMedisAnakContent() {
                           <td className="p-2.5 font-bold text-left bg-gray-50">Tripel Eliminasi</td>
                           <td className="p-2.5 font-black text-[9px] text-emerald-700" colSpan={8}>
                             {catData.triple || "Non-Reaktif (3 Parameter)"}
-                          </td>
-                          <td className="p-1.5 bg-gray-50/80 text-center">
-                            {role === "nakes" && (
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEditPelayanan("tahunan", "triple", "Tripel Eliminasi", selectedKategoriUsia)}
-                                title="Edit Tripel Eliminasi"
-                                className="text-[9px] font-black text-gray-700 hover:text-black bg-white hover:bg-gray-100 border border-gray-300 px-1.5 py-0.5 rounded shadow-2xs transition cursor-pointer"
-                              >
-                                ✏️ Edit
-                              </button>
-                            )}
                           </td>
                         </tr>
                       )}
@@ -2687,170 +3219,211 @@ function RekamMedisAnakContent() {
       )}
 
       {/* ─── RENDER TABS 3: PELAYANAN KESEHATAN BAYI UMUR 0 - 28 HARI (NEONATUS) ─── */}
-      {activeTab === "neonatus" && (
-        <div className="space-y-6 animate-fadeIn">
-          
-          {/* Sub-Tabs Penyaring Fase Kunjungan Neonatal (KN) */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-2 shadow-sm">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block px-2 mb-2">
-              Pilih Fase Pelayanan Neonatus
-            </span>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 bg-gray-100 p-1 rounded-xl">
-              {[
-                { id: 0, label: "0 - 6 Jam" },
-                { id: 1, label: "6 - 48 Jam (KN 1)" },
-                { id: 2, label: "3 - 7 Hari (KN 2)" },
-                { id: 3, label: "8 - 28 Hari (KN 3)" },
-              ].map((kn) => (
-                <button
-                  key={kn.id}
-                  type="button"
-                  onClick={() => setSelectedKN(kn.id)}
-                  className={`py-2.5 rounded-lg text-xs font-bold transition-all text-center cursor-pointer ${
-                    selectedKN === kn.id
-                      ? "bg-white text-gray-950 shadow-xs border"
-                      : "text-gray-500 hover:text-gray-900"
-                  }`}
-                >
-                  {kn.label}
-                </button>
-              ))}
-            </div>
-          </div>
+      {activeTab === "neonatus" && (() => {
+        const curFase = neonatusFaseData[selectedKN] || MOCK_NEONATUS_DATA[selectedKN];
 
-          {/* BENTROW BLOCK: Konten Pemeriksaan Medis Terpilih */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        return (
+          <div className="space-y-6 animate-fadeIn">
             
-            {/* KANVAS KIRI: Rekam Fisik & Tindakan Klinis (7 Kolom) */}
-            <div className="lg:col-span-7 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-5">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center border-b pb-2">
-                  <h3 className="text-sm font-black text-gray-900 flex items-center gap-1.5">
-                    <span className="w-1.5 h-3.5 bg-[#EA2986] rounded-full block"/> 
-                    Lembar Pemeriksaan: {MOCK_NEONATUS_DATA[selectedKN].fase}
-                  </h3>
-                  <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded uppercase">
-                    MTBS Algoritma Bayi Muda
-                  </span>
-                </div>
-
-                {/* Grid Identitas Batas Kunjungan */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] font-bold text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                  <div>📅 Tanggal: <span className="text-gray-900 font-black">{MOCK_NEONATUS_DATA[selectedKN].tanggal}</span></div>
-                  <div>⏰ Jam Periksa: <span className="text-gray-900 font-black">{MOCK_NEONATUS_DATA[selectedKN].jam} WIB</span></div>
-                  <div>🧪 No. Batch: <span className="text-gray-500 font-mono font-semibold">{MOCK_NEONATUS_DATA[selectedKN].batch}</span></div>
-                </div>
-
-                {/* Indikator Fisik & Antropometri */}
-                <div className="space-y-2">
-                  <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Hasil Pengukuran Fisik</span>
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="bg-white border rounded-xl p-2.5"><span className="text-[10px] text-gray-400 block font-bold">BB (Berat)</span><span className="text-sm font-black text-gray-900">{MOCK_NEONATUS_DATA[selectedKN].bb} g</span></div>
-                    <div className="bg-white border rounded-xl p-2.5"><span className="text-[10px] text-gray-400 block font-bold">PB (Panjang)</span><span className="text-sm font-black text-gray-900">{MOCK_NEONATUS_DATA[selectedKN].pb} cm</span></div>
-                    <div className="bg-white border rounded-xl p-2.5"><span className="text-[10px] text-gray-400 block font-bold">LK (Kepala)</span><span className="text-sm font-black text-gray-900">{MOCK_NEONATUS_DATA[selectedKN].lk} cm</span></div>
-                  </div>
-                </div>
-
-                {/* Checklist Komponen Pelayanan Kesehatan Neonatus */}
-                <div className="space-y-2 pt-1">
-                  <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Checklist Pelayanan Kesehatan yang Diterima</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-gray-700">
-                    {selectedKN === 0 && (
-                      <>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Inisiasi Menyusu Dini (IMD)</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].imd}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Suntik Vitamin K1</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].vitK}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Salep/Tetes Mata Antibiotik</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].salepMata}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Imunisasi Hepatitis B (HB0)</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].hb0}</span></div>
-                      </>
-                    )}
-                    {selectedKN === 1 && (
-                      <>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Menyusu Aktif / Adekuat</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].menyusu}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Perawatan Tali Pusat</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].taliPusat}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Skrining Hipotiroid (SHK)</span><span className="text-indigo-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].shk}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Skrining PJB Kritis (24-48 Jam)</span><span className="text-indigo-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].pjbKritis}</span></div>
-                      </>
-                    )}
-                    {selectedKN >= 2 && (
-                      <>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Menyusu / Kebutuhan ASI</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].menyusu}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Kondisi Tali Pusat</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].taliPusat}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Skrining Tanda Bahaya</span><span className="text-rose-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].tandaBahaya}</span></div>
-                        <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Identifikasi Ikterus (Kuning)</span><span className="text-emerald-700 font-black">{MOCK_NEONATUS_DATA[selectedKN].ikterus}</span></div>
-                      </>
-                    )}
-                  </div>
-                </div>
+            {/* Sub-Tabs Penyaring Fase Kunjungan Neonatal (KN) */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-3 shadow-sm space-y-2">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">
+                  Pilih Fase Pelayanan Neonatus
+                </span>
+                <span className="text-[10px] font-extrabold text-[#EA2986] bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100">
+                  Fase Terpilih: {curFase.fase}
+                </span>
               </div>
 
-              <div className="pt-3 border-t text-[11px] font-bold text-gray-400 flex justify-between items-center">
-                <span>Tenaga Kesehatan Pemeriksa: <span className="text-gray-800 font-black">{MOCK_NEONATUS_DATA[selectedKN].nakes}</span></span>
-                <span>Buku KIA Hal. 116</span>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 bg-gray-100 p-1.5 rounded-2xl">
+                {[
+                  { id: 0, label: "0 - 6 Jam" },
+                  { id: 1, label: "6 - 48 Jam (KN 1)" },
+                  { id: 2, label: "3 - 7 Hari (KN 2)" },
+                  { id: 3, label: "8 - 28 Hari (KN 3)" },
+                ].map((kn) => (
+                  <div
+                    key={kn.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setSelectedKN(kn.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedKN(kn.id);
+                      }
+                    }}
+                    className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer select-none ${
+                      selectedKN === kn.id
+                        ? "bg-white text-gray-950 shadow-xs border border-gray-200 ring-1 ring-black/5"
+                        : "text-gray-500 hover:text-gray-900"
+                    }`}
+                  >
+                    <span>{kn.label}</span>
+                    {selectedKN === kn.id && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEditFaseNeonatus(kn.id);
+                        }}
+                        className="text-[9px] font-black text-amber-950 bg-amber-400 hover:bg-amber-300 border border-amber-500 px-2 py-0.5 rounded-md shadow-2xs transition cursor-pointer flex items-center gap-0.5 shrink-0"
+                        title={`Edit Data Fase ${kn.label}`}
+                      >
+                        <MdEdit /> Edit
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* KANVAS KANAN: Laboratorium, Kramer Score & Rujukan (5 Kolom) */}
-            <div className="lg:col-span-5 flex flex-col gap-4 justify-between">
+            {/* BENTROW BLOCK: Konten Pemeriksaan Medis Terpilih */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               
-              {/* Box A: Triple Eliminasi Berkala */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3">
-                <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Hasil Uji Laboratorium Triple Eliminasi Prenatal/Bayi</span>
-                <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-black">
-                  <div className="p-2 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl"><span className="block text-gray-400 font-bold text-[9px] mb-0.5">HIV (H)</span>{MOCK_NEONATUS_DATA[selectedKN].hiv}</div>
-                  <div className="p-2 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl"><span className="block text-gray-400 font-bold text-[9px] mb-0.5">Sifilis (S)</span>{MOCK_NEONATUS_DATA[selectedKN].sifilis}</div>
-                  <div className="p-2 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl"><span className="block text-gray-400 font-bold text-[9px] mb-0.5">Hep B</span>{MOCK_NEONATUS_DATA[selectedKN].hepB}</div>
-                </div>
-              </div>
+              {/* KANVAS KIRI: Rekam Fisik & Tindakan Klinis (7 Kolom) */}
+              <div className="lg:col-span-7 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm flex flex-col justify-between space-y-5">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap justify-between items-center border-b pb-3 gap-2">
+                    <h3 className="text-sm font-black text-gray-900 flex items-center gap-1.5">
+                      <span className="w-1.5 h-3.5 bg-[#EA2986] rounded-full block"/> 
+                      Lembar Pemeriksaan: {curFase.fase}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded uppercase">
+                        MTBS Algoritma Bayi Muda
+                      </span>
+                      {role === "nakes" && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditFaseNeonatus(selectedKN)}
+                          className="text-[10px] font-black text-amber-950 bg-amber-400 hover:bg-amber-300 border border-amber-500 px-2.5 py-1 rounded-lg shadow-2xs transition cursor-pointer flex items-center gap-1"
+                        >
+                          <MdEdit /> Edit Data Fase Ini
+                        </button>
+                      )}
+                    </div>
+                  </div>
 
-              {/* Box B: Visualisasi Penanda Kramer Score (Hanya Muncul di KN2 & KN3) */}
-              {selectedKN >= 2 ? (
-                <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-2.5">
-                  <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Peta Identifikasi Ikterus (Kramer Score)</span>
-                  <div className="p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl text-[11px] font-medium text-amber-900 leading-normal flex gap-2">
-                    <span className="text-lg">👶</span>
-                    <div>
-                      <strong>Hasil Pemetaan Tubuh:</strong> Bayi terpantau bersih. Tidak ada indikasi akumulasi warna kuning di area kepala (Kramer 1), badan (Kramer 2), paha (Kramer 3), maupun ujung kaki/tangan (Kramer 4-5).
+                  {/* Grid Identitas Batas Kunjungan */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] font-bold text-gray-700 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                    <div>📅 Tanggal: <span className="text-gray-900 font-black">{curFase.tanggal || "-"}</span></div>
+                    <div>⏰ Jam Periksa: <span className="text-gray-900 font-black">{curFase.jam ? `${curFase.jam} WIB` : "-"}</span></div>
+                    <div>🧪 No. Batch: <span className="text-gray-500 font-mono font-semibold">{curFase.batch || "-"}</span></div>
+                  </div>
+
+                  {/* Indikator Fisik & Antropometri */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Hasil Pengukuran Fisik</span>
+                    <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                      <div className="bg-white border rounded-xl p-2.5"><span className="text-[10px] text-gray-400 block font-bold">BB (Berat)</span><span className="text-sm font-black text-gray-900">{curFase.bb || "-"} g</span></div>
+                      <div className="bg-white border rounded-xl p-2.5"><span className="text-[10px] text-gray-400 block font-bold">PB (Panjang)</span><span className="text-sm font-black text-gray-900">{curFase.pb || "-"} cm</span></div>
+                      <div className="bg-white border rounded-xl p-2.5"><span className="text-[10px] text-gray-400 block font-bold">LK (Kepala)</span><span className="text-sm font-black text-gray-900">{curFase.lk || "-"} cm</span></div>
+                    </div>
+                  </div>
+
+                  {/* Checklist Komponen Pelayanan Kesehatan Neonatus */}
+                  <div className="space-y-2 pt-1">
+                    <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Checklist Pelayanan Kesehatan yang Diterima</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-gray-700">
+                      {selectedKN === 0 && (
+                        <>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Inisiasi Menyusu Dini (IMD)</span><span className="text-emerald-700 font-black">{curFase.imd || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Suntik Vitamin K1</span><span className="text-emerald-700 font-black">{curFase.vitK || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Salep/Tetes Mata Antibiotik</span><span className="text-emerald-700 font-black">{curFase.salepMata || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Imunisasi Hepatitis B (HB0)</span><span className="text-emerald-700 font-black">{curFase.hb0 || "-"}</span></div>
+                        </>
+                      )}
+                      {selectedKN === 1 && (
+                        <>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Menyusu Aktif / Adekuat</span><span className="text-emerald-700 font-black">{curFase.menyusu || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Perawatan Tali Pusar</span><span className="text-emerald-700 font-black">{curFase.taliPusat || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Skrining Hipotiroid (SHK)</span><span className="text-indigo-700 font-black">{curFase.shk || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Skrining PJB Kritis (24-48 Jam)</span><span className="text-indigo-700 font-black">{curFase.pjbKritis || "-"}</span></div>
+                        </>
+                      )}
+                      {selectedKN >= 2 && (
+                        <>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Menyusu / Kebutuhan ASI</span><span className="text-emerald-700 font-black">{curFase.menyusu || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Kondisi Tali Pusar</span><span className="text-emerald-700 font-black">{curFase.taliPusat || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Skrining Tanda Bahaya</span><span className="text-rose-700 font-black">{curFase.tandaBahaya || "-"}</span></div>
+                          <div className="p-2.5 bg-gray-50 border rounded-lg flex justify-between"><span>Identifikasi Ikterus (Kuning)</span><span className="text-emerald-700 font-black">{curFase.ikterus || "-"}</span></div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col justify-center items-center text-center p-6 text-gray-400 text-xs">
-                  <span>ℹ️</span>
-                  <p className="mt-1 font-medium text-[11px]">Skrining visual perluasan ikterus (Kramer) dilakukan mulai usia &gt; 3 hari setelah bersalin.</p>
-                </div>
-              )}
 
-              {/* Box C: Temuan Keluhan & Rujukan */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-2.5">
-                <div className="p-2.5 bg-gray-50 border rounded-xl text-xs">
-                  <span className="text-[9px] text-gray-400 block font-black uppercase tracking-wide">Masalah yang Ditemukan:</span>
-                  <p className="font-bold text-gray-700 mt-0.5">{MOCK_NEONATUS_DATA[selectedKN].masalah}</p>
-                </div>
-                <div className="p-2.5 bg-gray-50 border rounded-xl text-xs">
-                  <span className="text-[9px] text-gray-400 block font-black uppercase tracking-wide">Dirujuk Ke faskes/RS:</span>
-                  <p className="font-bold text-gray-700 mt-0.5">{MOCK_NEONATUS_DATA[selectedKN].rujukan}</p>
+                <div className="pt-3 border-t text-[11px] font-bold text-gray-400 flex justify-between items-center">
+                  <span>Tenaga Kesehatan Pemeriksa: <span className="text-gray-800 font-black">{curFase.nakes || "Bidan Desa"}</span></span>
+                  <span>Buku KIA Hal. 116</span>
                 </div>
               </div>
 
-            </div>
-          </div>
+              {/* KANVAS KANAN: Laboratorium, Kramer Score & Rujukan (5 Kolom) */}
+              <div className="lg:col-span-5 flex flex-col gap-4 justify-between">
+                
+                {/* Box A: Triple Eliminasi Berkala */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-3">
+                  <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Hasil Uji Laboratorium Triple Eliminasi Prenatal/Bayi</span>
+                  <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-black">
+                    <div className="p-2 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl"><span className="block text-gray-400 font-bold text-[9px] mb-0.5">HIV (H)</span>{curFase.hiv || "Non-Reaktif"}</div>
+                    <div className="p-2 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl"><span className="block text-gray-400 font-bold text-[9px] mb-0.5">Sifilis (S)</span>{curFase.sifilis || "Non-Reaktif"}</div>
+                    <div className="p-2 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-xl"><span className="block text-gray-400 font-bold text-[9px] mb-0.5">Hep B</span>{curFase.hepB || "Non-Reaktif"}</div>
+                  </div>
+                </div>
 
-          {/* Baris Khusus Kaki Halaman: Catatan Penting & Resume Narasi Medis Terpisah */}
-          <div className="space-y-4">
-            <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm space-y-2">
-              <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Catatan Penting Pelayanan Neonatus</span>
-              <p className="text-xs font-bold text-gray-700 bg-gray-50 p-3.5 rounded-xl border border-gray-100 leading-relaxed">
-                Seluruh parameter refleks neurologis primitif (rooting, sucking, moro, plantar) bayi muda berkembang baik dan simetris. Tali pusat terawat bersih, sirkulasi paru-jantung stabil, dan berat badan adaptif berada pada kurva normal rujukan standar nasional Kemenkes RI.
-              </p>
-            </div>
-            
-            <div className="p-3 bg-[#EA2986]/5 border border-[#EA2986]/20 text-[10px] font-bold text-gray-500 rounded-xl">
-              * Tanda penandaan strip (—) menandakan parameter tidak ada masalah atau tidak memerlukan tindakan rujukan terencana harian.
-            </div>
-          </div>
+                {/* Box B: Visualisasi Penanda Kramer Score (Hanya Muncul di KN2 & KN3) */}
+                {selectedKN >= 2 ? (
+                  <div className="bg-[#EA2986]/5 border border-[#EA2986]/20 rounded-2xl p-4 shadow-xs space-y-2">
+                    <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Peta Identifikasi Ikterus (Kramer Score)</span>
+                    <div className="p-2.5 bg-amber-50/50 border border-amber-200 rounded-xl text-[11px] font-medium text-amber-900 leading-normal flex gap-2">
+                      <span className="text-lg">👶</span>
+                      <div>
+                        <strong>Hasil Pemetaan Tubuh:</strong> Bayi terpantau bersih. Tidak ada indikasi akumulasi warna kuning di area kepala (Kramer 1), badan (Kramer 2), paha (Kramer 3), maupun ujung kaki/tangan (Kramer 4-5).
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col justify-center items-center text-center p-6 text-gray-400 text-xs">
+                    <span>ℹ️</span>
+                    <p className="mt-1 font-medium text-[11px]">Skrining visual perluasan ikterus (Kramer) dilakukan mulai usia &gt; 3 hari setelah bersalin.</p>
+                  </div>
+                )}
 
-        </div>
-      )}
+                {/* Box C: Temuan Keluhan & Rujukan */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm space-y-2.5">
+                  <div className="p-2.5 bg-gray-50 border rounded-xl text-xs">
+                    <span className="text-[9px] text-gray-400 block font-black uppercase tracking-wide">Masalah yang Ditemukan:</span>
+                    <p className="font-bold text-gray-700 mt-0.5">{curFase.masalah || "-"}</p>
+                  </div>
+                  <div className="p-2.5 bg-gray-50 border rounded-xl text-xs">
+                    <span className="text-[9px] text-gray-400 block font-black uppercase tracking-wide">Dirujuk Ke faskes/RS:</span>
+                    <p className="font-bold text-gray-700 mt-0.5">{curFase.rujukan || "-"}</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Baris Khusus Kaki Halaman: Catatan Penting & Resume Narasi Medis Terpisah */}
+            <div className="space-y-4">
+              <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm space-y-2">
+                <span className="text-[10px] text-gray-400 font-bold block uppercase tracking-wide">Catatan Penting Pelayanan Neonatus</span>
+                <p className="text-xs font-bold text-gray-700 bg-gray-50 p-3.5 rounded-xl border border-gray-100 leading-relaxed">
+                  Seluruh parameter refleks neurologis primitif (rooting, sucking, moro, plantar) bayi muda berkembang baik dan simetris. Tali pusar terawat bersih, sirkulasi paru-jantung stabil, dan berat badan adaptif berada pada kurva normal rujukan standar nasional Kemenkes RI.
+                </p>
+              </div>
+              
+              <div className="p-3 bg-[#EA2986]/5 border border-[#EA2986]/20 text-[10px] font-bold text-gray-500 rounded-xl">
+                * Tanda penandaan strip (—) menandakan parameter tidak ada masalah atau tidak memerlukan tindakan rujukan terencana harian.
+              </div>
+            </div>
+
+          </div>
+        );
+      })()}
 
       {/* ─── RENDER TABS 4: PELAYANAN GIZI (PMBA, VIT A) & CATATAN KESEHATAN GIGI ─── */}
       {activeTab === "gizi" && (
@@ -2889,15 +3462,17 @@ function RekamMedisAnakContent() {
           {/* KONTEN SUB-TAB 1: MATRIKS KOMPREHENSIF PMBA */}
           {activeGiziSubTab === "matriks_gizi" && (
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
-              <div className="flex justify-between items-center border-b pb-3">
-              <div>
-                <h3 className="text-sm font-black text-gray-900">Pelayanan Gizi (PMBA) Berkala</h3>
-                <p className="text-[11px] text-gray-400 mt-0.5">Matriks evaluasi nasihat pemberian ASI, variasi, tekstur, porsi, dan frekuensi MPASI per bulan.</p>
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b pb-3">
+                <div>
+                  <h3 className="text-sm font-black text-gray-900">Pelayanan Gizi (PMBA) Berkala</h3>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Matriks evaluasi nasihat pemberian ASI, variasi, tekstur, porsi, dan frekuensi MPASI. Klik tombol <MdEdit className="inline" /> di setiap header kolom usia untuk mengedit.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded uppercase tracking-wider">
+                    Diisi Oleh Tenaga Kesehatan
+                  </span>
+                </div>
               </div>
-              <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded uppercase tracking-wider">
-                Diisi Oleh Tenaga Kesehatan
-              </span>
-            </div>
 
             <div className="border rounded-xl overflow-hidden shadow-2xs overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[950px]">
@@ -2905,16 +3480,29 @@ function RekamMedisAnakContent() {
                   <tr className="bg-gray-900 text-[10px] font-extrabold text-white uppercase tracking-wider text-center">
                     <th className="py-2.5 px-3 text-left w-1/5 bg-gray-900 sticky left-0 z-10">Nasihat Klinis</th>
                     <th className="py-2.5 px-3 text-left w-1/5 bg-gray-800">Detail Parameter</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-16">0 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-16">1 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-16">2 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-16">3 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-16">4 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-16">5 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-20 bg-pink-950/10">6-8 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-20 bg-pink-950/10">9-11 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-24 bg-emerald-950/10">12-23 Bln</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700 w-24 bg-emerald-950/10">23-59 Bln</th>
+                    {[
+                      { key: "0", label: "0 Bln" },
+                      { key: "1", label: "1 Bln" },
+                      { key: "2", label: "2 Bln" },
+                      { key: "3", label: "3 Bln" },
+                      { key: "4", label: "4 Bln" },
+                      { key: "5", label: "5 Bln" },
+                      { key: "6_8", label: "6-8 Bln", bg: "bg-pink-950/20" },
+                      { key: "9_11", label: "9-11 Bln", bg: "bg-pink-950/20" },
+                      { key: "12_23", label: "12-23 Bln", bg: "bg-emerald-950/20" },
+                      { key: "23_59", label: "23-59 Bln", bg: "bg-emerald-950/20" },
+                    ].map((col) => (
+                      <th key={col.key} className={`py-2 px-1 border-l border-gray-700 ${col.bg || ""}`}>
+                        <div className="text-[10px] font-black text-white">{col.label}</div>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditGiziCol(col.key, col.label)}
+                          className="mt-1 text-[9px] font-black text-amber-950 bg-amber-400 hover:bg-amber-300 px-1.5 py-0.5 rounded transition cursor-pointer"
+                        >
+                          <MdEdit /> Edit
+                        </button>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="text-xs bg-white text-gray-700 font-medium divide-y divide-gray-100 text-center">
@@ -2923,102 +3511,134 @@ function RekamMedisAnakContent() {
                   <tr>
                     <td className="p-2 px-3 font-black text-left bg-gray-100 sticky left-0" rowSpan={3}>ASI</td>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Frekuensi menyusui</td>
-                    <td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+                    {["0","1","2","3","4","5","6_8","9_11","12_23","23_59"].map((k) => (
+                      <td key={k} className="text-emerald-600 font-bold">{giziPmbaData?.asi_frekuensi?.[k] || "✓"}</td>
+                    ))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Posisi Menyusu (Pelekatan)</td>
-                    <td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+                    {["0","1","2","3","4","5","6_8","9_11","12_23","23_59"].map((k) => (
+                      <td key={k} className="text-emerald-600 font-bold">{giziPmbaData?.asi_posisi?.[k] || "✓"}</td>
+                    ))}
                   </tr>
                   <tr>
-                    <td className="p-2 px-3 text-left bg-gray-50/50">Asi Perah</td>
-                    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+                    <td className="p-2 px-3 text-left bg-gray-50/50">ASI Perah</td>
+                    {["0","1","2","3","4","5","6_8","9_11","12_23","23_59"].map((k) => (
+                      <td key={k}>{giziPmbaData?.asi_perah?.[k] || "-"}</td>
+                    ))}
                   </tr>
 
                   {/* KLASTER MPASI */}
                   <tr>
                     <td className="p-2 px-3 font-black text-left bg-gray-100 sticky left-0" rowSpan={2}>MPASI</td>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Ya</td>
-                    <td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td>
+                    {["0","1","2","3","4","5"].map((k) => (
+                      <td key={k} className="text-gray-300 bg-gray-50/50">❌</td>
+                    ))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (
+                      <td key={k} className="text-emerald-600 font-bold">{giziPmbaData?.mpasi_ya?.[k] || "✓"}</td>
+                    ))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Tidak</td>
-                    <td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td><td className="text-gray-300 bg-gray-50/50">❌</td>
+                    {["0","1","2","3","4","5"].map((k) => (
+                      <td key={k} className="text-emerald-600 font-bold">✓</td>
+                    ))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (
+                      <td key={k} className="text-gray-300 bg-gray-50/50">{giziPmbaData?.mpasi_tidak?.[k] || "❌"}</td>
+                    ))}
                   </tr>
 
                   {/* KLASTER VARIASI MPASI */}
                   <tr>
                     <td className="p-2 px-3 font-black text-left bg-gray-100 sticky left-0" rowSpan={6}>Variasi MPASI</td>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Beras / Makanan Pokok</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className="text-emerald-600 font-bold">{giziPmbaData?.variasi_pokok?.[k] || "✓"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Lauk / Protein (Hewani/Nabati)</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-emerald-600 font-bold">✓ (Hewani)</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className="text-emerald-600 font-bold">{giziPmbaData?.variasi_lauk?.[k] || "✓"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Minyak / Lemak</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td><td className="text-emerald-600 font-bold">✓</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className="text-emerald-600 font-bold">{giziPmbaData?.variasi_minyak?.[k] || "✓"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Sayur</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k}>{giziPmbaData?.variasi_sayur?.[k] || "✓"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Buah</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k}>{giziPmbaData?.variasi_buah?.[k] || "✓"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Lainnya</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k}>{giziPmbaData?.variasi_lainnya?.[k] || "-"}</td>))}
                   </tr>
 
                   {/* KLASTER TEKSTUR MPASI */}
                   <tr>
                     <td className="p-2 px-3 font-black text-left bg-gray-100 sticky left-0" rowSpan={4}>Tekstur MPASI</td>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Disaring</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-indigo-600 font-bold">✓ Saring</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.tekstur_saring?.[k] === "✓ Saring" ? "text-indigo-600 font-bold" : "text-gray-300"}>{giziPmbaData?.tekstur_saring?.[k] || "❌"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Dihaluskan</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-indigo-600 font-bold">✓ Lumat</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.tekstur_lumat?.[k] === "✓ Lumat" ? "text-indigo-600 font-bold" : "text-gray-300"}>{giziPmbaData?.tekstur_lumat?.[k] || "❌"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Dicincang</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-300">❌</td><td className="text-indigo-600 font-bold">✓ Cincang</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.tekstur_cincang?.[k] === "✓ Cincang" ? "text-indigo-600 font-bold" : "text-gray-300"}>{giziPmbaData?.tekstur_cincang?.[k] || "❌"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Makanan Rumah</td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-indigo-600 font-bold">✓ Menu Keluarga</td><td className="text-indigo-600 font-bold">✓ Menu Keluarga</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.tekstur_keluarga?.[k] ? "text-indigo-600 font-bold" : "text-gray-300"}>{giziPmbaData?.tekstur_keluarga?.[k] || "❌"}</td>))}
                   </tr>
 
                   {/* KLASTER JUMLAH MAKAN */}
                   <tr>
                     <td className="p-2 px-3 font-black text-left bg-gray-100 sticky left-0" rowSpan={4}>Jumlah Setiap Kali Makan</td>
-                    <td className="p-2 px-3 text-left bg-gray-50/50">2 - 3 sdm <span className="text-[10px] text-gray-400 block font-normal">(1/2 mangkok ukuran 250ml)</span></td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-emerald-600 font-bold">✓ Terpenuhi</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td>
+                    <td className="p-2 px-3 text-left bg-gray-50/50">2 - 3 sdm <span className="text-[10px] text-gray-400 block font-normal">(1/2 mangkok 250ml)</span></td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.porsi_1?.[k] === "✓ Terpenuhi" ? "text-emerald-600 font-bold" : "text-gray-300"}>{giziPmbaData?.porsi_1?.[k] || "❌"}</td>))}
                   </tr>
                   <tr>
-                    <td className="p-2 px-3 text-left bg-gray-50/50">1/2 - 3/4 mangkok <span className="text-[10px] text-gray-400 block font-normal">(ukuran 250ml)</span></td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-300">❌</td><td className="text-emerald-600 font-bold">✓ Terpenuhi</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td>
+                    <td className="p-2 px-3 text-left bg-gray-50/50">1/2 - 3/4 mangkok <span className="text-[10px] text-gray-400 block font-normal">(250ml)</span></td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.porsi_2?.[k] === "✓ Terpenuhi" ? "text-emerald-600 font-bold" : "text-gray-300"}>{giziPmbaData?.porsi_2?.[k] || "❌"}</td>))}
                   </tr>
                   <tr>
-                    <td className="p-2 px-3 text-left bg-gray-50/50">3/4 - 1 mangkok <span className="text-[10px] text-gray-400 block font-normal">(ukuran 250ml)</span></td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-emerald-600 font-bold">✓ Terpenuhi</td><td className="text-gray-300">❌</td>
+                    <td className="p-2 px-3 text-left bg-gray-50/50">3/4 - 1 mangkok <span className="text-[10px] text-gray-400 block font-normal">(250ml)</span></td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.porsi_3?.[k] === "✓ Terpenuhi" ? "text-emerald-600 font-bold" : "text-gray-300"}>{giziPmbaData?.porsi_3?.[k] || "❌"}</td>))}
                   </tr>
                   <tr>
-                    <td className="p-2 px-3 text-left bg-gray-50/50">1 mangkok <span className="text-[10px] text-gray-400 block font-normal">(ukuran 250ml)</span></td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-gray-300">❌</td><td className="text-emerald-600 font-bold">✓ Terpenuhi</td>
+                    <td className="p-2 px-3 text-left bg-gray-50/50">1 mangkok <span className="text-[10px] text-gray-400 block font-normal">(250ml)</span></td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className={giziPmbaData?.porsi_4?.[k] === "✓ Terpenuhi" ? "text-emerald-600 font-bold" : "text-gray-300"}>{giziPmbaData?.porsi_4?.[k] || "❌"}</td>))}
                   </tr>
 
                   {/* KLASTER FREKUENSI MAKAN */}
                   <tr>
                     <td className="p-2 px-3 font-black text-left bg-gray-100 sticky left-0" rowSpan={2}>Frekuensi Makan</td>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Makanan Utama <span className="text-[10px] text-gray-400 block font-normal">(3x / hari)</span></td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-indigo-600 font-bold">2x Sehari</td><td className="text-indigo-600 font-bold">3x Sehari</td><td className="text-indigo-600 font-bold">3x Sehari</td><td className="text-indigo-600 font-bold">3x Sehari</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k} className="text-indigo-600 font-bold">{giziPmbaData?.frekuensi_utama?.[k] || "3x Sehari"}</td>))}
                   </tr>
                   <tr>
                     <td className="p-2 px-3 text-left bg-gray-50/50">Makanan Selingan <span className="text-[10px] text-gray-400 block font-normal">(2x / hari)</span></td>
-                    <td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td className="text-gray-200 bg-gray-100">-</td><td>✓ 1-2x</td><td>✓ 2x</td><td>✓ 2x</td><td>✓ 2x</td>
+                    {["0","1","2","3","4","5"].map((k) => (<td key={k} className="text-gray-200 bg-gray-100">-</td>))}
+                    {["6_8","9_11","12_23","23_59"].map((k) => (<td key={k}>{giziPmbaData?.frekuensi_selingan?.[k] || "✓ 2x"}</td>))}
                   </tr>
 
                 </tbody>
@@ -3030,22 +3650,37 @@ function RekamMedisAnakContent() {
           {/* KONTEN SUB-TAB 2: KAPSUL VITAMIN A & OBAT CACING */}
           {activeGiziSubTab === "vit_a" && (
             <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-4">
-              <div>
-              <h3 className="text-sm font-black text-gray-900">Pemberian Vitamin A &amp; Obat Cacing</h3>
-              <p className="text-[11px] text-gray-400 mt-0.5">Matriks validasi pemberian berkala. Kotak abu-abu menandakan bulan/tahun yang tidak diperbolehkan menerima produk medis.</p>
-            </div>
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b pb-3">
+                <div>
+                  <h3 className="text-sm font-black text-gray-900">Pemberian Vitamin A &amp; Obat Cacing</h3>
+                  <p className="text-[11px] text-gray-400 mt-0.5">Matriks validasi pemberian berkala. Klik <MdEdit className="inline" /> Edit pada header kolom usia untuk mencatat tanggal &amp; batch.</p>
+                </div>
+              </div>
 
             <div className="border rounded-xl overflow-hidden shadow-2xs overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[750px]">
                 <thead>
                   <tr className="bg-gray-800 text-[10px] font-extrabold text-white uppercase tracking-wider text-center">
                     <th className="py-2.5 px-3 text-left w-1/4 bg-gray-900">Vitamin A dan Obat Cacing</th>
-                    <th className="py-2.5 px-3 w-28 border-l border-gray-700">Bulan 6 - 11</th>
-                    <th className="py-2.5 px-3 w-28 border-l border-gray-700">Tahun 1 - 2</th>
-                    <th className="py-2.5 px-3 w-28 border-l border-gray-700">Tahun 2 - 3</th>
-                    <th className="py-2.5 px-3 w-28 border-l border-gray-700">Tahun 3 - 4</th>
-                    <th className="py-2.5 px-3 w-28 border-l border-gray-700">Tahun 4 - 5</th>
-                    <th className="py-2.5 px-3 w-28 border-l border-gray-700">Tahun 5 - 6</th>
+                    {[
+                      { key: "bln_6_11", label: "Bulan 6 - 11" },
+                      { key: "th1", label: "Tahun 1 - 2" },
+                      { key: "th2", label: "Tahun 2 - 3" },
+                      { key: "th3", label: "Tahun 3 - 4" },
+                      { key: "th4", label: "Tahun 4 - 5" },
+                      { key: "th5", label: "Tahun 5 - 6" },
+                    ].map((col) => (
+                      <th key={col.key} className="py-2.5 px-2 w-28 border-l border-gray-700">
+                        <div className="text-[10px] font-black text-white">{col.label}</div>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditVitACol(col.key, col.label)}
+                          className="mt-1 text-[9px] font-black text-blue-950 bg-blue-400 hover:bg-blue-300 px-1.5 py-0.5 rounded transition cursor-pointer"
+                        >
+                          <MdEdit /> Edit
+                        </button>
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="text-xs bg-white font-bold text-gray-700 divide-y divide-gray-100 text-center">
@@ -3057,8 +3692,14 @@ function RekamMedisAnakContent() {
                       <span className="text-[10px] text-gray-400 font-normal block">(100.000 IU) — Februari / Agustus</span>
                     </td>
                     <td className="bg-emerald-50 text-emerald-700 font-black text-xs">
-                      14/08/2026<br/>
-                      <span className="text-[9px] font-normal text-gray-400">Batch: A26-BLU</span>
+                      {vitAObatCacingData?.vitA_biru?.tanggal ? (
+                        <>
+                          {vitAObatCacingData.vitA_biru.tanggal}<br/>
+                          <span className="text-[9px] font-normal text-gray-400">Batch: {vitAObatCacingData.vitA_biru.batch || "-"}</span>
+                        </>
+                      ) : (
+                        <span className="text-gray-400 font-normal">Belum Diberikan</span>
+                      )}
                     </td>
                     <td className="bg-gray-200/70 text-gray-400 font-normal">❌ Disabled</td>
                     <td className="bg-gray-200/70 text-gray-400 font-normal">❌ Disabled</td>
@@ -3067,42 +3708,48 @@ function RekamMedisAnakContent() {
                     <td className="bg-gray-200/70 text-gray-400 font-normal">❌ Disabled</td>
                   </tr>
 
-                  {/* VIT A KAPSUL MERAH FEBRUARI */}
+                  {/* VIT A KAPSUL MERAH FEBRUARI & AGUSTUS */}
                   <tr>
-                    <td className="p-3 text-left bg-gray-50/70" rowSpan={2}>
+                    <td className="p-3 text-left bg-gray-50/70">
                       <span className="text-rose-600 block">🔴 VIT A KAPSUL MERAH</span>
                       <span className="text-[10px] text-gray-400 font-normal block">(200.000 IU) — Setiap Februari &amp; Agustus</span>
                     </td>
                     <td className="bg-gray-200/70 text-gray-400 font-normal">❌ Disabled</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                  </tr>
-                  
-                  {/* VIT A KAPSUL MERAH AGUSTUS */}
-                  <tr>
-                    <td className="bg-gray-200/70 text-gray-400 font-normal">❌ Disabled</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
+                    {["th1","th2","th3","th4","th5"].map((k) => {
+                      const item = vitAObatCacingData?.[`vitA_merah_${k}`];
+                      return (
+                        <td key={k} className={item?.tanggal ? "bg-rose-50 text-rose-700 font-black text-xs" : "text-gray-400 font-medium"}>
+                          {item?.tanggal ? (
+                            <>
+                              {item.tanggal}<br/>
+                              <span className="text-[9px] font-normal text-gray-400">Batch: {item.batch || "-"}</span>
+                            </>
+                          ) : "Belum"}
+                        </td>
+                      );
+                    })}
                   </tr>
 
                   {/* OBAT CACING */}
                   <tr>
                     <td className="p-3 text-left bg-gray-50/70">
-                      <span className="text-amber-700 block">💊 OBAT CACING</span>
+                      <span className="text-amber-700 flex items-center gap-1 font-black"><MdMedication className="text-base" /> OBAT CACING</span>
                       <span className="text-[10px] text-gray-400 font-normal block">Pencegahan Infeksi Parasit Cacingan</span>
                     </td>
-                    <td className="bg-gray-200/70 text-gray-400 font-normal">❌ Disabled</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
-                    <td className="text-gray-400 font-medium">Belum</td>
+                    <td className="bg-gray-200/70 text-gray-400 font-normal">— Disabled</td>
+                    {["th1","th2","th3","th4","th5"].map((k) => {
+                      const item = vitAObatCacingData?.[`cacing_${k}`];
+                      return (
+                        <td key={k} className={item?.tanggal ? "bg-amber-50 text-amber-800 font-black text-xs" : "text-gray-400 font-medium"}>
+                          {item?.tanggal ? (
+                            <>
+                              {item.tanggal}<br/>
+                              <span className="text-[9px] font-normal text-gray-400">Batch: {item.batch || "-"}</span>
+                            </>
+                          ) : "Belum"}
+                        </td>
+                      );
+                    })}
                   </tr>
 
                 </tbody>
@@ -3132,7 +3779,8 @@ function RekamMedisAnakContent() {
                       <th className="py-2.5 px-2 border-r border-gray-700" colSpan={2}>Pemeriksaan</th>
                       <th className="py-2.5 px-2 border-r border-gray-700" colSpan={2}>Jumlah Gigi</th>
                       <th className="py-2.5 px-2 border-r border-gray-700" colSpan={2}>Plak</th>
-                      <th className="py-2.5 px-2" colSpan={3}>Risiko Gigi Berlubang</th>
+                      <th className="py-2.5 px-2 border-r border-gray-700" colSpan={3}>Risiko Gigi Berlubang</th>
+                      <th className="py-2.5 px-2">Aksi</th>
                     </tr>
                     <tr className="bg-gray-800 text-[9px] font-bold text-white text-center">
                       <th className="py-2 px-1 border-r border-gray-600 w-16">Bulan</th>
@@ -3143,22 +3791,12 @@ function RekamMedisAnakContent() {
                       <th className="py-2 px-1 border-r border-gray-600 w-16">Kotor</th>
                       <th className="py-2 px-1 border-r border-gray-600 w-20 bg-rose-950/40">Tinggi</th>
                       <th className="py-2 px-1 border-r border-gray-600 bg-amber-950/40">Sedang</th>
-                      <th className="py-2 px-1 bg-emerald-950/40">Rendah</th>
+                      <th className="py-2 px-1 border-r border-gray-600 bg-emerald-950/40">Rendah</th>
+                      <th className="py-2 px-1 w-14">Edit</th>
                     </tr>
                   </thead>
                   <tbody className="text-xs bg-white text-gray-800 font-medium divide-y divide-gray-400 text-center">
-                    {[
-                      { bln: "9 M", tgl: "14/06/2026", ada: "2", lubang: "0", bersih: "✓", kotor: "", r: "Rendah" },
-                      { bln: "12 M", tgl: "14/09/2026", ada: "4", lubang: "0", bersih: "✓", kotor: "", r: "Rendah" },
-                      { bln: "18 M", tgl: "14/03/2027", ada: "8", lubang: "0", bersih: "✓", kotor: "", r: "Rendah" },
-                      { bln: "24 M", tgl: "14/09/2027", ada: "12", lubang: "1", bersih: "", kotor: "✓", r: "Sedang" },
-                      { bln: "30 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
-                      { bln: "36 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
-                      { bln: "42 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
-                      { bln: "48 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
-                      { bln: "54 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
-                      { bln: "60 M", tgl: "", ada: "", lubang: "", bersih: "", kotor: "", r: "" },
-                    ].map((row, idx) => (
+                    {(gigiRecordsData.length > 0 ? gigiRecordsData : DEFAULT_GIGI_RECORDS).map((row, idx) => (
                       <tr key={idx} className="hover:bg-gray-50/40">
                         <td className="p-2.5 font-black bg-gray-50 border-r border-gray-400 text-gray-900">{row.bln}</td>
                         <td className="p-2.5 border-r border-gray-400 text-gray-600 font-mono">{row.tgl || "—"}</td>
@@ -3174,7 +3812,17 @@ function RekamMedisAnakContent() {
                         <td className={`p-2.5 border-r border-gray-400 transition-colors ${row.r === "Sedang" ? "bg-amber-100 text-amber-800 font-black" : "bg-amber-50/20 text-transparent"}`}>● Sedang</td>
                         
                         {/* Kolom Risiko Rendah (Arsir Hijau jika aktif) */}
-                        <td className={`p-2.5 transition-colors ${row.r === "Rendah" ? "bg-emerald-100 text-emerald-700 font-black" : "bg-emerald-50/20 text-transparent"}`}>✓ Rendah</td>
+                        <td className={`p-2.5 border-r border-gray-400 transition-colors ${row.r === "Rendah" ? "bg-emerald-100 text-emerald-700 font-black" : "bg-emerald-50/20 text-transparent"}`}>✓ Rendah</td>
+
+                        <td className="p-2">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditGigiModal(row, idx)}
+                            className="px-2 py-1 text-[11px] font-black text-[#EA2986] bg-pink-50 hover:bg-pink-100 border border-pink-200 rounded-lg transition cursor-pointer"
+                          >
+                            <MdEdit />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -3233,9 +3881,6 @@ function RekamMedisAnakContent() {
                 </div>
               ))}
             </div>
-            <div className="text-[9px] text-gray-400 font-medium space-y-0.5 leading-normal pt-1">
-              <p>* Ket: <strong>RV</strong>: Rotavirus (introduksi wilayah), <strong>JE</strong>: Japanese Encephalitis (hanya daerah endemis).</p>
-            </div>
           </div>
 
           {/* BENTO CARD 2: MATRIKS FORMAT FORMAL REKAM IMUNISASI BUKU KIA */}
@@ -3256,7 +3901,10 @@ function RekamMedisAnakContent() {
                 <thead>
                   <tr className="bg-gray-900 text-[10px] font-extrabold text-white uppercase tracking-wider text-center">
                     <th className="py-2.5 px-3 text-left w-64 bg-gray-900 sticky left-0 z-10" rowSpan={2}>Jenis Vaksin &amp; No. Batch</th>
-                    <th className="py-2.5 px-2 border-l border-gray-700" colSpan={17}>Pemberian Berdasarkan Usia Rentang Bulan Anak</th>
+                    <th className="py-2.5 px-2 border-l border-gray-700" colSpan={16}>Pemberian Berdasarkan Usia Rentang Bulan Anak</th>
+                    {role === "nakes" && (
+                      <th className="py-2.5 px-2 border-l border-gray-700 w-16" rowSpan={2}>Aksi</th>
+                    )}
                   </tr>
                   <tr className="bg-gray-800 text-[9px] font-bold text-white text-center">
                     {/* Header Kolom Bulan 0 s/d 23-59 sesuai gambar Buku KIA */}
@@ -3266,38 +3914,28 @@ function RekamMedisAnakContent() {
                   </tr>
                 </thead>
                 <tbody className="text-[11px] bg-white text-gray-700 font-medium divide-y divide-gray-100 text-center">
-                  
-                  {[
-                    { nama: "Hepatitis B (<24 Jam)", target: [0], done: "14/09/26", batch: "B-HB091", yellow: [], pink: [] },
-                    { nama: "BCG", target: [1], done: "14/10/26", batch: "B-BCG22", yellow: [2,3,4,5,6,7,8,9,10,11], pink: [] },
-                    { nama: "Polio Tetes 1 (OPV 1)", target: [1], done: "14/10/26", batch: "B-OPV01", yellow: [2,3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16] },
-                    { nama: "DPT-HB-Hib 1", target: [2], done: "", batch: "", yellow: [3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1] },
-                    { nama: "Polio Tetes 2 (OPV 2)", target: [2], done: "", batch: "", yellow: [3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1] },
-                    { nama: "Rotavirus (RV) 1*", target: [2], done: "", batch: "", yellow: [3,4,5], pink: [], gray: [0,1,6,7,8,9,10,11,12,13,14,15,16] },
-                    { nama: "PCV 1", target: [2], done: "", batch: "", yellow: [3,4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1] },
-                    { nama: "DPT-HB-Hib 2", target: [3], done: "", batch: "", yellow: [4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2] },
-                    { nama: "Polio Tetes 3 (OPV 3)", target: [3], done: "", batch: "", yellow: [4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2] },
-                    { nama: "Rotavirus (RV) 2*", target: [3], done: "", batch: "", yellow: [4,5], pink: [], gray: [0,1,2,6,7,8,9,10,11,12,13,14,15,16] },
-                    { nama: "PCV 2", target: [3], done: "", batch: "", yellow: [4,5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2] },
-                    { nama: "DPT-HB-Hib 3", target: [4], done: "", batch: "", yellow: [5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2,3] },
-                    { nama: "Polio Tetes 4 (OPV 4)", target: [4], done: "", batch: "", yellow: [5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2,3] },
-                    { nama: "Polio Suntik (IPV) 1", target: [4], done: "", batch: "", yellow: [5,6,7,8,9,10,11], pink: [12,13,14,15,16], gray: [0,1,2,3] },
-                    { nama: "Rotavirus (RV) 3*", target: [4], done: "", batch: "", yellow: [5,6], pink: [], gray: [0,1,2,3,7,8,9,10,11,12,13,14,15,16] }, // 👈 RV3 pada kolom ke-6 (6 M) masuk yellow arsir kuning
-                    { nama: "Campak -Rubella (MR)", target: [9], done: "", batch: "", yellow: [10,11], pink: [12,13,14,15,16], gray: [0,1,2,3,4,5,6,7,8] },
-                    { nama: "Polio Suntik (IPV) 2*", target: [9], done: "", batch: "", yellow: [10,11], pink: [12,13,14,15,16], gray: [0,1,2,3,4,5,6,7,8] },
-                    { nama: "*Japanese Encephalitis (JE)", target: [10], done: "", batch: "", yellow: [], pink: [11,12,13,14,15,16], gray: [0,1,2,3,4,5,6,7,8,9] }, // 👈 Insert JE sebelum PCV 3
-                    { nama: "PCV 3 Lanjutan", target: [12], done: "", batch: "", yellow: [13,14], pink: [15,16], gray: [0,1,2,3,4,5,6,7,8,9,10,11] }, // 👈 Memakai Rose full
-                    { nama: "DPT-HB-Hib Lanjutan", target: [13], done: "", batch: "", yellow: [14], pink: [,15,16], gray: [0,1,2,3,4,5,6,7,8,9,10,11,12] }, // 👈 Memakai Rose full
-                    { nama: "Campak Rubella Lanjutan", target: [13], done: "", batch: "", yellow: [14], pink: [15,16], gray: [0,1,2,3,4,5,6,7,8,9,10,11,12] }, // 👈 Memakai Rose full
-                  ].map((row, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50/40 transition-colors">
-                      {/* Sisi Kiri Terkunci: Nama Vaksin & Slot Batch */}
-                      <td className="p-2 px-3 text-left bg-gray-50 sticky left-0 font-bold border-r shadow-3xs z-10">
-                        <span className="text-gray-900 block">{row.nama}</span>
+                  {imunisasiData.map((row, idx) => {
+                    const isEditing = editingImunisasiId === row.id;
+                    return (
+                    <tr key={row.id || idx} className="hover:bg-gray-50/40 transition-colors">
+                      {/* Sisi Kiri Terkunci: Nama Vaksin & Slot Batch + Metadata */}
+                      <td className="p-2 px-3 text-left bg-gray-50 sticky left-0 font-bold border-r shadow-3xs z-10 min-w-[160px]">
+                        <span className="text-gray-900 block text-[11px]">{row.nama}</span>
                         {row.batch ? (
-                          <span className="text-[9px] font-mono font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded mt-0.5 inline-block">No. Batch: {row.batch}</span>
+                          <span className="text-[9px] font-mono font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded mt-0.5 inline-block">Batch: {row.batch}</span>
                         ) : (
-                          <span className="text-[9px] text-gray-300 font-normal italic block">No Batch: ................</span>
+                          <span className="text-[9px] text-gray-300 font-normal italic block">Batch: —</span>
+                        )}
+                        {row.nakes && (
+                          <span className="text-[9px] text-emerald-600 font-semibold block mt-0.5 truncate max-w-[155px]">👩‍⚕️ {row.nakes}</span>
+                        )}
+                        {row.status && row.status !== "Belum" && (
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded inline-block mt-0.5 ${
+                            row.status === "Tepat Jadwal" ? "bg-emerald-100 text-emerald-700" :
+                            row.status === "Terlambat" ? "bg-amber-100 text-amber-700" :
+                            row.status === "Terlewat" ? "bg-rose-100 text-rose-700" :
+                            "bg-gray-100 text-gray-600"
+                          }`}>{row.status}</span>
                         )}
                       </td>
 
@@ -3307,29 +3945,126 @@ function RekamMedisAnakContent() {
                         const isYellow = row.yellow?.includes(cIdx);
                         const isPink = row.pink?.includes(cIdx);
                         const isGray = row.gray?.includes(cIdx);
+                        const isDone = isTarget && !!row.done;
+                        const isActiveEdit = isEditing && isTarget;
 
-                        // Pengondisian Background Warna Cell Matriks
-                        let cellStyle = "bg-white"; 
-                        if (isTarget && row.done) cellStyle = "bg-emerald-50 text-emerald-700 font-black text-[10px]";
-                        else if (isYellow) cellStyle = "bg-amber-100/60"; // Kuning: Diperbolehkan melengkapi
-                        else if (isPink) cellStyle = "bg-pink-100/50"; // Rose/Pink: Imunisasi Kejar / Booster Lanjutan
-                        else if (isGray || (!isTarget && !isYellow && !isPink)) cellStyle = "bg-gray-200 text-gray-400 font-normal select-none"; 
+                        // Background warna cell
+                        let cellBg = "bg-white";
+                        if (isActiveEdit) cellBg = "bg-white ring-2 ring-[#EA2986] ring-inset";
+                        else if (isDone) cellBg = "bg-emerald-50 text-emerald-700";
+                        else if (isYellow) cellBg = "bg-amber-100/60";
+                        else if (isPink) cellBg = "bg-pink-100/50";
+                        else if (isGray || (!isTarget && !isYellow && !isPink)) cellBg = "bg-gray-200 text-gray-400 font-normal select-none";
+
+                        // Nakes: klik cell target untuk inline edit
+                        const canClickToEdit = role === "nakes" && isTarget && !isEditing;
+                        const canClickToClearEdit = role === "nakes" && isTarget && isEditing;
+
+                        if (isActiveEdit) {
+                          // ── MODE INLINE EDIT ──
+                          return (
+                            <td key={cIdx} className={`border border-[#EA2986] border-2 align-top p-1.5 ${cellBg}`} style={{ minWidth: 140 }}>
+                              <div className="flex flex-col gap-1">
+                                {/* Tanggal */}
+                                <input
+                                  type="date"
+                                  value={inlineImunisasiForm.tgl
+                                    ? (() => {
+                                        const p = inlineImunisasiForm.tgl.split("/");
+                                        if (p.length === 3) {
+                                          const [d, m, y] = p;
+                                          return y.length === 4 ? `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}` : inlineImunisasiForm.tgl;
+                                        }
+                                        return inlineImunisasiForm.tgl;
+                                      })()
+                                    : ""
+                                  }
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (!v) { setInlineImunisasiForm(f => ({...f, tgl: ""})); return; }
+                                    const [y,m,d] = v.split("-");
+                                    setInlineImunisasiForm(f => ({...f, tgl: `${d}/${m}/${y}`}));
+                                  }}
+                                  className="w-full text-[9px] border border-gray-300 rounded-md px-1 py-0.5 font-bold outline-none focus:border-[#EA2986] bg-white cursor-pointer"
+                                />
+                                {/* Batch */}
+                                <input
+                                  type="text"
+                                  value={inlineImunisasiForm.batch}
+                                  onChange={(e) => setInlineImunisasiForm(f => ({...f, batch: e.target.value}))}
+                                  placeholder="No. Batch"
+                                  className="w-full text-[9px] border border-gray-300 rounded-md px-1 py-0.5 font-mono font-bold outline-none focus:border-[#EA2986] bg-white"
+                                />
+                                {/* Nakes */}
+                                <input
+                                  type="text"
+                                  value={inlineImunisasiForm.nakes}
+                                  onChange={(e) => setInlineImunisasiForm(f => ({...f, nakes: e.target.value}))}
+                                  placeholder="Nama Nakes"
+                                  className="w-full text-[9px] border border-gray-300 rounded-md px-1 py-0.5 font-bold outline-none focus:border-[#EA2986] bg-white"
+                                />
+                                {/* Status */}
+                                <select
+                                  value={inlineImunisasiForm.status}
+                                  onChange={(e) => setInlineImunisasiForm(f => ({...f, status: e.target.value}))}
+                                  className="w-full text-[9px] border border-gray-300 rounded-md px-1 py-0.5 font-bold outline-none focus:border-[#EA2986] bg-white cursor-pointer"
+                                >
+                                  <option value="Tepat Jadwal">✓ Tepat Jadwal</option>
+                                  <option value="Terlambat">! Terlambat</option>
+                                  <option value="Terlewat">✗ Terlewat</option>
+                                  <option value="Kontraindikasi">⊘ Kontraindikasi</option>
+                                </select>
+                                {/* Aksi tombol */}
+                                <div className="flex gap-1 mt-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSaveInlineImunisasi(row.id)}
+                                    className="flex-1 text-[9px] font-black text-white bg-[#EA2986] hover:bg-[#D01F75] rounded-md py-0.5 transition cursor-pointer"
+                                  >✓</button>
+                                  <button
+                                    type="button"
+                                    onClick={handleCancelInlineImunisasi}
+                                    className="flex-1 text-[9px] font-black text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-md py-0.5 transition cursor-pointer"
+                                  >✕</button>
+                                </div>
+                              </div>
+                            </td>
+                          );
+                        }
 
                         return (
-                          <td key={cIdx} className={`p-2 border border-gray-400 font-bold leading-tight ${cellStyle}`}>
-                            {isTarget && row.done ? (
-                              <>
-                                <span>{row.done}</span>
-                                <span className="block text-[8px] text-emerald-600">✓ Done</span>
-                              </>
-                            ) : (
-                              ""
-                            )}
+                          <td
+                            key={cIdx}
+                            onClick={canClickToEdit ? () => handleStartInlineImunisasi(row) : undefined}
+                            className={`border border-gray-400 font-bold leading-tight transition ${
+                              canClickToEdit
+                                ? "cursor-pointer hover:ring-2 hover:ring-[#EA2986]/50 hover:ring-inset hover:bg-white"
+                                : ""
+                            } ${
+                              isDone ? "p-2 text-[10px]" : "p-2"
+                            } ${cellBg}`}
+                          >
+                            {isDone ? (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span className="font-black">{row.tgl || row.done}</span>
+                                <span className="text-[8px] text-emerald-600">✓ Selesai</span>
+                                {role === "nakes" && isTarget && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); handleStartInlineImunisasi(row); }}
+                                    className="text-[8px] text-[#EA2986] hover:underline mt-0.5 cursor-pointer"
+                                  >edit</button>
+                                )}
+                              </div>
+                            ) : isTarget && role === "nakes" ? (
+                              <span className="text-[9px] text-gray-300 italic">+ isi</span>
+                            ) : ""}
                           </td>
                         );
                       })}
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -3487,7 +4222,7 @@ function RekamMedisAnakContent() {
                   if (isExisting) {
                     return (
                       <div className="bg-amber-50 border border-amber-300 rounded-xl p-2.5 mt-2 flex items-start gap-2 text-[11px] text-amber-900 font-semibold leading-snug">
-                        <span className="text-sm">⚠️</span>
+                        <MdWarning className="text-base shrink-0" />
                         <span>
                           Usia <strong>{selMonth} Bulan</strong> sudah memiliki data LiLA (<strong>{lilaRecords[selMonth]?.val} cm</strong>). Menyimpan data ini akan <strong>memperbarui (mengedit)</strong> data yang sudah ada.
                         </span>
@@ -3665,195 +4400,194 @@ function RekamMedisAnakContent() {
         </div>
       )}
 
-      {/* ─── MODAL EDIT MATRIKS PELAYANAN KESEHATAN ANAK ─── */}
+      {/* ─── MODAL EDIT MATRIKS PELAYANAN KESEHATAN ANAK (PER KOLOM KUNJUNGAN) ─── */}
       {showEditPelayananModal && editPelayananTarget && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-gray-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3 border-gray-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-pink-100 text-[#EA2986] flex items-center justify-center text-lg font-black">
-                  ✏️
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl font-black shadow-2xs">
+                  <MdEdit />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-gray-900">Edit Status Pelayanan Health Services</h3>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Pelayanan Kolom: {editPelayananTarget.itemLabel}
+                  </h3>
                   <p className="text-xs text-gray-500 font-medium">
-                    Indikator: <span className="font-bold text-gray-900">{editPelayananTarget.itemLabel}</span> ({dbChildData?.name || dbChildData?.child_name})
+                    Input / Perbarui Seluruh Indikator Pelayanan ({dbChildData?.name || dbChildData?.child_name})
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowEditPelayananModal(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition cursor-pointer"
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
               >
-                <MdClose className="text-lg" />
+                ✕
               </button>
             </div>
 
             <form onSubmit={handleSavePelayananEdit} className="space-y-4">
-              {/* CASES A: NEONATUS DATES */}
-              {editPelayananTarget.type === "neonatus" && editPelayananTarget.itemKey === "header_dates" && (
-                <div className="space-y-3">
-                  <p className="text-xs font-bold text-gray-700">Tanggal &amp; Tempat Pelayanan Neonatal (0-28 Hari):</p>
-                  {[
-                    { dateKey: "k1Date", placeKey: "k1Place", label: "0 - 6 Jam" },
-                    { dateKey: "k2Date", placeKey: "k2Place", label: "6 - 48 Jam (KN1)" },
-                    { dateKey: "k3Date", placeKey: "k3Place", label: "3 - 7 Hari (KN2)" },
-                    { dateKey: "k4Date", placeKey: "k4Place", label: "8 - 28 Hari (KN3)" },
-                  ].map((field) => (
-                    <div key={field.dateKey} className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+              {/* MODAL CASE A: NEONATUS PER KOLOM (0-6 Jam / KN1 / KN2 / KN3) */}
+              {editPelayananTarget.type === "neonatus" && (
+                <div className="space-y-4">
+                  {/* Header Tanggal & Tempat */}
+                  <div className="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 space-y-2">
+                    <p className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                      <span>📅</span> Tanggal &amp; Lokasi Pelayanan ({editPelayananTarget.itemLabel})
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-700 mb-1">Tanggal ({field.label})</label>
+                        <label className="block text-[10px] font-extrabold text-gray-600 mb-1">Tanggal Periksa</label>
                         <input
                           type="text"
-                          value={editPelayananForm[field.dateKey] || ""}
-                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [field.dateKey]: e.target.value })}
-                          placeholder="dd/mm/yyyy"
-                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-lg p-2 font-bold outline-none focus:border-[#EA2986]"
+                          value={editPelayananForm.date || ""}
+                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, date: e.target.value })}
+                          placeholder="misal: 14/09/2026"
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-700 mb-1">Tempat ({field.label})</label>
+                        <label className="block text-[10px] font-extrabold text-gray-600 mb-1">Tempat Pelayanan</label>
                         <input
                           type="text"
-                          value={editPelayananForm[field.placeKey] || ""}
-                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [field.placeKey]: e.target.value })}
-                          placeholder="Puskesmas / Rumah / Klinik"
-                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-lg p-2 font-medium outline-none focus:border-[#EA2986]"
+                          value={editPelayananForm.place || ""}
+                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, place: e.target.value })}
+                          placeholder="misal: Puskesmas Suhat"
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-medium outline-none focus:border-[#EA2986]"
                         />
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
 
-              {/* CASE B: NEONATUS TRIPLE ELIMINASI */}
-              {editPelayananTarget.type === "neonatus" && editPelayananTarget.itemKey === "triple" && (
-                <div className="space-y-3">
-                  <p className="text-xs font-bold text-gray-700">Hasil Skrining Tripel Eliminasi Neonatus:</p>
-                  {[
-                    { key: "hiv", label: "HIV" },
-                    { key: "sifilis", label: "Sifilis" },
-                    { key: "hepB", label: "Hepatitis B" },
-                  ].map((item) => (
-                    <div key={item.key} className="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-200">
-                      <span className="text-xs font-bold text-gray-800">{item.label}</span>
-                      <select
-                        value={editPelayananForm[item.key] || "Non-Reaktif"}
-                        onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [item.key]: e.target.value })}
-                        className="bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-1.5 outline-none focus:border-[#EA2986]"
-                      >
-                        <option value="Non-Reaktif">Non-Reaktif</option>
-                        <option value="Reaktif">Reaktif</option>
-                        <option value="Belum Diperiksa">Belum Diperiksa</option>
-                      </select>
+                  {/* Checklist Indikator Wajib Neonatal */}
+                  <div className="space-y-2.5">
+                    <p className="text-xs font-black text-gray-800">Checklist Pelayanan Medis Diterima:</p>
+                    {[
+                      { key: "tali_pusat", label: "Perawatan Tali Pusar", ph: "Contoh: ✓ Bersih / ✓ Puput/Sembuh / -" },
+                      { key: "imd", label: "IMD (Inisiasi Menyusu Dini)", ph: "Contoh: ✓ Dilaksanakan / Lanjut ASI / -" },
+                      { key: "vit_k1", label: "Vitamin K1", ph: "Contoh: ✓ Injeksi Done / -" },
+                      { key: "hb0", label: "Imunisasi Hepatitis B (HB0)", ph: "Contoh: ✓ (<24 Jam) Done / -" },
+                      { key: "salep_mata", label: "Salep/Tetes Mata Antibiotik", ph: "Contoh: ✓ Diberikan / -" },
+                      { key: "shk", label: "Skrining BBL / SHK", ph: "Contoh: ✓ Ambil Sampel / ✓ Hasil Normal / -" },
+                      { key: "buku_kia", label: "Buku KIA (Diberikan/Edukasi)", ph: "Contoh: ✓ Diterima / ✓ Edukasi / -" },
+                    ].map((item) => (
+                      <div key={item.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <span className="text-xs font-bold text-gray-800 shrink-0">{item.label}</span>
+                        <input
+                          type="text"
+                          value={editPelayananForm[item.key] || ""}
+                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [item.key]: e.target.value })}
+                          placeholder={item.ph}
+                          className="w-full sm:w-64 bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-2 outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Status Triple Eliminasi */}
+                  <div className="bg-pink-50/50 p-3 rounded-2xl border border-pink-200 space-y-2">
+                    <p className="text-xs font-black text-pink-950 flex items-center gap-1.5">
+                      <span>🧪</span> Skrining Tripel Eliminasi (H, S, Hep B)
+                    </p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { key: "hiv", label: "HIV" },
+                        { key: "sifilis", label: "Sifilis" },
+                        { key: "hepB", label: "Hepatitis B" },
+                      ].map((sub) => (
+                        <div key={sub.key} className="bg-white p-2 rounded-xl border border-gray-200 text-center">
+                          <span className="block text-[10px] font-bold text-gray-500 mb-1">{sub.label}</span>
+                          <select
+                            value={editPelayananForm[sub.key] || "Non-Reaktif"}
+                            onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [sub.key]: e.target.value })}
+                            className="w-full bg-slate-50 border border-gray-300 text-[10px] font-black text-emerald-800 rounded p-1 outline-none text-center cursor-pointer"
+                          >
+                            <option value="Non-Reaktif">Non-Reaktif</option>
+                            <option value="Reaktif">Reaktif</option>
+                            <option value="-">Belum</option>
+                          </select>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
               )}
 
-              {/* CASE C: NEONATUS ITEMS (4 VISITS) */}
-              {editPelayananTarget.type === "neonatus" && editPelayananTarget.itemKey !== "header_dates" && editPelayananTarget.itemKey !== "triple" && (
-                <div className="space-y-3">
-                  <p className="text-xs font-bold text-gray-700">Status Pelayanan per Kunjungan Neonatus:</p>
-                  {[
-                    { key: "k1", label: "0 - 6 Jam" },
-                    { key: "k2", label: "6 - 48 Jam (KN1)" },
-                    { key: "k3", label: "3 - 7 Hari (KN2)" },
-                    { key: "k4", label: "8 - 28 Hari (KN3)" },
-                  ].map((vis) => (
-                    <div key={vis.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
-                      <span className="text-xs font-bold text-gray-800 shrink-0">{vis.label}</span>
+              {/* MODAL CASE B: TAHUNAN PER KOLOM KUNJUNGAN (Kunjungan 1..8) */}
+              {editPelayananTarget.type === "tahunan" && (
+                <div className="space-y-4">
+                  {/* Header Tanggal & Tempat */}
+                  <div className="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 space-y-2">
+                    <p className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                      <span>📅</span> Tanggal &amp; Lokasi Kunjungan ({editPelayananTarget.itemLabel})
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-extrabold text-gray-600 mb-1">Tanggal Periksa</label>
+                        <input
+                          type="text"
+                          value={editPelayananForm.date || ""}
+                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, date: e.target.value })}
+                          placeholder="misal: 14/09/2026"
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold text-gray-600 mb-1">Tempat Pelayanan</label>
+                        <input
+                          type="text"
+                          value={editPelayananForm.place || ""}
+                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, place: e.target.value })}
+                          placeholder="misal: Posyandu Kenanga 1"
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-medium outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Input All Indicators for this visit */}
+                  <div className="space-y-2.5">
+                    <p className="text-xs font-black text-gray-800">Indikator Pelayanan Kunjungan Ini:</p>
+                    {[
+                      { key: "bb", label: "Berat Badan (BB)", ph: "misal: 3.5 kg / -" },
+                      { key: "tb", label: editPelayananTarget.katUsia === "bayi_1" || editPelayananTarget.katUsia === "anak_2" ? "Panjang Badan (PB)" : "Tinggi Badan (TB)", ph: "misal: 50 cm / -" },
+                      { key: "lk", label: "Lingkar Kepala (LK)", ph: "misal: 34 cm / -" },
+                      { key: "perkembangan", label: "Perkembangan (KPSP/KIA)", ph: "misal: Sesuai (S) / -" },
+                      { key: "kie", label: "Pemberian KIE / Konseling", ph: "misal: Edukasi ASI Eksklusif / -" },
+                      { key: "imunisasi", label: "Imunisasi Masuk", ph: "misal: BCG + Polio 1 / -" },
+                      { key: "vita", label: editPelayananTarget.katUsia === "bayi_1" ? "Vitamin A" : "Vit. A & Obat Cacing", ph: "misal: Kapsul Biru / -" },
+                    ].map((item) => (
+                      <div key={item.key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <span className="text-xs font-bold text-gray-800 shrink-0">{item.label}</span>
+                        <input
+                          type="text"
+                          value={editPelayananForm[item.key] || ""}
+                          onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [item.key]: e.target.value })}
+                          placeholder={item.ph}
+                          className="w-full sm:w-64 bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-2 outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Status Triple Eliminasi */}
+                  {(editPelayananTarget.katUsia === "bayi_1" || editPelayananTarget.katUsia === "anak_2") && (
+                    <div className="bg-pink-50/50 p-3 rounded-2xl border border-pink-200 space-y-1.5">
+                      <label className="block text-xs font-black text-pink-950">Status Tripel Eliminasi Tahunan</label>
                       <input
                         type="text"
-                        value={editPelayananForm[vis.key] || ""}
-                        onChange={(e) => setEditPelayananForm({ ...editPelayananForm, [vis.key]: e.target.value })}
-                        placeholder="Contoh: ✓ Bersih / ✓ Injeksi Done / -"
-                        className="w-full sm:w-64 bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-2 outline-none focus:border-[#EA2986]"
+                        value={editPelayananForm.triple || ""}
+                        onChange={(e) => setEditPelayananForm({ ...editPelayananForm, triple: e.target.value })}
+                        placeholder="Contoh: Non-Reaktif (3 Parameter) / -"
+                        className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
                       />
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
 
-              {/* CASE D: TAHUNAN HEADER VISITS (8 VISITS) */}
-              {editPelayananTarget.type === "tahunan" && editPelayananTarget.itemKey === "header_visits" && (
-                <div className="space-y-3">
-                  <p className="text-xs font-bold text-gray-700">Tanggal &amp; Tempat Kunjungan (1 s/d 8):</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {(editPelayananForm.visits || Array.from({ length: 8 }, () => ({ date: "-", place: "-" }))).map((v: any, idx: number) => (
-                      <div key={idx} className="bg-gray-50 p-2 rounded-xl border border-gray-200 text-xs">
-                        <span className="font-black text-gray-700 block mb-1">Kunjungan {idx + 1}</span>
-                        <div className="space-y-1">
-                          <input
-                            type="text"
-                            value={v.date || ""}
-                            onChange={(e) => {
-                              const newVisits = [...(editPelayananForm.visits || [])];
-                              newVisits[idx] = { ...(newVisits[idx] || {}), date: e.target.value };
-                              setEditPelayananForm({ ...editPelayananForm, visits: newVisits });
-                            }}
-                            placeholder="Tgl (dd/mm/yy)"
-                            className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded p-1.5 font-bold outline-none"
-                          />
-                          <input
-                            type="text"
-                            value={v.place || ""}
-                            onChange={(e) => {
-                              const newVisits = [...(editPelayananForm.visits || [])];
-                              newVisits[idx] = { ...(newVisits[idx] || {}), place: e.target.value };
-                              setEditPelayananForm({ ...editPelayananForm, visits: newVisits });
-                            }}
-                            placeholder="Tempat (Pusk/Posy)"
-                            className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded p-1.5 font-medium outline-none"
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* CASE E: TAHUNAN TRIPLE ELIMINASI */}
-              {editPelayananTarget.type === "tahunan" && editPelayananTarget.itemKey === "triple" && (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Status Tripel Eliminasi</label>
-                  <input
-                    type="text"
-                    value={editPelayananForm.triple || ""}
-                    onChange={(e) => setEditPelayananForm({ ...editPelayananForm, triple: e.target.value })}
-                    placeholder="Contoh: Non-Reaktif (3 Parameter) / -"
-                    className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-extrabold outline-none focus:border-[#EA2986]"
-                  />
-                </div>
-              )}
-
-              {/* CASE F: TAHUNAN INDICATOR ITEMS (8 VISITS) */}
-              {editPelayananTarget.type === "tahunan" && editPelayananTarget.itemKey !== "header_visits" && editPelayananTarget.itemKey !== "triple" && (
-                <div className="space-y-3">
-                  <p className="text-xs font-bold text-gray-700">Status Pelayanan per Kunjungan (1 s/d 8):</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {(editPelayananForm.list || Array(8).fill("-")).map((val: string, idx: number) => (
-                      <div key={idx} className="bg-gray-50 p-2 rounded-xl border border-gray-200 text-xs flex flex-col gap-1">
-                        <span className="font-bold text-gray-700">Kunjungan {idx + 1}</span>
-                        <input
-                          type="text"
-                          value={val || ""}
-                          onChange={(e) => {
-                            const newList = [...(editPelayananForm.list || Array(8).fill("-"))];
-                            newList[idx] = e.target.value;
-                            setEditPelayananForm({ ...editPelayananForm, list: newList });
-                          }}
-                          placeholder="Status (misal: ✓ Diukur / -)"
-                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded p-1.5 font-bold outline-none focus:border-[#EA2986]"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setShowEditPelayananModal(false)}
@@ -3863,15 +4597,1119 @@ function RekamMedisAnakContent() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
                 >
-                  Simpan Perubahan
+                  <MdEdit /> Simpan Perubahan Kolom
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* ─── MODAL EDIT DATA PER-FASE NEONATUS (0-6 Jam / KN1 / KN2 / KN3) ─── */}
+      {showEditFaseModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-gray-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3 border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-rose-100 text-[#EA2986] flex items-center justify-center text-xl font-black shadow-2xs">
+                  <MdEdit />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Data Fase Pelayanan: {editFaseForm.fase || "Neonatus"}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Input / Perbarui Pemeriksaan Medis Fase Neonatal ({dbChildData?.name || dbChildData?.child_name || "Pasien"})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditFaseModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveFaseEdit} className="space-y-4">
+              {/* Header Info Kunjungan */}
+              <div className="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 space-y-2">
+                <p className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                  <span>📅</span> Identitas Waktu &amp; Nakes Pemeriksa
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                      <span>📅</span> Tanggal Periksa
+                    </label>
+                    <input
+                      type="date"
+                      value={toInputDate(editFaseForm.tanggal)}
+                      onChange={(e) => {
+                        const formatted = formatDisplayDate(e.target.value);
+                        setEditFaseForm({ ...editFaseForm, tanggal: formatted, rawTanggal: e.target.value });
+                      }}
+                      className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-bold outline-none focus:border-[#EA2986] focus:ring-2 focus:ring-[#EA2986]/20 transition shadow-2xs cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                      <span>⏰</span> Jam Periksa (WIB)
+                    </label>
+                    <input
+                      type="time"
+                      value={toInputTime(editFaseForm.jam)}
+                      onChange={(e) => {
+                        setEditFaseForm({ ...editFaseForm, jam: e.target.value });
+                      }}
+                      className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-bold outline-none focus:border-[#EA2986] focus:ring-2 focus:ring-[#EA2986]/20 transition shadow-2xs cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold text-gray-600 mb-1">No. Batch Vaksin/Kit</label>
+                    <input
+                      type="text"
+                      value={editFaseForm.batch || ""}
+                      onChange={(e) => setEditFaseForm({ ...editFaseForm, batch: e.target.value })}
+                      placeholder="B26-HB0 / -"
+                      className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-mono font-semibold outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-extrabold text-gray-600 mb-1">Nakes Pemeriksa</label>
+                    <input
+                      type="text"
+                      value={editFaseForm.nakes || ""}
+                      onChange={(e) => setEditFaseForm({ ...editFaseForm, nakes: e.target.value })}
+                      placeholder="Bidan Widya"
+                      className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Pengukuran Fisik */}
+              <div className="space-y-2">
+                <p className="text-xs font-black text-gray-800">Hasil Pengukuran Fisik Antropometri:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 mb-1">BB (Berat - gram)</label>
+                    <input
+                      type="number"
+                      value={editFaseForm.bb || ""}
+                      onChange={(e) => setEditFaseForm({ ...editFaseForm, bb: e.target.value })}
+                      placeholder="3200"
+                      className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-black text-center outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 mb-1">PB (Panjang - cm)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={editFaseForm.pb || ""}
+                      onChange={(e) => setEditFaseForm({ ...editFaseForm, pb: e.target.value })}
+                      placeholder="50"
+                      className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-black text-center outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-600 mb-1">LK (Kepala - cm)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={editFaseForm.lk || ""}
+                      onChange={(e) => setEditFaseForm({ ...editFaseForm, lk: e.target.value })}
+                      placeholder="34"
+                      className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-black text-center outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Checklist Spesifik Per Fase */}
+              <div className="space-y-2">
+                <p className="text-xs font-black text-gray-800">Checklist Pelayanan Kesehatan ({editFaseForm.fase}):</p>
+                
+                {selectedKN === 0 && (
+                  <div className="space-y-2">
+                    {[
+                      { key: "imd", label: "Inisiasi Menyusu Dini (IMD)", ph: "✓ Ya / -" },
+                      { key: "vitK", label: "Suntik Vitamin K1", ph: "✓ Ya / -" },
+                      { key: "salepMata", label: "Salep/Tetes Mata", ph: "✓ Ya / -" },
+                      { key: "hb0", label: "Imunisasi Hepatitis B (HB0)", ph: "✓ Ya / -" },
+                    ].map((item) => (
+                      <div key={item.key} className="flex items-center justify-between gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <span className="text-xs font-bold text-gray-800">{item.label}</span>
+                        <input
+                          type="text"
+                          value={editFaseForm[item.key] || ""}
+                          onChange={(e) => setEditFaseForm({ ...editFaseForm, [item.key]: e.target.value })}
+                          placeholder={item.ph}
+                          className="w-48 bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-1.5 outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {selectedKN === 1 && (
+                  <div className="space-y-2">
+                    {[
+                      { key: "menyusu", label: "Menyusu Aktif / Adekuat", ph: "✓ Aktif / -" },
+                      { key: "taliPusat", label: "Perawatan Tali Pusar", ph: "✓ Bersih/Normal / -" },
+                      { key: "shk", label: "Skrining Hipotiroid (SHK)", ph: "Dilakukan (Sampel Darah Tumit)" },
+                      { key: "pjbKritis", label: "Skrining PJB Kritis", ph: "Lolos (Saturasi 98%)" },
+                    ].map((item) => (
+                      <div key={item.key} className="flex items-center justify-between gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <span className="text-xs font-bold text-gray-800">{item.label}</span>
+                        <input
+                          type="text"
+                          value={editFaseForm[item.key] || ""}
+                          onChange={(e) => setEditFaseForm({ ...editFaseForm, [item.key]: e.target.value })}
+                          placeholder={item.ph}
+                          className="w-48 bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-1.5 outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {selectedKN >= 2 && (
+                  <div className="space-y-2">
+                    {[
+                      { key: "menyusu", label: "Menyusu / Kebutuhan ASI", ph: "✓ Kuat / -" },
+                      { key: "taliPusat", label: "Kondisi Tali Pusar", ph: "✓ Kering/Puput / -" },
+                      { key: "tandaBahaya", label: "Skrining Tanda Bahaya", ph: "❌ Tidak Ada" },
+                      { key: "ikterus", label: "Identifikasi Ikterus (Kramer)", ph: "❌ Tidak Kuning" },
+                    ].map((item) => (
+                      <div key={item.key} className="flex items-center justify-between gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <span className="text-xs font-bold text-gray-800">{item.label}</span>
+                        <input
+                          type="text"
+                          value={editFaseForm[item.key] || ""}
+                          onChange={(e) => setEditFaseForm({ ...editFaseForm, [item.key]: e.target.value })}
+                          placeholder={item.ph}
+                          className="w-48 bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-lg p-1.5 outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Triple Eliminasi */}
+              <div className="bg-pink-50/50 p-3 rounded-2xl border border-pink-200 space-y-2">
+                <p className="text-xs font-black text-pink-950 flex items-center gap-1.5">
+                  <span>🧪</span> Uji Laboratorium Triple Eliminasi Fase Ini
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { key: "hiv", label: "HIV (H)" },
+                    { key: "sifilis", label: "Sifilis (S)" },
+                    { key: "hepB", label: "Hepatitis B" },
+                  ].map((sub) => (
+                    <div key={sub.key} className="bg-white p-2 rounded-xl border border-gray-200 text-center">
+                      <span className="block text-[10px] font-bold text-gray-500 mb-1">{sub.label}</span>
+                      <select
+                        value={editFaseForm[sub.key] || "Non-Reaktif"}
+                        onChange={(e) => setEditFaseForm({ ...editFaseForm, [sub.key]: e.target.value })}
+                        className="w-full bg-slate-50 border border-gray-300 text-[10px] font-black text-emerald-800 rounded p-1 outline-none text-center cursor-pointer"
+                      >
+                        <option value="Non-Reaktif">Non-Reaktif</option>
+                        <option value="Reaktif">Reaktif</option>
+                        <option value="-">Belum</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Masalah & Rujukan */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-600 mb-1">Masalah yang Ditemukan</label>
+                  <input
+                    type="text"
+                    value={editFaseForm.masalah || ""}
+                    onChange={(e) => setEditFaseForm({ ...editFaseForm, masalah: e.target.value })}
+                    placeholder="misal: Tidak ada, kondisi stabil"
+                    className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-medium outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-600 mb-1">Dirujuk Ke Faskes/RS</label>
+                  <input
+                    type="text"
+                    value={editFaseForm.rujukan || ""}
+                    onChange={(e) => setEditFaseForm({ ...editFaseForm, rujukan: e.target.value })}
+                    placeholder="misal: - / RSUD Suhat"
+                    className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-medium outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditFaseModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <MdEdit /> Simpan Data Fase
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL EDIT MATRIKS GIZI & PMBA (PER KOLOM USIA) ─── */}
+      {showEditGiziPmbaModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-gray-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3 border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-black shadow-2xs">
+                  🥗
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Matriks Gizi: {selectedGiziColLabel}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Evaluasi Nasihat ASI &amp; PMBA ({dbChildData?.name || dbChildData?.child_name || "Pasien"})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditGiziPmbaModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveGiziPmbaEdit} className="space-y-4">
+              <div className="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 text-xs text-amber-900 font-medium leading-relaxed">
+                💡 Mengubah parameter gizi khusus untuk kelompok usia <strong>{selectedGiziColLabel}</strong>.
+              </div>
+
+              {/* Form ASI */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">1. Evaluasi Pemberian ASI ({selectedGiziColLabel})</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1">
+                    <label className="block text-[10px] font-extrabold text-gray-700">Frekuensi Menyusui</label>
+                    <select
+                      value={editGiziPmbaForm.asi_frekuensi?.[selectedGiziColKey] || "✓"}
+                      onChange={(e) => {
+                        const updated = { ...editGiziPmbaForm.asi_frekuensi, [selectedGiziColKey]: e.target.value };
+                        setEditGiziPmbaForm({ ...editGiziPmbaForm, asi_frekuensi: updated });
+                      }}
+                      className="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-bold text-gray-900"
+                    >
+                      <option value="✓">✓ Terpenuhi / Adekuat</option>
+                      <option value="❌">❌ Kurang / Tidak ASI</option>
+                    </select>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1">
+                    <label className="block text-[10px] font-extrabold text-gray-700">Posisi &amp; Pelekatan Menyusu</label>
+                    <select
+                      value={editGiziPmbaForm.asi_posisi?.[selectedGiziColKey] || "✓"}
+                      onChange={(e) => {
+                        const updated = { ...editGiziPmbaForm.asi_posisi, [selectedGiziColKey]: e.target.value };
+                        setEditGiziPmbaForm({ ...editGiziPmbaForm, asi_posisi: updated });
+                      }}
+                      className="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-bold text-gray-900"
+                    >
+                      <option value="✓">✓ Baik &amp; Melekat Sempurna</option>
+                      <option value="❌">❌ Pelekatan Perlu Perbaikan</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form MPASI Khusus Usia >= 6 Bulan */}
+              {["6_8", "9_11", "12_23", "23_59"].includes(selectedGiziColKey) ? (
+                <div className="space-y-3 pt-2 border-t border-gray-100">
+                  <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">2. Evaluasi MPASI ({selectedGiziColLabel})</h4>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-1">
+                      <label className="block text-[10px] font-extrabold text-gray-700">Pemberian MPASI</label>
+                      <select
+                        value={editGiziPmbaForm.mpasi_ya?.[selectedGiziColKey] === "✓" ? "Ya" : "Belum"}
+                        onChange={(e) => {
+                          const isYa = e.target.value === "Ya";
+                          const uYa = { ...editGiziPmbaForm.mpasi_ya, [selectedGiziColKey]: isYa ? "✓" : "❌" };
+                          const uTidak = { ...editGiziPmbaForm.mpasi_tidak, [selectedGiziColKey]: isYa ? "❌" : "✓" };
+                          setEditGiziPmbaForm({ ...editGiziPmbaForm, mpasi_ya: uYa, mpasi_tidak: uTidak });
+                        }}
+                        className="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs font-bold text-gray-900"
+                      >
+                        <option value="Ya">✓ Ya (Sudah Diberikan MPASI)</option>
+                        <option value="Belum">❌ Belum Diberikan</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">Variasi Lauk Protein</label>
+                      <input
+                        type="text"
+                        value={editGiziPmbaForm.variasi_lauk?.[selectedGiziColKey] || "✓ (Hewani)"}
+                        onChange={(e) => {
+                          const u = { ...editGiziPmbaForm.variasi_lauk, [selectedGiziColKey]: e.target.value };
+                          setEditGiziPmbaForm({ ...editGiziPmbaForm, variasi_lauk: u });
+                        }}
+                        placeholder="misal: ✓ (Telur, Ayam, Daging)"
+                        className="w-full bg-white border border-gray-300 rounded-xl p-2 text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">Frekuensi Makanan Utama</label>
+                      <input
+                        type="text"
+                        value={editGiziPmbaForm.frekuensi_utama?.[selectedGiziColKey] || "3x Sehari"}
+                        onChange={(e) => {
+                          const u = { ...editGiziPmbaForm.frekuensi_utama, [selectedGiziColKey]: e.target.value };
+                          setEditGiziPmbaForm({ ...editGiziPmbaForm, frekuensi_utama: u });
+                        }}
+                        className="w-full bg-white border border-gray-300 rounded-xl p-2 text-xs font-bold"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">Frekuensi Makanan Selingan</label>
+                      <input
+                        type="text"
+                        value={editGiziPmbaForm.frekuensi_selingan?.[selectedGiziColKey] || "✓ 2x"}
+                        onChange={(e) => {
+                          const u = { ...editGiziPmbaForm.frekuensi_selingan, [selectedGiziColKey]: e.target.value };
+                          setEditGiziPmbaForm({ ...editGiziPmbaForm, frekuensi_selingan: u });
+                        }}
+                        className="w-full bg-white border border-gray-300 rounded-xl p-2 text-xs font-bold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3 bg-blue-50/60 border border-blue-200 rounded-xl text-[11px] font-medium text-blue-900">
+                  ℹ️ Bayi usia 0-5 bulan direkomendasikan mendapat ASI Eksklusif saja tanpa MPASI.
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditGiziPmbaModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <MdEdit /> Simpan Kolom Usia {selectedGiziColLabel}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL EDIT VITAMIN A & OBAT CACING (PER KOLOM USIA) ─── */}
+      {showEditVitAModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-gray-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3 border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl font-black shadow-2xs">
+                  <MdMedication className="text-blue-600 text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Vitamin A &amp; Cacing: {selectedVitAColLabel}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Validasi Kapsul Medis ({dbChildData?.name || dbChildData?.child_name || "Pasien"})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditVitAModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveVitAEdit} className="space-y-4">
+              {/* Form Jika Kolom Bulan 6 - 11 */}
+              {selectedVitAColKey === "bln_6_11" ? (
+                <div className="bg-blue-50/70 p-3.5 rounded-2xl border border-blue-200 space-y-2">
+                  <span className="text-xs font-black text-blue-900 block">🔵 VITAMIN A KAPSUL BIRU (100.000 IU) — Bulan 6 - 11</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                        <span>📅</span> Tanggal Pemberian
+                      </label>
+                      <input
+                        type="date"
+                        value={toInputDate(editVitAForm.vitA_biru?.tanggal)}
+                        onChange={(e) => {
+                          const formatted = formatDisplayDate(e.target.value);
+                          setEditVitAForm({
+                            ...editVitAForm,
+                            vitA_biru: { ...editVitAForm.vitA_biru, tanggal: formatted, diberikan: true, status: "Sudah Diberikan" }
+                          });
+                        }}
+                        className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986] cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-extrabold text-gray-700 mb-1">Nomor Batch / Keterangan</label>
+                      <input
+                        type="text"
+                        value={editVitAForm.vitA_biru?.batch || ""}
+                        onChange={(e) => {
+                          setEditVitAForm({
+                            ...editVitAForm,
+                            vitA_biru: { ...editVitAForm.vitA_biru, batch: e.target.value }
+                          });
+                        }}
+                        placeholder="A26-BLU"
+                        className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Form Jika Kolom Tahun 1-2 s/d Tahun 5-6 */
+                <div className="space-y-3">
+                  {/* Kapsul Merah */}
+                  <div className="bg-rose-50/70 p-3.5 rounded-2xl border border-rose-200 space-y-2">
+                    <span className="text-xs font-black text-rose-900 block">🔴 VITAMIN A KAPSUL MERAH (200.000 IU) — {selectedVitAColLabel}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                          <span>📅</span> Tanggal Pemberian
+                        </label>
+                        <input
+                          type="date"
+                          value={toInputDate(editVitAForm[`vitA_merah_${selectedVitAColKey}`]?.tanggal)}
+                          onChange={(e) => {
+                            const formatted = formatDisplayDate(e.target.value);
+                            const key = `vitA_merah_${selectedVitAColKey}`;
+                            setEditVitAForm({
+                              ...editVitAForm,
+                              [key]: { ...editVitAForm[key], tanggal: formatted, diberikan: true, status: "Sudah" }
+                            });
+                          }}
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986] cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold text-gray-700 mb-1">Nomor Batch</label>
+                        <input
+                          type="text"
+                          value={editVitAForm[`vitA_merah_${selectedVitAColKey}`]?.batch || ""}
+                          onChange={(e) => {
+                            const key = `vitA_merah_${selectedVitAColKey}`;
+                            setEditVitAForm({
+                              ...editVitAForm,
+                              [key]: { ...editVitAForm[key], batch: e.target.value }
+                            });
+                          }}
+                          placeholder="M26-RED"
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Obat Cacing */}
+                  <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                    <span className="text-xs font-black text-amber-900 flex items-center gap-1"><MdMedication className="text-base" /> OBAT CACING — {selectedVitAColLabel}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                          <MdCalendarMonth className="text-gray-500" /> Tanggal Pemberian
+                        </label>
+                        <input
+                          type="date"
+                          value={toInputDate(editVitAForm[`cacing_${selectedVitAColKey}`]?.tanggal)}
+                          onChange={(e) => {
+                            const formatted = formatDisplayDate(e.target.value);
+                            const key = `cacing_${selectedVitAColKey}`;
+                            setEditVitAForm({
+                              ...editVitAForm,
+                              [key]: { ...editVitAForm[key], tanggal: formatted, diberikan: true, status: "Sudah" }
+                            });
+                          }}
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986] cursor-pointer"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-extrabold text-gray-700 mb-1">Nomor Batch / Merk</label>
+                        <input
+                          type="text"
+                          value={editVitAForm[`cacing_${selectedVitAColKey}`]?.batch || ""}
+                          onChange={(e) => {
+                            const key = `cacing_${selectedVitAColKey}`;
+                            setEditVitAForm({
+                              ...editVitAForm,
+                              [key]: { ...editVitAForm[key], batch: e.target.value }
+                            });
+                          }}
+                          placeholder="C26-ALB"
+                          className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditVitAModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <MdEdit /> Simpan {selectedVitAColLabel}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL EDIT CATATAN KESEHATAN GIGI ─── */}
+      {showEditGigiModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-gray-200 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b pb-3 border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-black shadow-2xs">
+                  🦷
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Catatan Gigi: {editGigiForm.bln || "Usia"}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Buku KIA Halaman 126 ({dbChildData?.name || dbChildData?.child_name || "Pasien"})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditGigiModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveGigiEdit} className="space-y-3.5">
+              <div>
+                <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                  <span>📅</span> Tanggal Periksa Gigi
+                </label>
+                <input
+                  type="date"
+                  value={toInputDate(editGigiForm.tgl)}
+                  onChange={(e) => {
+                    const formatted = formatDisplayDate(e.target.value);
+                    setEditGigiForm({ ...editGigiForm, tgl: formatted });
+                  }}
+                  className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-bold outline-none focus:border-[#EA2986] cursor-pointer"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-700 mb-1">Gigi Tumbuh (Ada)</label>
+                  <input
+                    type="number"
+                    value={editGigiForm.ada || ""}
+                    onChange={(e) => setEditGigiForm({ ...editGigiForm, ada: e.target.value })}
+                    placeholder="misal: 4"
+                    className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-black text-center outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-rose-700 mb-1">Gigi Berlubang</label>
+                  <input
+                    type="number"
+                    value={editGigiForm.lubang || ""}
+                    onChange={(e) => setEditGigiForm({ ...editGigiForm, lubang: e.target.value })}
+                    placeholder="misal: 0"
+                    className="w-full bg-rose-50/50 border border-rose-200 text-rose-900 text-xs rounded-xl p-2 font-black text-center outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-extrabold text-gray-700">Kondisi Kebersihan Plak Gigi</label>
+                <select
+                  value={editGigiForm.bersih === "✓" ? "Bersih" : editGigiForm.kotor === "✓" ? "Kotor" : "Bersih"}
+                  onChange={(e) => {
+                    if (e.target.value === "Bersih") {
+                      setEditGigiForm({ ...editGigiForm, bersih: "✓", kotor: "" });
+                    } else {
+                      setEditGigiForm({ ...editGigiForm, bersih: "", kotor: "✓" });
+                    }
+                  }}
+                  className="w-full bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-xl p-2.5 outline-none focus:border-[#EA2986]"
+                >
+                  <option value="Bersih">✓ Bersih (Tidak ada plak menumpuk)</option>
+                  <option value="Kotor">! Kotor (Ada penumpukan plak/sisa makanan)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-extrabold text-gray-700">Penilaian Risiko Gigi Berlubang</label>
+                <select
+                  value={editGigiForm.r || "Rendah"}
+                  onChange={(e) => setEditGigiForm({ ...editGigiForm, r: e.target.value })}
+                  className="w-full bg-white border border-gray-300 text-xs font-bold text-gray-900 rounded-xl p-2.5 outline-none focus:border-[#EA2986]"
+                >
+                  <option value="Rendah">🟢 Rendah (Gigi sehat, tidak ada karies)</option>
+                  <option value="Sedang">🟡 Sedang (Mulai ada plak / 1 bercak)</option>
+                  <option value="Tinggi">🔴 Tinggi (Ada karies aktif &amp; berlubang)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditGigiModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <MdEdit /> Simpan Catatan Gigi
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL EDIT PELAYANAN NEONATUS PER KOLOM ─── */}
+      {showEditPelayananNeonatusColModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-gray-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3 border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-black shadow-2xs">
+                  📋
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Pelayanan Neonatus: {selectedPelayananNeonatusColLabel}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Kolom Kunjungan Neonatus ({dbChildData?.name || dbChildData?.child_name || "Pasien"})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditPelayananNeonatusColModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePelayananNeonatusColEdit} className="space-y-3.5">
+              <div className="bg-amber-50/60 p-3 rounded-2xl border border-amber-200 text-xs text-amber-900 font-medium">
+                💡 Mengubah status pelayanan yang diberikan pada periode <strong>{selectedPelayananNeonatusColLabel}</strong>.
+              </div>
+
+              {/* Tanggal & Tempat */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 rounded-2xl border border-gray-200">
+                <div>
+                  <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                    <span>📅</span> Tanggal Periksa
+                  </label>
+                  <input
+                    type="date"
+                    value={toInputDate(editPelayananNeonatusColForm.headerDates?.[`${selectedPelayananNeonatusColKey}Date`])}
+                    onChange={(e) => {
+                      const formatted = formatDisplayDate(e.target.value);
+                      const hd = { ...(editPelayananNeonatusColForm.headerDates || {}), [`${selectedPelayananNeonatusColKey}Date`]: formatted };
+                      setEditPelayananNeonatusColForm({ ...editPelayananNeonatusColForm, headerDates: hd });
+                    }}
+                    className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold cursor-pointer outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-extrabold text-gray-700 mb-1">Lokasi Periksa</label>
+                  <input
+                    type="text"
+                    value={editPelayananNeonatusColForm.headerDates?.[`${selectedPelayananNeonatusColKey}Place`] || "Puskesmas Suhat"}
+                    onChange={(e) => {
+                      const hd = { ...(editPelayananNeonatusColForm.headerDates || {}), [`${selectedPelayananNeonatusColKey}Place`]: e.target.value };
+                      setEditPelayananNeonatusColForm({ ...editPelayananNeonatusColForm, headerDates: hd });
+                    }}
+                    placeholder="misal: Puskesmas Suhat"
+                    className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+              </div>
+
+              {/* Item Pelayanan */}
+              <div className="space-y-2.5">
+                {[
+                  { key: "tali_pusat", item: "Perawatan Tali pusat" },
+                  { key: "imd", item: "IMD (Inisiasi Menyusu Dini)" },
+                  { key: "vit_k1", item: "Vitamin K1" },
+                  { key: "hb0", item: "Imunisasi Hepatitis B (HB0)" },
+                  { key: "salep_mata", item: "Salep/Tetes Mata Antibiotik" },
+                  { key: "shk", item: "Skrining BBL / SHK" },
+                  { key: "buku_kia", item: "Buku KIA (Diberikan/Edukasi)" },
+                ].map(({ key, item }) => (
+                  <div key={key} className="flex items-center justify-between gap-3 p-2 bg-gray-50/50 rounded-xl border border-gray-100">
+                    <span className="text-xs font-bold text-gray-700">{item}</span>
+                    <input
+                      type="text"
+                      value={editPelayananNeonatusColForm.items?.[key]?.[selectedPelayananNeonatusColKey] || ""}
+                      onChange={(e) => {
+                        const itemsObj = { ...(editPelayananNeonatusColForm.items || {}) };
+                        itemsObj[key] = { ...(itemsObj[key] || {}), [selectedPelayananNeonatusColKey]: e.target.value };
+                        setEditPelayananNeonatusColForm({ ...editPelayananNeonatusColForm, items: itemsObj });
+                      }}
+                      placeholder="✓ Done / -"
+                      className="w-40 bg-white border border-gray-300 text-xs font-bold rounded-lg p-1.5 text-center"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditPelayananNeonatusColModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <MdEdit /> Simpan Kolom {selectedPelayananNeonatusColLabel}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL EDIT PELAYANAN TAHUNAN PER KOLOM KUNJUNGAN ─── */}
+      {showEditPelayananTahunanColModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-xl w-full border border-gray-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b pb-3 border-gray-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-black shadow-2xs">
+                  📅
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-gray-900">
+                    Edit Pelayanan: Kunjungan {selectedPelayananTahunanIndex + 1}
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Kategori: {selectedPelayananTahunanKatUsia} ({dbChildData?.name || dbChildData?.child_name || "Pasien"})
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEditPelayananTahunanColModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePelayananTahunanColEdit} className="space-y-3.5">
+              <div className="bg-indigo-50/60 p-3 rounded-2xl border border-indigo-200 text-xs text-indigo-900 font-medium">
+                💡 Mengubah detail Kunjungan Ke-{selectedPelayananTahunanIndex + 1} untuk kategori usia <strong>{selectedPelayananTahunanKatUsia}</strong>.
+              </div>
+
+              {/* Tanggal & Tempat Kunjungan */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 rounded-2xl border border-gray-200">
+                <div>
+                  <label className="block text-[10px] font-extrabold text-gray-700 mb-1 flex items-center gap-1">
+                    <span>📅</span> Tanggal Kunjungan
+                  </label>
+                  <input
+                    type="date"
+                    value={toInputDate(editPelayananTahunanColForm[selectedPelayananTahunanKatUsia]?.visits?.[selectedPelayananTahunanIndex]?.date)}
+                    onChange={(e) => {
+                      const formatted = formatDisplayDate(e.target.value);
+                      const catData = { ...(editPelayananTahunanColForm[selectedPelayananTahunanKatUsia] || {}) };
+                      const visits = [...(catData.visits || [])];
+                      visits[selectedPelayananTahunanIndex] = { ...(visits[selectedPelayananTahunanIndex] || {}), date: formatted };
+                      catData.visits = visits;
+                      setEditPelayananTahunanColForm({ ...editPelayananTahunanColForm, [selectedPelayananTahunanKatUsia]: catData });
+                    }}
+                    className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold cursor-pointer outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-extrabold text-gray-700 mb-1">Lokasi Kunjungan</label>
+                  <input
+                    type="text"
+                    value={editPelayananTahunanColForm[selectedPelayananTahunanKatUsia]?.visits?.[selectedPelayananTahunanIndex]?.place || "Posyandu"}
+                    onChange={(e) => {
+                      const catData = { ...(editPelayananTahunanColForm[selectedPelayananTahunanKatUsia] || {}) };
+                      const visits = [...(catData.visits || [])];
+                      visits[selectedPelayananTahunanIndex] = { ...(visits[selectedPelayananTahunanIndex] || {}), place: e.target.value };
+                      catData.visits = visits;
+                      setEditPelayananTahunanColForm({ ...editPelayananTahunanColForm, [selectedPelayananTahunanKatUsia]: catData });
+                    }}
+                    placeholder="misal: Posyandu"
+                    className="w-full bg-white border border-gray-300 text-gray-900 text-xs rounded-xl p-2 font-bold outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowEditPelayananTahunanColModal(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 text-xs font-black text-white bg-[#EA2986] hover:bg-[#d41f76] rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <MdEdit /> Simpan Kunjungan {selectedPelayananTahunanIndex + 1}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL TAMBAH / EDIT DATA PERTUMBUHAN KMS (TABEL BB & PB PER BULAN) ─── */}
+      {showEditKmsRowModal && (() => {
+        const currentData = findMeasurementForMonth(editKmsRowForm.usiaBulan);
+        const isEditMode = !!(currentData && (currentData.weight !== null || currentData.height !== null || currentData.head_circumference !== null));
+
+        return (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fadeIn">
+            <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-gray-200 shadow-2xl space-y-4">
+              <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex items-center gap-2">
+                  <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-base font-black ${
+                    isEditMode ? "bg-amber-100 text-amber-800" : "bg-rose-100 text-[#EA2986]"
+                  }`}>
+                    {isEditMode ? <MdEdit /> : <MdAdd />}
+                  </span>
+                  <div>
+                    <h3 className="text-base font-black text-gray-900">
+                      {isEditMode ? "Edit Data Pertumbuhan" : "Tambah Data Pertumbuhan Baru"} (Usia {editKmsRowForm.usiaBulan} Bulan)
+                    </h3>
+                    <p className="text-[11px] text-gray-500 font-medium">
+                      Input / Perbarui Berat Badan (BB) &amp; Panjang/Tinggi Badan (PB/TB)
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEditKmsRowModal(false)}
+                  className="w-7 h-7 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition cursor-pointer font-black text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Status Card Banner Indicator */}
+              {isEditMode ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-center justify-between text-xs animate-fadeIn">
+                  <div className="flex items-center gap-2.5 text-amber-900 font-bold">
+                    <MdEdit className="text-base shrink-0" />
+                    <div>
+                      <p className="font-black text-amber-950 text-[12px]">Mode Edit Data (Sudah Ada Record)</p>
+                      <p className="text-[10px] text-amber-700 font-medium mt-0.5">
+                        Data usia {editKmsRowForm.usiaBulan} bulan sudah tersimpan. Mengubah nilai akan meng-update record database.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-extrabold bg-amber-200 text-amber-900 px-2 py-1 rounded-md shrink-0 uppercase tracking-wider">
+                    Status: Terisi
+                  </span>
+                </div>
+              ) : (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 flex items-center justify-between text-xs animate-fadeIn">
+                  <div className="flex items-center gap-2.5 text-emerald-900 font-bold">
+                    <MdAdd className="text-base shrink-0" />
+                    <div>
+                      <p className="font-black text-emerald-950 text-[12px]">Mode Tambah Data Baru</p>
+                      <p className="text-[10px] text-emerald-700 font-medium mt-0.5">
+                        Belum ada data penimbangan untuk usia {editKmsRowForm.usiaBulan} bulan. Silakan isi form di bawah.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-extrabold bg-emerald-200 text-emerald-900 px-2 py-1 rounded-md shrink-0 uppercase tracking-wider">
+                    Status: Kosong
+                  </span>
+                </div>
+              )}
+
+              <form onSubmit={handleSaveEditKmsRow} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Pilih Usia Bulan (Combobox 0–60 Bln)
+                  </label>
+                  <select
+                    value={editKmsRowForm.usiaBulan}
+                    onChange={(e) => handleSelectMonthInModal(parseInt(e.target.value, 10) || 0)}
+                    className={`w-full border text-xs rounded-xl p-2.5 font-black outline-none transition cursor-pointer ${
+                      isEditMode
+                        ? "bg-amber-50/60 border-amber-300 text-amber-950 focus:border-amber-500"
+                        : "bg-slate-50 border-gray-300 text-gray-900 focus:border-[#EA2986]"
+                    }`}
+                  >
+                    {Array.from({ length: 61 }, (_, i) => {
+                      const mData = findMeasurementForMonth(i);
+                      const hasData = mData && (mData.weight !== null || mData.height !== null);
+                      return (
+                        <option key={i} value={i} className={hasData ? "font-black text-amber-950 bg-amber-50" : "font-medium text-gray-700"}>
+                          {i} Bulan {hasData ? "(Sudah Ada Data - Mode Edit)" : "(Belum Ada Data)"}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Tanggal Pemeriksaan / Kunjungan
+                  </label>
+                  <input
+                    type="date"
+                    value={editKmsRowForm.tanggalPeriksa}
+                    onChange={(e) => setEditKmsRowForm({ ...editKmsRowForm, tanggalPeriksa: e.target.value })}
+                    className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-bold outline-none focus:border-[#EA2986]"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">
+                      Berat Badan (BB - kg)
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={editKmsRowForm.beratBadan}
+                      onChange={(e) => setEditKmsRowForm({ ...editKmsRowForm, beratBadan: e.target.value })}
+                      placeholder="Contoh: 3.5 atau 3,5"
+                      className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-black outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">
+                      Panjang/Tinggi (PB/TB - cm)
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={editKmsRowForm.tinggiBadan}
+                      onChange={(e) => setEditKmsRowForm({ ...editKmsRowForm, tinggiBadan: e.target.value })}
+                      placeholder="Contoh: 50.0 atau 50,0"
+                      className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-black outline-none focus:border-[#EA2986]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Lingkar Kepala (LK - cm) <span className="text-gray-400 font-normal">(Opsional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={editKmsRowForm.lingkarKepala}
+                    onChange={(e) => setEditKmsRowForm({ ...editKmsRowForm, lingkarKepala: e.target.value })}
+                    placeholder="Contoh: 35.0"
+                    className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-bold outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Catatan Pertumbuhan / Nakes <span className="text-gray-400 font-normal">(Opsional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editKmsRowForm.catatan}
+                    onChange={(e) => setEditKmsRowForm({ ...editKmsRowForm, catatan: e.target.value })}
+                    placeholder="Contoh: Penimbangan Posyandu Rutin"
+                    className="w-full bg-slate-50 border border-gray-300 text-gray-900 text-xs rounded-xl p-2.5 font-medium outline-none focus:border-[#EA2986]"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditKmsRowModal(false)}
+                    className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    className={`px-5 py-2.5 text-xs font-black text-white rounded-xl shadow-xs transition cursor-pointer flex items-center gap-1.5 ${
+                      isEditMode
+                        ? "bg-amber-600 hover:bg-amber-700 shadow-amber-200"
+                        : "bg-[#EA2986] hover:bg-[#d41f76] shadow-rose-200"
+                    }`}
+                  >
+                    {isEditMode ? <><MdEdit /> Simpan Perubahan (Edit Data)</> : <><MdAdd /> Tambah Data Pertumbuhan</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ─── MODAL KONFIRMASI HAPUS CATATAN NAKES ─── */}
       {deleteConfirmLogId && (
@@ -3904,6 +5742,41 @@ function RekamMedisAnakContent() {
                 Ya, Hapus
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* ─── TOAST NOTIFICATION FLOATING POPUP ─── */}
+
+      {toast.show && (
+        <div className="fixed top-5 right-5 z-50 animate-fadeIn max-w-md w-full sm:w-96">
+          <div className={`p-4 rounded-2xl shadow-2xl border flex items-start gap-3 backdrop-blur-md transition-all ${
+            toast.type === "success"
+              ? "bg-slate-900 text-emerald-300 border-emerald-500/40 shadow-emerald-950/20"
+              : toast.type === "error"
+                ? "bg-slate-900 text-rose-300 border-rose-500/40 shadow-rose-950/20"
+                : toast.type === "warning"
+                  ? "bg-slate-900 text-amber-300 border-amber-500/40 shadow-amber-950/20"
+                  : "bg-slate-900 text-slate-200 border-slate-700 shadow-slate-950/20"
+          }`}>
+            <div className="text-xl shrink-0 mt-0.5">
+              {toast.type === "success" && <MdCheckCircle className="text-emerald-400" />}
+              {toast.type === "error" && <MdWarning className="text-amber-400" />}
+              {toast.type === "warning" && <MdWarningAmber className="text-yellow-400" />}
+              {toast.type === "info" && <MdWarningAmber className="text-sky-400" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-xs font-black uppercase tracking-wider text-white">{toast.title}</h4>
+              <p className="text-xs font-medium opacity-90 leading-relaxed mt-0.5">{toast.message}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setToast(prev => ({ ...prev, show: false }))}
+              className="text-xs font-bold opacity-70 hover:opacity-100 p-1 rounded-lg transition cursor-pointer text-white"
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}

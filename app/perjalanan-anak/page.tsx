@@ -8,7 +8,7 @@ import {
   MdMonitorWeight, MdOutlineError, MdVaccines, MdTrendingDown,
   MdMale, MdFemale, MdPerson, MdCalendarMonth, MdCake, MdFingerprint,
   MdScale, MdHeight, MdOutlineMonitorWeight as MdOutlineWeight,
-  MdPhone, MdArrowBack, MdBloodtype
+  MdPhone, MdArrowBack, MdBloodtype, MdWarning
 } from "react-icons/md";
 import { FiArrowUp, FiArrowDown, FiMinus, FiRefreshCw } from "react-icons/fi";
 import { FaBaby, FaNotesMedical } from "react-icons/fa";
@@ -543,7 +543,7 @@ function PerjalananAnakContent() {
     <div className="space-y-6 max-w-[1600px] mx-auto p-4 md:p-8 pb-28 lg:pb-10 animate-in fade-in duration-300">
       {child.isOfflineFallback && (
         <div className="bg-status-orange-light text-status-orange-solid border border-status-orange-solid/25 px-5 py-3 rounded-bento-lg text-xs font-bold flex items-center gap-2 shadow-sm animate-in slide-in-from-top duration-300">
-          <span className="text-sm">⚠️</span>
+          <MdWarning className="text-status-orange-solid text-sm flex-shrink-0" />
           <span>Mode Offline: Menampilkan data cadangan lokal. Sambungkan ke internet untuk melihat grafik &amp; riwayat lengkap.</span>
         </div>
       )}
@@ -1084,7 +1084,7 @@ function PerjalananAnakContent() {
                 </div>
                 {currentList.some(item => item.status === false) && (
                   <div className="p-4 bg-status-red-light/20 border border-status-red-solid/25 rounded-xl text-xs text-status-red-solid font-bold leading-relaxed flex gap-2.5 items-start shadow-xs animate-in shake duration-300">
-                    <span className="text-base mt-0.5">⚠️</span>
+                    <MdWarning className="text-base mt-0.5 flex-shrink-0 text-status-red-solid" />
                     <p className="font-semibold text-status-red-solid"><strong>PENTING:</strong> Jika anak BELUM bisa melakukan salah satu indikator di atas, mohon segera bawa balita ke dokter anak atau Puskesmas terdekat untuk pemeriksaan dini tumbuh kembang!</p>
                   </div>
                 )}
