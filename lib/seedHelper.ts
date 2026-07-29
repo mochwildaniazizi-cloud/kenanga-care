@@ -15,6 +15,7 @@ const future = (months = 0, days = 0) => {
   return d;
 };
 
+// ─── SYSTEM ACCOUNTS ─────────────────────────────────────────────
 const SYSTEM_ACCOUNTS = [
   {
     national_id: "KADER-DEFAULT",
@@ -38,19 +39,55 @@ const SYSTEM_ACCOUNTS = [
     number_of_children: 0,
     address: "Puskesmas Pembantu Kenanga"
   },
-  {
-    national_id: "IBU-DEFAULT",
-    mother_name: "Ibu Ika",
-    phone_number: "081234567891",
-    ui_status: "Ibu Balita",
-    risk_status: "Normal",
-    husband_name: "Budi Santoso",
-    password: "ibu123",
-    number_of_children: 1,
-    address: "Jl. Mawar No. 12, Kel. Kenanga"
-  }
 ];
 
+// ─── IBU IKA (DATA LENGKAP UNTUK SIMULASI) ───────────────────────
+const IBU_IKA_DATA = {
+  national_id: "IBU-DEFAULT",
+  mother_name: "Ibu Ika",
+  password: "ibu123",
+  phone_number: "081234567891",
+  birth_date: ago(31), // 15 Maret 1995
+  birth_place: "Surabaya",
+  education: "S1 Keperawatan",
+  occupation: "Ibu Rumah Tangga",
+  address: "Jl. Mawar No. 12, RT 03 / RW 02, Kel. Kenanga",
+  blood_type: "O",
+  ui_status: "Ibu Hamil",
+  risk_status: "Normal",
+  estimated_due_date: future(1, 0), // 25 Agustus 2026 (~36 Minggu)
+  number_of_children: 1,
+  children_born_alive: 1,
+  pregnancy_number: 2,
+  miscarriage_history: 0,
+  disease_history: "Tidak ada riwayat penyakit kronis. Alergi makanan laut ringan.",
+
+  // Identitas Tambahan Buku KIA 2024 (Ibu)
+  jkn_number: "0001234567890",
+  faskes_1: "Klinik Pratama Kenanga 1",
+  faskes_referral: "RSUD Dr. Soetomo",
+  faskes_primary: "Puskesmas Pembantu Kenanga",
+  puskesmas_domicile: "Puskesmas Wonorejo",
+  cohort_register_number: "KOHORT-IBU-2026-089",
+  medical_record_number: "RM-IBU-2026-012",
+
+  // Identitas Lengkap Suami (Bapak Budi Santoso)
+  husband_name: "Budi Santoso",
+  husband_national_id: "3578-001-101092-001",
+  husband_jkn_number: "0001234567891",
+  husband_faskes_1: "Klinik Pratama Kenanga 1",
+  husband_faskes_referral: "RSUD Dr. Soetomo",
+  husband_birth_place: "Surabaya",
+  husband_birth_date: ago(33), // 10 Oktober 1992
+  husband_education: "S1 Teknik",
+  husband_occupation: "Karyawan BUMN",
+  husband_address: "Jl. Mawar No. 12, RT 03 / RW 02, Kel. Kenanga",
+  husband_phone_number: "0813-9876-5432",
+  husband_blood_type: "A",
+  husband_faskes_primary: "Puskesmas Pembantu Kenanga",
+};
+
+// ─── DATA IBU LAINNYA ────────────────────────────────────────────
 const MOTHERS_DATA = [
   // ── IBU BALITA (11 IBU) ─────────────────────────────────────────
   {
@@ -430,7 +467,31 @@ const MOTHERS_DATA = [
   },
 ];
 
+// ─── DATA ANAK (23 ANAK, TERMASUK ALYA PUTRI SANTOSO) ────────────
 const CHILDREN_DATA = [
+  // ── Anak Ibu Ika (Alya Putri Santoso) ───────────────────────────
+  { 
+    motherNationalId: "IBU-DEFAULT", 
+    national_id: "3578-CH-IBUIKA-01", 
+    child_name: "Alya Putri Santoso", 
+    gender: "P", 
+    birth_date: ago(1, 6), // 25 Jan 2025 (Usia 18 Bulan / 1.5 th)
+    birth_weight: 3.2, 
+    birth_length: 49, 
+    current_weight: 10.5, 
+    current_height: 82, 
+    birth_order: 1, 
+    blood_type: "O", 
+    birth_place: "Surabaya",
+    jkn_number: "0001234567892",
+    birth_certificate_number: "3578-LT-25012025-0001",
+    faskes_1: "Klinik Pratama Kenanga 1",
+    faskes_primary: "Puskesmas Pembantu Kenanga",
+    cohort_register_number_toddler: "KOHORT-BALITA-042",
+    medical_record_number: "RM-ANK-2025-018",
+    address: "Jl. Mawar No. 12, RT 03 / RW 02, Kel. Kenanga",
+    phone_number: "081234567891"
+  },
   // Siti Rahayu – 2 anak
   { motherNationalId: "3578-001-010190-001", national_id: "3578-CH-001", child_name: "Muhammad Farhan Setiawan", gender: "L", birth_date: ago(0, 0, 18), birth_weight: 3.1, birth_length: 49, current_weight: 3.4, current_height: 50, birth_order: 2, blood_type: "O", birth_place: "Puskesmas Kenanga" },
   { motherNationalId: "3578-001-010190-001", national_id: "3578-CH-002", child_name: "Aulia Putri Setiawan", gender: "P", birth_date: ago(4), birth_weight: 2.9, birth_length: 48, current_weight: 14.2, current_height: 98, birth_order: 1, blood_type: "O", birth_place: "RS Bhakti Husada" },
@@ -471,17 +532,23 @@ export async function seedDatabaseIfEmpty() {
     const existingMothersCount = await prisma.mother.count({
       where: {
         national_id: {
-          notIn: ["KADER-DEFAULT", "NAKES-DEFAULT", "IBU-DEFAULT"]
+          notIn: ["KADER-DEFAULT", "NAKES-DEFAULT"]
         }
       }
     });
 
-    // If data is already populated, skip auto seeding
-    if (existingChildrenCount >= 10 && existingMothersCount >= 10) {
+    // Check if Ibu Ika has maternal records and child measurements
+    const ibuIka = await prisma.mother.findFirst({
+      where: { national_id: "IBU-DEFAULT" }
+    });
+
+    const needFullSeed = existingChildrenCount < 10 || existingMothersCount < 10 || !ibuIka || !ibuIka.estimated_due_date;
+
+    if (!needFullSeed) {
       return;
     }
 
-    console.log("=== AUTO SEEDING DATABASE FOR KENANGA CARE ===");
+    console.log("=== SEEDING FULL DATABASE & IBU IKA SIMULATION DATA ===");
 
     // 1. System Accounts
     for (const acc of SYSTEM_ACCOUNTS) {
@@ -492,8 +559,18 @@ export async function seedDatabaseIfEmpty() {
       });
     }
 
-    // 2. Mothers Data
+    // 2. Ibu Ika (Identitas Lengkap Ibu & Ayah)
+    const ibuIkaRecord = await prisma.mother.upsert({
+      where: { national_id: "IBU-DEFAULT" },
+      update: IBU_IKA_DATA,
+      create: IBU_IKA_DATA,
+    });
+    const ibuIkaId = ibuIkaRecord.mother_id;
+
+    // 3. Populate Mothers Data
     const motherIdMap: Record<string, string> = {};
+    motherIdMap["IBU-DEFAULT"] = ibuIkaId;
+
     for (const m of MOTHERS_DATA) {
       const { children_born_alive, pregnancy_number, miscarriage_history, disease_history, ...rest } = m as any;
       const record = await prisma.mother.upsert({
@@ -504,20 +581,121 @@ export async function seedDatabaseIfEmpty() {
       motherIdMap[m.national_id] = record.mother_id;
     }
 
-    // 3. Children Data
+    // 4. Children Data
+    const childIdMap: Record<string, string> = {};
+
     for (const c of CHILDREN_DATA) {
       const motherId = motherIdMap[(c as any).motherNationalId];
       if (!motherId) continue;
 
       const { motherNationalId, birth_weight, birth_length, current_weight, current_height, ...rest } = c as any;
-      await prisma.child.upsert({
+      const childRecord = await prisma.child.upsert({
         where: { national_id: c.national_id },
         update: { mother_id: motherId, birth_weight, birth_length, current_weight, current_height, ...rest },
         create: { mother_id: motherId, birth_weight, birth_length, current_weight, current_height, ...rest },
       });
+
+      childIdMap[c.national_id] = childRecord.child_id;
     }
 
-    console.log("=== AUTO SEEDING FINISHED SUCCESSFULLY ===");
+    // 5. Populate Maternal Health Records (Kunjungan ANC Ibu Ika)
+    const existingMaternalRecords = await prisma.maternalHealthRecord.count({ where: { mother_id: ibuIkaId } });
+    if (existingMaternalRecords === 0) {
+      const ancVisits = [
+        { visit_date: ago(0, 6), weight: 54.0, blood_pressure: "110/70", muac: 25.5, fundal_height: 12.0, fetal_heart_rate: 140, iron_pills_given: 30, cadre_notes: "K1 ANC: Kondisi ibu & janin sehat. DJJ teratur, Hb 12.0 g/dL." },
+        { visit_date: ago(0, 4), weight: 56.5, blood_pressure: "115/75", muac: 26.0, fundal_height: 18.0, fetal_heart_rate: 144, iron_pills_given: 30, cadre_notes: "K2 ANC: USG normal, gerakan janin aktif. TTD dikonsumsi teratur." },
+        { visit_date: ago(0, 3), weight: 58.5, blood_pressure: "118/76", muac: 26.0, fundal_height: 23.0, fetal_heart_rate: 142, iron_pills_given: 30, cadre_notes: "K3 ANC: Evaluasi nutrisi baik. Kenaikan BB sesuai grafik KIA." },
+        { visit_date: ago(0, 2), weight: 61.0, blood_pressure: "120/78", muac: 26.5, fundal_height: 26.0, fetal_heart_rate: 145, iron_pills_given: 30, cadre_notes: "K4 ANC: Pembekalan senam hamil & edukasi tanda bahaya trimester 3." },
+        { visit_date: ago(0, 1), weight: 63.0, blood_pressure: "118/78", muac: 26.5, fundal_height: 29.0, fetal_heart_rate: 140, iron_pills_given: 30, cadre_notes: "K5 ANC: Kepala di bawah, DJJ teratur, persiapan persalinan." },
+        { visit_date: ago(0, 0, 7), weight: 64.5, blood_pressure: "120/80", muac: 27.0, fundal_height: 32.0, fetal_heart_rate: 142, iron_pills_given: 30, cadre_notes: "K6 ANC: Kepala masuk PAP, kesiapan persalinan & pendamping suami lengkap." },
+      ];
+
+      for (const v of ancVisits) {
+        await prisma.maternalHealthRecord.create({
+          data: {
+            mother_id: ibuIkaId,
+            ...v,
+          }
+        });
+      }
+    }
+
+    // 6. Populate TTD Logs for Ibu Ika (30 Hari Terakhir)
+    const existingTtd = await prisma.ttdLog.count({ where: { mother_id: ibuIkaId } });
+    if (existingTtd === 0) {
+      for (let i = 1; i <= 30; i++) {
+        const intakeDate = ago(0, 0, i);
+        try {
+          await prisma.ttdLog.create({
+            data: {
+              mother_id: ibuIkaId,
+              intake_date: intakeDate,
+              taken: i !== 5 && i !== 14, // missed 2 days, 28 days taken
+              companion: "Budi Santoso",
+              relationship: "Suami",
+            }
+          });
+        } catch (e) {
+          // ignore duplicate date constraint if any
+        }
+      }
+    }
+
+    // 7. Populate Weekly Monitoring for Ibu Ika (Minggu 4 - 36)
+    const existingWeekly = await prisma.weeklyMonitoring.count({ where: { mother_id: ibuIkaId } });
+    if (existingWeekly === 0) {
+      for (let w = 4; w <= 36; w++) {
+        try {
+          await prisma.weeklyMonitoring.create({
+            data: {
+              mother_id: ibuIkaId,
+              week_number: w,
+              check_pregnancy: true,
+              check_class: w % 4 === 0,
+              fever: false,
+              headache: false,
+              insomnia: false,
+              cough: false,
+              fetal_movement: w >= 20,
+              stomach_pain: false,
+              fluid_discharge: false,
+              urination_pain: false,
+              diarrhea: false,
+            }
+          });
+        } catch (e) {
+          // ignore duplicate week constraint
+        }
+      }
+    }
+
+    // 8. Populate Child Measurements for Alya Putri Santoso
+    const alyaId = childIdMap["3578-CH-IBUIKA-01"];
+    if (alyaId) {
+      const existingAlyaMeas = await prisma.childMeasurement.count({ where: { child_id: alyaId } });
+      if (existingAlyaMeas === 0) {
+        const alyaMeasurements = [
+          { visit_date: ago(1, 5), weight: 4.1, height: 53.0, muac: 12.0, head_circumference: 36.0, vitamin_a_capsule: null, deworming_pill: false, immunizations: "BCG, Polio 1", cadre_notes: "Kunjungan 1 bulan: Imunisasi BCG & Polio 1." },
+          { visit_date: ago(1, 2), weight: 6.2, height: 61.0, muac: 13.5, head_circumference: 40.0, vitamin_a_capsule: null, deworming_pill: false, immunizations: "DPT-HB-Hib 3, Polio 4", cadre_notes: "Kunjungan 4 bulan: Imunisasi DPT3 & Polio 4." },
+          { visit_date: ago(0, 11), weight: 7.8, height: 67.0, muac: 14.5, head_circumference: 42.0, vitamin_a_capsule: "Biru", deworming_pill: false, immunizations: null, cadre_notes: "Kunjungan 7 bulan: Pemberian Vitamin A Biru 100.000 IU." },
+          { visit_date: ago(0, 8), weight: 8.9, height: 72.0, muac: 15.0, head_circumference: 44.0, vitamin_a_capsule: null, deworming_pill: false, immunizations: "Campak/MR 1", cadre_notes: "Kunjungan 10 bulan: Imunisasi Campak/MR." },
+          { visit_date: ago(0, 5), weight: 9.7, height: 77.0, muac: 15.5, head_circumference: 45.0, vitamin_a_capsule: "Merah", deworming_pill: true, immunizations: null, cadre_notes: "Kunjungan 13 bulan: Vitamin A Merah 200.000 IU & Obat Cacing." },
+          { visit_date: ago(0, 2), weight: 10.2, height: 80.0, muac: 15.8, head_circumference: 46.0, vitamin_a_capsule: null, deworming_pill: false, immunizations: null, cadre_notes: "Kunjungan 16 bulan: Tumbuh kembang baik, SDIDTK sesuai usia." },
+          { visit_date: ago(0, 0, 5), weight: 10.5, height: 82.0, muac: 16.0, head_circumference: 46.5, vitamin_a_capsule: null, deworming_pill: false, immunizations: "DPT Lanjutan", cadre_notes: "Kunjungan 18 bulan: Penimbangan posyandu, status gizi normal." },
+        ];
+
+        for (const m of alyaMeasurements) {
+          await prisma.childMeasurement.create({
+            data: {
+              child_id: alyaId,
+              ...m,
+            }
+          });
+        }
+      }
+    }
+
+    console.log("=== FULL SEEDING FINISHED SUCCESSFULLY ===");
   } catch (err) {
     console.error("Auto seeding error:", err);
   }

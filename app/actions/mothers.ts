@@ -851,6 +851,8 @@ export async function ensureNakesProfileExists(name: string, phone?: string, pas
 
 export async function ensureIbuProfileExists(name: string, phone?: string, password?: string) {
   try {
+    await seedDatabaseIfEmpty();
+
     const existing = await prisma.mother.findFirst({
       where: {
         OR: [

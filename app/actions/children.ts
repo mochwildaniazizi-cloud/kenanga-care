@@ -97,7 +97,7 @@ export async function getChildrenData() {
         name: child.child_name,
         age: `${ageInMonths} Bulan`,
         rawAge: ageInMonths,
-        gender: child.gender, // 'M' atau 'F'
+        gender: (child.gender === "L" || child.gender === "M") ? "M" : "F",
         birth_place: child.birth_place || "-",
         dob: child.birth_date ? formatDateIndonesian(child.birth_date) : "-",
         mother: child.mother?.mother_name || "-",

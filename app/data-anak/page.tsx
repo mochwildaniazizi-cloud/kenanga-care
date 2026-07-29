@@ -96,7 +96,7 @@ function GenderIcon({ gender, imageUrl }: { gender: string; imageUrl?: string })
       </div>
     );
   }
-  const isMale = gender === "M";
+  const isMale = gender === "M" || gender === "L";
   return (
     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${isMale ? 'bg-gender-male-bg text-gender-male-solid' : 'bg-gender-female-bg text-gender-female-solid'}`}>
       {isMale ? <MdMale className="w-5 h-5" /> : <MdFemale className="w-5 h-5" />}
