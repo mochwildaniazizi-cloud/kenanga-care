@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { resetSystemData, deleteOtherMothersExceptIbuIka } from "@/app/actions/mothers";
+import { resetSystemData, deleteOtherMothersExceptIbuIka, deleteAllMothersFromList } from "@/app/actions/mothers";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,11 +10,16 @@ export async function GET(req: Request) {
     return NextResponse.json(result);
   }
   
+  if (type === "clear_list") {
+    const result = await deleteAllMothersFromList();
+    return NextResponse.json(result);
+  }
+
   const result = await deleteOtherMothersExceptIbuIka();
   return NextResponse.json(result);
 }
 
 export async function POST() {
-  const result = await deleteOtherMothersExceptIbuIka();
+  const result = await deleteAllMothersFromList();
   return NextResponse.json(result);
 }
