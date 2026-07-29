@@ -644,8 +644,26 @@ export async function getLoggedInMotherData(username: string) {
     }
 
     let cleanUsername = username.replace(/\s*\(Demo\)\s*/gi, "").trim();
-    if (cleanUsername.toLowerCase() === "ibu aminah" || cleanUsername.toLowerCase() === "ibu") {
-      cleanUsername = "Siti Aminah";
+    const lowerClean = cleanUsername.toLowerCase();
+    if (lowerClean === "ibu" || lowerClean === "ibu.ika" || lowerClean === "ibu ika" || lowerClean === "ibu aminah" || lowerClean === "08123456789" || lowerClean === "081234567891") {
+      await ensureIbuProfileExists("Ibu Ika");
+      const ikaRecord = await prisma.mother.findFirst({
+        where: { national_id: "IBU-DEFAULT" },
+        include: { children: true }
+      });
+      if (ikaRecord) {
+        return {
+          mother_id: ikaRecord.mother_id,
+          mother_name: ikaRecord.mother_name,
+          national_id: ikaRecord.national_id,
+          avatarUrl: ikaRecord.avatarUrl,
+          children: ikaRecord.children.map((c: any) => ({
+            child_id: c.child_id,
+            child_name: c.child_name,
+            gender: c.gender
+          }))
+        };
+      }
     }
 
     const u = cleanUsername.toLowerCase();
@@ -675,10 +693,10 @@ export async function getLoggedInMotherData(username: string) {
       }
     });
 
-    // Fallback if not found to "Siti Aminah" or first mother in database
+    // Fallback if not found to "Ibu Ika" or first mother in database
     if (!mother) {
       mother = await prisma.mother.findFirst({
-        where: { mother_name: { contains: "Aminah", mode: "insensitive" } },
+        where: { OR: [{ national_id: "IBU-DEFAULT" }, { mother_name: { contains: "Ika", mode: "insensitive" } }] },
         include: { children: true }
       });
     }
@@ -917,12 +935,14 @@ export async function verifyUserLogin(username: string, pass: string, role: "kad
     }
 
     // 3. Bypass default ibu simulation account — ensure DB record exists
-    if (role === "ibu" && (u === "ibu" || u === "ibu.ika" || u === "ibu.ana") && pass === "ibu123") {
+    if (role === "ibu" && (u === "ibu" || u === "ibu.ika" || u === "ibu ika" || u === "ibu.ana" || u === "08123456789" || u === "081234567891") && pass === "ibu123") {
       const ibuProfile = await ensureIbuProfileExists("Ibu Ika");
-      const ibuName = ibuProfile ?
-        ((await prisma.mother.findFirst({ where: { national_id: "IBU-DEFAULT" }, select: { mother_name: true } }))?.mother_name || "Ibu Ika")
-        : "Ibu Ika";
-      return { success: true, name: ibuName, role: "ibu" as const, avatarUrl: ibuProfile?.avatarUrl ?? null };
+      const ikaRecord = await prisma.mother.findFirst({
+        where: { national_id: "IBU-DEFAULT" },
+        select: { mother_name: true, avatarUrl: true }
+      });
+      const ibuName = ikaRecord?.mother_name || "Ibu Ika";
+      return { success: true, name: ibuName, role: "ibu" as const, avatarUrl: ikaRecord?.avatarUrl ?? null };
     }
 
     let cleanU = u;

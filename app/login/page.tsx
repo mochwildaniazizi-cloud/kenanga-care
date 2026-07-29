@@ -188,9 +188,9 @@ export default function LoginPage() {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="font-bold text-base-text-primary">Ibu</span>
+              <span className="font-bold text-base-text-primary">Ibu (Ibu Ika)</span>
               <span>
-                <code className="bg-base-bg px-1.5 py-0.5 rounded font-bold text-base-text-primary">08123456789</code>
+                <code className="bg-base-bg px-1.5 py-0.5 rounded font-bold text-base-text-primary">ibu</code>
                 {" / "}
                 <code className="bg-base-bg px-1.5 py-0.5 rounded font-bold text-base-text-primary">ibu123</code>
               </span>
