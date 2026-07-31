@@ -27,6 +27,13 @@ import { useUserRole } from "@/context/UserRoleContext";
 import { createChildMeasurement, createChild, updateChild } from "@/app/actions/children";
 import { createMaternalRecord, createMother, getLoggedInMotherData, updateMother } from "@/app/actions/mothers";
 import { getRealtimeNotifications } from "@/app/actions/schedule";
+import { 
+  getPendingChildMeasurementsFromDexie, 
+  deletePendingChildMeasurementFromDexie, 
+  getPendingMaternalRecordsFromDexie, 
+  deletePendingMaternalRecordFromDexie 
+} from "@/lib/db/dexieDb";
+
 
 const breadcrumbs: Record<string, { label: string; icon: any; parent?: string; parentLabel?: string }> = {
   "/": { label: "Beranda", icon: HomeIcon },
@@ -314,8 +321,8 @@ export default function Header() {
   };
 
   const runActualSync = async () => {
-    const pendingChildMeas = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
-    const pendingMaternal = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
+    const pendingChildMeas = await getPendingChildMeasurementsFromDexie();
+    const pendingMaternal = await getPendingMaternalRecordsFromDexie();
     const pendingMothers = JSON.parse(localStorage.getItem("pending_create_mothers") || "[]");
     const pendingCreateChildren = JSON.parse(localStorage.getItem("pending_create_children") || "[]");
     const pendingUpdateMothers = JSON.parse(localStorage.getItem("pending_update_mothers") || "[]");
@@ -388,49 +395,35 @@ export default function Header() {
     }
 
     // Sync child measurements
-    const failedChildMeas = [];
     for (const m of pendingChildMeas) {
       try {
         const res = await createChildMeasurement(m);
         if (res.success) {
           syncedCount++;
-        } else {
-          failedChildMeas.push(m);
+          if (m.id) {
+            await deletePendingChildMeasurementFromDexie(m.id);
+          }
         }
       } catch (e) {
         console.error("Failed to sync child measurement offline record:", e);
-        failedChildMeas.push(m);
       }
     }
 
     // Sync maternal records
-    const failedMaternal = [];
     for (const m of pendingMaternal) {
       try {
         const res = await createMaternalRecord(m);
         if (res.success) {
           syncedCount++;
-        } else {
-          failedMaternal.push(m);
+          if (m.id) {
+            await deletePendingMaternalRecordFromDexie(m.id);
+          }
         }
       } catch (e) {
         console.error("Failed to sync maternal offline record:", e);
-        failedMaternal.push(m);
       }
     }
 
-    // Save failed queues back or remove if empty
-    if (failedChildMeas.length > 0) {
-      localStorage.setItem("pending_child_measurements", JSON.stringify(failedChildMeas));
-    } else {
-      localStorage.removeItem("pending_child_measurements");
-    }
-
-    if (failedMaternal.length > 0) {
-      localStorage.setItem("pending_maternal_records", JSON.stringify(failedMaternal));
-    } else {
-      localStorage.removeItem("pending_maternal_records");
-    }
 
     if (failedMothers.length > 0) {
       localStorage.setItem("pending_create_mothers", JSON.stringify(failedMothers));

@@ -7,30 +7,46 @@ export interface PendingMeasurement {
   id?: number;
   child_id: string;
   visit_date: string;
+  weight?: string | number;
   weight_kg?: number;
+  height?: string | number;
   height_cm?: number;
+  head_circumference?: string | number;
   head_circ_cm?: number;
+  muac?: string | number;
   muac_cm?: number;
+  vitamin_a?: string;
+  deworming?: boolean;
+  pmt?: boolean;
+  immunization?: string;
   notes?: string;
-  timestamp: string;
-  synced: boolean;
+  timestamp?: string;
+  synced?: boolean;
 }
 
 export interface PendingMaternalRecord {
   id?: number;
   mother_id: string;
-  screening_date: string;
+  visit_date?: string;
+  screening_date?: string;
+  weight?: string | number;
   weight_kg?: number;
+  blood_pressure?: string;
   systolic_bp?: number;
   diastolic_bp?: number;
+  muac?: string | number;
+  fundal_height?: string | number;
   fundal_height_cm?: number;
   hb_level?: number;
-  fetal_heart_rate?: number;
+  fetal_heart_rate?: string | number;
+  iron_pills_given?: string | number;
   is_high_risk?: boolean;
+  cadre_notes?: string;
   notes?: string;
-  timestamp: string;
-  synced: boolean;
+  timestamp?: string;
+  synced?: boolean;
 }
+
 
 export interface OfflineChildRecord {
   child_id: string;
@@ -143,7 +159,7 @@ export async function removeCacheItem(key: string): Promise<void> {
 /**
  * Enqueues a child anthropometric measurement to Dexie.js (IndexedDB)
  */
-export async function saveChildMeasurementToDexie(payload: Omit<PendingMeasurement, "id" | "timestamp" | "synced">): Promise<void> {
+export async function saveChildMeasurementToDexie(payload: any): Promise<void> {
   if (typeof window === "undefined") return;
   try {
     const db = await getIndexedDB();
@@ -164,7 +180,7 @@ export async function saveChildMeasurementToDexie(payload: Omit<PendingMeasureme
 /**
  * Enqueues a maternal health screening record to Dexie.js (IndexedDB)
  */
-export async function saveMaternalRecordToDexie(payload: Omit<PendingMaternalRecord, "id" | "timestamp" | "synced">): Promise<void> {
+export async function saveMaternalRecordToDexie(payload: any): Promise<void> {
   if (typeof window === "undefined") return;
   try {
     const db = await getIndexedDB();
@@ -263,3 +279,78 @@ export async function getMotherOfflineStateFromDexie(motherId: string): Promise<
     }
   });
 }
+
+/**
+ * Gets all pending child measurements from Dexie.js (IndexedDB)
+ */
+export async function getPendingChildMeasurementsFromDexie(): Promise<any[]> {
+  if (typeof window === "undefined") return [];
+  return new Promise(async (resolve) => {
+    try {
+      const db = await getIndexedDB();
+      if (!db) return resolve([]);
+      const tx = db.transaction("pendingChildMeasurements", "readonly");
+      const req = tx.objectStore("pendingChildMeasurements").getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    } catch (err) {
+      console.error("[Dexie.js] Failed to get pending child measurements:", err);
+      resolve([]);
+    }
+  });
+}
+
+/**
+ * Deletes a pending child measurement from Dexie.js (IndexedDB) by its ID
+ */
+export async function deletePendingChildMeasurementFromDexie(id: number): Promise<void> {
+  if (typeof window === "undefined") return;
+  try {
+    const db = await getIndexedDB();
+    if (db) {
+      const tx = db.transaction("pendingChildMeasurements", "readwrite");
+      tx.objectStore("pendingChildMeasurements").delete(id);
+      console.log("[Dexie.js] Deleted pending child measurement from IndexedDB:", id);
+    }
+  } catch (err) {
+    console.error("[Dexie.js] Failed to delete pending child measurement:", err);
+  }
+}
+
+/**
+ * Gets all pending maternal records from Dexie.js (IndexedDB)
+ */
+export async function getPendingMaternalRecordsFromDexie(): Promise<any[]> {
+  if (typeof window === "undefined") return [];
+  return new Promise(async (resolve) => {
+    try {
+      const db = await getIndexedDB();
+      if (!db) return resolve([]);
+      const tx = db.transaction("pendingMaternalRecords", "readonly");
+      const req = tx.objectStore("pendingMaternalRecords").getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    } catch (err) {
+      console.error("[Dexie.js] Failed to get pending maternal records:", err);
+      resolve([]);
+    }
+  });
+}
+
+/**
+ * Deletes a pending maternal record from Dexie.js (IndexedDB) by its ID
+ */
+export async function deletePendingMaternalRecordFromDexie(id: number): Promise<void> {
+  if (typeof window === "undefined") return;
+  try {
+    const db = await getIndexedDB();
+    if (db) {
+      const tx = db.transaction("pendingMaternalRecords", "readwrite");
+      tx.objectStore("pendingMaternalRecords").delete(id);
+      console.log("[Dexie.js] Deleted pending maternal record from IndexedDB:", id);
+    }
+  } catch (err) {
+    console.error("[Dexie.js] Failed to delete pending maternal record:", err);
+  }
+}
+

@@ -14,6 +14,8 @@ import { getChildrenData, createChildMeasurement } from "@/app/actions/children"
 import { showLocalNotification } from "@/utils/notifications";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import { calculateZScore, getNutritionalStatus } from "@/utils/zScoreCalculator";
+import { saveChildMeasurementToDexie } from "@/lib/db/dexieDb";
+
 
 // Type matching getChildrenData return
 export interface Child {
@@ -209,9 +211,8 @@ export default function InputPenimbanganPage() {
     };
 
     if (!navigator.onLine) {
-      const pending = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
-      pending.push(measurementData);
-      localStorage.setItem("pending_child_measurements", JSON.stringify(pending));
+      await saveChildMeasurementToDexie(measurementData);
+
 
       showLocalNotification("Data Disimpan Offline", {
         body: `Data pemeriksaan untuk ${selectedChild.name} disimpan secara offline.`,
@@ -249,9 +250,8 @@ export default function InputPenimbanganPage() {
       }
     } catch (err) {
       console.error("Error saving child measurement:", err);
-      const pending = JSON.parse(localStorage.getItem("pending_child_measurements") || "[]");
-      pending.push(measurementData);
-      localStorage.setItem("pending_child_measurements", JSON.stringify(pending));
+      await saveChildMeasurementToDexie(measurementData);
+
 
       showLocalNotification("Data Disimpan Offline", {
         body: `Data pemeriksaan untuk ${selectedChild.name} disimpan secara offline.`,

@@ -15,6 +15,8 @@ import { FiArrowLeft } from "react-icons/fi";
 import { getMothersData, createMaternalRecord } from "@/app/actions/mothers";
 import { showLocalNotification } from "@/utils/notifications";
 import CustomDatePicker from "@/components/CustomDatePicker";
+import { saveMaternalRecordToDexie } from "@/lib/db/dexieDb";
+
 
 export interface Mother {
   id: string;
@@ -215,9 +217,8 @@ export default function InputPemeriksaanIbuPage() {
     };
 
     if (!navigator.onLine) {
-      const pending = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
-      pending.push(recordData);
-      localStorage.setItem("pending_maternal_records", JSON.stringify(pending));
+      await saveMaternalRecordToDexie(recordData);
+
       
       setIsSubmitting(false);
       showLocalNotification("Data Ibu Disimpan Offline", {
@@ -249,9 +250,8 @@ export default function InputPemeriksaanIbuPage() {
       }
     } catch (err) {
       console.error(err);
-      const pending = JSON.parse(localStorage.getItem("pending_maternal_records") || "[]");
-      pending.push(recordData);
-      localStorage.setItem("pending_maternal_records", JSON.stringify(pending));
+      await saveMaternalRecordToDexie(recordData);
+
       
       setIsSubmitting(false);
       showLocalNotification("Data Ibu Disimpan Offline", {
